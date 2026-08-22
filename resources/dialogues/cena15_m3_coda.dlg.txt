@@ -1,0 +1,51 @@
+// cena15_m3_coda.dlg.txt
+//
+// Cena 15 "Pergunta amanha", Movimento 3: a coda.
+// Fonte canonica: docs/narrative/comic-reliefs.md, Cena 15 (nenhuma fala alterada).
+//
+// GATILHO: voltar ao caixote nos Dutos DEPOIS do payoff em combate. O payoff em si
+// ("Compila e roda." / "Essa aqui compilou mesmo.") sao DUAS BARKS de combate, nao
+// entram neste grafo: abrir caixa de dialogo no meio da luta por duas linhas seria
+// pior em tudo.
+//
+// FLAG ESCRITA: cena15.m3_done (no ultimo no). Devolve o bordao ao pool de barks e
+// habilita a variante literal.
+//
+// A resposta a pergunta do moleque NUNCA e mostrada. A cena nao e sobre a resposta.
+
+#meta dialogue_id cena15_m3
+#meta default_register warm
+#meta entry n01_caixote
+
+@node n01_caixote
+speaker: terminal
+text: DIALOGUE_CENA15_M3_N01_CAIXOTE
+register: terminal
+-> n02_falou
+
+@node n02_falou
+speaker: moleque
+text: DIALOGUE_CENA15_M3_N02_FALOU
+-> n03_falei
+
+@node n03_falei
+speaker: caua
+text: DIALOGUE_CENA15_M3_N03_FALEI
+-> n04_eamanha
+
+@node n04_eamanha
+speaker: moleque
+text: DIALOGUE_CENA15_M3_N04_EAMANHA
+-> n05_senta
+
+@node n05_senta
+speaker: terminal
+text: DIALOGUE_CENA15_M3_N05_SENTA
+register: terminal
+-> n06_elongo
+
+@node n06_elongo
+speaker: caua
+text: DIALOGUE_CENA15_M3_N06_ELONGO
+on_enter: cena15.m3_done=true
+-> @exit

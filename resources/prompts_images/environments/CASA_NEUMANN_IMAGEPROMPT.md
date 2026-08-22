@@ -1,0 +1,4 @@
+# Casa Neumann (Neumann Home) — image prompt (nano banana)
+
+A stylized low-poly 3D environment, atmospheric establishing shot of a location: the modest ground-floor interior of a small four-room apartment on a quiet street, walls painted a deep night-blue. Sparse worn furniture, industrial headphones hanging on a nail by the door, a single black-and-white photograph of a young woman holding a guitar on the east wall, a back room that once held a confiscated record player now bare. Lived-in, intimate, hushed, tender and a little sad. A working-class family home in an acoustically dead district.
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic domestic. This is a SCENE, not a white-background asset: render with real depth, scale and in-world atmospheric lighting — soft warm interior lamp light through a window, deep blue shadows, gentle volumetric dust, muted navy-and-amber palette. Cozy cinematic establishing composition with shallow depth.

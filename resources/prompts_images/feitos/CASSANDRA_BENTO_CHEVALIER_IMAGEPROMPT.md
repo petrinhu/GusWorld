@@ -1,0 +1,7 @@
+# Cassandra "Bento" Chevalier — image prompt (nano banana)
+
+An extreme chibi super-deformed (SD) figurine of an archivist-scholar woman, styled like a small collectible vinyl figure (Funko Pop / nendoroid). VERY IMPORTANT PROPORTIONS: the head is enormous, round and as large as the entire rest of the body; the whole character is only about three heads tall; tiny torso, very short stubby arms and legs. This is NOT a realistic human body.
+
+She is a present-day keeper of a cathedral cross-glossary, bookish and precise. Her huge round head has a quiet, studious adult-woman face with round brass spectacles, attentive dark eyes, and dark hair gathered into a neat low bun with a brass pin. She wears layered monastic-archivist robes in charcoal-grey and muted teal, with a high collar, brass clasps, and an embroidered stole bearing a small square-and-compass emblem. A leather book-strap crosses her chest; ink-stained fingers, a magnifier on a cord, a folded chart, and a thick knotted rope cord complete the look. Her stubby hands hold a thick leather-bound glossary open, its pages dense with twin columns of glyphs.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic mood. Full body head to feet, centered, facing camera, plain pure-white (#FFFFFF) background, flat even lighting. REMINDER — extreme chibi: gigantic round head equal to whole body, three heads tall, tiny stubby limbs. Do NOT draw realistic adult proportions.

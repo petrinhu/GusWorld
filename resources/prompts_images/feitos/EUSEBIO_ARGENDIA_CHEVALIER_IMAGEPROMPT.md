@@ -1,0 +1,7 @@
+# Eusébio Argéndia-Chevalier — image prompt (nano banana)
+
+An extreme chibi super-deformed (SD) figurine of a practical engineer-codifier man, styled like a small collectible vinyl figure (Funko Pop / nendoroid). VERY IMPORTANT PROPORTIONS: the head is enormous, round and as large as the entire rest of the body; the whole character is only about three heads tall; tiny torso, very short stubby arms and legs. This is NOT a realistic human body.
+
+He is the hands-on co-codifier and life-partner of a master engineer, in an old technical era. His huge round head has an earnest, capable adult-man face with warm dark eyes, a trimmed beard, and dark hair pushed back, a brass loupe headband perched on his brow. He wears workshop-monastic attire: a charcoal and forest-green robe with rolled sleeves under a sturdy weathered brown leather apron studded with tool-loops, fingerless gloves, and a wide tool-belt. Brass gears, a soldering tool, calipers, and a thick knotted rope cord hang at his side. His stubby hands grip a clamped clockwork assembly and a fine brass tool mid-repair, a faint cyan crystal glowing in the mechanism.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic mood. Full body head to feet, centered, facing camera, plain pure-white (#FFFFFF) background, flat even lighting. REMINDER — extreme chibi: gigantic round head equal to whole body, three heads tall, tiny stubby limbs. Do NOT draw realistic adult proportions.

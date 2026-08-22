@@ -1,0 +1,193 @@
+// cena15_m2_intervalo.dlg.txt
+//
+// Cena 15 "Pergunta amanha", Movimento 2: o intervalo.
+// Fonte canonica: docs/narrative/comic-reliefs.md, Cena 15 (nenhuma fala alterada).
+//
+// GATILHO: falar com o Bento na Catedral de Neo-Sylvania com cena15.m1_done escrita.
+//
+// FLAG ESCRITA: cena15.m2_done (no ultimo no).
+//
+// NOTA DE ENCENACAO (nao vira no): durante o intervalo que comeca aqui, o bordao
+// "compila e roda" sai do pool de barks do Caua, junto com o tic de estalar os
+// dedos por empolgacao. O beat mudo da Linda (ela ajusta o fone e olha um segundo
+// a mais, sem falar) NAO foi convertido de proposito: narrar seria apontar, e a
+// regra de ferro da cena e que ninguem comenta.
+//
+// O ECO: a Catedral devolve cada som meio segundo depois. Nos nos n20 e n32 o eco
+// e narrado, e o avanco da caixa faz o atraso acontecer de verdade na mao do
+// jogador.
+
+#meta dialogue_id cena15_m2
+#meta default_register warm
+#meta entry n01_catedral
+
+@node n01_catedral
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N01_CATEDRAL
+register: terminal
+-> n02_mosaico
+
+@node n02_mosaico
+speaker: bento
+text: DIALOGUE_CENA15_M2_N02_MOSAICO
+-> n03_chaointeiro
+
+@node n03_chaointeiro
+speaker: caua
+text: DIALOGUE_CENA15_M2_N03_CHAOINTEIRO
+-> n04_tem
+
+@node n04_tem
+speaker: bento
+text: DIALOGUE_CENA15_M2_N04_TEM
+-> n05_episando
+
+@node n05_episando
+speaker: bento
+text: DIALOGUE_CENA15_M2_N05_EPISANDO
+-> n06_pes
+
+@node n06_pes
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N06_PES
+register: terminal
+-> n07_perguntar
+
+@node n07_perguntar
+speaker: caua
+text: DIALOGUE_CENA15_M2_N07_PERGUNTAR
+-> n08_pergunta
+
+@node n08_pergunta
+speaker: bento
+text: DIALOGUE_CENA15_M2_N08_PERGUNTA
+-> n09_naopergunta
+
+@node n09_naopergunta
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N09_NAOPERGUNTA
+register: terminal
+-> n10_moleque
+
+@node n10_moleque
+speaker: caua
+text: DIALOGUE_CENA15_M2_N10_MOLEQUE
+-> n11_e
+
+@node n11_e
+speaker: bento
+text: DIALOGUE_CENA15_M2_N11_E
+-> n12_amanha
+
+@node n12_amanha
+speaker: caua
+text: DIALOGUE_CENA15_M2_N12_AMANHA
+-> n13_amanhaehoje
+
+@node n13_amanhaehoje
+speaker: caua
+text: DIALOGUE_CENA15_M2_N13_AMANHAEHOJE
+-> n14_limpa
+
+@node n14_limpa
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N14_LIMPA
+register: terminal
+-> n15_nemcompila
+
+@node n15_nemcompila
+speaker: caua
+text: DIALOGUE_CENA15_M2_N15_NEMCOMPILA
+-> n16_falei
+
+@node n16_falei
+speaker: bento
+text: DIALOGUE_CENA15_M2_N16_FALEI
+-> n17_zoando
+
+@node n17_zoando
+speaker: caua
+text: DIALOGUE_CENA15_M2_N17_ZOANDO
+-> n18_para
+
+@node n18_para
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N18_PARA
+register: terminal
+-> n19_nao
+
+@node n19_nao
+speaker: bento
+text: DIALOGUE_CENA15_M2_N19_NAO
+-> n20_eco
+
+@node n20_eco
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N20_ECO
+register: terminal
+-> n21_silencio
+
+@node n21_silencio
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N21_SILENCIO
+register: terminal
+-> n22_palavra
+
+@node n22_palavra
+speaker: bento
+text: DIALOGUE_CENA15_M2_N22_PALAVRA
+-> n23_promessa
+
+@node n23_promessa
+speaker: bento
+text: DIALOGUE_CENA15_M2_N23_PROMESSA
+-> n24_senta
+
+@node n24_senta
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N24_SENTA
+register: terminal
+-> n25_promessadeque
+
+@node n25_promessadeque
+speaker: caua
+text: DIALOGUE_CENA15_M2_N25_PROMESSADEQUE
+-> n26_verdade
+
+@node n26_verdade
+speaker: bento
+text: DIALOGUE_CENA15_M2_N26_VERDADE
+-> n27_naodecido
+
+@node n27_naodecido
+speaker: bento
+text: DIALOGUE_CENA15_M2_N27_NAODECIDO
+-> n28_levanta
+
+@node n28_levanta
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N28_LEVANTA
+register: terminal
+-> n29_bento
+
+@node n29_bento
+speaker: caua
+text: DIALOGUE_CENA15_M2_N29_BENTO
+-> n30_garoto
+
+@node n30_garoto
+speaker: bento
+text: DIALOGUE_CENA15_M2_N30_GAROTO
+-> n31_obrigado
+
+@node n31_obrigado
+speaker: caua
+text: DIALOGUE_CENA15_M2_N31_OBRIGADO
+-> n32_fecho
+
+@node n32_fecho
+speaker: terminal
+text: DIALOGUE_CENA15_M2_N32_FECHO
+register: terminal
+on_enter: cena15.m2_done=true
+-> @exit

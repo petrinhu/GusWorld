@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GusWorld :: Bancada / Montar Mao (mockup)</title>
+<style>
+  :root{
+    --bg:#080b11; --panel:#0d131c; --panel2:#111a26; --line:#1d2c3d;
+    --cyan:#3ad0e0; --cyan-dim:#1c6b74; --ink:#c9d6e2; --ink-dim:#6d8299;
+    --amber:#e0a53a; --violet:#a06be0; --green:#5fe08a; --red:#e05f6b;
+    --slot:#0a1119;
+    --fam-eletrico:#3ad0e0; --fam-termico:#e0703a; --fam-grupo:#e0c93a;
+    --fam-bio:#5fe08a; --fam-anomalia:#a06be0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:
+      repeating-linear-gradient(0deg, rgba(58,208,224,.025) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 80% at 50% -10%, #0e1826 0%, var(--bg) 60%);
+    color:var(--ink);
+    font-family:"PixelOperatorMono","Consolas","DejaVu Sans Mono",ui-monospace,monospace;
+    font-size:14px; letter-spacing:.3px;
+    padding:14px; min-height:100vh;
+  }
+  .frame{max-width:1180px;margin:0 auto;border:1px solid var(--line);
+    background:linear-gradient(180deg,var(--panel) 0%, #0a1017 100%);
+    box-shadow:0 0 0 1px #000, 0 0 40px rgba(58,208,224,.06) inset;}
+  .top{display:flex;align-items:center;gap:14px;padding:10px 14px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#0f1b28,#0b1119)}
+  .brand{color:var(--cyan);text-shadow:0 0 8px rgba(58,208,224,.5);font-weight:bold}
+  .brand small{color:var(--ink-dim);text-shadow:none;font-weight:normal}
+  .who{display:flex;gap:6px;margin-left:8px}
+  .tab{padding:3px 10px;border:1px solid var(--line);background:var(--slot);color:var(--ink-dim);cursor:default;border-radius:2px}
+  .tab.on{border-color:var(--cyan);color:var(--cyan);background:#0b1a22;box-shadow:0 0 10px rgba(58,208,224,.25)}
+  .spacer{flex:1}
+  .cred{color:var(--amber);border:1px solid #3a2f14;background:#150f04;padding:3px 10px;border-radius:2px}
+  .cred b{color:#ffcf5a}
+  .grid{display:grid;grid-template-columns:1.15fr 1fr;gap:0}
+  .col{padding:12px 14px}
+  .col.left{border-right:1px solid var(--line)}
+  .h{display:flex;align-items:baseline;gap:8px;margin:2px 0 10px;color:var(--cyan);text-transform:uppercase;font-size:12px;letter-spacing:1.5px}
+  .h .cap{margin-left:auto;color:var(--ink-dim);font-size:12px;letter-spacing:.5px}
+  .h .cap b{color:var(--ink)}
+  .filters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+  .f{font-size:11px;padding:2px 8px;border:1px solid var(--line);border-radius:10px;color:var(--ink-dim);background:var(--slot)}
+  .f.on{color:#04121a;font-weight:bold}
+  .f[data-k=eletrico].on{background:var(--fam-eletrico);border-color:var(--fam-eletrico)}
+  .f[data-k=termico].on{background:var(--fam-termico);border-color:var(--fam-termico);color:#150a04}
+  .f[data-k=grupo].on{background:var(--fam-grupo);border-color:var(--fam-grupo);color:#151204}
+  .f[data-k=bio].on{background:var(--fam-bio);border-color:var(--fam-bio);color:#04150a}
+  .f[data-k=anom].on{background:var(--fam-anomalia);border-color:var(--fam-anomalia);color:#0f0418}
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:360px;overflow:auto;padding-right:4px}
+  .card{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),#0a1017);
+    border-radius:3px;padding:8px 9px;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--fam,#555)}
+  .card.eletrico{--fam:var(--fam-eletrico)} .card.termico{--fam:var(--fam-termico)}
+  .card.grupo{--fam:var(--fam-grupo)} .card.bio{--fam:var(--fam-bio)} .card.anom{--fam:var(--fam-anomalia)}
+  .card .nm{display:flex;align-items:center;gap:6px;font-weight:bold;color:var(--ink)}
+  .card .mana{margin-left:auto;color:var(--cyan);border:1px solid var(--cyan-dim);border-radius:50%;
+    width:20px;height:20px;display:grid;place-items:center;font-size:12px;background:#04141a}
+  .card .fx{color:var(--ink-dim);font-size:11.5px;margin-top:3px;line-height:1.35}
+  .card .tag{position:absolute;right:6px;bottom:5px;font-size:9.5px;color:var(--ink-dim);letter-spacing:.5px}
+  .card.inhand{opacity:.4}
+  .card.inhand .nm::after{content:" [na mao]";color:var(--green);font-weight:normal;font-size:10px}
+  .handwrap{display:flex;flex-direction:column;gap:10px}
+  .slotrow{display:flex;gap:8px;flex-wrap:wrap}
+  .slot{width:118px;height:74px;border:1px dashed var(--line);border-radius:3px;background:var(--slot);
+    display:flex;flex-direction:column;justify-content:center;padding:7px 8px;position:relative}
+  .slot.filled{border-style:solid}
+  .slot.filled::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--fam,#555)}
+  .slot.eletrico{--fam:var(--fam-eletrico)} .slot.grupo{--fam:var(--fam-grupo)} .slot.bio{--fam:var(--fam-bio)}
+  .slot .sn{font-weight:bold;font-size:12.5px}
+  .slot .sm{color:var(--ink-dim);font-size:10.5px;margin-top:2px}
+  .slot .mchip{position:absolute;right:6px;top:5px;color:var(--cyan);font-size:11px}
+  .slot.empty{color:var(--ink-dim);align-items:center;text-align:center;font-size:11px}
+  .slot.special{border-color:var(--violet);background:#120a1c}
+  .slot.special.empty{color:#7d5aa8}
+  .slot.special.filled::before{background:var(--violet)}
+  .lbl{font-size:11px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+  .lbl b{color:var(--violet)}
+  .lbl .r{float:right;color:var(--ink)}
+  .curve{border:1px solid var(--line);background:var(--slot);border-radius:3px;padding:9px 10px}
+  .curve .bars{display:flex;align-items:flex-end;gap:10px;height:56px;margin-top:6px}
+  .bars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-dim);font-size:10px}
+  .bars .bar{width:100%;background:linear-gradient(180deg,var(--cyan),#0c4a52);border-radius:2px 2px 0 0;min-height:3px}
+  .dead{border:1px solid #33202a;background:#12090d;border-radius:3px;padding:9px 11px}
+  .dead .h{color:var(--red)}
+  .deadrow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+  .dchip{font-size:11px;padding:2px 8px;border:1px solid #3a2530;border-radius:2px;color:#c98f9b;background:#170a10;text-decoration:line-through}
+  .actions{display:flex;gap:8px;margin-top:8px}
+  .btn{font-family:inherit;font-size:12px;padding:6px 12px;border:1px solid var(--cyan-dim);background:#08151a;color:var(--cyan);border-radius:2px;cursor:default}
+  .btn.warn{border-color:#5a3a1a;background:#160f05;color:var(--amber)}
+  .msg{margin-top:8px;font-size:11px;color:var(--green);border-left:2px solid var(--green);padding:4px 9px;background:#07130c;line-height:1.4}
+  .foot{border-top:1px solid var(--line);padding:8px 14px;color:var(--ink-dim);font-size:11px;display:flex;gap:14px}
+  .foot b{color:var(--ink)}
+  .k{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="top">
+    <span class="brand">GUS.WORLD <small>// tavus-drive :: BANCADA</small></span>
+    <span class="who">
+      <span class="tab on">GUS</span>
+      <span class="tab">Caua</span>
+      <span class="tab">Iara</span>
+      <span class="tab">Bento</span>
+      <span class="tab">Linda</span>
+      <span class="tab">Jaci</span>
+    </span>
+    <span class="spacer"></span>
+    <span class="cred">creditos <b>1 597</b></span>
+  </div>
+
+  <div class="grid">
+
+    <div class="col left">
+      <div class="h">Deck ativo <span class="cap">bolsa <b>21</b>/<b>34</b></span></div>
+      <div class="filters">
+        <span class="f on" data-k="all" style="border-color:var(--cyan);color:var(--cyan)">todas</span>
+        <span class="f" data-k="eletrico">eletrico</span>
+        <span class="f" data-k="termico">termico</span>
+        <span class="f" data-k="grupo">grupo</span>
+        <span class="f" data-k="bio">biologico</span>
+        <span class="f" data-k="anom">anomalia</span>
+      </div>
+      <div class="cards">
+        <div class="card eletrico inhand"><div class="nm">Descarga.exe <span class="mana">1</span></div><div class="fx">dano eletrico simples</div><div class="tag">COMUM</div></div>
+        <div class="card grupo inhand"><div class="nm">Broadcast.sh <span class="mana">3</span></div><div class="fx">dano em area, todos os alvos</div><div class="tag">COMUM</div></div>
+        <div class="card bio"><div class="nm">Patch-Vida <span class="mana">2</span></div><div class="fx">cura HP de 1 aliado</div><div class="tag">COMUM</div></div>
+        <div class="card termico"><div class="nm">Overclock <span class="mana">2</span></div><div class="fx">+dano no proximo golpe</div><div class="tag">COMUM</div></div>
+        <div class="card eletrico"><div class="nm">Ping.util <span class="mana">1</span></div><div class="fx">revela HP + familia do alvo</div><div class="tag">COMUM</div></div>
+        <div class="card anom"><div class="nm">Nullptr <span class="mana">2</span></div><div class="fx">chance de anular buff inimigo</div><div class="tag">COMUM</div></div>
+        <div class="card grupo inhand"><div class="nm">Firewall <span class="mana">2</span></div><div class="fx">escudo pra party</div><div class="tag">COMUM</div></div>
+        <div class="card bio"><div class="nm">Daemon-Regen <span class="mana">3</span></div><div class="fx">regenera ao longo dos turnos</div><div class="tag">COMUM</div></div>
+        <div class="card termico"><div class="nm">Throttle <span class="mana">1</span></div><div class="fx">reduz SPD do inimigo</div><div class="tag">COMUM</div></div>
+        <div class="card eletrico"><div class="nm">Stack-Bounce <span class="mana">2</span></div><div class="fx">dano que salta 1 vez</div><div class="tag">COMUM</div></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="handwrap">
+
+        <div>
+          <div class="lbl">Mao comum <span class="r">4 / <b style="color:var(--cyan)">5</b> slots</span></div>
+          <div class="slotrow">
+            <div class="slot filled eletrico"><span class="mchip">1</span><div class="sn">Descarga.exe</div><div class="sm">dano eletrico</div></div>
+            <div class="slot filled grupo"><span class="mchip">3</span><div class="sn">Broadcast.sh</div><div class="sm">dano em area</div></div>
+            <div class="slot filled grupo"><span class="mchip">2</span><div class="sn">Firewall</div><div class="sm">escudo party</div></div>
+            <div class="slot filled bio"><span class="mchip">2</span><div class="sn">Patch-Vida</div><div class="sm">cura aliado</div></div>
+            <div class="slot empty">+ vazio<br><span style="font-size:9px">(clique uma carta)</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="lbl"><b>Slots especiais</b> (so do Gus) <span class="r">1 / <b style="color:var(--violet)">2</b></span></div>
+          <div class="slotrow">
+            <div class="slot special filled"><span class="mchip" style="color:var(--violet)">8</span><div class="sn" style="color:#d9b8ff">Tesla</div><div class="sm">cadeia eletrica (1x/batalha)</div></div>
+            <div class="slot special empty">+ especial<br><span style="font-size:9px">(Einstein, Planck, John Dee...)</span></div>
+          </div>
+        </div>
+
+        <div class="curve">
+          <div class="lbl" style="margin:0">Curva de mana da mao</div>
+          <div class="bars">
+            <div class="b"><div class="bar" style="height:20%"></div>1</div>
+            <div class="b"><div class="bar" style="height:55%"></div>2</div>
+            <div class="b"><div class="bar" style="height:35%"></div>3</div>
+            <div class="b"><div class="bar" style="height:8%"></div>4</div>
+            <div class="b"><div class="bar" style="height:60%"></div>5+</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col" style="border-top:1px solid var(--line);padding:12px 14px">
+    <div class="dead">
+      <div class="h">Deck morto <span class="cap" style="color:#c98f9b">one-way, nao volta, <b style="color:#e6b3bf">3</b>/<b style="color:#e6b3bf">8</b></span></div>
+      <div class="deadrow">
+        <span class="dchip">Kernel-Panic.old</span>
+        <span class="dchip">Buffer-Leak</span>
+        <span class="dchip">Legacy.dll</span>
+      </div>
+      <div class="actions">
+        <span class="btn warn">Upload ao commons: +3 creditos</span>
+        <span class="btn">Comerciar com NPC / loja</span>
+      </div>
+      <div class="msg">// seu codigo foi enviado ao repositorio-commons e sera reusado por devs precisando de ideia: voce recebeu <b>3 creditos</b> por essa doacao.</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><span class="k">[&lt;&gt;]</span> personagem</span>
+    <span><span class="k">[A]</span> add a mao</span>
+    <span><span class="k">[X]</span> mandar p/ deck morto</span>
+    <span><span class="k">[U]</span> upload</span>
+    <span class="spacer" style="flex:1"></span>
+    <span>loadout deterministico, sem sorteio, <b>mao fixa fora do combate</b> (swap em batalha custa 1 acao)</span>
+  </div>
+
+</div>
+</body>
+</html>

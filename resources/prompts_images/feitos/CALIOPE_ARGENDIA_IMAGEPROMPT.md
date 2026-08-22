@@ -1,0 +1,7 @@
+# Calíope Argéndia — image prompt (nano banana)
+
+An extreme chibi super-deformed (SD) figurine of a sharp-eyed council strategist woman from an ancient medieval-monastic age, styled like a small collectible vinyl figure (Funko Pop / nendoroid). VERY IMPORTANT PROPORTIONS: the head is enormous, round and as large as the entire rest of the body; the whole character is only about three heads tall; tiny torso, very short stubby arms and legs. This is NOT a realistic human body.
+
+She is a senior cantor-lector and internal strategist of a stone-and-brass monastic order, shrewd and watchful. Her huge round head has a composed, calculating adult-woman face with keen narrowed eyes and dark hair coiled into an elaborate braided crown threaded with thin brass wire. She wears layered medieval-monastic ceremonial robes in deep wine-red and charcoal, with a high embroidered collar, brass clasps, and a long stole bearing a small embroidered square-and-compass emblem. A thick knotted rope cord and a sprig of acacia leaves hang at her waist. Her stubby hands hold a sealed scroll and a small brass seal-stamp. No modern cyber elements — this is an old medieval-monastic era.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber gothic mood. Full body head to feet, centered, facing camera, plain pure-white (#FFFFFF) background, flat even lighting. REMINDER — extreme chibi: gigantic round head equal to whole body, three heads tall, tiny stubby limbs. Do NOT draw realistic adult proportions.

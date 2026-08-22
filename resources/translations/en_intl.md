@@ -1,0 +1,895 @@
+# en_intl.md, international English translations
+
+> Locale fallback international. **VALUES VAZIOS até pós-release v1.0.0** (canon: dev em pt-br, tradução en-intl pós-launch).
+>
+> Paridade estrutural com pt_br.md obrigatória: toda key em pt_br.md MUST existir aqui (valor vazio aceito durante G1).
+>
+> Formato: `## CHAVE_UPPER_SNAKE` + valor abaixo. Ver engine/foundation/localization/MdTranslationLoader.cs.
+>
+> Última revisão: 2026-05-19.
+
+---
+
+## §1. Main menu
+
+## MENU_START_GAME
+
+## MENU_CONTINUE
+
+## MENU_NEW_GAME
+
+## MENU_LOAD_GAME
+
+## MENU_SAVE_GAME
+
+## MENU_OPTIONS
+
+## MENU_CREDITS
+
+## MENU_QUIT
+
+## MENU_QUIT_CONFIRM
+
+## MENU_QUIT_CONFIRM_YES
+
+## MENU_QUIT_CONFIRM_NO
+
+---
+
+## §2. Settings (accessibility canon CONTRACT §6)
+
+## SETTINGS_TITLE
+
+## SETTINGS_VIDEO
+
+## SETTINGS_AUDIO
+
+## SETTINGS_CONTROLS
+
+## SETTINGS_ACCESSIBILITY
+
+## SETTINGS_LANGUAGE
+
+## SETTINGS_BACK
+
+## SETTINGS_APPLY
+
+## SETTINGS_REVERT
+
+## SETTINGS_RESET_DEFAULTS
+
+---
+
+## §3. Accessibility (4 D1 gates canon)
+
+## A11Y_REMAP_CONTROLS
+
+## A11Y_REMAP_KEYBOARD
+
+## A11Y_REMAP_GAMEPAD
+
+## A11Y_REDUCE_MOTION
+
+## A11Y_REDUCE_MOTION_DESC
+
+## A11Y_SUBTITLES
+
+## A11Y_CLOSED_CAPTIONS
+
+## A11Y_SUBTITLE_SIZE
+
+## A11Y_SUBTITLE_SIZE_SMALL
+
+## A11Y_SUBTITLE_SIZE_MEDIUM
+
+## A11Y_SUBTITLE_SIZE_LARGE
+
+## A11Y_SUBTITLE_BG
+
+---
+
+## §4. Save / Load
+
+## SAVE_SLOT_EMPTY
+
+## SAVE_SLOT_LABEL
+
+## SAVE_SLOT_AUTO_NAME
+
+## SAVE_SLOT_READONLY_TAG
+
+## SAVE_TIMESTAMP_LABEL
+
+## SAVE_LOCATION_LABEL
+
+## SAVE_PLAYTIME_LABEL
+
+## SAVE_XP_LABEL
+
+## SAVE_CHAPTER_LABEL
+
+## SAVE_SCREEN_TITLE_SAVE
+
+## SAVE_SCREEN_TITLE_LOAD
+
+## SAVE_SCREEN_SUBTITLE_SAVE
+
+## SAVE_SCREEN_SUBTITLE_LOAD
+
+## SAVE_SCREEN_FOOTER_SAVE
+
+## SAVE_SCREEN_FOOTER_LOAD
+
+## SAVE_CONFIRM_OVERWRITE
+
+## SAVE_OVERWRITE_CONFIRM_YES
+
+## SAVE_OVERWRITE_CONFIRM_NO
+
+## SAVE_CONFIRM_EMPTY
+
+## SAVE_EMPTY_CONFIRM_YES
+
+## SAVE_EMPTY_CONFIRM_NO
+
+## SAVE_SUCCESS
+
+## SAVE_FAILED
+
+## SAVE_CONFIRM_DELETE
+
+## SAVE_DELETE_CONFIRM_YES
+
+## SAVE_DELETE_CONFIRM_NO
+
+## SAVE_DELETE_BUTTON_LABEL
+
+## SAVE_LOAD_WARN_DAMAGED
+
+## SAVE_LOAD_WARN_VERSION
+
+## SAVE_LOAD_RECOVER_TRY
+
+## SAVE_LOAD_RECOVER_FAILED
+
+## SAVE_LOAD_SLOT_DAMAGED_LABEL
+
+## SAVE_LOAD_SLOT_VERSION_LABEL
+
+## SAVE_LOAD_WARN_CANCEL
+
+## SAVE_LOAD_WARN_CONTROLS_DIFF
+
+## SAVE_LOAD_CONTROLS_USE_SAVE
+
+## SAVE_LOAD_CONTROLS_KEEP_CURRENT
+
+## LOAD_CONFIRM
+
+## LOAD_SUCCESS
+
+## LOAD_FAILED
+
+## LOAD_MIGRATION_REQUIRED
+
+## LOCATION_PRACA_COMPILACAO
+
+## LOCATION_UNKNOWN
+
+---
+
+## §4b. Title screen (SAVE-LOAD-UI step 4)
+
+## TITLE_LOGO_PREFIX
+
+## TITLE_LOGO_SUFFIX
+
+## TITLE_SUBTITLE
+
+## TITLE_FOOTER_HINT
+
+## TITLE_NEW_GAME_CONFIRM
+
+## TITLE_NEW_GAME_CONFIRM_YES
+
+## TITLE_NEW_GAME_CONFIRM_NO
+
+---
+
+## §4c. Difficulty selection screen (MODOS-MORTE Phase 0)
+
+## SAVE_DIFFICULTY_TITLE
+
+## SAVE_DIFFICULTY_HINT
+This choice is permanent for this save. To play differently, start a new save.
+
+## SAVE_DIFFICULTY_FACIL_LABEL
+
+## SAVE_DIFFICULTY_FACIL_DESC
+If you lose, you return to your last save.
+
+## SAVE_DIFFICULTY_MEDIO_LABEL
+
+## SAVE_DIFFICULTY_MEDIO_BADGE
+Recommended
+
+## SAVE_DIFFICULTY_MEDIO_DESC
+If you lose, you wake up at the Hospital. Costs a bit of credit.
+
+## SAVE_DIFFICULTY_DIFICIL_LABEL
+
+## SAVE_DIFFICULTY_DIFICIL_DESC
+If you lose, you wake up far away and badly weakened. You recover gradually.
+
+## SAVE_DIFFICULTY_HARDCORE_LABEL
+
+## SAVE_DIFFICULTY_HARDCORE_DESC_LOCKED
+
+## SAVE_DIFFICULTY_HARDCORE_DESC_UNLOCKED
+
+## SAVE_DIFFICULTY_HARDCORE_BADGE_LOCKED
+
+## SAVE_DIFFICULTY_CONFIRM_TITLE_FACIL
+Play on Easy?
+
+## SAVE_DIFFICULTY_CONFIRM_TITLE_MEDIO
+Play on Normal?
+
+## SAVE_DIFFICULTY_CONFIRM_TITLE_DIFICIL
+Play on Hard?
+
+## SAVE_DIFFICULTY_CONFIRM_BODY
+This applies to the whole save and never changes once you start. To play differently, just start a new save anytime.
+
+## SAVE_DIFFICULTY_CONFIRM_YES_FACIL
+Yes, play on Easy
+
+## SAVE_DIFFICULTY_CONFIRM_YES_MEDIO
+Yes, play on Normal
+
+## SAVE_DIFFICULTY_CONFIRM_YES_DIFICIL
+Yes, play on Hard
+
+## SAVE_DIFFICULTY_CONFIRM_NO
+Cancel
+
+## SAVE_DIFFICULTY_FOOTER_HINT
+
+## §5. HUD + combat (placeholders)
+
+## HUD_HP_LABEL
+
+## HUD_AP_LABEL
+
+## HUD_MANA_LABEL
+
+## HUD_ACTION_LABEL
+
+## HUD_TURN_LABEL
+
+## COMBAT_PLAYER_TURN
+
+## COMBAT_ENEMY_TURN
+
+## COMBAT_BANNER_BATTLE
+
+## COMBAT_INTRO_ENCARAR
+
+## COMBAT_INTRO_AUTORESOLVE
+
+## COMBAT_BANNER_PLAYER_TURN
+
+## COMBAT_BANNER_ENEMY_TURN
+
+## COMBAT_BANNER_CHOOSE_ACTOR
+
+## COMBAT_SELECT_TARGET
+
+## COMBAT_VICTORY
+
+## COMBAT_DEFEAT
+
+## COMBAT_DEFEAT_BARK
+
+## COMBAT_DEFEAT_BARK_GENERIC
+
+## COMBAT_DEFEAT_CHESS_NOTE
+
+## COMBAT_FLEE
+
+## COMBAT_FLEE_FAILED
+
+## COMBAT_FLEE_SUCCESS
+
+## COMBAT_PANEL_ENEMIES
+
+## COMBAT_PANEL_ACTIONS
+
+## COMBAT_PANEL_HAND
+
+## COMBAT_ACTION_ATTACK
+
+## COMBAT_ACTION_DEFEND
+
+## COMBAT_ACTION_SCAN
+
+## COMBAT_ACTION_GAMBIT_PREDICT
+
+## COMBAT_ACTION_GAMBIT_REORDER
+
+## COMBAT_VERB_GAMBITO
+
+## COMBAT_VERB_COMPILAR
+
+## COMBAT_ACTION_USE_CARD
+
+## COMBAT_ACTION_PASS
+
+## COMBAT_ACTION_RESTART
+
+## COMBAT_TURN_ROUND
+
+## COMBAT_LOG_ACTION
+
+## COMBAT_LOG_ACTION_NOTARGET
+
+## COMBAT_LOG_STATUS_APPLIED
+
+## COMBAT_LOG_STATUS_EXPIRED
+
+## COMBAT_LOG_DEFEATED
+
+## COMBAT_LOG_INCAPACITATED
+
+## COMBAT_LOG_COMPILED
+
+## COMBAT_LOG_COMPILE_ERROR
+
+## COMBAT_LOG_COMPILE_UNAVAILABLE
+COMPILE: compiler module offline.
+## COMBAT_LOG_AUTORESOLVE_UNAVAILABLE
+RESOLVE WITHOUT FACING: routine offline.
+## COMBAT_LOG_GAMBIT_UNAVAILABLE
+GAMBIT: prediction offline.
+## COMBAT_ACTOR_RESOURCES
+
+---
+
+## §6. Dialogue (placeholders)
+
+## DIALOGUE_CONTINUE
+
+## DIALOGUE_CHOICE_PROMPT
+
+## DIALOGUE_GUS_INTRO_001
+
+## DIALOGUE_GUS_INTRO_002
+
+### NPC Bertoldo (M7-DIALOGO, npc_intro) — values empty until post-v1.0.0 (canon)
+
+## DIALOGUE_NPC_INTRO_N0_GREET
+
+## DIALOGUE_NPC_INTRO_N1_HOOK
+
+## DIALOGUE_NPC_INTRO_CHOICE_CURIOSO
+
+## DIALOGUE_NPC_INTRO_CHOICE_PRAGMATICO
+
+## DIALOGUE_NPC_INTRO_CHOICE_SECO
+
+## DIALOGUE_NPC_INTRO_N2A_CURIOSO
+
+## DIALOGUE_NPC_INTRO_N2B_PRAGMATICO
+
+## DIALOGUE_NPC_INTRO_N2C_SECO
+
+## DIALOGUE_NPC_INTRO_N3_RECONVERGE
+
+---
+
+
+### Scene 15 (comic-reliefs), in-game form
+
+> Convertida da prosa de `docs/narrative/comic-reliefs.md` (Cena 15) em 2026-07-28.
+> Falas no registro `warm`; narração no registro `terminal`, speaker `terminal`.
+> Três arquivos em `resources/dialogues/`: `cena15_m1_pergunta`, `cena15_m2_intervalo`, `cena15_m3_coda`.
+
+## DIALOGUE_CENA15_M1_N01_ABERTURA
+The Infernal Ducts, in the block being rebuilt. Makeshift scaffolding, new cable run over the burnt one. Cauã is teaching five kids sitting on crates, and the smallest one won't leave his side.
+
+## DIALOGUE_CENA15_M1_N02_ESCREVE
+Write the step. Say what you want. She gets it.
+
+## DIALOGUE_CENA15_M1_N03_ERRADO
+And if I write it wrong?
+
+## DIALOGUE_CENA15_M1_N04_PERDOA
+She forgives. You fix it later.
+
+## DIALOGUE_CENA15_M1_N05_JAESCREVE
+The smallest one starts writing before Cauã finishes talking.
+
+## DIALOGUE_CENA15_M1_N06_PRONTO
+Done.
+
+## DIALOGUE_CENA15_M1_N07_LEITURA
+Cauã reads over his shoulder.
+
+## DIALOGUE_CENA15_M1_N08_LIGATUDO
+You wrote "turn everything on".
+
+## DIALOGUE_CENA15_M1_N09_EQUEEUQUERO
+That's what I want.
+
+## DIALOGUE_CENA15_M1_N10_TUDOOQUE
+Everything what?
+
+## DIALOGUE_CENA15_M1_N11_TUDO
+Everything.
+
+## DIALOGUE_CENA15_M1_N12_APAGA
+Delete the "everything".
+
+## DIALOGUE_CENA15_M1_N13_RIEM
+The other kids laugh. The smallest one doesn't find it funny at all, and erases it with great seriousness.
+
+## DIALOGUE_CENA15_M1_N14_CONSERTAR
+And if I don't know how to fix it?
+
+## DIALOGUE_CENA15_M1_N15_MECHAMA
+Then you call me.
+
+## DIALOGUE_CENA15_M1_N16_NAOESTIVER
+And if you're not there?
+
+## DIALOGUE_CENA15_M1_N17_OLHABLOCO
+Cauã stops. He looks at the kid. Then he looks at the block around them, which two weeks ago had more people sitting in it.
+
+## DIALOGUE_CENA15_M1_N18_OUTRO
+Then you call someone else. There's always someone else.
+
+## DIALOGUE_CENA15_M1_N19_ACEITA
+The kid accepts the answer right away, the way only an eight-year-old can. He goes back to writing. Cauã lets out his breath.
+
+## DIALOGUE_CENA15_M1_N20_CAUA
+Cauã.
+
+## DIALOGUE_CENA15_M1_N21_OI
+Yeah.
+
+## DIALOGUE_CENA15_M1_N22_COMPILAR
+What does compile mean?
+
+## DIALOGUE_CENA15_M1_N23_SILENCIO
+Silence. One of the older kids looks up, curious, because he never asked either.
+
+## DIALOGUE_CENA15_M1_N24_EQUANDO
+It's when...
+
+## DIALOGUE_CENA15_M1_N25_NAOCONTINUA
+The sentence doesn't continue.
+
+## DIALOGUE_CENA15_M1_N26_AMANHA
+Ask me tomorrow.
+
+## DIALOGUE_CENA15_M1_N27_SAIDA
+He puts the stylus away and leaves slowly. His hand stays still the whole way. None of the kids find that strange: Cauã always comes back.
+
+## DIALOGUE_CENA15_M2_N01_CATEDRAL
+The Cathedral of Neo-Sylvania, late afternoon. The echo gives every footstep back half a second later. Cauã walks in and hates the place immediately. Bento is sitting on a step, cleaning one of the shield's gears with a rag, and doesn't look up.
+
+## DIALOGUE_CENA15_M2_N02_MOSAICO
+You are standing on the mosaic.
+
+## DIALOGUE_CENA15_M2_N03_CHAOINTEIRO
+There's mosaic on the whole floor.
+
+## DIALOGUE_CENA15_M2_N04_TEM
+There is.
+
+## DIALOGUE_CENA15_M2_N05_EPISANDO
+And you are standing on it.
+
+## DIALOGUE_CENA15_M2_N06_PES
+Cauã looks down at his own feet. He takes a step to the side. It doesn't help. He gives up.
+
+## DIALOGUE_CENA15_M2_N07_PERGUNTAR
+I gotta ask you something.
+
+## DIALOGUE_CENA15_M2_N08_PERGUNTA
+Ask.
+
+## DIALOGUE_CENA15_M2_N09_NAOPERGUNTA
+Cauã doesn't ask. Bento keeps cleaning the gear and doesn't help. A good few seconds go by, and the echo gives nothing back, because nobody spoke.
+
+## DIALOGUE_CENA15_M2_N10_MOLEQUE
+A kid asked me something yesterday.
+
+## DIALOGUE_CENA15_M2_N11_E
+And?
+
+## DIALOGUE_CENA15_M2_N12_AMANHA
+And I told him to ask me tomorrow.
+
+## DIALOGUE_CENA15_M2_N13_AMANHAEHOJE
+Tomorrow is today.
+
+## DIALOGUE_CENA15_M2_N14_LIMPA
+Bento cleans the gear.
+
+## DIALOGUE_CENA15_M2_N15_NEMCOMPILA
+You said mine doesn't even compile.
+
+## DIALOGUE_CENA15_M2_N16_FALEI
+I did.
+
+## DIALOGUE_CENA15_M2_N17_ZOANDO
+Were you messing with me?
+
+## DIALOGUE_CENA15_M2_N18_PARA
+Bento stops cleaning. He sets the rag down in his lap.
+
+## DIALOGUE_CENA15_M2_N19_NAO
+No.
+
+## DIALOGUE_CENA15_M2_N20_ECO
+The echo gives the no back half a second later. Cauã hears it twice.
+
+## DIALOGUE_CENA15_M2_N21_SILENCIO
+Bento doesn't add anything, and the pause goes past the point where adding something would still be comfortable.
+
+## DIALOGUE_CENA15_M2_N22_PALAVRA
+But you say the word every day.
+
+## DIALOGUE_CENA15_M2_N23_PROMESSA
+That is not a lie, lad. It is a promise.
+
+## DIALOGUE_CENA15_M2_N24_SENTA
+Cauã sits on the step, two below him. He doesn't ask permission. Bento doesn't complain.
+
+## DIALOGUE_CENA15_M2_N25_PROMESSADEQUE
+A promise of what?
+
+## DIALOGUE_CENA15_M2_N26_VERDADE
+That one day the word will be true in your mouth.
+
+## DIALOGUE_CENA15_M2_N27_NAODECIDO
+That is not mine to decide.
+
+## DIALOGUE_CENA15_M2_N28_LEVANTA
+Cauã sits with that for a while. Then he gets up and leaves. Halfway down the nave, he stops.
+
+## DIALOGUE_CENA15_M2_N29_BENTO
+Bento.
+
+## DIALOGUE_CENA15_M2_N30_GAROTO
+Lad.
+
+## DIALOGUE_CENA15_M2_N31_OBRIGADO
+Thank you.
+
+## DIALOGUE_CENA15_M2_N32_FECHO
+Bento doesn't answer. He waits for the echo to give the word back, and only then goes back to cleaning the gear.
+
+## DIALOGUE_CENA15_M3_N01_CAIXOTE
+The Infernal Ducts, later. The kid is sitting on the same crate, with the same stylus.
+
+## DIALOGUE_CENA15_M3_N02_FALOU
+You told me to ask you tomorrow.
+
+## DIALOGUE_CENA15_M3_N03_FALEI
+I did.
+
+## DIALOGUE_CENA15_M3_N04_EAMANHA
+It's tomorrow.
+
+## DIALOGUE_CENA15_M3_N05_SENTA
+Cauã sits down next to him on the crate.
+
+## DIALOGUE_CENA15_M3_N06_ELONGO
+Then sit properly, because this takes a while.
+
+## §7. Errors + system messages
+
+## ERROR_GENERIC
+
+## ERROR_FILE_NOT_FOUND
+
+## ERROR_INVALID_SAVE
+
+## ERROR_SAVE_VERSION_NEWER
+
+## INFO_AUTOSAVE
+
+## INFO_AUTOSAVE_DONE
+
+---
+
+## §8. Combat data names (cards, status, families, combos)
+
+> Structural parity with pt_br.md §8 (values empty until post-v1.0.0).
+
+### Card families (FAMILY_<id>_NAME)
+
+## FAMILY_ELETRICO_NAME
+
+## FAMILY_BIOQUIMICO_NAME
+
+## FAMILY_SONICO_NAME
+
+## FAMILY_CINETICO_NAME
+
+## FAMILY_CRIPTOGRAFICO_NAME
+
+### Status (STATUS_<id>_NAME)
+
+## STATUS_STUN_NAME
+
+## STATUS_POISON_NAME
+
+## STATUS_CORRODE_NAME
+
+## STATUS_DISRUPT_NAME
+
+## STATUS_SILENCE_NAME
+
+## STATUS_KNOCKBACK_NAME
+
+## STATUS_BREAK_NAME
+
+## STATUS_EXPOSE_NAME
+
+## STATUS_DECRYPT_NAME
+
+## STATUS_SHIELD_NAME
+
+## STATUS_REGEN_NAME
+
+## STATUS_HASTE_NAME
+
+## STATUS_SLOW_NAME
+
+## STATUS_SOBRECARGATERMICA_NAME
+
+## STATUS_RESFRIAMENTO_NAME
+
+## STATUS_REFLECT_NAME
+
+## STATUS_BLINDAGEMEM_NAME
+
+## STATUS_NULLPROOF_NAME
+
+## STATUS_SCRYING_NAME
+
+## STATUS_ECO_NAME
+Mold
+
+## STATUS_PROVOCADO_NAME
+
+### Curated combos (COMBO_<comboId>_NAME)
+
+## COMBO_PULSO_STREAM_NAME
+
+## COMBO_RAIZ_NULL_NAME
+
+### Actor names for the slice (ACTOR_<id_upper>)
+
+## ACTOR_GUS
+
+## ACTOR_CAUA
+
+## ACTOR_JACI
+
+## ACTOR_BERTOLDO
+
+## ACTOR_SENTINELA_BIT
+
+## ACTOR_DAEMON_GUARD
+
+### Slice placeholder cards (CARD_<id>_NAME)
+
+## CARD_PULSO_ELETRICO_NAME
+
+## CARD_SCAN_BASICO_NAME
+
+### System menu (pause + sound config, MENU-PAUSA-CONFIG-SOM)
+
+## MENU_SYSTEM_KICKER
+
+## MENU_PAUSE_TITLE
+
+## MENU_PAUSE_HINT
+
+## SETTINGS_MUSIC_VOLUME
+
+## SETTINGS_SFX_VOLUME
+
+## MENU_PLACEHOLDER_TEXT
+
+## MENU_TO_TITLE
+
+## MENU_TO_TITLE_CONFIRM_TITLE
+
+## MENU_TO_TITLE_CONFIRM_YES
+
+## MENU_TO_TITLE_CONFIRM_NO
+
+## CARD_RAIZ_CURA_NAME
+
+### Master special cards (techMagic executor, ADR-016; effect nickname, provisional)
+
+## CARD_EXEC_VOLTA_NAME
+Volt-Leech
+
+## CARD_EXEC_NEWTON_NAME
+Force-Law
+
+## CARD_EXEC_PYTHAGORAS_NAME
+Hypotenuse
+
+## CARD_EXEC_MANDELBROT_NAME
+Fractal-Echo
+
+## CARD_EXEC_ADA_NAME
+Re-Run
+
+## CARD_EXEC_GODEL_NAME
+Null-Proof
+
+## CARD_EXEC_FARADAY_NAME
+EM-Shield
+
+## CARD_EXEC_EULER_NAME
+Bridge-Walk
+
+## CARD_EXEC_TURING_NAME
+Decrypt-All
+
+## CARD_EXEC_MENGER_NAME
+Barter
+
+## CARD_EXEC_TESLA_NAME
+Tesla
+
+## CARD_EXEC_EINSTEIN_NAME
+Einstein
+
+## CARD_EXEC_PLANCK_NAME
+Quantum-Lock
+
+## CARD_EXEC_DEE_NAME
+Black-Mirror
+
+## CARD_EXEC_MAXWELL_NAME
+Spectra-Wave
+
+## CARD_EXEC_HAYEK_NAME
+Free-Order
+
+## CARD_EXEC_MISES_NAME
+Calc-Edge
+
+## CARD_EXEC_VONNEUMANN_NAME
+Fork
+
+## CARD_EXEC_BRUNO_NAME
+Echo-Self
+
+## CARD_EXEC_URANDOM_NAME
+urandom
+
+### Controls screen (keyboard remap, M2)
+
+## CONTROLS_HINT
+
+## CONTROLS_CAPTURE_PROMPT
+
+## CONTROLS_COL_ACTION
+
+## CONTROLS_COL_KEYBOARD
+
+## CONTROLS_COL_GAMEPAD
+
+## CONTROLS_NAV_HINT
+
+## CONTROLS_GROUP_MOVEMENT
+
+## CONTROLS_GROUP_WORLD
+
+## CONTROLS_GROUP_COMBAT
+
+## CONTROLS_GROUP_MENU_DIALOGUE
+
+## CONTROLS_SWAP_NOTICE
+
+## CONTROLS_RESTORE_CONFIRM_TITLE
+
+## CONTROLS_RESTORE_CONFIRM_YES
+
+## CONTROLS_RESTORE_CONFIRM_NO
+
+## CONTROLS_DISCARD_CONFIRM_TITLE
+
+## CONTROLS_DISCARD_CONFIRM_YES
+
+## CONTROLS_DISCARD_CONFIRM_NO
+
+## CONTROLS_NO_BINDING
+
+## ACTION_MOVE_FORWARD
+
+## ACTION_MOVE_BACKWARD
+
+## ACTION_MOVE_LEFT
+
+## ACTION_MOVE_RIGHT
+
+## ACTION_MOVE_RUN
+
+## ACTION_INTERACT
+
+## ACTION_MENU_OPEN
+
+## ACTION_MENU_CLOSE
+
+## ACTION_MENU_CONFIRM
+
+## ACTION_MENU_CANCEL
+
+## ACTION_MENU_NAV_UP
+
+## ACTION_MENU_NAV_DOWN
+
+## ACTION_MENU_NAV_LEFT
+
+## ACTION_MENU_NAV_RIGHT
+
+## ACTION_COMBAT_ATTACK_BASIC
+
+## ACTION_COMBAT_DEFEND
+
+## ACTION_COMBAT_CAST
+
+## ACTION_COMBAT_CARD_1
+
+## ACTION_COMBAT_CARD_2
+
+## ACTION_COMBAT_CARD_3
+
+## ACTION_COMBAT_END_TURN
+
+## ACTION_DIALOGUE_CONTINUE
+
+## ACTION_DIALOGUE_SKIP
+
+## ACTION_DIALOGUE_CHOICE_1
+
+## ACTION_DIALOGUE_CHOICE_2
+
+## ACTION_DIALOGUE_CHOICE_3
+
+## ACTION_DIALOGUE_CHOICE_4
+
+## ACTION_INVENTORY_OPEN
+
+## ACTION_INVENTORY_CLOSE
+
+## ACTION_DIARY_OPEN
+
+## SETTINGS_GAME
+
+## SETTINGS_EXIT_SAVE_SLOT_PROMPT
+
+## SETTINGS_EXIT_SKIP_AUTOSAVE
+
+## SETTINGS_TOGGLE_ON
+
+## EXITPROMPT_TITLE
+
+## EXITPROMPT_SAVE_EXIT
+
+## EXITPROMPT_EXIT_NO_SAVE
+
+## EXITPROMPT_CANCEL
+
+## SETTINGS_TOGGLE_OFF

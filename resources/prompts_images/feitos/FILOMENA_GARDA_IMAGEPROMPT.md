@@ -1,0 +1,7 @@
+# Filomena Garda — image prompt (nano banana)
+
+An extreme chibi super-deformed (SD) figurine of a young holographic-cult adept woman, styled like a small collectible vinyl figure (Funko Pop / nendoroid). VERY IMPORTANT PROPORTIONS: the head is enormous, round and as large as the entire rest of the body; the whole character is only about three heads tall; tiny torso, very short stubby arms and legs. This is NOT a realistic human body.
+
+She is a twenty-eight-year-old adept of a theatrical, light-worshipping cult, an archivist of glowing patterns. Her huge round head has a curious, dreamy young-woman face with luminous eyes touched by faint prismatic reflections, and sleek dark hair with a single iridescent dyed streak shifting violet to cyan. She wears flowing ceremonial cult robes whose fabric shimmers in a holographic gradient of violet, magenta, and cyan, with translucent layered veils that catch rainbow light, a high asymmetric collar, and thin glowing trim along the seams. A catalogue-tablet and stylus hang at her side. Her stubby hands hold up a small glowing prism-card emitting soft rainbow light.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic mood but lit with theatrical prismatic glow on the figure. Full body head to feet, centered, facing camera, plain pure-white (#FFFFFF) background, flat even lighting. REMINDER — extreme chibi: gigantic round head equal to whole body, three heads tall, tiny stubby limbs. Do NOT draw realistic adult proportions.

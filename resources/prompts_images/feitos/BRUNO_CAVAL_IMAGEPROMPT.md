@@ -1,0 +1,7 @@
+# Bruno Caval — image prompt (nano banana)
+
+An extreme chibi super-deformed (SD) figurine of a young industrial-security soldier, styled like a small collectible vinyl figure (Funko Pop / nendoroid). VERY IMPORTANT PROPORTIONS: the head is enormous, round and as large as the entire rest of the body; the whole character is only about three heads tall; tiny torso, very short stubby arms and legs. This is NOT a realistic human body.
+
+He is a thirty-two-year-old soldier-technician of an industrial recycling cartel's security force, patrolling grimy maintenance tunnels. His huge round head has a tired, faintly conflicted adult-man face with stubble, a short utilitarian haircut, and tired eyes. He wears a grubby corporate-security uniform in dull olive-green and grey: a padded tactical jacket with a faded cartel patch, reinforced shoulder pads, utility harness with pouches, scuffed steel-toe boots, and a half-strap helmet hanging at his hip. Soot and grease stains everywhere. A small worn brass medal shaped like a square-and-compass (one arm broken) is pinned over his heart. His stubby hands grip a stubby industrial baton.
+
+Art style: cel-shaded anime 3D, low-poly stylized, somber cyber-gothic mood. Full body head to feet, centered, facing camera, plain pure-white (#FFFFFF) background, flat even lighting. REMINDER — extreme chibi: gigantic round head equal to whole body, three heads tall, tiny stubby limbs. Do NOT draw realistic adult proportions.

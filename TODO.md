@@ -1,0 +1,154 @@
+> ESTRUTURA CANÔNICA: este arquivo termina na última linha da TABELA UNIFICADA. É proibido criar segunda tabela neste arquivo e é proibida linha em branco dentro da tabela. Legenda, scoring, rastreio e listas auxiliares vivem em bullets no cabeçalho, nunca em tabela.
+
+# TODO.md - Tabela de pendências do GusWorld
+
+## Legenda e critérios
+
+- Status possíveis: `⏳ Pendente` (inicial de tudo), `🚧 Em andamento`, `🔍 Pendente verificação` (implementado, aguardando teste ou auditoria), `✅ Concluído` (só depois de verificado), `⛔ Bloqueado`, `🗄️ Arquivado`, `❌ Cancelado`.
+- `Estado Auditado` começa em `—` e só é preenchido por auditoria de C-level `fable` (L-10), nunca por auto-relato de implementer.
+- A ordem das linhas, de cima para baixo, É a ordem de execução. Onda `0` = decisões do líder (custam tempo dele, não WIP de engenharia). Onda `—` = item bloqueado por terceiro, sem data; a causa está na Descrição.
+- Teste unitário NÃO é item desta tabela: nasce com o código pelo TDD estrito da L-19 (vermelho, verde, refatorar). Só teste não unitário (`TST-*`) e auditoria (`AUD-*`) têm linha, sempre downstream do que cobrem.
+- D12 da lista bruta NÃO é item de onda própria: o contrato comando/evento (L-17) é CRITÉRIO DE ACEITE de cada sistema D3 a D11, cobrado na revisão adversarial e na re-verificação do orquestrador de cada fatia. As descrições marcam isso como "aceite: ex-D12".
+- Limite de WIP: 2 a 3 itens de código em progresso ao mesmo tempo, no máximo 1 build pesado por vez (ASan/UBSan, matriz de CI). Na onda 10 o cap é explícito: 3 frentes, D7 na fila.
+- Ao commitar trabalho de um item, citar o ID na mensagem do Conventional Commit e tocar o Status no mesmo commit (implementação entregue vira `🔍 Pendente verificação`, nunca `✅` direto).
+- Itens novos criados na consolidação (G5, B7, B8, D15, TST-1, TST-2, AUD-1 a AUD-5): pontuação atribuída pelo COO (Cosmo), não pelas lentes. Os demais usam CoD da lente de produto e Job Size da lente de esforço, sem alteração.
+
+## Fórmula WSJF (referência de scoring, não é tabela de trabalho)
+
+- `CoD = Valor + Criticidade + Redução de Risco`
+- `WSJF = CoD / Job Size`
+- Régua de pontuação por dimensão e de Job Size: 1, 2, 3, 5, 8, 13, 20.
+- Empates de CoD foram desfeitos pelo WSJF (o Job Size separa) e, onde restou empate, por dependência primeiro e irreversibilidade depois (ex.: A5 antes de A2 no empate em 21,0 porque A2 depende de A3).
+
+## Rastreio dos 28 itens do inicial.md (condição da L-21 para o líder poder apagá-lo)
+
+- Item 1 (jogo 2d c++23): virou as leis L-02 e L-03. Resolvido e encerrado.
+- Item 2 (só GlintFx e SO, bus, esperar parado): virou a LEI ZERO, L-05 e L-07. Resolvido e encerrado.
+- Item 3 (camadas, proibido monolito, POCO por átomo): virou L-04 e L-17; execução em C1, C2 e todo o grupo D.
+- Item 4 (inspiração Zelda SNES, Chrono Trigger, Stardew): virou a L-26 (perspectiva 3/4 top-down); canon em `docs/`. Resolvido e encerrado.
+- Item 5 (pixelado mas luxuoso): virou a L-02. Resolvido e encerrado.
+- Item 6 (FOSS, discutir licença): virou a L-08 (AGPL-3.0-or-later com ressalva offline); execução em A5 a A12.
+- Item 7 (lore com outra licença, livro comercial): virou a L-08 (assets todos os direitos reservados, livros obra à parte); execução em A6 e A7.
+- Item 8 (wayland/x11 indiferente, GlintFx intermedia): coberto pela LEI ZERO e L-05. Resolvido e encerrado.
+- Item 9 (repo /petrinhu/GusWorld): remoto público já existe e está vazio; execução em A12.
+- Item 10 (CI com 5 runners): virou L-09 e L-20; execução em C4.
+- Item 11 (main orquestra, fable audita, sonnet implementa): virou a L-10. Resolvido e encerrado.
+- Item 12 (bus e Gus Dragon): virou a L-07; prática contínua de vigilância dos canais; execução das ideias dele em F1 a F4.
+- Item 13 (homenagens com aceite): virou a L-16. Resolvido e encerrado.
+- Item 14 (Gus Vector Tavus Vance): coberto pela L-16 e pelo canon em `docs/`. Resolvido e encerrado.
+- Item 15 (muitos arquivos no cwd): o corpus foi levantado; limpeza no grupo B, publicação em B7 e B8.
+- Item 16 (AskUserQuestion obrigatório): virou a L-11. Resolvido e encerrado.
+- Item 17 (GODS_LAWS.md): existe, com 28 leis e índice de gatilhos. Resolvido e encerrado.
+- Item 18 (do zero, assentado em GlintFx): virou a L-01. Resolvido e encerrado.
+- Item 19 (tabela de pendências com WSJF em bullets no cabeçalho): é este arquivo. Resolvido com este documento.
+- Item 20 (levantar tudo do cwd, conversar exaustivamente): feito nesta fundação; segue contínuo via L-13 e L-14.
+- Item 21 (html/rml/css traduzidos pelo GlintFx): virou a L-27; execução só com `present/`, bloqueada pelo GlintFx, sem data.
+- Item 22 (TODO.md revista e adaptada ao projeto): esta É a revisão adaptada; manutenção contínua pela skill de tabela de pendências.
+- Item 23 (testes e auditorias como no GlintFx, mesmo rigor): virou a L-19; `TESTES.md` e `AUDITORIAS.md` adaptados na raiz; execução em C5, C7, TST-1, TST-2 e AUD-1 a AUD-5.
+- Item 24 (reformatar o documento, leis em GODS_LAWS): feito; `GODS_LAWS.md` é a casa das leis. Resolvido e encerrado.
+- Item 25 (proteção de saves e mapas): virou L-18 e L-25; execução no grupo E.
+- Item 26 (configs com as mesmas proteções): virou L-18 e L-25; execução em E1 e E5.
+- Item 27 (PixelLab): PARCIAL. O pipeline de arte é do líder (L-02) e não gera item de execução; o estudo exaustivo da API pedido no texto não foi executado e aguarda pedido explícito dele. Ponta aberta a confirmar com o líder antes de apagar o `inicial.md`.
+- Item 28 (uso web autorizado): registrado como preferência operacional permanente. Resolvido e encerrado.
+
+## Itens bloqueados pelo GlintFx (sem data; o GlintFx hoje tem um header e nenhuma data prometida)
+
+- Causa: falta criptografia no GlintFx (pedido E7 vai ao bus no início da fatia do envelope, L-07 e L-25): E1 (o selo), E5 (a checagem real do selo), E6 (o re-selo real), E8 (o pacote binário selado), E9, E10, E11.
+- Causa: falta janela, contexto gráfico, entrada e texto: a camada `present/` INTEIRA, que por L-06 e L-27 não tem item nesta tabela (só nasce quando o GlintFx existir), e as partes visuais de F1 (travessia na tela), F3 (VFX da explosão) e F4 (relógio visível ao jogador).
+- Por transitividade (tag de versão pressupõe jogo jogável, que pressupõe `present/`): H1 e H2.
+- Nenhum destes tem onda com data. Quando o vácuo chegar (domínio esgotado e as duas frentes esperando o GlintFx), o que o time faz nele é decisão do líder, não de agente (L-11); dublê é proibido (L-05).
+
+- 🚧 **A cerca do escopo é a L-29 do `GODS_LAWS.md`:** 16 cortes numerados (C-01 a C-16) definem o que o jogo NÃO é (sem multiplayer, sem mundo aberto, sem crafting, sem dublagem, sem conquistas, sem romance nem múltiplos finais, cartas nunca craftadas, campanha de 4 a 8 horas, e outros). **Item novo que atravesse a cerca vai ao líder como pedido de exceção citando o corte pelo número, nunca como proposta comum.**
+- 📓 **Erros já pagos** ficam em `docs/licoes-aprendidas.md` e, os de teste, na L-19. Consulte antes de repetir uma classe de trabalho.
+- ⚠️ **ESTADO PROVISÓRIO, reordenação combinada com o líder em 21/08/2026.** Esta tabela foi montada antes de se descobrir um backup completo do projeto anterior (1.383 commits) com 21 ADRs, seis dossiês de auditoria, `docs/tech/` inteiro, roadmap e a tabela antiga de 457 itens. A mineração desse material pode acrescentar trabalho e mudar dependências. **A reordenação acontece depois que essa integração fechar**, via `/tab_pendencias --reorder`. Até lá, a ordem vale, mas não é final. Na reordenação, **todo item passa a apontar para o documento que o especifica** (lei, documento de `docs/`, ADR ou manual da raiz), ou a dizer `sem documento` (GODS_LAWS.md, L-30). Medição de 21/08/2026: 43 dos 71 itens já apontam, 28 ainda não.
+
+## INBOX
+
+Fila de exceção: descoberta que ainda não virou item. Drenada na próxima reordenação.
+
+- `[triage 2026-08-21]` **Material recuperado do backup precisa de itens próprios:** 20 ADRs em `docs/tech/adr/`, o ui-kit de 7 componentes, 11 mockups e 14 capturas em `docs/design/`. Falta decidir o que continua valendo (o líder já pediu a revisão dos ADRs) e o que fazer com os mockups quando o GlintFx traduzir marcação.
+- `[triage 2026-08-21]` **`docs/design/ui-kit/REQUISITOS-UI.md` criado**, derivado dos mockups: é a lista do que a interface exige. Precisa virar pedido ao GlintFx no momento certo, não agora (L-27).
+- `[triage 2026-08-21]` **`docs/design/mecanicas/save-por-local.md` criado**, com regra resgatada do projeto anterior. Duas decisões novas do líder ficaram abertas dentro dele: quem define a intensidade do campo em cada uma das 13 dungeons, e como o jogador percebe fraca contra total sem tutorial.
+- `[triage 2026-08-21]` **Necessidade de mapa enviada ao GlintFx** pelo bus (10 necessidades, por célula, objeto e área). Quando ele publicar a primeira versão do formato, haverá trabalho de revisão nossa antes de ele congelar.
+- `[triage 2026-08-21]` **`REUSE.toml` declara `docs/book/**` como AGPL**, contra a L-08, que diz que os livros são obra à parte com direitos reservados. Correção em execução pelo Cláudio (CLO).
+- `[triage 2026-08-21]` **Quatro ADRs históricos citam o ADR-010 apagado.** O agente não mexeu, por serem registro histórico da época. Decisão do líder pendente.
+- `[triage 2026-08-21]` **Backup do projeto anterior segue em `/var/tmp`**, área temporária, e é a única cópia de 1.383 commits. Falta decidir onde guardá-lo e o que mais trazer dele (ROADMAP, CHANGELOG, ACKNOWLEDGMENTS, seis dossiês de auditoria, `docs/tech/` restante).
+- `[triage 2026-08-21]` **Três decisões antigas do líder seguem abertas e travam conteúdo:** efeito do suco de limão e da água com gás (itens de cura, canon do filho); balanceamento dos easter eggs; perguntas Q4 a Q7 de canon do Gus.
+
+_(vazia)_
+
+## TABELA UNIFICADA
+
+| WSJF | ID | Onda | Grupo | Descrição Técnica | Prioridade | Pré-requisito | Dificuldade | Status | Estado Auditado |
+|---|---|---|---|---|---|---|---|---|---|
+| 18,0 | G1 | 0 | G | Decisão do líder: aprovar em bloco a lista de reparo das 28 ocorrências de `__DEP_REMOVIDA__` (a lista é compilada na fase 1 de B1 e vai a ele antes de qualquer edição). Destrava a fase de edição de B1. | Alta | Lista compilada em B1 | Baixa | ⏳ Pendente | — |
+| 14,0 | G2 | 0 | G | Decisão do líder: escolher ferramenta e formato do gerador de conteúdo (deixado em aberto de propósito pelo CTO e pelo CISO). Destrava E8. | Média | Nenhum | Baixa | ⏳ Pendente | — |
+| 10,0 | G3 | 0 | G | Decisão do líder: confirmar o que sobrevive do desenho antigo dos modos de morte (referencia infraestrutura inexistente). Gateia a parte de morte de D5 e E11; pode gerar item de execução novo depois da decisão. | Média | Nenhum | Baixa | ⏳ Pendente | — |
+| 8,0 | G4 | 0 | G | Decisão do líder com o Gus Dragon: fechar os dois pontos em aberto da carta glitch devolvidos a ele na issue 3 (regra da bateria acabando com o personagem dentro da parede; uso da carta em batalha). Depende de resposta de terceiro (Gus), sem data. Destrava o fechamento de F1. | Alta | Resposta do Gus na issue 3 | Baixa | ⏳ Pendente | — |
+| 7,0 | G5 | 0 | G | (novo; pontuação do COO) Decisão ADIADA pelo líder em 21/08/2026: relógio da missão do Gus (F4) versus Pilar 1 ("sem timer no turno do jogador"). Não bloqueia o início de F4; precisa estar fechada antes do aceite final de F4. | Média | Nenhum | Baixa | ⏳ Pendente | — |
+| 3,0 | B5 | 0 | B | Decisão do líder (surfaçar já): `.dlg.txt` e traduções Markdown são fonte de build ou formato de runtime (tensão L-18 x L-25)? O tratamento decorrente executa dentro de D9 e E8, não aqui. Gateia D9. | Média | Nenhum | Alta | ⏳ Pendente | — |
+| 30,0 | A1 | 1 | A | `.gitignore`: `resources/livros/` (943 MB regenerável) e `resources/glb/` (402 MB, pipeline pessoal do líder) fora do git (L-15). Porta de mão única: depois do push, corrigir custa reescrita de histórico. | Alta | Nenhum | Baixa | 🔍 Pendente verificação | — |
+| 21,0 | A5 | 1 | A | `LICENSE` com o texto verbatim e imutável da AGPL-3.0 (L-08). A escolha da licença já é lei e é porta de mão única (relicenciar exige consentimento de contribuidor futuro); a gravação do arquivo é mecânica. | Alta | Nenhum | Baixa | 🔍 Pendente verificação | — |
+| 14,0 | A3 | 1 | A | Configurar `git-crypt` com chave simétrica, exportar a chave para FORA da árvore e informar o caminho exato ao líder. Executa ANTES de A2: sem o filtro registrado, o primeiro `add` de arquivo secreto entra em texto puro no objeto git, irreversível. Perda da chave é perda permanente do conteúdo cifrado. | Alta | Nenhum | Média | 🔍 Pendente verificação | — |
+| 21,0 | A2 | 1 | A | `.gitattributes`: Git LFS para sprite, VFX, imagem e áudio (cerca de 280 MB) e marcação git-crypt de `docs/_secret/**`. Depende do git-crypt já configurado (A3), resolução de conflito a favor da lente de arquitetura. | Alta | A3 | Baixa | 🔍 Pendente verificação | — |
+| 16,0 | A6 | 1 | A | Diretório `LICENSES/` no padrão REUSE: `AGPL-3.0-or-later.txt` e o texto da reserva de asset (L-08). | Média | A5 | Baixa | 🔍 Pendente verificação | — |
+| 10,0 | A9 | 1 | A | `OFFLINE-NOTICE.md` bilíngue (pt-br e inglês): a cláusula de rede da AGPL não alcança quem só joga. Texto já redigido pelo Cláudio (CLO); gravar e formatar. | Baixa | Nenhum | Baixa | 🔍 Pendente verificação | — |
+| 10,0 | A10 | 1 | A | `THIRD-PARTY-LICENSES.md` (hoje: só o GlintFx, AGPL-3.0-or-later). | Baixa | Nenhum | Baixa | 🔍 Pendente verificação | — |
+| 8,0 | A8 | 1 | A | `README.md` com seção de licença, carve-out de marca e link para a nota offline (A9). | Média | A5, A9 | Baixa | 🔍 Pendente verificação | — |
+| 7,7 | A11 | 1 | A | Gabarito de cabeçalho SPDX (`SPDX-FileCopyrightText` Petrus Alves da Silva Costa + `SPDX-License-Identifier`) e a PRÁTICA contínua em todo arquivo novo desde o primeiro (L-08). Nasce nesta onda, não fecha sozinha: atravessa C, D, E e F. | Alta | A5, A6 | Média | 🟡 Parcial | — |
+| 6,3 | A7 | 1 | A | `REUSE.toml` com regras por diretório: código AGPL, asset reservado, fronteira jurídica do catálogo conforme L-25. Precisa passar o lint do REUSE. | Média | A2, A6 | Média | 🔍 Pendente verificação | — |
+| 36,0 | A12 | 2 | A | `git remote add origin` e PRIMEIRO COMMIT MÍNIMO, por ordem do líder: só licença e configuração de repositório (A1 a A11). O corpus (`docs/`, `resources/`) NÃO entra aqui; sobe em B7 e B8 depois da limpeza correspondente. | Alta | A1 a A11 | Baixa | 🔍 Pendente verificação | — |
+| 17,0 | B2 | 3 | B | Remover nome real, biografia e link de foto de Elon Musk de `docs/design/roster-analogos/21-helion-tusk.md` e `docs/design/brainstorm-backlog.md`; o personagem Helion Tusk permanece intacto (L-16: homenagem só com aceite confirmado). | Alta | Nenhum | Baixa | ⏳ Pendente | — |
+| 5,2 | C1 | 3 | C | `CMakeLists.txt` raiz, C++23, estrutura das cinco camadas `core`, `content`, `domain`, `app`, `present` (L-17, L-20). Fundação de build, legitimamente sem TDD (L-20); nasce certo para as cinco plataformas. | Alta | A12 | Média | ⏳ Pendente | — |
+| 4,4 | B6 | 3 | B | Conferência visual amostral das 1266 imagens antes de irem a público: o método indireto não achou captura de tela, mas nenhum humano olhou. Gateia B8. | Alta | Nenhum | Média | ⏳ Pendente | — |
+| 2,9 | B1 | 3 | B | Reparar as 28 ocorrências de `__DEP_REMOVIDA__` caso a caso (separar nome de biblioteca raspado do dano colateral em texto inocente). Fase 1: compilar a lista completa para G1. Fase 2: editar, só depois da aprovação em bloco. Fatiar por categoria, não por contagem. **Escopo cresceu de 28 para 45 arquivos** depois que os 20 ADRs foram recuperados do backup em 21/08/2026. | Média | G1 (para a fase 2) | Alta | ⏳ Pendente | — |
+| 7,0 | C2 | 4 | C | Gate de CI de camadas: qualquer `#include <glintfx/` fora de `present/` derruba o build (L-17). Se dividir o mesmo arquivo de workflow com C4 e C5, sequenciar C2, C4, C5 ou separar workflows desde já. | Média | C1 | Média | ⏳ Pendente | — |
+| 7,0 | C6 | 4 | C | `clang-format` base LLVM, indentação 4, colunas 100. | Baixa | C1 | Baixa | ⏳ Pendente | — |
+| 2,2 | B4 | 4 | B | Fechar as sete pontas soltas do canon: vocabulário .NET e contradição de plataforma em `plano_vs.md` (mesmo arquivo, sequenciar internamente), bloco histórico em `docs/specs/_INDEX.md`, títulos "Especificação Técnica de Asset 3D" nas oito specs, linha órfã em `style-guide.md`, citações órfãs em `resources/translations/en_intl.md`, ponta em `raid-log.md`. | Baixa | Nenhum | Média | ⏳ Pendente | — |
+| 1,8 | C3 | 4 | C | Harness de teste próprio, sem framework de terceiro (LEI ZERO): motor de asserção e execução, descoberta e registro, integração CMake e relatório legível por humano e CI. Pré-requisito literal de todo o grupo D (L-19); maior risco de bloqueio em cadeia, fatiar nas três partes. | Alta | C1 | Alta | ⏳ Pendente | — |
+| 5,0 | C8 | 4 | C | Hook de TDD do projeto (`.claude/tdd-guard.json`, hoje inexistente), encaixado no ciclo vermelho/verde da L-19 contra o harness C3. | Média | C3 | Média | ⏳ Pendente | — |
+| 1,5 | C4 | 4 | C | Matriz de CI das cinco plataformas: Fedora 44 pinado (nunca `:latest`), Ubuntu, Arch, CachyOS com job próprio (não é Arch renomeado), Windows. Nenhuma não bloqueante (L-09, L-20). Fatiar por plataforma, Fedora primeiro. | Alta | C1, C2 | Alta | ⏳ Pendente | — |
+| 3,0 | C5 | 4 | C | Os quatro portões da L-19 no CI: zero aviso com `-Werror`, ASan e UBSan em build separado, `clang-tidy` e `cppcheck`, `gitleaks`. Integrar ferramenta a ferramenta, cada uma verde antes da próxima, nas cinco plataformas. | Alta | C4 | Alta | ⏳ Pendente | — |
+| 14,0 | A4 | 5 | A | Corrigir a frase nos dois arquivos de `docs/_secret/` que afirma proteção por `.gitignore` inexistente, descrevendo o mecanismo real (git-crypt via A2 e A3). Sobe com o corpus em B7. | Média | A2, A3 | Baixa | ⏳ Pendente | — |
+| 3,8 | B3 | 5 | B | Trocar caminhos absolutos de máquina (o diretório de usuário do líder, hoje escrito por extenso em alguns arquivos) por caminho genérico ou relativo nos arquivos que vão a público; a URL do bus permanece por decisão do líder. Roda DEPOIS de B1 e B4 para não colidir nas mesmas linhas. | Média | B1, B4 | Média | 🔍 Pendente verificação | — |
+| 3,0 | C7 | 5 | C | Script local que espelha o CI, rodado antes do push (L-19): reproduz os quatro portões e a lógica multiplataforma, com variante POSIX e Windows. | Média | C2, C4, C5, C6 | Média | ⏳ Pendente | — |
+| 19,0 | B7 | 6 | B | (novo; pontuação do COO) Commit e push do corpus TEXTUAL limpo (`docs/`, `resources/translations/` e afins), segundo momento de publicação depois do primeiro commit mínimo. Verificar por clone fresco que o diff não expõe o que a limpeza removeu (histórico é público). | Média | A4, B1, B2, B3, B4 | Baixa | ⏳ Pendente | — |
+| 9,5 | B8 | 6 | B | (novo; pontuação do COO) Commit e push dos assets binários (`resources/` restante: 1266 imagens, sprites, áudio) via Git LFS, depois da conferência visual amostral. | Média | A2, B6, B7 | Baixa | ⏳ Pendente | — |
+| 4,6 | D1 | 7 | D | `core`: tipos básicos, identificadores, resultado e erro; cada conceito é átomo em arquivo próprio (L-04). TDD estrito começa aqui (L-19): saída real do vermelho antes do verde em toda fatia. | Alta | C3, C5 | Média | ⏳ Pendente | — |
+| 7,7 | D2 | 8 | D | `core`: sorteio determinístico CONTADO, como parte do estado (semente mais contador), nunca global (L-17). Se nascer global por engano, D5, D13, D14 e F2 precisam ser reescritos e o replay fica inválido retroativamente. | Alta | D1 | Média | ⏳ Pendente | — |
+| 4,2 | D3 | 8 | D | POCOs de carta: carta de catálogo em `content/`, instância e estado físico (bateria, origem ROM/EPROM/pirata, infecção) em `domain/`, com zero-value seguro; separar fisicamente as duas camadas do L-17. Aceite: contrato comando/evento (ex-D12). | Alta | D1 | Média | ⏳ Pendente | — |
+| 2,6 | D4 | 9 | D | `domain`: deck, mão e coleção com os invariantes anti-exploit do canon (instância única com id, mão como lista de ids, descarte só num sentido, venda atômica e idempotente, especial protegida); um ciclo vermelho/verde por invariante. Aceite: ex-D12. | Alta | D3 | Alta | ⏳ Pendente | — |
+| 2,0 | D5 | 10 | D | `domain`: máquina de estados de combate, fila de iniciativa, recursos, fórmula de dano, com a ordem de consumo do sorteio fixada; fatiar por subsistema (fórmula e fila antes da máquina que as consome). Primeiro da onda por ter a maior cauda de dependentes (D6, D13, D14, F3, F4). Aceite: ex-D12. | Alta | D2, D3, D4 | Alta | ⏳ Pendente | — |
+| 4,2 | D10 | 10 | D | `domain`: mapa como dado, grade quadrada, colisão por célula e marcação de bloco atravessável (L-26). Gateia F1. Aceite: ex-D12. Regra de save por local que depende do mapa: `docs/design/mecanicas/save-por-local.md`. | Média | D1 | Média | ⏳ Pendente | — |
+| 3,2 | D8 | 10 | D | `domain`: progressão de conhecimento e mestria por uso (diferencial anti-grind do canon). Aceite: ex-D12. | Média | D1, D3, D4 | Média | ⏳ Pendente | — |
+| 2,6 | D7 | 10 | D | `domain`: economia (fontes e sumidouros), com a régua do comedimento como propriedade executável. Entra na vaga liberada: cap de WIP 3 nesta onda, D7 é a fila. Aceite: ex-D12. | Média | D3, D4 | Média | ⏳ Pendente | — |
+| 2,6 | D6 | 11 | D | `domain`: efeitos de status e o contrato de evento, acoplado à fronteira do combate (interface com D5 coordenada, arquivos vizinhos). Aceite: ex-D12. | Média | D5 | Média | ⏳ Pendente | — |
+| 2,2 | D9 | 11 | D | `domain`: diálogo como dado; a forma de armazenamento segue a decisão B5 (fonte de build ou runtime). Aceite: ex-D12. | Média | D1, B5 | Média | ⏳ Pendente | — |
+| 2,7 | F2 | 12 | F | Carta `urandom`, ideia do Gus Dragon (autoria dele): versão pirata com 1 em 3 de dar ruim (número definido por ele), versão original como prêmio da RunaDex; usa o sorteio contado (D2). Sequencial com F1 por tocarem o mesmo catálogo. | Média | D2, D3, D8 | Média | ⏳ Pendente | — |
+| 2,7 | F3 | 12 | F | Vírus zip-bomb, ideia do Gus Dragon (autoria dele): a ficha técnica existe no design, falta o efeito de estourar na batalha (regra de dano e status via D5 e D6). O VFX da explosão fica para `present/`, bloqueado pelo GlintFx. | Média | D5, D6 | Média | ⏳ Pendente | — |
+| 1,6 | F1 | 12 | F | Carta `glitch`, ideia do Gus Dragon (autoria dele): atravessa só blocos marcados pelo designer (D10); duração derivada de tipo de carta, tipo de bateria e carga. Inclui a regra do que acontece quando a bateria acaba com o personagem dentro da parede (segunda ideia dele, mesma carta, não duplicada; fechamento em G4). A travessia NA TELA fica para `present/`, bloqueada pelo GlintFx. | Média | G4, D3, D4, D10 | Média | ⏳ Pendente | — |
+| 2,3 | D11 | 13 | D | `domain`: modelo de save como estado canônico serializável, agregando D3 a D10 e as cartas F1 a F3; o esquema antigo do corpus (Godot/GDScript) não é base, re-derivar da forma real dos sistemas. Aceite: ex-D12. Política de save por local (cidade livre, dungeon restrita): `docs/design/mecanicas/save-por-local.md`. | Alta | D3 a D10, F1, F2, F3 | Alta | ⏳ Pendente | — |
+| 2,0 | D15 | 14 | D | (novo; pontuação do COO) Camada `app/` exigida pela L-17: fluxo de cena, avanço de turno, coordenação entre domínios, save e load como caso de uso. Despachante FINO: cada cena recebe só os sistemas que usa; proibido contexto universal dono de tudo (armadilha 1 da L-17). F4 e TST-2 dependem dela. | Alta | D5 a D11 | Alta | ⏳ Pendente | — |
+| 2,9 | D13 | 15 | D | Teste de replay determinístico permanente: semente mais lista de comandos reproduz o estado final byte a byte (L-17); detector das armadilhas de contêiner não ordenado e ponto flutuante em fórmula. | Alta | D2, D5, D11, D15 | Alta | ⏳ Pendente | — |
+| 1,5 | F4 | 15 | F | Missão com relógio correndo de verdade, ideia do Gus Dragon (autoria dele), inclusive durante batalhas, premiando escolha de rota. Núcleo como contador de tick em `app/` e `domain/` (regra pura); o relógio VISÍVEL fica para `present/`, bloqueado pelo GlintFx. A decisão G5 (tensão com o Pilar 1) foi adiada pelo líder e precisa fechar antes do aceite final. | Média | D5, D10, D15 | Alta | ⏳ Pendente | — |
+| 2,2 | TST-2 | 16 | TST | (novo; pontuação do COO) Teste de integração do núcleo via `app/`: turno completo atravessando combate, economia, progressão e save/load, sem GlintFx (regra pura, permitido pela L-05). Derivado de TESTES.md T14, podado para este stack. | Média | D13, D15 | Média | ⏳ Pendente | — |
+| 0,9 | D14 | 16 | D | Auto-resolve de combate para balanceamento em massa: harness de simulação em lote sobre o determinismo de D13. Critério de estudo por simulação pré-registrado antes do dado existir. | Baixa | D5, D13 | Alta | ⏳ Pendente | — |
+| 14,0 | E7 | 17 | E | Registrar no bus a necessidade de criptografia ao GlintFx: hash, MAC, cifra autenticada com nonce e dados associados, KDF, bytes aleatórios criptográficos, comparação em tempo constante (L-25). DISPARA NO INÍCIO da fatia do envelope (L-07), não depois de E1 a E6; sem classificar prioridade do outro lado. | Alta | Início da fatia E1 | Baixa | ⏳ Pendente | — |
+| 3,3 | E1 | 17 | E | Envelope binário do projeto (magia, versão de formato, tipo, nonce, dado, selo), servindo save, configuração, mapa e pacote de conteúdo (L-25). A estrutura é redigível hoje; o SELO depende de criptografia do GlintFx, inexistente e sem data: nessa parte o item fica bloqueado por terceiro, esperando a resposta do bus (E7), sem dublê (L-05). Porta de mão única depois que existir save de jogador. | Alta | D11, E7 | Alta | ⏳ Pendente | — |
+| 1,6 | E6 | 17 | E | Ferramenta de inspeção e re-selo para desenvolvimento: nasce JUNTO com o formato, na mesma fatia de E1, não depois (L-25). O re-selo real herda o bloqueio de criptografia do GlintFx, sem data. | Média | E1 (mesma fatia) | Alta | ⏳ Pendente | — |
+| 2,3 | E2 | 17 | E | Serialização binária versionada dos POCOs de domínio, escrita em casa, com round-trip byte-exato por átomo. | Média | D3 a D11, E1 | Alta | ⏳ Pendente | — |
+| 3,7 | E5 | 17 | E | Configuração selada que NUNCA impede o jogo de abrir: selo inválido cai em padrão de fábrica com aviso, jamais recusa de boot (L-25). O caminho de fallback é escrevível já; a checagem do selo real herda o bloqueio do GlintFx. | Média | E1 | Média | ⏳ Pendente | — |
+| 2,8 | E4 | 17 | E | Gravação atômica e cadeia de backups (escrever em temporário, mover, rotacionar), com atenção à divergência de rename atômico entre os cinco SOs (L-09). | Média | E1, E2 | Média | ⏳ Pendente | — |
+| 2,0 | E3 | 17 | E | Validador semântico: o estado carregado é alcançável pelas regras; único nível de defesa que sobrevive à chave vazada (L-25). Não depende de criptografia. | Média | E2, D3 a D10 | Alta | ⏳ Pendente | — |
+| 1,2 | E8 | — | E | Gerador de build: fonte de conteúdo em texto no repositório vira tabelas compiladas no executável (número e regra, AGPL) e pacote binário selado (texto de sabor, asset reservado), fronteira jurídica da L-25. BLOQUEADO pela decisão G2; a parte do pacote selado bloqueada também pela criptografia do GlintFx. Sem data; fatiar nos dois artefatos quando destravar. | Média | G2, E1, E2 | Alta | ⏳ Pendente | — |
+| 2,0 | E11 | — | E | Amarra de máquina só no slot Hardcore, com aviso ao jogador; save normal viaja com o dono (L-25). BLOQUEADO pela criptografia do GlintFx e pela decisão G3. Sem data. | Baixa | E1, G3 | Média | ⏳ Pendente | — |
+| 0,7 | E9 | — | E | Fase 2 da L-25: save híbrido de estado mais registro de comandos com encadeamento, verificável por re-execução (a única peça que não evapora quando o adversário lê o fonte). BLOQUEADO pela fase 1 completa (selo do GlintFx) e pela maturidade de D13. Sem data. | Baixa | E1 a E6, D13 | Alta | ⏳ Pendente | — |
+| 0,5 | E10 | — | E | Fase 3 da L-25, opcional: âncora anti-rollback por TPM, com retorno à âncora em arquivo onde não houver; NUNCA requisito para jogar. BLOQUEADO por E9 e pela criptografia do GlintFx. Sem data. | Baixa | E9 | Alta | ⏳ Pendente | — |
+| 2,8 | TST-1 | 18 | TST | (novo; pontuação do COO) Fuzzing dos parsers binários (envelope, serialização, mapa, save): entrada corrompida ou hostil nunca derruba o jogo nem passa pelo validador semântico. Derivado de TESTES.md T3; T5, T6, T9, T10 e T11 PODADOS para este stack (sem SQL, sem rede, sem API, dependência só GlintFx). | Média | E2, E3 | Média | ⏳ Pendente | — |
+| 3,3 | AUD-1 | 18 | AUD | (novo; pontuação do COO) Auditoria de arquitetura e camadas (AUDITORIAS.md cap. 2): dependência só para baixo, as cinco armadilhas da L-17, determinismo do replay como evidência. Executor: C-level `fable` (L-10). | Média | D13, D15 | Média | ⏳ Pendente | — |
+| 3,5 | AUD-2 | 18 | AUD | (novo; pontuação do COO) Auditoria de plataforma (cap. 3): matriz das cinco entradas verde, Fedora pinado, nenhum suporte declarado por tabela emprestada (CachyOS não é coberto pelo job de Arch). Executor: C-level `fable`. | Média | C4, C5 | Média | ⏳ Pendente | — |
+| 3,3 | AUD-3 | 18 | AUD | (novo; pontuação do COO) Auditoria de proteção de dado (cap. 4): nada em texto na distribuição, envelope e validador conferidos, fallback de configuração, comunicação pública sem promessa de "impossível editar". Executor: C-level `fable`. | Média | E1 a E6, TST-1 | Média | ⏳ Pendente | — |
+| 3,5 | AUD-4 | 18 | AUD | (novo; pontuação do COO) Auditoria de licença (cap. 5): REUSE/SPDX em todo arquivo, regime de asset reservado com carve-out de marca e permissão de fã, fronteira jurídica do catálogo, livros fora do regime do jogo. Executor: C-level `fable`. | Média | A7, A11, B7, B8 | Média | ⏳ Pendente | — |
+| 2,2 | AUD-5 | 18 | AUD | (novo; pontuação do COO) Dossiê formal consolidado pelo `internal-auditor`: os cinco capítulos num livro único com achado, severidade e remediação; PORTÃO DE RELEASE antes da 1.0 (L-19). | Alta | AUD-1 a AUD-4 | Média | ⏳ Pendente | — |
+| 0,6 | H1 | 19 | H | Wiki do repositório no GitHub, derivada de `docs/`, linkando em vez de duplicar. Herda, via tag e `present/`, o bloqueio sem data do GlintFx. Execução via technical-writer/ux-writer, nunca inline. | Baixa | B7, tag de versão | Média | ⏳ Pendente | — |
+| 0,4 | H2 | 19 | H | Documentação `.md` extensa em registro didático para INICIANTE em computação, explicando todo jargão, passo a passo, derivada de `docs/`. Pré-requisito: tag de versão (sem data hoje). Último item por regra permanente da casa; execução via technical-writer/ux-writer. | Baixa | H1, tag de versão | Alta | ⏳ Pendente | — |

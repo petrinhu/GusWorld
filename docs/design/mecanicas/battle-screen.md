@@ -1,0 +1,275 @@
+# Tela de Batalha (BattleScreen): Design de Apresentacao
+
+**Status:** Decisoes macro ratificadas pelo criador supremo em 2026-06-23 (brainstorm colaborativo, 5 perguntas via AskUserQuestion). Spec de APRESENTACAO do combate; o motor e as regras vivem em [`combat.md`](combat.md) (canonico, fechado, nao reaberto aqui). Implementacao no M5 (BattleScreen) da engine C++23 + __DEP_REMOVIDA__. **Atualizacao 2026-06-25 (comando livre):** §3.5 modo-mira / target selection (D3) integrado ao menu de verbos; o painel do ator ativo e a faixa de fila refletem o comando livre da party (combat.md §4.1, modelo 1B).
+
+**Convencao de escrita:** pt-br. Termos de game-dev no original. Sem em-dash; usa ponto, virgula, parenteses, dois-pontos.
+
+**Cross-ref:** [`combat.md`](combat.md) (motor turn_combat ja portado/auditado), [`pillars.md`](../pillars.md), [`locomotion.md`](locomotion.md) (poses 4 direcoes, Pillar 3), [`../art/vfx-combate-familias.md`](../art/vfx-combate-familias.md) (vocabulario visual de ataque das 5 familias).
+
+---
+
+## 1. As 5 decisoes macro (criador, 2026-06-23)
+
+| # | Decisao | Escolha | Por que | Implicacao |
+|---|---|---|---|---|
+| 1 | **Modelo de cena** | **Tela de batalha separada** (mundo some -> arena dedicada -> volta ao mapa). Feel Pokemon/Final Fantasy. | Mais barata e MUITO mais legivel: o sistema de cartas/pipeline/fila precisa de espaco de tela limpo, sem o mundo 3D competindo. | A arena e uma cena propria. Evolui depois pro **hibrido** (fundo da arena = pintura do bioma onde esbarrou) SEM refazer: so trocar o fundo plano por uma arte de bioma. |
+| 2 | **Angulo dos atores** | **Side-view de perfil** (Chrono Trigger / FF). Party a esquerda olhando pra direita; inimigos a direita olhando pra esquerda. | Ve todos de corpo inteiro: ideal pra COMANDAR 3 personagens com fila CTB. A referencia-mae (Chrono Trigger) e exatamente assim. | **Zero arte nova:** usa as poses leste (party) e oeste (inimigos) que ja existem. Sem flip (Pillar 3 respeitado). Nao depende das diagonais (ARTE-DIAGONAL-8DIR fica fora do caminho critico). |
+| 3 | **Layout** | **Comando-first** (menu de verbos do ator ativo; cartas + pipeline abrem so ao COMPILAR). | Tela limpa e legivel; casa com Chrono Trigger/Sea of Stars/Pokemon (todos comando-first). Nao polui com 3-4 inimigos. As cartas tomam o palco na hora certa. | A mao de 15 cartas NAO fica sempre na tela; surge num leque + pipeline de 3 slots quando o jogador escolhe COMPILAR. |
+| 4 | **Feedback / juice** | **Numeros flutuantes sobre o alvo + caixa de log.** | O numero da impacto imediato; o log carrega as mensagens de sistema longas que o combat.md EXIGE (ERRO DE COMPILACAO, COMPILADO, ANALISE PREDITIVA). | Dois canais de feedback: popup de dano (curto, sobre o alvo) + log rolando (mensagens de sistema + historico). |
+| 5 | **Telegraph de intent** | **Icone de intencao flutuando sobre o inimigo** (estilo Slay the Spire). | Padrao-ouro de legibilidade; casa com Scan (revela) e Gambito-Prever (aprofunda alvo/area). Pillar 1: informacao habilita acao. | Cada inimigo mostra um simbolo do plano (atacar quem + dano previsto / defender / aplicar status). **Patch-Zero** (intent caotico, one-way door ja canon) mostra um icone "ruido" embaralhado. |
+
+---
+
+## 2. Layout consolidado - "Tatico Cockpit" (variante C, aprovada pelo criador 2026-06-25)
+
+Apos 3 variantes mockadas (A compacto / B cinematografico / C tatico), o criador aprovou a **variante C "Tatico Cockpit"**. O painel do ator ativo deixou o rodape e virou um COCKPIT lateral esquerdo; a arena ocupa o resto. Resolucao logica **960x540** (16:9, escala inteira). Mock canonico: `scratchpad/battle_mock/variante_C_tatico.html` + `_common.css`.
+
+```
++--------+----------------------------------------------+
+| COCKPIT|  FILA CTB:  > Gus  [i]  Caua  [i]  Jaci  +2  |   topo (a dir do cockpit)
+| retrato|----------------------------------------------|
+|  GRANDE|             VEZ DE GUS                       |   banner em FAIXA PROPRIA
+|  GUS   |          SUA VEZ: escolha uma acao           |   (nao sobre os atores)
+|        |----------------------------------------------|
+| HP ====| [Gus]                              [i] intent|   arena: party a ESQ-da-arena,
+| AP ooo | [Caua]                  -45 CRIT   [i]       |   inimigos a DIR, atores
+| MANA   | [Jaci] (status)                    [i]       |   DISTRIBUIDOS (space-around),
+|        |                                    [i]       |   intent sobre cada inimigo,
+| ACAO   |                                              |   floater sobre o alvo
+| [Scan] |                                              |
+| [Gamb] |----------------------------------------------|
+| [Atac]<| TERMINAL                                     |   log fino no rodape
+| [Defe] | COMPILADO: Descarga Tripla  Caua ataca: 25  |
+| COMPIL | Drone sofre 45 [CRIT]  Jaci recebe Regen     |
+| [Fugir]| > Vez de Gus_                                |
++--------+----------------------------------------------+
+```
+
+### Zonas da tela (variante C)
+
+- **Cockpit lateral ESQUERDO (~174px, ~1/4 da largura):** o painel do ator ativo + o menu de verbos, empilhados verticalmente como um cockpit. De cima pra baixo: retrato GRANDE (64px) + nome + barra de HP (com numero) + pips de AP (latao) e Mana (cyan) + os 6 verbos EMPILHADOS (Scan/Gambito/Atacar/Defender/COMPILAR/Fugir). E onde o jogador comanda. So mostra dados FORA da abertura (na abertura o ativo e o 1o da fila por SPD = inimigo; o cockpit fica sem dados).
+- **Topo da arena, faixa horizontal:** fila de iniciativa CTB (5 proximos, retrato 48px + marca de "proximo"), a direita do cockpit.
+- **Faixa PROPRIA do banner:** "VEZ DE <nome>" / "BATALHA!" numa faixa reservada ACIMA dos atores (nao invade ninguem).
+- **Arena central-direita:** party (ate 3) numa coluna a esquerda-da-arena, inimigos (1 a 4) numa coluna a direita, atores DISTRIBUIDOS com espaco proprio (space-around vertical, cada um na sua faixa, ~54px). Por ora os atores sao RETRATOS (placeholder; sprites de corpo animados num passo futuro - decisao do criador "testar com retratos, animacoes depois"). Gus na arena usa `retrato_gus_combate.png`. Intent flutuante sobre cada inimigo; floater de dano sobre o alvo; mini-barra de HP + statusrow sob cada ator.
+- **Terminal/log fino no rodape:** mensagens narradas (COMPILADO/ERRO/dano/cura) com cor por categoria. So aparece FORA da abertura.
+
+### Paleta canonica (variante C, HEX exatos - o criador AMOU as cores)
+
+Fundo `#0c0f1a`; cockpit gradiente `#1B2238`->`#141a2c`; terminal `#0e1322`; slot escuro `#0a0d16`. **CYAN** (party / ativo / mira / CRIT / banner) `#22D3EE` (dim `#155e6b`); **MAGENTA** hostil (inimigo / intent) `#E11D74` (dim `#5c1230`); **LATAO** (Compilar / AP / fraqueza) `#E8A33D`; **VERDE HP** `#3FB97A` (dim `#1d5c3c`); **ERRO/FALHA** `#F43F5E`; tinta `#cfe6ee`, tinta-dim `#6f8593`; borda `#2a3450`. Verbos: neutros fundo `#10172a` borda `#2a3450`; Atacar(selecionado)=cyan; Compilar=latao; pips AP=latao, Mana=cyan. (Embarcada em `battle_scene.cpp` como constantes `kCyan/kMagenta/...`.)
+
+- **Overlay de compilacao:** so visivel ao escolher COMPILAR. Leque da mao + pipeline de 3 slots (incremento futuro).
+
+---
+
+## 3. O que a BattleScreen apresenta (mapeado do motor)
+
+O motor (`domain/combat/`) ja entrega o estado; a BattleScreen e a CAMADA DE APRESENTACAO (em `app/`). Mapeamento:
+
+| Estado do motor (combat.md) | Onde aparece na tela |
+|---|---|
+| Fila de iniciativa por SPD (CTB) | faixa do topo |
+| Ator ativo + AP (3) + Mana (ramp) | painel da base |
+| HP de cada ator + Shield (pool) | barra sob cada ator + no painel |
+| Status effects (Stun, Poison, Expose...) | icones sob o ator afetado |
+| IntentPreview do inimigo (telegraph) | icone de intent sobre o inimigo |
+| Mao de 15 cartas + pipeline de 3 slots | overlay de COMPILAR |
+| Roda de fraqueza (revelada por Scan) | indicado ao mirar (fraco/neutro/resistente/imune) |
+| Dano por canal (FALHA / CRIT / COMUM) | numero flutuante + sufixo no log ([CRITICO], FALHA DE COMPILACAO) |
+| Combo casado | COMPILADO: <nome> no log + flash na pipeline |
+| Erros de pre-condicao (mana/AP/Null sem Scan) | ERRO DE COMPILACAO: <motivo> no log |
+| Analise Preditiva (Pillar 4, 1x/batalha) | ANALISE PREDITIVA: golpe fatal absorvido no log |
+| Ambiente (terreno/clima/periodo) | marca discreta na arena (fundo/HUD); Scan-ambiente revela tier |
+
+---
+
+## 3.1 Tela de resultado (fim de combate)
+
+Decidido no brainstorm 2026-06-23. O fim do combate e um LOG DE BUILD que imprime ao vivo (terminal; coerente com "software fala em terminal", ver [`combat-flavor.md`](combat-flavor.md) paragrafo 5). Acervo de frases (vitoria/derrota/rotulos) em combat-flavor.md.
+
+- **Formato:** o terminal imprime as etapas e os ganhos linha a linha (build rodando), nao um painel estatico. A satisfacao esta no scroll de sucesso.
+- **Vitoria:** imprime `BUILD SUCCEEDED` / `exit 0` + ganhos: XP, loot, Knowledge (o selo do bestiario sobe), mestria de carta (+1 por uso, Pillar 1). **Metrica de build:** os turnos viram "compile time"; build rapido ganha rotulo de elogio (blazing fast / clean build) + BONUS de loot/XP por eficiencia; build lento recebe rotulo NEUTRO (nunca xinga). Liga com Knowledge (dominar = build mais rapido) e com o bonus de "lutar de verdade" do auto-kill.
+- **Derrota (party wipe):** imprime `BUILD FAILED` / `core dumped`, corta pro HOSPITAL (canon Pillar 4 + economia: `ActorIncapacitated` -> hospital). NAO e game-over, NAO perde progresso: a derrota e um CUSTO (cura proporcional ao dano, ~1cr/3HP). Hospital tematizado como "restaurando do snapshot".
+- **Sem creditos pro hospital (anti-softlock; parametros do economy-designer + criador 2026-06-23):** o jogador ESCOLHE, nunca trava:
+  - **Safe mode (gratis):** revive a party a **13% do HP max** (sequência numérica recorrente; piso 1 HP), "no optimizations". So ofertado em wipe REAL (nunca voluntario). Capenga sem death-loop (a Analise Preditiva cobre o golpe fatal seguinte). Anti-abuso: o HP ganho vale menos que o XP/loot/credito perdido ao morrer (perder e sempre net-negativo).
+  - **OU cura completa a credito (divida = "taxa de recompilacao do snapshot"):** sai inteiro, devendo. Termos TRANSPARENTES no terminal antes de aceitar (Pillar 2, anti-Sterling: sem letra miuda):
+    - **Principal:** 1 cura completa da party (~48cr no VS, escala sozinho).
+    - **Juros:** 5% SIMPLES (nunca composto) sobre o principal, 1x por NOVA ZONA cruzada, teto 21% do principal (~11cr). Param de crescer no teto.
+    - **Multa:** so por REINCIDENCIA (wipe enquanto ainda devendo). Escada curta: 8cr na 1a, 13cr da 2a em diante, TRAVA em 13cr. Evento pontual, nunca relogio.
+    - **Cap total fixo ~72cr** (principal + encargos com tetos proprios). Encargos nunca compram mais cura nem movem o cap.
+    - **Quitacao automatica:** o JOGADOR escolhe o PLANO ao sair do hospital (pode reajustar): agressivo (62% do credito recebido pra divida) / medio (50%) / suave (38%); o resto fica livre. Ordem de abate: multa -> juros -> principal. Pior caso quita em ~17 encontros, sempre jogando normal.
+    - Bloqueia SO compras/craft, NUNCA o hospital (curar sempre disponivel = anti-softlock).
+  - Tematizacao terminal: `insufficient funds` -> `[1] safe mode (13% HP, gratis)` / `[2] recompilar a credito (ver termos)`.
+- **Build NAO-otimizado (combate RESOLVIDO sem encarar; canon 2026-06-25, combat.md §19):** quando o jogador escolhe `Resolver sem encarar` (auto-resolve opt-in), o motor roda headless com a IA sub-otima (`AutoResolveBrain`) e o terminal de resultado imprime um build `-O0`, distinto do build a mao:
+  - **Pulou e sobreviveu:** `building (no optimizations, -O0)...` -> `warning: combat resolved unattended` -> `BUILD SUCCEEDED` com loot REDUZIDO (sem rotulo de elogio de eficiencia; o `-O0` ja comunica "lento/sujo"). Penalidade de loot/dano por selo (x/y) = economia.md (economy-designer).
+  - **Pulou e deu wipe:** `building (no optimizations, -O0)...` -> `BUILD FAILED` / `core dumped` -> HOSPITAL (mesmo fluxo acima: safe mode gratis OU credito).
+  - Contraste `-O0` (pulou, sem otimizar) vs `-O2` (encarou e otimizou, blazing fast + bonus) = feedback diegetico da escolha (Pillar 2: magia=software; encarar = compilar a mao otimizando).
+
+A economia do hospital (estes parametros) deve ser integrada formalmente em [`economia.md`](economia.md) via economy-designer.
+
+---
+
+## 3.2 Overlay de compilacao (mao + pipeline)
+
+Decidido no brainstorm 2026-06-23. O CORACAO da jogabilidade: aparece ao escolher COMPILAR no menu de verbos (par.1, decisao 3, comando-first). Materializa a pipeline de 3 slots do [`combat.md`](combat.md) par.10.
+
+- **Montagem (tap-to-place):** clica uma carta da mao e ela vai pro proximo slot livre da pipeline; clica no slot pra remover. Funciona igual em mouse, teclado e controller (sem drag-drop).
+- **Mao (leque), carta COMPACTA:** cada carta mostra cor da familia + nome + custo de mana + marcador RAPIDA (compilada) ou LENTA (interpretada). O detalhe (power, fraqueza vs alvo, status aplicado, mestria, alvo) aparece num painel lateral ao FOCAR a carta. Leque limpo, decisao agil.
+- **Pipeline de 3 slots:** preenchida em ordem. Cada slot = carta OU modificador (canon par.10). Conforme monta, mostra o custo acumulado (mana/AP) e, se a assinatura casar uma receita:
+  - combo JA descoberto (no codex de receitas): preview ao vivo `COMPILANDO: <nome>` + efeito + se e rapido/lento.
+  - combo NAO catalogado: `??? combo nao catalogado` (dica de que vale disparar pra descobrir; preserva o aesthetic Discovery).
+- **Modificadores (combat.md par.8):** ocupam 1 slot e afetam a carta do slot anterior, somando mana.
+  - **Object (+1)** e **Stream (+2):** sempre disponiveis (2 botoes fixos).
+  - **Null (+1):** ESPECIAL, so via carta/desbloqueio (o mais forte, anti-buff); exige Scan previo no alvo (botao desabilitado sem Scan, com a mensagem de erro do par.10).
+- **Erros (combat.md par.10):** tentativa invalida mostra a mensagem no log: `ERRO DE COMPILACAO: mana insuficiente (custa X, tem Y)` / `AP insuficiente` / `alvo invalido` / `Null requer Scan previo` / `pipeline ja contem 3 slots`.
+- **Disparar:** confirma a pipeline -> resolve sequencial (slot 1, 2, 3) -> se casou receita, `COMPILADO: <combo>` no log + flash na pipeline. A velocidade (rapida/lenta, cast-time) do resultado segue [`combat-flavor.md`](combat-flavor.md) par.1.
+
+Decisoes finas: posicao do overlay = D5 (inferior parcial, arena com dim); animacao de encaixe = D6 (snap + slot acende + pulse de receita); ver paragrafo 5. Vocabulario visual do marcador rapida/lenta e dos icones de modificador fica pro ux-ui-designer no polimento (os icones de modificador ja existem em resources/sprites/icons-m5/modificador/).
+
+---
+
+## 3.3 Transicao de entrada e saida
+
+Decidido 2026-06-24. **Entrada:** ao esbarrar no inimigo, BOOT/COMPILACAO tematico (~0.5s, rapido, nao cansa ao repetir): flash + scanline + micro-log de terminal (`encounter.init()` / `arena: linking atores...` / `READY`) e a arena MONTA. Simetria com a tela de resultado (abre "compilando", fecha "BUILD SUCCEEDED"). **NAO usa o glitch / RGB-split** (reservado ao anomalo / Patch-Zero, ver vfx-combate-familias.md): a linguagem aqui e scanline + build-log, nao glitch. **Saida:** o inverso (a arena "descompila" de volta pro overworld). Coerente com magia=software e o registro terminal de todo o combate.
+
+---
+
+## 3.4 Pipeline dos atores na arena (decisao do criador 2026-06-24)
+
+Os atores na arena side-view sao **sprites 2D puros**, gerados direto no **PixelLab** (mesmo pipeline dos 37 icones + 11 retratos ja produzidos). NAO ha bake 3D: o jogo e 2D-only (style-guide, ADR-008); o 3D era so ferramenta de bake e foi aposentado no pivot (os .glb do art-spike foram deletados). Consequencias:
+- Poses de batalha (idle / cast / ataque / hit / vitoria) por personagem = PixelLab. A foto `gus_baby/gus_meiafrente.png` serve de referencia pra pose lateral do Gus; demais personagens partem dos retratos/character-specs ja canonicos.
+- O PixelLab gera personagem com 4/8 direcoes nativas (`create_character`), util pra a pose leste (party) / oeste (inimigo) sem flip (Pillar 3).
+- Fecha o gate que estava adiado: as poses de corpo inteiro deixam de ser bloqueadas e entram no pipeline normal de arte.
+
+---
+
+## 3.5 Modo-mira / target selection (D-nova, canon 2026-06-25)
+
+Decidido pelo criador supremo via AskUserQuestion (D3). Integra a escolha de ALVO ao menu de verbos comando-first (par.1, decisao 3). E APRESENTACAO pura: o motor (domain/combat) ja recebe o alvo na acao (a roda de fraqueza e a formula §11 ja usam o alvo); a tela so deixa o jogador navegar e confirmar. Zero mudanca no motor (entra JA, antes da Janela de Comando da Party, combat.md §4.1 / decisao D6).
+
+### Fluxo (encaixado no menu de verbos)
+
+```
+Menu do membro selecionado: [Scan] [Gambito] [Atacar] [Defender] [COMPILAR] [Flee]
+
+[Atacar]  -> entra em MODO-MIRA:
+   - cursor/seta sobre o inimigo SUGERIDO por default (regra D3 abaixo)
+   - jogador navega entre inimigos vivos (setas / clique / toque / D-pad)
+   - cada inimigo mirado mostra HP e, se ja escaneado, o tier de fraqueza vs a acao
+     (fraco 1.5 / neutro 1.0 / resistente 0.66 / imune 0.0 = combat.md §6, ja previsto no par.3)
+   - confirma (Enter / clique) -> resolve
+   - cancela (Esc / voltar) -> volta ao menu de verbos
+
+[COMPILAR] -> o alvo segue o TargetShape da carta/pipeline:
+   - Single -> a mesma mira de inimigo
+   - Linha / Area3x3 / Grupo -> mira o ponto/grupo; o preview destaca quem sera atingido
+   - Self -> sem mira
+
+[Gambito-Reordenar] / [Null] -> mira o inimigo-alvo (Null exige Scan previo, combat.md §8)
+```
+
+### Alvo sugerido por default (D3: opcao (d) com fallback (b))
+
+Ao abrir o modo-mira para uma acao ofensiva, a pre-selecao segue, nesta ordem:
+
+1. **Se o inimigo ja foi escaneado:** pre-seleciona o inimigo FRACO a familia da acao atual (multFraqueza 1.5). Premia o Scan (Pillar 1: informacao habilita acao); a mira ja "aponta para a jogada certa" para quem investiu em ler o inimigo.
+2. **Sem Scan (fallback):** pre-seleciona o inimigo mais A FRENTE na fila (o que vai agir antes), reduzindo o dano que a party vai tomar.
+
+A pre-selecao e sempre apenas sugestao: a mira e 100% navegavel, o jogador escolhe qualquer inimigo vivo. Coerente com a filosofia do comando livre (combat.md §4.1): o sistema sugere a jogada otima por SPD/Scan, mas a decisao e do jogador.
+
+### Acessibilidade (Pillar 4 / WCAG)
+
+A mira e navegavel por teclado e controller, nao so mouse (mesmo principio tap-to-place do par.3.2). O inimigo mirado tem destaque multimodal (contorno + seta + nome/HP no painel), nunca so cor (daltonismo).
+
+---
+
+## 4. Escopo do M5 (vertical slice) vs depois
+
+### M5 entrega (a tela jogavel do combate)
+- A cena separada (transicao de entrada/saida, forma simples no M5; polimento depois).
+- Side-view com party (placeholders/poses leste-oeste) vs inimigos.
+- Faixa de fila CTB lendo o estado do motor.
+- Painel do ator ativo (HP/AP/Mana/status) + menu de verbos.
+- Overlay de COMPILAR (leque da mao + pipeline de 3 slots).
+- Numero flutuante + caixa de log com as mensagens de sistema do combat.md.
+- Icone de intent sobre o inimigo (ScriptedBrain ja expoe IntentPreview).
+- Loop completo: entra do overworld -> resolve o combate -> volta ao overworld (engancha no CombatEnded/PlayerBus).
+
+### Fora do M5 (interface ja preparada)
+- Fundo de bioma (evolucao pro hibrido).
+- Animacoes de ataque ricas por familia (VFX de Pulso/Raiz/Eco...): polimento de arte posterior.
+- Transicao "assinatura" elaborada (a do M5 e funcional).
+- COMBATE-AUTOKILL + Resolver sem encarar (instant-win no overworld + auto-resolve opt-in): **mecanica CANONIZADA em combat.md §19** (eixo de dominio auto-kill/auto-resolve/encarar). A BattleScreen ja incorpora o HOLD de abertura + verbo (§5.2 D13) e o terminal `-O0` (§3.1); o auto-kill silencioso no overworld (micro-animacao por arquetipo + falas-balao) e apresentacao de OVERWORLD, fora da BattleScreen, plugada DEPOIS.
+- CARTAS-CAST-TIME (cartas lenta/rapida; ver [`combat-flavor.md`](combat-flavor.md) + INBOX do TODO): a tela ja deve PREVER o marcador de cast na fila (ex: "Gus: interpretando...") e o spinner de fases; a mecanica de motor (cast-time real) entra como extensao DEPOIS da BattleScreen base, sem refazer.
+
+---
+
+## 5. Decisoes finas de layout (FECHADAS pelo criador 2026-06-24)
+
+Briefing 100% fechado pro engine-graphics-programmer (proposta do lead-game-designer + decisao do criador via AskUserQuestion).
+
+- **D1 Resolucao base:** **960x540** (16:9), pixel-perfect, escala inteira (x2 = 1920x1080). E a tela mais densa do jogo (7 atores + 4 zonas de HUD + overlay). **Subiu de 640x360 (lider 2026-06-25):** no display o 640x360 ficou apertado (4 inimigos + painel nao cabiam, a coluna de inimigos transbordava pro menu); 960x540 da folga pra TODOS os slots em tamanho fixo (sem escala) e pro HUD respirar, mantendo o pixel-perfect no x2 ate 1080p. (Constantes de layout em `gus/app/screens/battle_layout.hpp`; textos de corpo subiram 8px->16px, banner/floater 16px->24px, pra legibilidade proporcional no canvas 1.5x maior.)
+- **D2/D3 Arena (disposicao):** **coluna unica de cada lado, espacamento fixo.** Party empilha a esquerda (pose leste), inimigos a direita (pose oeste), sempre centralizados no eixo vertical (1 a 4 inimigos, **SEM escala dinamica = TAMANHO FIXO**, pixel-perfect, mira deterministica). **Gus levemente recuado** (1 regra, serve Pillar 4: o fragil). Profundidade real (V/frente-tras) = polimento pos-M5. Mini-boss ocupa mais por sprite-base maior, nao por escala.
+- **D4 Fila CTB:** mostra os **5 proximos**, celula = **retrato 48px** (asset nativo, sem downscale) + marca de "proximo" no 1o. SEM nome, SEM mini-barra (a barra de HP vive sob o ator na arena). Preparada pra o marcador "interpretando..." (cast LENTO, CARTAS-CAST-TIME) ocupar uma celula como ator-fantasma; se resolver alem de 5 casas, a 5a celula marca "+N".
+- **D5 Overlay de COMPILAR:** **inferior parcial** (~40% da tela, sobe de baixo sobre painel+log), a **arena fica visivel atras com leve dim** (nao apaga). Pillar 1: ver intent/fraqueza do inimigo enquanto monta o combo. (Acoplado a D1=960x540 pra caber.)
+- **D6 Encaixe de carta (tap-to-place):** **snap instantaneo** (<100ms, sem tween bloqueante) + o slot "acende" na cor/icone da familia + quando a assinatura casa receita, a **pipeline pulsa** (preview COMPILANDO). Ao remover, fade-out rapido. O juice esta no "ding" de combo fechado (Discovery). Slide animado = polimento opcional depois.
+- **D7 Camera + dano:** **camera estatica** (sem zoom/pan a cada turno; CTB troca muito de turno, pan enjoa e esconde fila/intents), so um **highlight/seta no ator ativo**. Dano = **numero flutuante** sobre o alvo (sobe + fade ~700ms), **cor por canal** (combat.md par.11): COMUM claro, CRIT ciano + bold, FALHA dano-0 vermelho-erro `#F43F5E`, CURA verde com `+N`. Cinematografia de golpe especial = pos-M5.
+  - **REVISAO D7-LOG (criador, 2026-06-25, apos teste no display):** o log **NARRA o combate** (mostra TODA acao e dano em texto, nao so eventos notaveis). Motivo: a regra original "log so notavel + dano = numero flutuante" deixou o dano comum **invisivel** enquanto os numeros flutuantes nao existiam (eram do incr 5); ao implementar os dois juntos, o criador decidiu que o log deve narrar (ex.: "Caua ataca o Drone: 25", "Drone usa Pulso em Gus: 12", "Gus defende"). Mantem **cor por categoria** (dano/cura/status/sistema), **bold** nas mensagens-codigo (COMPILADO / ERRO DE COMPILACAO) e nos golpes notaveis, e **rola cortando no tamanho da caixa** (mostra as ultimas N linhas). O numero flutuante cobre o IMPACTO imediato; o log cobre o HISTORICO legivel. (Implementado no incr 5: `battle_floaters` + `battle_log_model::build_log_lines` sem filtro de notavel.)
+
+---
+
+## 5.1 Sistema de fonte (decisao do criador 2026-06-24)
+
+A engine NAO tem sistema de fonte (o IRenderer so faz rect/textura). Decisao: **manter font-free por enquanto** (HP=barra, AP/Mana=pips, status=icones PNG; tudo legivel sem texto). Decidir a fonte quando o combate EXIGIR texto de verdade. Reversivel: numeros se sobrepoem as barras sem mudar o layout POCO.
+
+**Tensao registrada (dever de contra-argumentar, NAO bloqueia):** o design da BattleScreen e CENTRADO em texto de terminal (o LOG com COMPILADO/ERRO DE COMPILACAO/as 100 frases de falha, os numeros de dano flutuante, a tela de resultado BUILD SUCCEEDED, as falas-terminal). Font-free cobre o PAINEL (incremento 2), mas o LOG e os numeros (incrementos 3-5) sao o coracao do "magia=software" e SAO texto. Consequencia pratica: ate a fonte entrar, o log/numeros ficam como PLACEHOLDER (estrutura da caixa sem conteudo legivel). Candidato pronto: rasterizador de texto do glintfx. O criador decide o momento; provavel gatilho = quando o log/terminal precisar ser lido de fato.
+
+---
+
+## 5.2 Ritmo / pacing do combate (decisoes do criador 2026-06-25, do playtest no display)
+
+O playtest pegou que o combate sem RITMO atropela tudo (inimigos agem antes do jogador ver, floaters/log somem, confuso de quem e a vez). Decisoes:
+
+- **D8 Modelo de ritmo: HIBRIDO.** Cada turno mostra acao + numero flutuante + log, pausa ~0.8s, segue sozinho; o jogador pode APERTAR uma tecla pra acelerar/avancar pro proximo. Fluido por padrao + controle quando quer ler. A apresentacao processa UM evento de cada vez (fila de eventos drenada do motor com timing), NAO resolve tudo instantaneo.
+- **D9 Indicador de turno: banner + highlight + 'sua vez'.** Texto claro de quem joga ("TURNO DE GUS"); ator ativo com destaque forte (brilho/seta); na vez do jogador, "SUA VEZ: escolha uma acao"; na vez do inimigo, "vez do inimigo". Leitura imediata.
+- **D10 Abertura: comeca PARADA e ESPERA INPUT.** Ao abrir: arena monta, "BATALHA!" breve + a fila, NINGUEM agiu. **A abertura agora PARA e ESPERA o jogador iniciar** (decisao do criador 2026-06-25, casa com o verbo Resolver sem encarar, D13): a luta so comeca quando o jogador manda [Encarar] (Enter). Ao iniciar, os turnos animam um a um com o ritmo; se o inimigo for o 1o (maior SPD), o jogador VE ele atacar com numero+log no tempo certo. (Resolve "inimigos ja atacaram antes de eu ver": agora o 1o turno so dispara com input do jogador.)
+- **D11 Floater no ataque do INIMIGO:** com o pacing, cada ataque inimigo aparece no seu tempo com seu numero flutuante (antes batiam todos juntos e somiam).
+- **D12 Log narra a CONSEQUENCIA:** nao so "X atacou", mas "X atacou Y: Y recebeu N de dano" e o status ("Y ficou com Stun"). A apresentacao monta a linha completa a partir do dano + status que o motor ja entrega. E com o pacing, o log nao rola rapido demais (uma linha por evento no ritmo).
+- **D13 Estado de HOLD na abertura + verbo "Resolver sem encarar" (canon 2026-06-25, combat.md §19; SO TRASH).** O estado parado do D10 e um HOLD que espera o input. Opcoes apresentadas:
+  - **[Encarar] (Enter):** inicia o combate normal (caminho ja descrito em D10). Custo ZERO de atrito (default; 99% das lutas).
+  - **[Resolver sem encarar] (tecla dedicada):** SO aparece para TRASH com selo de dominio Bronze+ (gate de onboarding; combat.md §19.2). Ao apertar, abre o **aviso de consequencias** com o **rotulo de risco** (LOW / MEDIUM / HIGH, lido do Knowledge; HIGH adverte explicitamente que pode mandar a party pro Hospital). Confirmar -> roda o auto-resolve headless (`AutoResolveBrain`, combat.md §19.6) -> terminal de resultado `-O0` (§3.1). Voltar -> encara.
+  - Em luta NAO-trash ou sem selo, o verbo NAO aparece; o HOLD ainda espera [Encarar] (Enter) para iniciar (o hold de abertura e universal; o verbo de pular e condicional ao tier Trash + selo Bronze+).
+  - O atalho global para pular em massa e o **toggle "Auto-resolver" do HUD de 3 estados** (Encarar tudo / Auto so dominado [default] / Auto maximo; combat.md §19.5). O verbo per-luta e o override pontual no estado default.
+  - Consequencia arquitetural: o `PacingDirector` ganha o estado de HOLD inicial esperando input (ja existe `WaitingPlayerInput`; aqui e um hold de abertura ANTES do 1o turno, com o menu [Encarar]/[Resolver sem encarar]). O auto-resolve em si nao usa a BattleScene (roda a FSM headless); so o resultado volta pro terminal.
+
+Consequencia arquitetural: a BattleScene ganha um "diretor de pacing" (POCO testavel) que consome os eventos do motor um a um, com timing e estados (animando / esperando-input-do-jogador / esperando-delay). O motor (domain/combat) NAO muda - so a apresentacao deixa de drenar tudo de uma vez.
+
+**Status de implementacao (incremento 6, entregue 2026-06-25):** D8-D12 implementados. `PacingDirector` POCO (`gus/app/screens/battle_pacing.{hpp,cpp}`): estados Intro / WaitingDelay / WaitingPlayerInput, avanco por `tick(dt)`, `skip()` pra acelerar. A BattleScene comeca PARADA (D10), anima 1 turno por vez com delay ~0.8s (D8/D11), mostra o banner de turno (D9) e narra a consequencia (dano + status via `consequence_suffix`, D12). Cada inimigo age UMA vez por turno (1 ataque = 1 floater no seu tempo), em vez de gastar os 3 AP de uma vez. Intro `kPacingIntroSeconds` = 0.9s; delay `kPacingStepDelaySeconds` = 0.8s.
+
+**Refinamento D8: 2 BEATS no turno de inimigo (2026-06-25, do playtest):** o lider no display: "a tela aparece com o ataque ja feito" e "quando colocar a animacao isso vai ser perdido". Causa: o motor resolve o turno instantaneo e a apresentacao mostrava o ANUNCIO junto do resultado ja aplicado. Fix: o turno de inimigo agora tem 2 beats. **Beat 1 ANUNCIO** (`PacingState::AnnouncingEnemy`, `kPacingAnnounceSeconds` = 0.7s): mostra "Vez de <nome>" + highlight, NADA resolveu (HP intacto, sem floater, sem log de acao). **E o beat onde a animacao de ataque (windup) vai morar** (gancho explicito em `advance_pacing`). **Beat 2 RESOLUCAO** (`begin_enemy_step` -> `WaitingDelay`): aplica o golpe (dano + floater + queda de HP + log de consequencia), pausa ~0.8s, proximo. Vale tambem pro 1o turno apos a intro (BATALHA! -> anuncio -> resolve). O turno do JOGADOR ja pausa no menu (`WaitingPlayerInput`), entao nao precisa do beat de anuncio. Regressao travada em `battle_scene_test` (no anuncio o alvo esta intacto; so o resolve bate).
+
+**Status D13 - HOLD de abertura aguardando input (2026-06-25, do playtest):** o lider no display: "abriu com pequena pausa e atacou" + "nao vi nenhum BATALHA!". O Intro de 0.9s temporizado ainda passava antes dele olhar. Fix (decisao do lider): o `PacingState::Intro` deixou de ter timer - vira um HOLD que ESPERA INPUT (igual ao turno do jogador): `tick`/`skip` nao avancam o Intro; so `begin_combat()` (ENCARAR) sai dele e libera o 1o turno. A abertura mostra "BATALHA!" + prompt: **"[Enter] Encarar"** (sempre) e **"[Q] Resolver sem encarar"** (so quando `offers_auto_resolve()` = todos os inimigos sao TRASH; no demo sim - boss/elite escondem). O verbo de auto-resolve esta como PLACEHOLDER NAO-DESTRUTIVO neste incremento (`request_auto_resolve()` so loga "[auto-resolve: a implementar]"); o calculo real (`AutoResolveBrain` headless + penalidade por selo, §19) vira num incremento separado pos-canonizacao. Implementado: `PacingDirector::begin_combat`/`waiting_intro`; `BattleScene::start_combat`/`request_auto_resolve`/`offers_auto_resolve`; render do prompt; viewer (Enter=Encarar, Q=placeholder). Regressao travada em `battle_scene_test` (abertura nao auto-avanca por tempo; skip nao comeca; Q nao e destrutivo e nao sai do hold).
+
+**Fix "ataque colado/duplo" (2026-06-25, do playtest):** o lider no display: "quando o ataque SEGUINTE e de um inimigo, sai COLADO com o anterior (impressao de ataque duplo)". Causa-raiz (confirmada por instrumentacao da fila real): apertar a tecla durante o BEAT 1 (anuncio) chamava `skip()`, que ZERAVA o timer do anuncio -> o anuncio durava 1 frame e o golpe resolvia colado. Fix: `skip()` agora so acelera a pausa de LEITURA pos-resolucao (`WaitingDelay`); NUNCA o anuncio (`AnnouncingEnemy`) - o anuncio "Vez de <nome>" sempre toca seu tempo proprio (e o beat do windup da animacao). Verificado: com skip a cada frame, o anuncio dura ~0.7s (42 frames), nao 1. Regressao em `battle_scene_test` (skip nao colapsa o anuncio; na fila REAL todo inimigo resolvido teve seu proprio anuncio).
+
+**Fix sobreposicao arena x painel -> RESOLVIDO PELO BUMP DE RESOLUCAO (2026-06-25, do playtest):** o lider no display: a coluna de 4 inimigos (slots empilhados) transbordava pra dentro do menu/log (4o inimigo atras do verbo "Fugir") - o aperto do 640x360 (banda da arena de so 186px nao cabia 4 slots de 64px + gaps = ~274px). **Solucao definitiva: subir a resolucao base pra 960x540 (D1).** Com a banda da arena agora em ~304px (kArenaTop=96..kArenaBottom=400), os 4 slots de **altura FIXA** (kActorSlotH=64, sem escala) cabem com ~24px de folga, centralizados. O painel/log tem fundo OPACO desenhado por cima dos atores (ordem: fundo arena -> atores -> painel/menu/log). Verificado pra 1..4 de cada lado: todo slot termina com y+altura <= kActivePanelTop. Regressao travada em `battle_layout_test` (nenhum slot invade o painel em nenhuma contagem; altura SEMPRE = kActorSlotH).
+  - **TENSAO COM D3 ENCERRADA:** o paliativo anterior (altura ADAPTATIVA por contagem - `arena_slot_height`, que encolhia o slot pra caber no 640x360 apertado) **foi revertido**. Com 960x540 o D3 ("SEM escala dinamica = pixel-perfect") volta a valer ao pe da letra: TODO slot de ator tem o mesmo tamanho fixo, em toda contagem. Sem trade-off pendente.
+
+---
+
+## 6. Animacao de combate (game-feel e timing)
+
+A especificacao de game-feel da animacao de ATAQUE (3 tipos: magia com cast no lugar + projetil; melee que desloca e volta; hit-react do alvo), o ENCAIXE no pacing de 2 beats (§5.2), a TABELA DE SONS (pendente, pos-visual) e o BRIEFING dos sprites de batalha necessarios vivem em doc dedicado: [`battle-anim.md`](battle-anim.md) (canon 2026-06-25). Resumo do contrato:
+
+- **Ator na arena = SPRITE animado** (battle-idle virado pro oponente), nao o retrato (retrato fica no cockpit lateral). Por ora testa-se com RETRATOS como placeholder; sprites de corpo entram depois.
+- **Magia:** cast no proprio lugar + projetil que viaja ate o alvo (placeholder circular por ora; VFX das 5 familias depois, vfx-combate-familias.md).
+- **Melee:** desloca ate o alvo, golpeia, volta a posicao de repouso (estilo Chrono Trigger / FF).
+- **Hit-react (nos dois):** sofrimento + knockback visual + volta a battle-idle.
+- **Encaixe no pacing (§5.2):** o windup mora no Beat 1 ANUNCIO; o contato/floater/hit-react/VFX no Beat 2 RESOLUCAO. `skip()` nunca colapsa o Beat 1 (e o beat do windup).
+
+## 7. Pipeline de implementacao (agentes)
+
+1. **lead-game-designer**: fecha as pendencias finas do paragrafo 5 (propostas -> AskUserQuestion ao criador).
+2. **engine-graphics-programmer**: implementa a BattleScreen em `app/` (cena, render side-view, overlay de cartas, numeros flutuantes, log, icones de intent), lendo o estado do motor `domain/combat/` e enganchando no barramento de eventos (`core/events/`) por CombatEnded/PlayerBus.
+3. **qa-engineer**: plano de teste da tela (loop overworld->batalha->volta; legibilidade dos feedbacks).
+
+A regra canonica: o motor (`domain/`, `core/`) permanece POCO puro; a BattleScreen vive em `app/` e so LE o estado + drena a lista de mudancas, sem framework no dominio.

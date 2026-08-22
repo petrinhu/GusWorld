@@ -1,0 +1,3 @@
+# Recursive Order Gear (Engrenagem da Ordem Recursiva) — image prompt (nano banana)
+
+A single emblem, flat straight-on, perfectly symmetrical: a cog-wheel whose teeth and hub contain a smaller identical cog-wheel, which contains a smaller one again, the same gear recursing inward toward the center in self-similar nested rings. Cold burnished-brass and dark-steel finish with thin glowing-cyan accent lines tracing the teeth and the recursive nesting, austere and mechanical. A flat heraldic logo, not a live machine in a scene. Centered, straight-on, plain pure-white (#FFFFFF) background, even lighting.
