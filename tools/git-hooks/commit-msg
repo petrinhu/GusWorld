@@ -1,0 +1,48 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Gate de commit-msg do GusWorld (GODS_LAWS.md L-19, L-25). Este arquivo e
+# so um delegador fino: a logica de verdade mora em
+# tools/security/commit_gate.py, em Python puro, pra rodar identica nas
+# cinco plataformas da matriz (GODS_LAWS.md L-09, L-20).
+#
+# Instalacao: este arquivo NAO roda sozinho -- git so executa hook a
+# partir de .git/hooks/<nome> (ou do que core.hooksPath apontar). Rode
+# "python3 tools/git-hooks/install.py" uma vez por clone pra copiar isto
+# (e qualquer outro hook local do projeto) pro lugar certo. Ver
+# docs/security/commit-gate.md.
+#
+# Degradacao conhecida no Windows: isto depende do Git for Windows
+# executar hook sem extensao atraves do sh.exe embutido (comportamento
+# padrao de qualquer instalacao normal do Git for Windows, que roda em
+# cima do MSYS2/Git Bash). Se o ambiente nao tiver esse sh nem python3/
+# python no PATH dentro dele, o hook simplesmente nao dispara -- sem
+# gate, sem aviso, porque nesse caso o proprio git nao consegue rodar o
+# hook. Testado neste projeto so em Linux (Fedora); pendente confirmar
+# em CI Windows real.
+
+set -e
+
+__root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+    echo "commit_gate: nao consegui achar a raiz do repositorio git" >&2
+    exit 1
+}
+
+__script="$__root/tools/security/commit_gate.py"
+
+if [ ! -f "$__script" ]; then
+    echo "commit_gate: script nao encontrado em $__script -- gate nao pode rodar" >&2
+    exit 1
+fi
+
+if command -v python3 >/dev/null 2>&1; then
+    exec python3 "$__script" "$1"
+elif command -v python >/dev/null 2>&1; then
+    exec python "$__script" "$1"
+else
+    echo "commit_gate: python3 (ou python) nao encontrado no PATH." >&2
+    echo "GODS_LAWS.md L-28: nada e instalado sem perguntar ao lider." >&2
+    echo "Instale python3 e rode 'git commit' de novo, ou avise o lider." >&2
+    exit 1
+fi
