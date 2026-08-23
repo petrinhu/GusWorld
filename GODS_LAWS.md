@@ -37,7 +37,7 @@
 | [L-16](#l-16) | homenagear pessoa real, ou citar o filho do líder | Homenagem só com aceite; o filho aparece só como "Gus Dragon" |
 | [L-17](#l-17) | criar módulo, arquivo, ou desenhar a forma de um sistema | Espinha de cinco camadas com gate de CI; regra como comando e evento |
 | [L-18](#l-18) | escolher formato de arquivo de mapa, save, configuração ou item | Nada em formato de texto; máxima proteção contra edição |
-| [L-19](#l-19) | commitar, fechar fatia, ou pensar em cobertura e formatação | Quatro portões de qualidade; TDD estrito; sem meta de cobertura |
+| [L-19](#l-19) | commitar, fechar fatia, ou pensar em cobertura e formatação | Cinco portões de qualidade; TDD estrito; sem meta de cobertura |
 | [L-20](#l-20) | escrever CI, ou declarar que uma plataforma funciona | Matriz das cinco plataformas desde o primeiro commit |
 | [L-21](#l-21) | achar que o `inicial.md` cumpriu o papel dele | Só se apaga com as quatro condições satisfeitas e o líder confirmando |
 | [L-22](#l-22) | nomear qualquer coisa, ou escrever comentário e commit | Identificador e comentário em inglês, `snake_case`; commit em pt-br |
@@ -50,6 +50,7 @@
 | [L-29](#l-29) | propor recurso, sistema ou escopo novo | Os 16 cortes: a cerca do que o jogo NÃO é |
 | [L-30](#l-30) | escrever, reordenar ou acrescentar item na tabela | Todo item aponta para o documento que o especifica, se existir |
 | [L-31](#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
+| [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
 
 
 ---
@@ -209,9 +210,9 @@ Cinco alvos, **cinco entradas distintas na matriz de CI**. **Fedora 44 é o alvo
 
 **Contradições já identificadas em 21/08/2026, que bloqueiam o que depender delas:**
 
-- `docs/design/pillars.md:27` diz *"Cel-shaded 3D low-poly"*, contra a L-02.
-- `docs/design/mecanicas/core-loop-exploracao.md:95`, decisão DA-1, canônica, diz *"Câmera e navegação no overworld: 3/4 orbital + controle direto [...] Coerente com '3D real'"*. **Resolvido pela L-26:** a perspectiva é 3/4 top-down fixa, e "orbital" e "3D real" estão revogados e serão apagados.
-- `docs/narrative/diary/knowledge-gates.md:380`, o único esquema de save do corpus, se declara escrito para o stack Godot e GDScript, a re-derivar.
+- ~~`docs/design/pillars.md:27` diz *"Cel-shaded 3D low-poly"*, contra a L-02.~~ **RESOLVIDO, conferido em 23/08/2026:** a linha 27 hoje diz *"Não é fotorrealista. Pixel-art 2D, paleta restrita"*, e a expressão "Cel-shaded" não existe mais em lugar nenhum do arquivo. A citação fica como registro de por que a L-02 precisou existir.
+- `docs/design/mecanicas/core-loop-exploracao.md:95`, decisão DA-1, canônica, diz *"Câmera e navegação no overworld: 3/4 orbital + controle direto [...] Coerente com '3D real'"*. **Resolvido pela L-26, e conferido em 23/08/2026:** a perspectiva é 3/4 top-down fixa, e "orbital" e "3D real" **já foram apagados** — a linha 95 hoje diz *"3/4 top-down fixa + controle direto"*, e "orbital" tem zero ocorrências no arquivo.
+- `docs/narrative/diary/knowledge-gates.md:376` (a citação dizia 380; a linha escorregou, corrigida em 23/08/2026), o único esquema de save do corpus, se declara escrito para o stack Godot e GDScript. **Parcialmente resolvido:** a nota de stack já está no arquivo e marca o que sobrevive e o que muda; **segue bloqueando** a re-derivação técnica do esquema.
 - `docs/design/producao/*` se declaram canônicos mas descrevem pipeline Godot e C# aposentado.
 
 **Aplicação:** a lista acima não é exaustiva, e não vira licença para ignorar o que não está nela. Contradição nova encontrada entra aqui.
@@ -570,3 +571,17 @@ Registrado aqui para não se perder. Nada nesta seção é lei ainda.
 **Nota de descumprimento, registrada porque é a causa do pedido:** o `PROTOCOL.md` do bus **já obrigava** a "Resposta 2" automática — o resultado da decisão do líder vai a ele sem reaprovação de texto. **Ele não deveria ter precisado pedir.** Se pediu, a resposta automática não estava saindo em algum dos quatro canais, e vale conferir se alguma ideia dele ficou sem retorno.
 
 **Formato, quando a resposta for na discussion 7** (o catálogo de bugs que ele mantém): timestamp, uma das três classificações que ele fixou (**Bug Consertado**, **Bug Funcional**, **Bug Possível**) e itens numerados entre parênteses. Ele tem 11 anos, programa, usa Manjaro e git — **o que ele não merece é resposta vaga**, e "não existe código disso ainda" é melhor resposta que estimativa inventada.
+
+## L-32
+
+**Data:** 23/08/2026, decisão do líder. Lei espelhada do GlintFx (lá é a L-11), pela mesma razão da L-31: **commit e push são obrigação permanente de cadência, não parágrafo dentro da lei de orquestração.**
+
+**Verbatim:** *"commit ao fim de cada fatia; push ao fim de cada onda só se o GHA fechar verde, se todos os testes verdes."*
+
+**Commit local** a cada fatia entregue, citando o ID do item do `TODO.md` na mensagem e tocando o `Status` do item no mesmo commit.
+
+**Push** só quando a onda inteira fecha **e** as duas condições valem juntas: a verificação automática do GitHub **verde** e **todos** os testes verdes. Vermelho em qualquer das duas **bloqueia** o push — diagnostica e conserta antes, não se empurra "para o CI ver".
+
+**Merge em `main` por PR e criação de tag continuam exigindo aval explícito no contexto** — aprovação dada antes não vale para a próxima.
+
+**Aplicação:** a mensagem do `push` mente; confirme o SHA no remoto por `git ls-remote <url> <branch>` sempre que o push importar. Confira `git diff --cached --stat` antes de commitar e `git show --stat` depois: `git add` é atômico, e um caminho inválido derruba o add inteiro em silêncio, deixando o commit mutilado sem dar erro.
