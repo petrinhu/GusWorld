@@ -4,7 +4,7 @@
 
 ## Legenda e critérios
 
-- Status possíveis: `⏳ Pendente` (inicial de tudo), `🚧 Em andamento`, `🔍 Pendente verificação` (implementado, aguardando teste ou auditoria), `✅ Concluído` (só depois de verificado), `🟡 Parcial` (feito em parte: uma fatia entregue e outra ainda não, dentro do mesmo item), `⛔ Bloqueado`, `🗄️ Arquivado`, `❌ Cancelado`.
+- Status possíveis: `⏳ Pendente` (inicial de tudo), `🔄 Em andamento`, `🔍 Pendente verificação` (implementado, aguardando teste ou auditoria), `✅ Concluído` (só depois de verificado), `🟡 Parcial` (feito em parte: uma fatia entregue e outra ainda não, dentro do mesmo item), `⛔ Bloqueado`, `❌ Reprovado`, `🚫 Cancelado`.
 - `Estado Auditado` começa em `—` e só é preenchido por auditoria de C-level `fable` (L-10), nunca por auto-relato de implementer.
 - A ordem das linhas, de cima para baixo, É a ordem de execução. Onda `0` = decisões do líder (custam tempo dele, não WIP de engenharia). Onda `—` = item bloqueado por terceiro, sem data; a causa está na Descrição.
 - Teste unitário NÃO é item desta tabela: nasce com o código pelo TDD estrito da L-19 (vermelho, verde, refatorar). Só teste não unitário (`TST-*`) e auditoria (`AUD-*`) têm linha, sempre downstream do que cobrem.
