@@ -27,7 +27,7 @@ All prompts used for image and sprite generation were derived from the game's lo
 
 ### Human contributors
 
-Alongside the AI tools, several people shaped this project directly. Full detail lives in the README's Credits and acknowledgments section and in [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md); in summary:
+Alongside the AI tools, several people shaped this project directly:
 
 - **Gus Dragon (my son):** inspiration for the protagonist's look and tastes, my partner in game decisions, and lead tester.
 - **El [Iagows](https://github.com/iagows) (my brother):** a computer engineer and a personal inspiration to me in IT, whose training shaped how I think about tech; he gave me plenty of architecture and stack advice, and guided me on using __DEP_REMOVIDA__ and spritesheets for movement.
@@ -86,7 +86,7 @@ Todos os prompts usados na geração de imagem e sprite foram derivados da lore 
 
 ### Contribuidores humanos
 
-Além das ferramentas de IA, várias pessoas moldaram este projeto diretamente. O detalhe completo vive na seção de Créditos e agradecimentos do README e em [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md); em resumo:
+Além das ferramentas de IA, várias pessoas moldaram este projeto diretamente:
 
 - **Gus Dragon (meu filho):** inspiração da aparência e dos gostos do protagonista, parceiro nas decisões sobre o jogo, e meu tester principal.
 - **El [Iagows](https://github.com/iagows) (meu irmão):** engenheiro de computação e uma inspiração pessoal minha em TI, cuja formação moldou meu jeito de pensar tecnologia; me deu várias dicas de arquitetura e stack, e me orientou no uso de __DEP_REMOVIDA__ e de spritesheets para o movimento.

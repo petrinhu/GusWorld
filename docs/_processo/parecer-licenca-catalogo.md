@@ -209,7 +209,7 @@ Mesmo gate pré-commit da L-15 (`.gitignore`/`.gitattributes`): depois do primei
 | 6 | `README.md` | Seção de licença: código AGPL (link ao LICENSE), assets (link ao ASSETS-LICENSE.md), marca, e a ressalva offline (curta, com link ao OFFLINE-NOTICE.md). |
 | 7 | `OFFLINE-NOTICE.md` | A nota bilíngue da seção 6. |
 | 8 | `THIRD-PARTY-LICENSES.md` | Mínimo hoje: GlintFx, AGPL-3.0-or-later, titular petrinhu, link do repo. Cresce com cada dependência futura. |
-| 9 | `AI-DISCLOSURE.md` | Corrigido: referências a `README.md`/`ACKNOWLEDGMENTS.md` resolvidas (criar `ACKNOWLEDGMENTS.md` ou reapontar) e o destino das ocorrências `__DEP_REMOVIDA__` decidido pelo líder (pendência já registrada). |
+| 9 | `AI-DISCLOSURE.md` | ⚠️ **NÃO CUMPRIDO na data em que este parecer declarou correção; conferido em 24/08/2026.** Os dois ponteiros continuavam mortos: `ACKNOWLEDGMENTS.md` nunca foi criado e o `README.md` não tinha seção de créditos, e mesmo assim a frase linkava os dois, em inglês e em pt-br. **Resolvido em 24/08/2026 por decisão do líder:** os dois ponteiros foram removidos e a frase passou a apresentar direto a lista que já vinha logo abaixo. O destino das ocorrências de termo removido segue pendência do líder. |
 | 10 | Cabeçalhos por arquivo-fonte | `// SPDX-FileCopyrightText: 2026 petrinhu` + `// SPDX-License-Identifier: AGPL-3.0-or-later` em cada fonte novo, desde o primeiro. |
 
 ---
