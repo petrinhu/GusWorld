@@ -26,7 +26,7 @@
 | [L-05](#l-05) | precisar de algo que o GlintFx ainda não tem | Proibido dublê de plataforma: ou liga no GlintFx, ou não existe |
 | [L-06](#l-06) | decidir o que construir primeiro | Núcleo puro agora; a camada que desenha só nasce com o GlintFx |
 | [L-07](#l-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
-| [L-08](#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets em três zonas; livros reservados |
+| [L-08](#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
 | [L-09](#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos; Fedora 44 primário; CachyOS é próprio, não Arch |
 | [L-10](#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level fable audita e cria; sonnet implementa |
 | [L-11](#l-11) | escolher entre duas abordagens, ou notar qualquer dúvida | Nada é decidido por agente; opções ao líder via `AskUserQuestion` |
