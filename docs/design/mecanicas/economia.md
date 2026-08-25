@@ -279,12 +279,58 @@ documento (L-11: quem decide é o líder, não o agente).
 | 4 | **Água com gás** | restaura **fôlego do corpo** (`core::player::WindedTimer`, `stamina.md`) — **não** é energia de ação/AP; lacuna anterior FECHADA nesta rodada, ver §5.5.3 | refina em **água destilada** (mesmo papel de insumo de bateria) | líder, 2026-08-25 |
 | 5 | **Sanduíche de queijo, sem queijo derretido** | fôlego do corpo **e** HP juntos, pouco de cada (mesmo recurso "fôlego" da linha 4, agora fechado — ver §5.5.3) | nenhum decidido | líder, 2026-08-25 |
 | 6 | **Tirinhas de frango** | **buff temporário de ataque ou força** — a categoria "buff ofensivo temporário" está fechada; qual das duas estatísticas exatas (se forem distintas no jogo) não foi escolhida pelo líder | nenhum decidido | líder, 2026-08-25 |
-| 7 | Churrasco | ⚠️ EFEITO A DECIDIR PELO LÍDER | nenhuma ligação óbvia a ingrediente do §5.5.2 | líder cita o item, 2026-08-25 |
-| 8 | Pastilha de menta | ⚠️ EFEITO A DECIDIR PELO LÍDER | nenhuma ligação óbvia | líder cita o item, 2026-08-25 |
-| 9 | Macarrão ao alho e óleo | ⚠️ EFEITO A DECIDIR PELO LÍDER | nome cita **Alho** (§5.5.2) | líder cita o item, 2026-08-25 |
-| 10 | Pão de alho | ⚠️ EFEITO A DECIDIR PELO LÍDER | nome e composição óbvia citam **Alho** e **Manteiga** (§5.5.2) | líder cita o item, 2026-08-25 |
+| 7 | **Churrasco** | **cura leve em TODA a party de uma vez** (área, não single-target; ver amarra §5.5.1a) | nenhuma ligação óbvia a ingrediente do §5.5.2 | líder, 2026-08-25 |
+| 8 | **Pastilha de menta** | **consumo sem custo de turno, só no overworld** (não vale em combate; ver amarra §5.5.1b) | nenhuma ligação óbvia | líder, 2026-08-25 |
+| 9 | **Macarrão ao alho e óleo** | **imunidade temporária a UM tipo de efeito negativo** (ver amarra §5.5.1c) | nome cita **Alho** (§5.5.2) | líder, 2026-08-25 |
+| 10 | **Pão de alho** | **escudo temporário**: absorve dano antes de o HP cair (ver amarra §5.5.1d) | nome e composição óbvia citam **Alho** e **Manteiga** (§5.5.2) | líder, 2026-08-25 |
 | 11 | Pizza de atum | ⚠️ EFEITO A DECIDIR PELO LÍDER | nome e composição óbvia citam **Atum em lata** e **Orégano** (§5.5.2) | líder cita o item, 2026-08-25 |
 | 12 | Macarrão ao molho pesto | ⚠️ EFEITO A DECIDIR PELO LÍDER | nenhuma ligação óbvia (pesto tradicional leva parmesão, mas o NOME do item não cita o ingrediente — não presumido aqui) | líder cita o item, 2026-08-25 |
+
+#### 5.5.1a Churrasco: amarra de preço (`economy-designer`)
+
+**Cura de área tem de ter preço que ESCALA com o tamanho da party.** Sem essa amarra, cura
+de área é matematicamente mais barata por ponto de vida entregue do que cura individual (o
+mesmo consumo cura N atores em vez de 1), e vira sempre a melhor compra, o que fere §0.1
+("comedido sai melhor que esbanjador, nunca empate por acidente de fórmula"). O NÚMERO da
+escala (linear por membro, degrau, teto) é do `economy-designer`, na onda de
+balanceamento; esta seção só fixa que a escala existe.
+
+**Forma do item, registrada para não se reabrir sozinha:** churrasco é **item comum**, sem
+restrição de transporte. O relatório anterior levantava que ele não caberia numa mochila
+(sugerindo virar bônus de descanso em vez de consumível). O líder corrigiu isso, verbatim:
+"Churrasco é apenas um pedaço de carne, não precisa estar no espeto para transporte."
+Churrasco entra no inventário como qualquer um dos outros onze itens desta lista, sem
+nenhuma mecânica de porte ou de preparo prévio.
+
+#### 5.5.1b Pastilha de menta: amarra de escopo (`economy-designer`)
+
+**A restrição "só overworld, não vale em combate" É o efeito, não um detalhe de
+implementação.** Consumo sem custo de turno dentro de combate quebraria a Doutrina do
+Comedimento (§0): viraria "come antes de qualquer ação", turno de graça repetível sempre
+que houvesse pastilha em estoque, o oposto de decisão comedida. Fora de combate, sem
+custo de turno para gastar, o risco de grind desaparece porque não há "turno" a economizar
+no overworld. Qualquer implementação futura que porte este item para dentro do combate
+sem repensar o preço fura esta amarra.
+
+#### 5.5.1c Macarrão ao alho e óleo: amarra de precedente (`economy-designer`)
+
+**Não é mecânica nova.** A poção `P2`, Ampola de Antídoto (§7.2 acima), já entrega
+"Dispel Poison/Corrode + imune a DoT por 2 turnos", o mesmo formato de imunidade
+temporária a uma família estreita de efeito negativo. O macarrão ao alho e óleo usa este
+precedente como PORTE DE REFERÊNCIA: escopo estreito (**um** tipo de efeito negativo, não
+uma categoria inteira), duração curta. Se a imunidade sair larga (vários tipos, ou uma
+categoria completa de debuff), ela neutraliza uma família inteira de inimigo que ataca por
+aquele eixo; o `economy-designer` calibra o número dentro deste teto de escopo, não fora
+dele.
+
+#### 5.5.1d Pão de alho: amarra de vocabulário (`economy-designer`)
+
+**Reusa o `Shield` já canônico** (`combat.md` §9: pool de absorção que protege o HP de
+QUALQUER fonte de dano, removido ao zerar o pool ou expirar por Duration, não é status
+novo). O único cuidado: o Shield do pão de alho tem de ficar **mais fraco** que o Shield da
+própria ação de Defender (`combat.md` §9: "`Defend` aplica Shield com Magnitude = Def"),
+senão o item comum compete com (ou substitui) a ação tática de defender. O número exato
+(Magnitude, Duration) é do `economy-designer`.
 
 ### 5.5.2 Ingredientes de craft (8)
 
@@ -575,7 +621,16 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 
 ---
 
-**Última revisão:** 2026-08-25, mesma data, mais uma rodada (§5.5.2a/b/c: fecha as duas lacunas que
+**Última revisão:** 2026-08-25, mesma data, mais uma rodada (§5.5.1a/b/c/d: o líder fecha o
+efeito de quatro das seis comidas que ainda estavam com ⚠️: churrasco (cura leve de toda a
+party, com amarra de preço escalando por tamanho de party), pastilha de menta (consumo sem
+custo de turno, restrito ao overworld, restrição que É o efeito), macarrão ao alho e óleo
+(imunidade temporária a um tipo de efeito negativo, com a Ampola de Antídoto `P2` como
+precedente/teto de escopo) e pão de alho (escudo temporário reusando o `Shield` de
+`combat.md` §9, mais fraco que o Shield da ação de Defender). Pizza de atum e macarrão ao
+molho pesto seguem ⚠️ abertas, sem efeito sugerido. Corrige também a premissa do churrasco:
+é item comum, sem restrição de transporte, não vira bônus de descanso). Revisão anterior,
+mesma data, mais uma rodada (§5.5.2a/b/c: fecha as duas lacunas que
 a expansão anterior deixava nomeadas, a origem dos oito ingredientes de craft ("2+3": loja/negociação
 com personagens mais drop travado por conhecimento, E exploração do mundo; exclusão explícita de
 drop de inimigo comum repetido) e o papel de cada um (cozinhar/temperar/insumo técnico, atribuído só
