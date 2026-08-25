@@ -2,7 +2,7 @@
 
 > **Atualização 2026-08-25 (líder, revogação de C-03/C-13 na L-29 de `GODS_LAWS.md`):** o craft de cópia pirata deixa de ser exclusivo da COMUM e passa a alcançar **ESPECIAL e SUPER**, sempre em qualidade inferior ao original — ver §15, seção nova. A SUPER também deixa de ser descrita como "forjada" em `cartas-technomagik.md` (ela é carta original; reflexo já aplicado lá, §2.4).
 >
-> **Atualização 2026-08-25 (líder, canon pessoal do Gus Dragon, L-16 de `GODS_LAWS.md`):** os quatro lanches favoritos reais dele viram os itens de cura do jogo (catálogo completo em `economia.md` §5.5). Dois deles, suco de limão e água com gás, também alimentam craft de **bateria de baixa qualidade**, via refino em suco puro de limão / água destilada: ver §5, nova subseção "Bateria de baixa qualidade (craftada)".
+> **Atualização 2026-08-25 (líder, canon pessoal do Gus Dragon, L-16 de `GODS_LAWS.md`):** o líder dita, no mesmo dia, a expansão de quatro para **doze comidas** favoritas reais dele como itens de cura do jogo, mais **oito ingredientes de craft** (catálogo completo em `economia.md` §5.5). Duas das doze, suco de limão e água com gás, continuam alimentando craft de **bateria de baixa qualidade**, via refino em suco puro de limão / água destilada: ver §5, subseção "Bateria de baixa qualidade (craftada)", que nesta rodada também fecha se a bateria craftada herda os riscos da pirata comprada (herda, sim).
 >
 > **Status:** ✅ **CANON FECHADO (líder, 2026-07-28).** Os quatro pontos que este cabeçalho listava como abertos foram entregues: os **números** viraram `cartas-numeros-proposta.md` (com as últimas duas ambiguidades fechadas em 2026-07-28), a **spec de implementação** virou `cartas-spec-dados.md` (aprovada em 2026-07-28) e `cartas-spec-logica.md`, e os **efeitos do vírus** e o **mercado negro** estão fixados aqui e nos docs de números. Reflexo pendente em `cartas-technomagik.md` e na terminologia, que é passo de escrita, não decisão. _(Status original, por registro: BRAINSTORM EM ANDAMENTO, líder, 2026-07-18.)_ Decisões fechadas via AskUserQuestion capturadas fielmente. Ainda ABERTO: efeitos exatos do vírus, o mercado negro (lugar/vendedor), números (delegar ao `economy-designer`), spec de implementação (delegar a `gameplay_engineer`/`backend-engineer`). NÃO é canon fechado até o líder revisar o doc consolidado.
 >
@@ -128,7 +128,7 @@ Existe: mais barata, mas **mente sobre a carga**, morre cedo, pode **danificar a
 > energia de ação]. E pode ser usada em craft de bateria, após refinada para 'agua destilada'.
 > Mesma logica do suco de limao."*
 
-Os quatro lanches (`economia.md` §5.5) alimentam este sistema por DOIS insumos refinados:
+Duas das doze comidas (`economia.md` §5.5) alimentam este sistema por DOIS insumos refinados:
 
 - **Suco de limão** → refinado em **suco puro de limão**.
 - **Água com gás** → refinada em **água destilada**.
@@ -173,15 +173,33 @@ fisicamente coerente com o Pillar 1 (a magia do mundo é sistema formal computá
 matemática), mas isto é leitura do que ele já decidiu, não uma extensão de química nova sobre o que
 ele disse.
 
+**Herda os riscos da bateria pirata comprada (decisão do líder, 2026-08-25 — fecha a lacuna que
+esta seção deixava aberta sobre se a craftada era categoria própria, sem riscos).** A bateria de
+baixa qualidade craftada NÃO é uma alternativa mais fraca porém limpa: ela herda os TRÊS riscos já
+atribuídos à bateria pirata comprada (subseção "Bateria pirata / genérica" acima) — pode **mentir
+sobre a carga**, **morrer cedo**, e **danificar a carta ou ser vetor de vírus**. Faz sentido pela
+mesma física da §3 (upload lento, EPROM, sem controle de qualidade de fábrica) e pela mesma lição
+Bastiat do §12: craft caseiro não é imune ao "custo que não se vê" só por o jogador ter feito com as
+próprias mãos.
+
+**Isto CONVIVE com a rede de segurança, não a substitui.** O risco herdado NUNCA reduz a bateria
+craftada a "sem efeito nenhum" — a regra dura logo acima ("melhor que nada pra quem tá sem bateria
+nenhuma no inventário", verbatim do líder) continua de pé, intocada. O que muda é que o
+`economy-designer`, ao numerar a chance de cada risco, tem que respeitar as DUAS pontas ao mesmo
+tempo: a bateria craftada dá energia REAL (nunca zero, nunca falha garantida) **e** carrega risco de
+verdade (nunca risco zero — senão ela viraria estritamente melhor que a de fábrica, o que quebraria
+a Doutrina do Comedimento, `economia.md` §0: quem esbanja a bateria de fábrica não pode sair
+ganhando ao trocar pela alternativa caseira sem custo nenhum). O ponto de equilíbrio exato
+(probabilidade de cada risco, se é igual ou menor que o da pirata comprada) é número, não decidido
+pelo líder nesta rodada.
+
 **Não decidido, e não inventado aqui:**
-- Se a bateria de baixa qualidade craftada compartilha os riscos já atribuídos à bateria pirata
-  comprada (subseção acima: mente sobre a carga, morre cedo, pode danificar a carta ou ser vetor de
-  vírus), ou se é categoria própria, só mecanicamente mais fraca, sem esses riscos.
 - Se o craft exige suco puro de limão E água destilada JUNTOS, ou se cada um sozinho já basta para
   uma bateria de baixa qualidade (duas receitas paralelas).
 - Capacidade, número de usos, preço de compra do suco puro/água destilada, taxa de sucesso do
-  refino, e o momento narrativo em que o personagem "aprende a filtrar": tudo é número de
-  balanceamento (`economy-designer`), nada decidido pelo líder nesta rodada.
+  refino, o momento narrativo em que o personagem "aprende a filtrar", e a probabilidade numérica de
+  cada risco herdado (mentir sobre a carga / morrer cedo / danificar a carta ou vírus): tudo é
+  número de balanceamento (`economy-designer`), nada decidido pelo líder nesta rodada.
 
 ## 6. Costuras entre software e hardware
 - **Mod porco** → drena bateria mais rápido (custo do "compilado ruim").
@@ -357,4 +375,4 @@ O mecanismo exato de como a party recebe a carta SUPER original ao fim da missã
 - [x] ✅ **Spec de implementação** (ENTREGUE e APROVADA 2026-07-28: `cartas-spec-dados.md` + `cartas-spec-logica.md`) → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção).
 - [x] ✅ **Canonizado pelo líder em 2026-07-28.** Falta só refletir em `cartas-technomagik.md` e na terminologia (passo de escrita). Era: canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar.
 - [ ] **Camada pirata de ESPECIAL/SUPER (§15, decisão do líder 25/08/2026):** canon fechado, números em aberto → `economy-designer` (probabilidade de cada um dos 3 graus de falha, custo em crédito/material do craft, preço da cópia comprada pronta no mercado negro). Mecanismo de entrega da SUPER original ao fim da missão-capstone também em aberto (§15.6) → líder.
-- [ ] **Bateria de baixa qualidade craftada a partir de lanches refinados (§5, decisão do líder 25/08/2026):** canon fechado no mecanismo (refino gated, bancada compartilhada com reparo/pirataria, trade-off consumir×refinar, rede de segurança, terceira rota de compra) → `economy-designer` (capacidade/usos, preço de compra do suco puro/água destilada, taxa de sucesso do refino). Três lacunas de desenho, não numéricas, também em aberto → líder: se a bateria craftada herda os riscos da bateria pirata comprada; se o craft exige os dois insumos refinados juntos ou cada um sozinho já basta; e o momento narrativo em que o personagem "aprende a filtrar".
+- [ ] **Bateria de baixa qualidade craftada a partir de lanches refinados (§5, decisão do líder 25/08/2026; herança de risco FECHADA no mesmo dia):** canon fechado no mecanismo (refino gated, bancada compartilhada com reparo/pirataria, trade-off consumir×refinar, rede de segurança, terceira rota de compra, herança dos três riscos da bateria pirata comprada) → `economy-designer` (capacidade/usos, preço de compra do suco puro/água destilada, taxa de sucesso do refino, probabilidade numérica de cada risco herdado). Duas lacunas de desenho, não numéricas, ainda em aberto → líder: se o craft exige os dois insumos refinados juntos ou cada um sozinho já basta; e o momento narrativo em que o personagem "aprende a filtrar".
