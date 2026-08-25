@@ -34,6 +34,8 @@ Dois níveis, os dois obrigatórios:
 - **Gate de CI:** nenhum `#include <glintfx/` fora de `present/`. Violação derruba o build, não depende de disciplina de quem escreve.
 - `present/` só existe quando o GlintFx tiver janela, contexto gráfico, entrada e texto (L-06); até lá, a auditoria de camadas cobre `core/`, `content/`, `domain/` e `app/`.
 - **Determinismo do replay** como teste automatizado permanente: mesma semente mais mesma lista de comandos reproduz o mesmo estado final, byte a byte.
+- **CRÍTICO (L-33):** nenhuma unidade acumula razões de mudar vindas de **leis diferentes e não relacionadas**, e os relatórios de revisão das fatias auditadas contêm **as cinco perguntas respondidas por unidade** criada ou crescida. Silêncio sobre uma unidade conta como unidade **não revisada**.
+  **O auditor não confia nos relatórios:** pega o maior arquivo de cada camada e o arquivo com mais aparições em `git log --stat`, responde ele mesmo as cinco perguntas, e compara com o que os relatórios disseram. Divergência entre os dois é achado.
 - Vigiar as cinco armadilhas nomeadas na L-17 (objeto `Game`/`app/` que vira dono de tudo, barramento genérico, `if` de dificuldade no corpo da regra, determinismo quebrado por detalhe de C++, regra vazando para a interface).
 
 ---

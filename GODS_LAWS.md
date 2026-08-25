@@ -51,7 +51,7 @@
 | [L-30](#l-30) | escrever, reordenar ou acrescentar item na tabela | Todo item aponta para o documento que o especifica, se existir |
 | [L-31](#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
-| [L-33](#l-33) | escrever documento, teste, commit, item da tabela ou asset | Atomizar fora do código também; monolito é acoplamento, não tamanho |
+| [L-33](#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
 
 
 ---
@@ -616,3 +616,63 @@ Registrado aqui para não se perder. Nada nesta seção é lei ainda.
 **A lei alcança o que este projeto AUTORA e POSSUI.** Formato ou esquema de terceiro fica **fora**, e a distinção foi estabelecida em três casos medidos no mesmo dia: o **esquema da tabela** é da ferramenta externa `tab_pendencias` (repositório próprio; nós escrevemos os itens, não o formato); o **formato de mapa** é do GlintFx (L-30 dele, e nossa é só a extensão `.gw.map`); e **artefato binário** pertence à cadeia de ferramentas do sistema. Detalhe em `docs/tech/convencao-formatos-gw.md`.
 
 **O que a lei NÃO é**, herdado da L-04 e repetido aqui porque é a parte que mais se perde: não é licença para fatiar em pedaços sem sentido próprio, nem para criar abstração especulativa. **Átomo é a menor unidade com significado, não a menor unidade possível.**
+
+---
+
+### A régua concreta: razões de mudar
+
+**Acrescentado em 24/08/2026 por ordem do líder, adaptado da L-19 do `gusworld_mapeditor`**, que resolveu o mesmo problema primeiro e com mais rigor. A régua que falta aos três testes acima é esta, e ela é operável:
+
+> **Se mudanças vindas de leis DIFERENTES e não relacionadas obrigam a editar a MESMA unidade, ela está virando monolito.**
+
+Funciona porque **as razões de mudar deste projeto já estão catalogadas** — as leis as fixaram. A fronteira do framework é a **LEI ZERO** e a **L-05**; a forma das camadas é a **L-17**; o formato de dado é a **L-18** e a **L-25**; câmera, grade e direção são a **L-26**; a cerca do escopo são os dezesseis cortes da **L-29**; a licença de asset é a **L-08**. Uma unidade que muda por **uma** dessas razões é sã. Uma que muda por **duas ou mais, não relacionadas**, é monolito em formação.
+
+**A regra é QUALITATIVA, por decisão do líder no projeto irmão e adotada aqui:** nada de número em portão automático (linhas por arquivo, métodos por classe). O `CONTRACT.md §2.2` mantém o teto de ~300 linhas como **orientação** (`SHOULD`), nunca como portão: excedê-lo obriga a responder as cinco perguntas na revisão, não a dividir. **Custo assumido:** sem número, a lei depende do revisor reconhecer o monolito, e casos parecidos podem sair julgados diferente. As cinco perguntas existem para encolher esse espaço, não para eliminá-lo.
+
+### As cinco perguntas do revisor
+
+*"Isto é monolito?"* ninguém responde. Estas cinco, sim, e **cada uma se responde olhando o artefato**, não opinando:
+
+1. **A pergunta das leis.** Quais leis obrigariam esta unidade a mudar? Responde-se lendo os `#include` e os métodos públicos. Uma lei: sã. Duas ou mais, não relacionadas: monolito em formação.
+2. **A frase sem "e".** Descreva a unidade em uma frase. Se precisar de "e" ligando verbos de natureza diferente (*"aplica o comando **e** persiste **e** valida"*), reprova. É a L-04 e o `CONTRACT.md §5.2` ditos para a unidade inteira. **A frase escrita entra no relatório de revisão.**
+3. **O teste monta o mundo?** Para exercitar UM comportamento, o preparo do teste precisa de save carregado, combate vivo e cena montada? Átomo de domínio se constrói sozinho, com os próprios campos. Responde-se lendo o preparo dos testes da fatia.
+4. **O que entra pelo `#include`?** O cabeçalho puxa grupos que não conversam entre si (regra de combate + serialização + fluxo de cena)? A lista de inclusões é a lista de dependências, e se lê em dez segundos.
+5. **Quem paga a próxima feature?** No diff da fatia (`git log --stat`), a operação nova tocou quais arquivos? Se **toda** operação nova aterrissa no mesmo arquivo — mais um método, mais um caso de `switch` —, esse arquivo é o monolito nascendo. **É a mais objetiva das cinco: responde-se com o diff, não com julgamento**, e por isso se responde sempre.
+
+### Onde o monolito vai nascer AQUI
+
+⚠️ **Estes candidatos são PREVISTOS, não medidos**, e a diferença é honesta: este projeto não tem uma linha de código, então não há diff nem arquivo para observar. Foram derivados do canon já escrito, por ordem do líder. Quando houver código, a lista se corrige com medição e esta nota some.
+
+Monolito nunca nasce por burrice; nasce por conveniência local que parece razoável no dia:
+
+| Lugar de risco | Como nasce | Por que parece razoável |
+|---|---|---|
+| **A camada `app/`** | fluxo de cena, avanço de turno, save e load como caso de uso já moram lá; todo comportamento novo "cabe" | "o despachante já conhece todo mundo" |
+| **O POCO de carta** | instância, estado físico, bateria, infecção e origem num tipo só, e cada regra nova vira método dele | "o dado da carta já está aqui" |
+| **A máquina de combate** | fila de iniciativa, recursos, fórmula de dano e efeitos de status colapsando numa unidade | "o turno é um fluxo só" |
+| **O modelo de save** | ele **agrega por definição** todo o domínio; a tentação é ele também serializar, validar e migrar | "quem conhece o estado sabe gravá-lo" |
+| **O gerador de conteúdo** | ler fonte, validar, compilar tabela e selar pacote numa ferramenta só | "é um passo só do build" |
+| **`present/`, quando nascer** | os retornos do GlintFx chegam todos no mesmo lugar | "é só a casca" |
+
+**Isto NÃO substitui as cinco armadilhas da L-17**, que continuam valendo e são a fonte da primeira e da segunda linhas acima. Leia as duas listas juntas.
+
+### Sinais precoces
+
+Monolito de 3.000 linhas todo mundo vê; a lei existe para reconhecê-lo com 300:
+
+- **O mesmo arquivo aparece no diff de todas as fatias.** É o sinal mais barato de medir e o mais confiável.
+- **Construtor, ou preparo de teste, ganhando parâmetro a cada fatia.** A unidade está precisando de cada vez mais mundo para existir.
+- **`switch` sobre tipo de carta, de efeito ou de comando que ganha um caso por feature.**
+- **Nome sem substantivo de domínio:** `Manager`, `Service`, `Helper`, `Utils`, `Core`. Carta, efeito, célula e comando têm nome próprio; a unidade que não consegue dizer o que é, é porque faz de tudo.
+- **Um `utils` acumulando funções soltas** sem razão comum de mudar (o `CONTRACT.md §5.7` já proíbe o auxiliar genérico antes da terceira ocorrência real).
+- **A frase "é só mais um método" aparecendo como justificativa na revisão.** Essa frase é o som do monolito crescendo: verdadeira em cada passo, falsa na soma.
+
+### Fiscalização: onde esta lei mora no processo
+
+Lei qualitativa sem lugar no processo é lei que ninguém aplica. Três amarras, adotadas iguais às do projeto irmão por decisão do líder:
+
+1. **Na revisão adversarial de cada fatia** (implementador, revisor e orquestrador são três agentes distintos, L-10): para **cada unidade criada ou crescida** na fatia, o revisor responde as cinco perguntas e **grava as respostas no relatório**. **Silêncio sobre uma unidade conta como unidade NÃO revisada** — silêncio nunca é prova de conformidade. A quinta pergunta se responde sempre, porque o diff sempre existe.
+2. **No `AUDITORIAS.md`:** a auditoria de arquitetura (seção 2, ancorada na L-17) ganha item **CRÍTICO** — *nenhuma unidade acumula razões de mudar de mais de uma lei, e os relatórios das fatias auditadas contêm as cinco perguntas respondidas por unidade*. O auditor **não confia nos relatórios**: pega o maior arquivo de cada camada e o arquivo com mais aparições em `git log --stat`, responde ele mesmo as cinco perguntas, e compara.
+3. **Divergência tem dono.** Se implementador e revisor discordarem, ou se a separação exigida tiver custo real (reescrita grande, fronteira genuinamente duvidosa), a decisão vai ao líder pela L-11 — **nunca sai no silêncio de um agente**.
+
+**Ao despachar subagent** que crie unidade nova, o texto desta lei vai no prompt da task, e a ordem de serviço do revisor cita as cinco perguntas como parte do entregável dele.
