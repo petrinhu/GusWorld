@@ -15,6 +15,7 @@
 - FATO: o editor de mapas externo existe (`Projects/gusworld_mapeditor/`, com `src/`, `tests/`, CI própria; verificado por `ls`).
 - FATO: `modos-morte.md` referencia infraestrutura do projeto ANTERIOR (ADR-006, ADR-014, `FsSaveStore`, "Monocypher vendorizado", `title_menu.hpp`). Pela L-01 nada disso existe como código; pela L-13 é canon a re-derivar; pela L-14 eu não declaro o documento morto, apenas aponto: o DESIGN (intenção das 3 camadas) parece vigente, as REFERÊNCIAS de implementação apontam para código que não existe. Cabe ao líder confirmar o que sobrevive.
 - INFERÊNCIA: tudo o mais abaixo marcado como tal.
+- **ATUALIZAÇÃO, 24/08/2026:** a pergunta 5 do "Resumo para a decisão" (E.5, e os FATOs das linhas 12 e 16 acima) foi respondida pelo líder no item `G3` do `TODO.md`: todo o design de §1 a §5 de `modos-morte.md` sobrevive como canon; só o plano de implementação (§6 de lá, referenciado nas linhas 12 e 16 acima) morreu, e agora está marcado como REVOGADO no próprio documento, não mais como código fantasma sem veredito. Este documento continua valendo como registro do levantamento de 21/08/2026 e não foi reescrito.
 
 ---
 
@@ -183,5 +184,5 @@ INFERÊNCIA: qualquer opção da seção B funciona com qualquer caminho daqui; 
 2. **De onde vêm as primitivas (seção D)?** Recomendo caminho (i): registrar no bus a necessidade formulada acima e construir, sem esperar, tudo que não é cripto. Alternativa: exceção nominal temporária (iii-b) com cláusula de migração.
 3. **A fonte canônica do conteúdo pode ser texto DENTRO do repositório, com distribuição 100% binária (C.3)?** Recomendo que sim (custo zero de proteção, ganho alto de fluxo); a alternativa literal (nada de texto nem no repo) obedece com o custo nomeado.
 4. **Machine-binding só no Hardcore (E.3)?** Recomendo que sim.
-5. **O que de `modos-morte.md` sobrevive como intenção (E.5)?** Confirmação do líder, exigida pela L-13/L-14.
+5. **O que de `modos-morte.md` sobrevive como intenção (E.5)?** Confirmação do líder, exigida pela L-13/L-14. **RESPONDIDO em 24/08/2026, item `G3` do `TODO.md`: sobrevive todo o design (§1 a §5); só o plano de implementação (§6) morreu.**
 6. **Rota ao CLO sobre conteúdo embutido no binário AGPL (E.10)?** Recomendo despachar antes de fechar a forma do catálogo.
