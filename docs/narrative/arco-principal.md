@@ -31,6 +31,23 @@ Casa diretamente com Compilação vs Interpretação (DRE de Sterling vs C-Arcan
 
 Cada beat narrativo precisa dialogar com esse eixo. Falas, decisões, escolhas e mecânicas reforçam.
 
+### Motivo recorrente: ética acima da fama
+
+**Fechado pelo líder em 25/08/2026**, verbatim, ao explicar por que a poção de longevidade de Brunus Vetorial ecoa no design da Carta 21 de Helion Tusk sem que os dois compartilhem mecanismo algum:
+
+> "foi apenas para dizer que GusWorld tem herois de inteligência (nao de força) que fazem coisas maravilhosas com sua inteligência, mas que podem causar danos à humanidade e preferiram eliminar isso mesmo sem receber os creditos por descobertas tao fantasticas. Passa conceito de ética acima da fama."
+
+Este é um **corolário do theme central** acima ("a inteligência mais alta é a que serve à vida"), não um tema concorrente: onde a tabela Sterling×Gus mostra o eixo em oposição corrente (interpretar/capturar vs compilar/preservar), este motivo mostra o mesmo eixo num momento de decisão pontual, o herói de inteligência que descobre ou constrói algo extraordinário e **perigoso**, e escolhe **destruí-lo ou escondê-lo por ética, abrindo mão do próprio crédito**, em vez de arriscar o mundo pela fama da descoberta.
+
+**Os dois personagens que encarnam o motivo, hoje (líder deu exatamente estes dois; nenhum terceiro exemplo é canônico sem aprovação dele):**
+
+- **Brunus Vetorial** uniu química, medicina e tecnologia num procedimento de longevidade, foi a **única cobaia** de si mesmo, quase morreu, e ao acordar **destruiu o experimento inteiro e as próprias anotações**, sem nunca revelar o método a ninguém (perigo duplo: mortal a quem tentasse, e perigo à própria história humana se multiplicado; `characters/brunus-vetorial.md`, seção "A longevidade").
+- **Helion Tusk** escreveu a Carta Perdida em asmódico puro e o compilador que a compilava (asmódico + C-Arcane), e **apagou o compilador com as próprias mãos** ao medir o perigo que ele seria nas mãos de Patch-Zero ou de Sterling Locke (`design/roster-analogos/21-helion-tusk.md`, seção "O clímax"; `narrative/deep/characters/mestre-cap-21-helion-tusk.md` §6).
+
+**O que liga os dois é arquétipo, não biologia nem cronologia compartilhada.** Brunus é longevo por um experimento próprio, autoaplicado, canônico e fechado como exceção única do jogo. **Helion Tusk NÃO é longevo**: a menção do líder à poção de Brunus, nesta mesma fala, foi explicitamente comparação temática, não mecanismo compartilhado, e a regra de que Brunus foi a **única cobaia** do próprio experimento permanece intacta, sem exceção nem para Tusk. Escrever em asmódico (língua de -720) também não exige que Tusk seja contemporâneo dela: é língua herdada pelo Conservatório (fundado em -150), o mesmo tipo de relação que um escriba de hoje tem com o latim.
+
+**Escopo:** só estes dois exemplos são canônicos. Nenhum agente deve estender o motivo a um terceiro personagem sem decisão do líder.
+
 ---
 
 ## Tom e referências
