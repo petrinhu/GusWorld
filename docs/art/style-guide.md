@@ -29,12 +29,12 @@ GusWorld é **pixel-art estilizado** (pipeline PixelLab): silhuetas legíveis em
 
 Anti-ref: Genshin (PBR + anime AAA, fora de orçamento).
 
-**Pendência de revisão:** o anti-ref original também incluía "Octopath (HD-2D, escolha 2D que falha em câmera rotacional)" — essa razão específica (câmera 3D rotacional) não existe mais agora que a arte É pixel-art. Se HD-2D volta a ser cogitado como referência de câmera/renderização, é **decisão pendente do líder**, não assumida aqui. Texto original preservado no Histórico.
+**Pendência de revisão:** o anti-ref original também incluía "Octopath (HD-2D, escolha 2D que falha em câmera rotacional)" — essa razão específica (câmera 3D rotacional) não existe mais agora que a arte É pixel-art. Se HD-2D volta a ser cogitado como referência de câmera/renderização, é **decisão pendente do líder**, não assumida aqui.
 
 ## 3. Pillars visuais
 
-1. **Cel-shading + outline.** — **Pendência de spec 2D.** A descrição original é 3D-específica (toon shading em bandas, outline inverted-hull, normal map em indumentária). Texto integral preservado no Histórico. Aguarda decisão: como shading/outline funcionam em pixel-art (o próprio PixelLab já resolve boa parte disso automaticamente — estilo de dithering, contorno, nº de tons por sprite é o que falta decidir).
-2. **Proporção SD 1:1:1 com extremidades ectomorfas.** — **Pendência de spec 2D.** O conceito de proporção "chibi/SD, cabeça grande, extremidades esguias, NÃO chibi inflado" é agnóstico de dimensão e continua valendo como diretriz de silhueta — mas a formulação exata em pixels (altura do sprite, proporção cabeça/corpo em pixel-grid) é decisão pendente. Texto original (termos de mesh 3D) preservado no Histórico.
+1. **Cel-shading + outline.** — **Pendência de spec 2D.** A descrição original é 3D-específica (toon shading em bandas, outline inverted-hull, normal map em indumentária). Aguarda decisão: como shading/outline funcionam em pixel-art (o próprio PixelLab já resolve boa parte disso automaticamente — estilo de dithering, contorno, nº de tons por sprite é o que falta decidir).
+2. **Proporção SD 1:1:1 com extremidades ectomorfas.** — **Pendência de spec 2D.** O conceito de proporção "chibi/SD, cabeça grande, extremidades esguias, NÃO chibi inflado" é agnóstico de dimensão e continua valendo como diretriz de silhueta — mas a formulação exata em pixels (altura do sprite, proporção cabeça/corpo em pixel-grid) é decisão pendente.
 3. **Silhueta primeiro.** Cada personagem/inimigo passa silhouette test antes de detalhe. (Método de teste em 2D — quantos ângulos/direções — ver §7, também pendente na parte de execução.)
 4. **Duas paletas, zero ambiguidade.** Cidade e Selve são personagens opostos. Transição é set-piece. Vigente, agnóstico.
 5. **Protagonista é foco saturado.** Gus carrega o único laranja vibrante (`#FF6B1A`); cenário é tudo frio. Vigente, agnóstico.
@@ -112,7 +112,7 @@ Vigente, agnóstico de dimensão.
 ## 7. Silhouette rules
 
 - **Silhouette test obrigatório:** screenshot da cena em preto puro contra BG branco. Protagonista, inimigo e objetivo identificáveis em 3s. Vigente.
-- **Character read multi-direcional:** ~~silhueta tem que funcionar em 8 ângulos (rotação a cada 45°). Testar em turntable Blender antes de aprovar.~~ **Pendência de spec 2D:** quantas direções o pixel-art precisa cobrir (PixelLab tipicamente gera um jogo fixo de direções, não rotação livre) — cruzar com a decisão já registrada em memória de locomoção (4 direções únicas, sem flip, ver `project_locomotion_animacao`) quando o líder consolidar a spec formal.
+- **Character read multi-direcional:** a regra antiga exigia silhueta em 8 ângulos e teste em turntable 3D; foi **apagada sob a L-24**, por ser regra de pipeline 3D num jogo 2D pixel-art (L-02). **Pendência de spec 2D:** quantas direções o pixel-art precisa cobrir (PixelLab tipicamente gera um jogo fixo de direções, não rotação livre) — cruzar com a decisão já registrada em memória de locomoção (4 direções únicas, sem flip, ver `project_locomotion_animacao`) quando o líder consolidar a spec formal.
 - **Gus:** triângulo invertido (cabelo asimétrico dominando **quadrante superior DIREITO** + ombros do sobretudo + base estreita das pernas finas). Aparelho ortodôntico visível mesmo em silhueta lateral (mandíbula com "linha" extra). Tavus-Drive saliente no pulso ESQUERDO. Traços de identidade — vigentes, agnósticos de dimensão. Sheet completo: `docs/art/characters/gus.md`.
 - **Inimigos cidade:** ângulos agudos, simetria quebrada (corporativo = uncanny). Triangular shape language. Vigente.
 - **Inimigos Selve:** fractal/orgânico, ramificação em razão recorrente visível. Curvas com pontas (cipó + espinho). Vigente.
@@ -169,13 +169,13 @@ A linguagem de cor/forma/movimento por família é **agnóstica de dimensão** e
 ## 12. Anti-objetivos (o que GusWorld NÃO é)
 
 - **Não é PBR.** Zero metallic/roughness workflow. Quem propor texture realista é redirecionado. Vigente.
-- **Não é cel-shaded anime 3D.** ~~Toon sim, mas com paleta restrita e silhueta low-poly — não Genshin/BoTW.~~ Vigente no espírito (paleta restrita, não anime AAA); a formulação 3D original é histórica.
-- **SUPERADO — "Não é pixel art".** O texto original dizia "a leitura é pixel-art-like, mas geometria é 3D real". Isso está **contradito pelo pivô de arte**: o jogo AGORA É pixel-art de verdade (via PixelLab), não mais 3D com leitura pixel-art-like. Texto original preservado no Histórico como registro do que já foi verdade.
+- **Não é cel-shaded anime 3D.** **Vigente:** paleta restrita, não anime AAA — não Genshin, não BoTW. A formulação antiga do princípio falava em silhueta low-poly e foi **apagada sob a L-24**, por ser 3D.
+- **SUPERADO — "Não é pixel art".** O texto original dizia "a leitura é pixel-art-like, mas geometria é 3D real". Isso está **contradito pelo pivô de arte**: o jogo AGORA É pixel-art de verdade (via PixelLab), não mais 3D com leitura pixel-art-like. A seção "Histórico" que guardava o texto original já não existe; sob a L-24, a citação órfã foi apagada e a afirmação acima permanece.
 - **Não é fotorrealista cyberpunk.** A cidade é estilizada gótica neon, não Cyberpunk 2077. Vigente.
 - **É chibi-SD canônico, NÃO realista, com tom analítico/gótico, não fofo/kawaii.** O princípio de proporção/tom é vigente; a formulação exata em pixel-grid é pendência de spec 2D (ver §3.2).
 - **Não é gore.** Sangue, vísceras, dismemberment proibidos. Inimigos derrotados "compilam erro" + dissolvem em partículas. Vigente.
 - **Não é zona-híbrida-genérica.** Cidade e Selve nunca se misturam visualmente até o ato 3 deliberado. Vigente.
-- **PENDÊNCIA — "Não é HD-2D (Octopath)".** A razão original ("decisão consciente: 3D real estilizado, não sprites 2D em ambiente 3D") não existe mais — o jogo agora usa sprites 2D. Se HD-2D (sprites 2D + ambiente 3D) volta a ser cogitado como abordagem de câmera/renderização, é decisão pendente do líder; não assumida aqui. Texto original preservado no Histórico.
+- **PENDÊNCIA — "Não é HD-2D (Octopath)".** A razão original ("decisão consciente: 3D real estilizado, não sprites 2D em ambiente 3D") não existe mais — o jogo agora usa sprites 2D. Se HD-2D (sprites 2D + ambiente 3D) volta a ser cogitado como abordagem de câmera/renderização, é decisão pendente do líder; não assumida aqui.
 - **Não é open-world.** Áreas curadas, navegação limitada por região. Vigente (a formulação "câmera orbital" era 3D-específica).
 - **Não é marketing visualmente diferente do jogo.** Key art final renderiza no engine + retoque mínimo. Sem bait. Vigente.
 
