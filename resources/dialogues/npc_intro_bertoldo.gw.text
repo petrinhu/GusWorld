@@ -1,19 +1,26 @@
-// npc_intro_bertoldo.dlg.txt
+// npc_intro_bertoldo.gw.text
 //
 // NPC introdutorio do Vertical Slice: Seu Bertoldo Caim (CHARS.md §7, ambient).
-// Formato-texto proprio (ADR-014, gus/domain/dialogue/dialogue_text.hpp) - o
-// SUCESSOR consumido pelo runtime C++ (DialogueRuntime/parse_text_to_dialogue_graph).
+// Formato-texto proprio da casa, extensao .gw.text (decisao do lider, 24/08/2026,
+// item G2 da tabela; padrao .gw.<tipo> para todo formato nosso).
 //
-// Existiu um irmao "npc_intro_bertoldo.dialogue" (sintaxe DialogueManager, Godot),
-// artefato do stub F2-E.6/ADR-003, obsoleto pos-ADR-008 (DA-2 do blueprint abaixo) e
-// NAO consumido pelo engine C++ atual. Removido do disco no decommission do M8
-// (2026-07-22); o historico sobrevive na tag `pre-m8-godot-legacy`. Este arquivo
-// (.dlg.txt) e a fonte editavel de verdade.
+// FONTE DE BUILD, NAO FORMATO DE RUNTIME: este arquivo existe em texto DENTRO do
+// repositorio para ser revisado e traduzido; o jogo NUNCA le texto. O gerador o
+// compila em pacote binario selado na hora de construir (L-25), e e isso que chega
+// a maquina do jogador (L-18).
+//
+// A ESPECIFICACAO DESTE FORMATO AINDA NAO EXISTE ESCRITA. Ela vive implicitamente
+// nestes quatro arquivos, mais o exemplo comentado em
+// docs/narrative/propostas/cena15-dlgtxt-PILOTO-PROPOSTA.md. Escreve-la e item
+// proprio da tabela. O cabecalho anterior apontava para um ADR e um caminho de
+// codigo do projeto ANTERIOR, ambos inexistentes (L-01); os dois foram removidos
+// em 24/08/2026 em vez de mantidos como ponteiro morto.
 //
 // Blueprint canonico (roteiro/flags/reconvergencia): docs/design/narrativa/
 // dialogue-tree-npc-intro.md (F2-N.1, ratificado 2026-06-03).
 //
-// ESCOPO M7-DIALOGO/NPC-MVP (ADR-014 decisao 3, TODO.md): SO o fluxo FIRST-VISIT
+// ESCOPO (decisao herdada do projeto anterior, mantida como INTENCAO de recorte,
+// nao como referencia a documento -- o ADR que a registrava foi apagado): SO o fluxo FIRST-VISIT
 // minimo do blueprint (saudacao -> gancho -> 3 escolhas -> reconvergencia -> saida).
 // SEM n7_revisit_hub nem os gates de combate/puzzle (blueprint §7) - ficam para
 // quando o resto do VS existir (combate/puzzle ainda nao escrevem essas flags).
@@ -22,7 +29,8 @@
 // (combat-flavor.md §5; DIALOGO-TERMINAL usa o Bertoldo como exemplo canonico de
 // caixa quente no mock aprovado, docs/design/mockups/03-.../04-...).
 //
-// FLAGS ESCRITAS (ADR-014 decisao 4: SaveData::flags, bools, SEM bump de schema):
+// FLAGS ESCRITAS (o COMO fica com o modelo de save a re-derivar; a LISTA abaixo e
+// que importa e sobrevive):
 //   npc_intro.met                 (on_enter de n0_greet, 1a entrada na conversa)
 //   npc_intro.choice_curioso      (escolher o ramo curioso em n1_hook)
 //   npc_intro.choice_pragmatico   (escolher o ramo pragmatico em n1_hook)
