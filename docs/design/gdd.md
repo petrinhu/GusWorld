@@ -142,7 +142,7 @@ Secundárias (não bloqueantes): "would play again" ≥70%, taxa de conclusão d
 - Dynamic difficulty adjustment (oferecer 2 modos fixos: Padrão + Analítico-hard).
 - Sistema de companions com afinidade / dating-sim mechanics.
 - Mais de 2 macro-biomas.
-- ~~Crafting de cartas (cartas são obtidas, não craftadas).~~ **REVISTO 2026-07-16 (evolução de pillar do líder):** as COMUNS podem ser craftadas/compradas/lootadas (economia de coleção bounded); as ESPECIAIS/SUPER seguem "obtidas, não craftadas" (só progresso narrativo). Ver pillars.md + cartas-technomagik §2.2 + deck-mao-sistema.md.
+- ~~Crafting de cartas (cartas são obtidas, não craftadas).~~ **REVISTO 2026-07-16 (evolução de pillar do líder):** as COMUNS podem ser craftadas/compradas/lootadas (economia de coleção bounded); as ESPECIAIS/SUPER seguem "obtidas, não craftadas" (só progresso narrativo) **para a ORIGINAL**. Ver pillars.md + cartas-technomagik §2.2 + deck-mao-sistema.md. **REVISTO DE NOVO EM 25/08/2026 (líder, revogação de C-03/C-13 na L-29 de `GODS_LAWS.md`):** ESPECIAIS e SUPER passam a ter **cópia pirata craftável**, sempre inferior à original — qualidade pior, efeito trocado, ou só o nome sem função. A ORIGINAL de ESPECIAL/SUPER continua fechada a crafting, compra e loot; só a imitação é craftável. Ver `cartas-technomagik.md` §2.3-2.4 e `cartas-hardware-pirataria-energia.md` §15.
 - DLC / season pass / live-service.
 - Console port no MVP (Linux v1; Windows export template preparado mas ship pós-v1).
 - Tradução além de pt-br em v1 (en-intl pós-release v1.0.0; estrutura i18n-ready desde F2-S.11).

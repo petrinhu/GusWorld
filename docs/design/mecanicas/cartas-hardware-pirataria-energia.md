@@ -1,5 +1,7 @@
 # Cartas: hardware, energia e pirataria
 
+> **Atualização 2026-08-25 (líder, revogação de C-03/C-13 na L-29 de `GODS_LAWS.md`):** o craft de cópia pirata deixa de ser exclusivo da COMUM e passa a alcançar **ESPECIAL e SUPER**, sempre em qualidade inferior ao original — ver §15, seção nova. A SUPER também deixa de ser descrita como "forjada" em `cartas-technomagik.md` (ela é carta original; reflexo já aplicado lá, §2.4).
+>
 > **Status:** ✅ **CANON FECHADO (líder, 2026-07-28).** Os quatro pontos que este cabeçalho listava como abertos foram entregues: os **números** viraram `cartas-numeros-proposta.md` (com as últimas duas ambiguidades fechadas em 2026-07-28), a **spec de implementação** virou `cartas-spec-dados.md` (aprovada em 2026-07-28) e `cartas-spec-logica.md`, e os **efeitos do vírus** e o **mercado negro** estão fixados aqui e nos docs de números. Reflexo pendente em `cartas-technomagik.md` e na terminologia, que é passo de escrita, não decisão. _(Status original, por registro: BRAINSTORM EM ANDAMENTO, líder, 2026-07-18.)_ Decisões fechadas via AskUserQuestion capturadas fielmente. Ainda ABERTO: efeitos exatos do vírus, o mercado negro (lugar/vendedor), números (delegar ao `economy-designer`), spec de implementação (delegar a `gameplay_engineer`/`backend-engineer`). NÃO é canon fechado até o líder revisar o doc consolidado.
 >
 > **Origem:** derivou do "vírus do Dante" (guarda-chuva Faraday, ver `docs/design/mundo-topologia.md` / brainstorm-backlog). O líder escalou o evento pontual (Dante injeta vírus na carta Faraday à noite) para um SISTEMA geral de cartas modificadas / piratas / infectadas / com bateria.
@@ -27,6 +29,9 @@ O **mercado negro** é o *lugar* onde os três circulam, misturados com usados l
 
 ### Clone-falso de especial
 As cartas especiais são **únicas** (uma no jogo). Mas existe **imitação pirata** de especial: parece o poder raro, é falsificação degradada/instável/possível-vírus, e **NÃO é a única real** (não conta como a especial). Não quebra a unicidade e ensina "a cópia não é o original". O Sterling pode usar falsos; um vendedor pode te enganar com um "Faraday" pirata.
+
+### Clone-falso de super (decisão do líder, 25/08/2026)
+O mesmo raciocínio vale, com um grau a mais de dificuldade, para a **SUPER**: existe uma original no jogo inteiro (`cartas-technomagik.md` §2.4), e ela **nunca é forjada nem craftada por ninguém** — é a peça original de Tusk, escrita em asmódico puro, num compilador que se perdeu (§15.2 abaixo). Qualquer coisa que saia de uma bancada tentando imitá-la é, por definição, uma cópia pirata, nunca a original. Tratamento completo em §15.
 
 ## 3. Física da carta (o que prova original × pirata × homebrew)
 
@@ -63,7 +68,11 @@ As cartas especiais são **únicas** (uma no jogo). Mas existe **imitação pira
 
 **Amarras:** ROM de fábrica = compilado/rápido = BOM; EPROM lenta = lado interpretado/lento. O "queima se mexer" é anti-tamper físico, irmão do save-crypto. O conector interno é a evidência forense da fraude (a pirataria é cinza; a *ocultação* denuncia).
 
+**Esta física é a mesma para pirata de COMUM, de ESPECIAL e de SUPER (decisão do líder, 25/08/2026, §15).** O que muda entre os tiers não é o hardware — é o **teto de fidelidade** alcançável, porque só a COMUM tem um original em circulação disponível pra copiar de perto; ESPECIAL e SUPER nunca circularam, e é isso que barra a engenharia reversa (§15.2).
+
 **Homebrew COPIA, não cria (líder, 2026-07-18 — preserva o anti-pillar):** gravar uma carta vazia via RSB é **duplicar** um conjuro que já existe (pirataria = cópia ilegal), **não** inventar um efeito novo numa bancada. Isso mantém intacto o anti-pillar do `gdd.md`/`cartas-technomagik.md` ("cartas são obtidas, não craftadas; o jogador nunca monta carta nova numa bancada") e casa com **von Neumann = replicação**. O jogador nunca cria conjuro inédito — ele copia um existente para um meio pirata barato.
+
+**Isto vale também para ESPECIAL e SUPER (decisão do líder, 25/08/2026, §15):** copiar não é criar, mesmo quando o alvo copiado é único no jogo inteiro. O mecanismo é sempre o mesmo — gravar cópia numa carta vazia via RSB, na bancada. O que muda por tier é se existe **conhecimento disponível** pra copiar bem: o efeito de uma COMUM roda num sistema aberto e conhecido (a mesma compilação-no-cast que o jogo inteiro usa); o efeito de uma ESPECIAL ou da SUPER nunca foi exposto a ninguém pra examinar, e é essa falta de exame que trava a cópia no teto de 20% de fidelidade (§15.2).
 
 ## 4. Unidade de memória (terminologia canônica)
 
@@ -140,14 +149,16 @@ Todo vírus é **oculto** — o jogador não sabe que pegou até se manifestar (
 | Tipo | Risco |
 |---|---|
 | Especial (original) | **0** (não contamina) |
+| **Super (original)** | **0** (não contamina — mesma ROM de qualidade suprema da especial; linha acrescentada 25/08/2026, §15) |
 | Comum (original) | `[calcular]` — a ROM **não é reescrita**, mas o vírus age como **rootkit** (residente em runtime) |
 | Pirata especial | `[calcular]` |
+| **Pirata super** | `[calcular]` — mesma lógica do pirata especial, com o teto de 20% de fidelidade (§15.2) restringindo ainda mais o quanto a cópia se aproxima do original (linha acrescentada 25/08/2026, §15) |
 | Pirata comum | `[calcular]` |
 | **Homebrew (EPROM)** | `[calcular]` — **a mais vulnerável** (mais fácil pegar, mais difícil não ser afetada) |
 
-Ordem de vulnerabilidade: **especial (0) < comum < pirata especial < pirata comum ≪ homebrew.**
+Ordem de vulnerabilidade: **especial/super (0) < comum < pirata especial/pirata super < pirata comum ≪ homebrew.**
 
-**Especiais são IMUNES a vírus comum** (risco 0 — ROM de qualidade suprema). **O vírus do Dante no clímax é a exceção que confirma a regra:** não é infecção acidental, é uma **arma ESPECIAL fabricada pelas indústrias Sterling sob medida** para furar e neutralizar a carta **Gaiola de Faraday** especificamente; o Dante (acesso logístico) só a instala à noite. Uma especial só cai por uma arma dedicada, nunca por descuido — o que reforça o peso da traição e do poder industrial da Sterling.
+**Especiais e Super são IMUNES a vírus comum** (risco 0 — ROM de qualidade suprema). **O vírus do Dante no clímax é a exceção que confirma a regra:** não é infecção acidental, é uma **arma ESPECIAL fabricada pelas indústrias Sterling sob medida** para furar e neutralizar a carta **Gaiola de Faraday** especificamente; o Dante (acesso logístico) só a instala à noite. Uma especial só cai por uma arma dedicada, nunca por descuido — o que reforça o peso da traição e do poder industrial da Sterling.
 
 **Apelo dramático (líder, 2026-07-18):** a Gaiola de Faraday é provavelmente a **primeira carta especial** do jogador (obtida cedo, no interior-faraday) e o acompanha o **jogo inteiro** — a especial em que ele mais confia e a que mais se apega. É exatamente ELA que o vírus-arma da Sterling mata no clímax. A carta-companheira "morre" na hora mais crítica: a traição do Dante dói mais porque tira do jogador o que ele tinha de mais familiar. Reforça a decisão de obtê-la cedo (§ guarda-chuva Faraday).
 
@@ -220,7 +231,59 @@ Duas camadas que se combinam:
 
 ---
 
+## 15. Pirataria alcança ESPECIAL e SUPER (decisão do líder, 25/08/2026)
+
+> **Revoga o que bloqueava isto:** os cortes **C-03** e **C-13** da L-29 (`GODS_LAWS.md`) foram revogados nesta data. O GusWorld TEM crafting, e ele alcança as cartas — inclusive ESPECIAL e SUPER, sob a forma de **cópia pirata**. As ORIGINAIS continuam fora de alcance de qualquer bancada: só progresso narrativo (`cartas-technomagik.md` §2.3-2.4).
+
+### 15.1 O que pode ser craftado, e o que nunca pode
+
+| | COMUM | ESPECIAL / SUPER original | ESPECIAL / SUPER pirata |
+|---|---|---|---|
+| Craftável | sim, já era canon (`cartas-technomagik.md` §2.2) | **não, nunca** | **sim — decisão de hoje** |
+| Mecanismo | compilação-no-cast (runtime) | progresso narrativo (Tavus-Eco do mestre; para a SUPER, missão-capstone — mecanismo exato de entrega em aberto, §15.6) | homebrew via RSB, gravado numa carta vazia, na bancada das oficinas do mercado negro/ferro-velho (§4 e §14 acima) |
+| Fidelidade | não se aplica — não há "original" separado da carta pra imitar, é sistema aberto por natureza | é a régua, 100% por definição | **teto de 20%** (§15.2) |
+
+O jogador nunca monta a original ESPECIAL ou SUPER numa bancada — ele monta, no máximo, uma **imitação**. É a mesma distinção que o anti-pillar do `gdd.md` já preservava para a COMUM (compilar ≠ inventar), estendida aqui: gravar uma cópia pirata de uma ESPECIAL ou da SUPER é **duplicar-tentando**, nunca criar (§3.6 acima).
+
+### 15.2 Por que a fidelidade tem teto: engenharia reversa impossível
+
+**Decisão do líder, 25/08/2026, sobre a SUPER especificamente, verbatim:** *"A original foi criada em asmódico puro, com compilador próprio que se perdeu ao longo dos tempos. As melhores cartas piratas nao alcancam nem 20% de fidelidade, pois RE é impossivel, já que a carta não está disponível para ninguém tentar fazer RE e entender os mecanismos."*
+
+A causa não é dificuldade técnica arbitrária — é que **ninguém jamais teve a carta original em mãos para examinar**. Engenharia reversa exige uma amostra pra desmontar; a SUPER nunca circulou, então não existe amostra. O mesmo vale, por construção, para as 20 ESPECIAIS: cada uma é única, entregue direto pelo Tavus-Eco do mestre, e nunca esteve em circulação para alguém copiar por exame direto. _(Esta extensão às ESPECIAIS é inferência por simetria com a razão dada pelo líder para a SUPER — ele agrupou as duas no mesmo tratamento na decisão 1, mas a frase sobre RE impossível foi dita sobre a SUPER. Sinalizado no relatório para confirmação.)_
+
+**Teto: as melhores cópias piratas não passam de 20% de fidelidade.** É o único número que o líder deu; nenhum outro valor (percentual de sucesso de craft, custo em crédito ou material, taxa por grau de falha) está decidido — fica para a onda de balanceamento, com `economy-designer`, junto do resto da tabela de risco de contaminação (§9) e dos preços já sinalizados como `[calcular]` neste documento.
+
+### 15.3 Três graus de falha (decisão do líder, 25/08/2026)
+
+Craftar uma cópia pirata de ESPECIAL ou SUPER nunca produz o original. O resultado cai num destes três graus, todos **abaixo** do original:
+
+1. **Qualidade inferior:** a cópia funciona, faz o que a original faz, mas pior — mais fraca, menos confiável (reusa a física §3: EPROM em vez de ROM, upload lento, degrada mais rápido).
+2. **Efeitos trocados:** a cópia funciona, mas faz algo **diferente** do que a original faz — a tentativa de reconstrução saiu errada e o comportamento resultante não é o pretendido.
+3. **Só o nome, sem função nenhuma:** a cópia se apresenta como a carta (nome, aparência), mas **não faz nada** — a imitação falhou por completo.
+
+Qual dos três graus sai de uma tentativa de craft é número de balanceamento (probabilidade), **não decidido**. O que está fechado é que os três graus existem e nenhum alcança o original.
+
+### 15.4 A escolha econômica que isto abre
+
+O tradeoff, verbatim do líder: *"tradeoff de comprar coisas ou craftar coisas tentando copiar original"*. Duas rotas para a MESMA cópia pirata de ESPECIAL/SUPER, com custo de natureza diferente:
+
+- **Comprar pronta:** um clone-falso já feito, no mercado negro (§14, vendedores com reputação variável — a lição Bastiat já canônica). Custa crédito, e a qualidade da cópia comprada é aposta na reputação do vendedor.
+- **Craftar você mesmo:** gravar a cópia na bancada (§4, RSB, oficinas do mercado negro/ferro-velho). Custa o material de craft e o risco do próprio resultado (§15.3), sem intermediário cobrando margem.
+
+**As ORIGINAIS não entram nesse tradeoff** — elas continuam fora de qualquer canal comercial, só por progresso narrativo (`cartas-technomagik.md` §2.3-2.4: "nunca é loot de baú, nunca é compra"). O tradeoff é sempre entre duas cópias piratas, nunca entre pirata e original.
+
+### 15.5 Onde isto mora tecnicamente
+
+A bancada onde a cópia é gravada é a mesma do §4 (terminal de bancada fixo, RSB, oficinas do mercado negro/ferro-velho, §14) — **não é um sistema paralelo**. No formato de arquivo do projeto, essa bancada é o `.gw.table` (ver `docs/tech/convencao-formatos-gw.md`), que agora cobre tanto reparo (recarregar, trocar bateria, limpar vírus) quanto criação de cópia pirata, com um campo dizendo qual operação é qual.
+
+### 15.6 Em aberto
+
+O mecanismo exato de como a party recebe a carta SUPER original ao fim da missão-capstone — já que "forjar" deixou de ser a resposta — não foi decidido pelo líder nesta rodada. `cartas-technomagik.md` §2.4 sinaliza o mesmo ponto em aberto. Documentos fora do escopo desta rodada de edição ainda descrevem um "ritual de forja da Carta 21" (`docs/design/roster-analogos/21-helion-tusk.md`, `docs/narrative/deep/characters/mestre-cap-21-helion-tusk.md`) e citam "forjada" em outros dois lugares (`docs/design/mecanicas/cartas/_vocabulario.md`, `docs/design/mecanicas/deck-mao-sistema.md`) — contradições reabertas pela decisão de hoje, reportadas, não corrigidas aqui.
+
+---
+
 ## Pontos ABERTOS (retomar aqui)
 - [x] ✅ **Números** (ENTREGUE: `cartas-numeros-proposta.md`) → `economy-designer` (preço de recarga, AP da troca in-battle, drain rate, capacidade kR/MR, vida de ciclos, **X% e a tabela de risco de contaminação da §9**, preço pirata vs original ao longo do arco).
 - [x] ✅ **Spec de implementação** (ENTREGUE e APROVADA 2026-07-28: `cartas-spec-dados.md` + `cartas-spec-logica.md`) → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção).
 - [x] ✅ **Canonizado pelo líder em 2026-07-28.** Falta só refletir em `cartas-technomagik.md` e na terminologia (passo de escrita). Era: canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar.
+- [ ] **Camada pirata de ESPECIAL/SUPER (§15, decisão do líder 25/08/2026):** canon fechado, números em aberto → `economy-designer` (probabilidade de cada um dos 3 graus de falha, custo em crédito/material do craft, preço da cópia comprada pronta no mercado negro). Mecanismo de entrega da SUPER original ao fim da missão-capstone também em aberto (§15.6) → líder.

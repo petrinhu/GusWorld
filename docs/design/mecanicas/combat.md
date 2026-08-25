@@ -31,9 +31,9 @@ Princípio decisório: **toda regra abaixo existe para forçar decisão interess
 | `MaxPartySize` (engine) | 1 a 4 (configurável) | módulo de engine reutilizável aceita 1-4 |
 | Party do jogo GusWorld | **3** | Gus + 2 companions ativos |
 | Inimigos por encontro | 1 a 4 | encontros assimétricos são válidos (ex: 3 party vs 1 mini-boss) |
-| Ordem de turno | **Por-ator** (CTB-style) | fila ordenada por SPD, não por-time |
-| `AP` por turno | **3 fixo** | cresce via skill tree em jogo posterior; no slice é constante |
-| `Mana` (Compilação) | ramp linear | `manaMax = 2 + turnoIndex`, cap 8 |
+| Ordem de turno | **Relógio de ação por ator** (`ActionClock`, `ADR-017`) | escalonador por instante-de-próxima-ação (inteiro); não é mais fila nem rodada global. Reconciliado com este canon em 25/08/2026 (decisão do líder); ver §3/§4 |
+| `AP` por turno | **3 fixo** | cresce via skill tree em jogo posterior; no slice é constante. ⚠️ Lacuna de spec aberta sobre ativação (uma ação por vez vs multi-ação): ver nota em §3 |
+| `Mana` (Compilação) | ramp linear | `manaMax = 2 + contagemPropriaDeTurnos`, cap 8. Contagem por-ator, substitui o antigo `turnoIndex` global (ver §5) |
 | Carry-over de mana | **nenhum** | recarrega ao máximo todo TurnStart; impossível bankar |
 | Determinismo no slice | total (variância 0) | RNG visível plugado mas com variância zerada na entrega F2-E.5 |
 
@@ -49,17 +49,18 @@ Decisão canônica N.2 R1, 2026-06-03:
 
 ## 3. Máquina de estados do combate (FSM)
 
-FSM por-ator. Cada ator (party ou inimigo) toma seu turno na ordem da fila de iniciativa. Multi-ação no turno acontece dentro de `ActionSelect` via loop interno consumindo AP.
+FSM por-ator. Cada ator (party ou inimigo) toma seu turno quando o **relógio de ação** o elege (`ActionClock`, `ADR-017`, reconciliado com este canon em 25/08/2026 por decisão do líder; ver §4). Não existe mais fila ordenada por SPD nem rodada com `turnoIndex` global. Multi-ação no turno acontece dentro de `ActionSelect` via loop interno consumindo AP.
 
 ```
         ┌──────────────┐
-        │  SetupPhase  │  (instancia atores, monta fila SPD, dispara CombatBus.CombatStarted)
-        └──────┬───────┘
-               ▼
+        │  SetupPhase  │  (instancia atores, inicializa o relogio de acao: instante
+        └──────┬───────┘   corrente = 0, next_action_at inicial por ator; dispara
+               ▼            CombatBus.CombatStarted)
         ┌──────────────┐
-   ┌───▶│  TurnStart   │  (recarrega mana do ator ativo: manaMax = 2 + turnoIndex, cap 8;
-   │    └──────┬───────┘   aplica tick de status: Poison/Regen/Duration--; reseta AP = 3)
-   │           ▼
+   ┌───▶│  TurnStart   │  (o relogio elege o ator de menor next_action_at, §4;
+   │    └──────┬───────┘   recarrega mana do ator eleito: manaMax = 2 +
+   │           ▼            contagemPropriaDeTurnos, cap 8; aplica tick de status:
+   │                        Poison/Regen/Duration--; reseta AP = 3, ver nota abaixo)
    │    ┌──────────────┐
    │    │ ActionSelect │  ◀─┐  loop interno: jogador/AI escolhe ação enquanto AP > 0 e não "passar"
    │    └──────┬───────┘   │  (Scan / Gambito / atacar / defender / jogar carta / flee / passar)
@@ -67,7 +68,7 @@ FSM por-ator. Cada ator (party ou inimigo) toma seu turno na ordem da fila de in
    │           ▼           │
    │    ┌──────────────┐   │
    │    │ ActionResolve│───┘  resolve a ação escolhida (dano, status, pipeline de combo,
-   │    └──────┬───────┘      reordenar fila, etc). Volta a ActionSelect se AP > 0.
+   │    └──────┬───────┘      ajustar o relogio de outro ator, etc). Volta a ActionSelect se AP > 0.
    │           ▼  (AP == 0 ou passou)
    │    ┌──────────────┐
    │    │   TurnEnd    │  (expira status com Duration==0 do ator; dispara CombatBus.TurnEnded)
@@ -85,27 +86,66 @@ FSM por-ator. Cada ator (party ou inimigo) toma seu turno na ordem da fila de in
 
 ### Notas de transição
 
-- `SetupPhase → TurnStart`: a fila já está ordenada por SPD; o primeiro ator entra. A SPD também decide qual LADO abre a rodada (party-block ou enemy-block), ver §4.1 (Janela de Comando da Party, modelo 1B).
-- `TurnStart → ActionSelect`: mana e AP do ator são preparados ANTES da seleção.
+- `SetupPhase → TurnStart`: o relógio elege o ator de menor instante-de-próxima-ação, pela ordem total de desempate (§4). Não existe mais "lado que abre a rodada": qualquer ator, de qualquer lado, pode ser o primeiro a agir.
+- `TurnStart → ActionSelect`: mana e AP do ator são preparados ANTES da seleção. ⚠️ **Lacuna de spec aberta (parecer do CTO, 25/08/2026; L-11, decisão pendente do líder).** O `ADR-017` reseta o relógio "pós-ação" com a fórmula tratando uma carta por ativação (estilo Pokémon Legends: Arceus); não diz o que acontece com os 3 AP fixos e o loop de multi-ação deste laço, que é o modelo deste documento. Os dois modelos são incompatíveis nesse ponto, e o D5 não decide isso sozinho. Este documento mantém o laço de `AP = 3` porque é a única regra escrita até a decisão; ela fica **para a onda de combate**.
 - `ActionSelect ⇄ ActionResolve`: laço interno. Cada ação custa AP. Quando `AP == 0` ou o ator escolhe "passar", sai do laço.
-- `TurnEnd → CheckEnd → TurnStart`: avança para o próximo ator. Quando o ator era da party, o "próximo" é escolhido pelo jogador dentro do bloco da party (comando livre, §4.1); quando era inimigo, segue a ordem de SPD entre inimigos. `turnoIndex` é por rodada completa de fila (afeta o ramp de mana de forma consistente entre todos).
-- Qualquer ator que chega a HP 0 é resolvido conforme regra de morte/incapacitação (companions incapacitados, Pillar 4; inimigos removidos da fila).
+- `TurnEnd → CheckEnd → TurnStart`: avança para o ator seguinte. O relógio reseta o `next_action_at` do ator que acabou de agir (fórmula em §4); o próximo a agir, de qualquer lado, é sempre o de menor instante-de-próxima-ação no relógio único (§4.1 descreve como o jogador comanda os membros da party quando mais de um fica pronto ao mesmo tempo). A contagem própria de turnos de cada ator, que alimenta o ramp de mana, substitui o antigo `turnoIndex` por rodada completa de fila.
+- Qualquer ator que chega a HP 0 é resolvido conforme regra de morte/incapacitação (companions incapacitados, Pillar 4; inimigos removidos do relógio).
 
-> **Modelo de seleção de ator (canon 2026-06-25, decisão do criador via AskUserQuestion, modelo 1B).** A FORMA da FSM acima NÃO muda. O que muda é a regra de QUEM entra em `ActionSelect` quando é a vez da party: em vez de forçar o topo da fila, o motor expõe os membros-da-party-elegíveis-na-rodada e o jogador escolhe qual age, em que ordem, com qual ação e qual alvo (comando livre estilo Final Fantasy clássico). A SPD deixa de microgerenciar a ordem DENTRO da party, mas continua decidindo qual lado abre a rodada e segue valendo para Haste/Slow, Gambito-Reordenar, ambientes-SPD (§18) e o item de iniciativa. Detalhe completo + nota técnica em §4.1.
+> ⚠️ **SUPERADO em 25/08/2026 (decisão do líder; parecer do CTO em `PARECER-ADR-017.md`).** A nota citada abaixo é o registro histórico da decisão de 2026-06-25 (modelo 1B: comando livre da party sobre uma fila CTB por SPD). O `ADR-017` (16/07/2026, "ACEITO", one-way-door de feel de combate) já revogava esse modelo explicitamente ("não é mais o free-order do 1B") ao trocar a fila por um relógio de ação por ator; este canon nunca absorveu a revogação, e o líder confirmou em 25/08/2026 que vale o `ADR-017`. **O que sobrevive do espírito do 1B:** o jogador continua escolhendo QUAL membro pronto age, com QUE ação e QUE alvo, agora entre os "prontos" do relógio, não entre o "bloco" da party; ver §4.1, reescrito com o contrato vigente. **O que morre:** a fila ordenada por SPD, o conceito de "lado que abre a rodada", e `turnoIndex`/`round_index` como contador global (substituído por contagem própria por ator). A L-24 manda apagar regra revogada, não apagar o registro de que ela existiu; por isso a nota original fica citada abaixo, e não excluída.
+>
+> "Modelo de seleção de ator (canon 2026-06-25, decisão do criador via AskUserQuestion, modelo 1B). A FORMA da FSM acima NÃO muda. O que muda é a regra de QUEM entra em `ActionSelect` quando é a vez da party: em vez de forçar o topo da fila, o motor expõe os membros-da-party-elegíveis-na-rodada e o jogador escolhe qual age, em que ordem, com qual ação e qual alvo (comando livre estilo Final Fantasy clássico). A SPD deixa de microgerenciar a ordem DENTRO da party, mas continua decidindo qual lado abre a rodada e segue valendo para Haste/Slow, Gambito-Reordenar, ambientes-SPD (§18) e o item de iniciativa. Detalhe completo + nota técnica em §4.1."
 
 ---
 
-## 4. Iniciativa e fila visível
+## 4. Relógio de ação e prontidão
 
-A ordem de turnos é uma **fila ordenada por SPD, sempre visível** ao jogador (UI mostra próximos N atores). Isto é mecânica central, não cosmético: o Gambito opera sobre esta fila.
+Não existe mais fila ordenada por SPD. A ordem de ação é resolvida por um **relógio de ação por ator** (`ActionClock`, `ADR-017`, reconciliado com este canon em 25/08/2026 por decisão do líder). Cada ator vivo tem um instante-de-próxima-ação (inteiro); o relógio elege sempre o ator de menor instante-de-próxima-ação, por uma ordem total de desempate (abaixo). O instante corrente do relógio é monotônico: só anda para a frente, nunca recua, e nenhum ator recebe instante-de-próxima-ação menor que o instante corrente. Isto é mecânica central, não cosmético: o Gambito opera sobre este relógio.
 
-### Operação `ReorderActor(actor, deltaPosicao)`
+### Ordem total de desempate
 
-Move um ator `deltaPosicao` casas na fila (negativo = adiantar, positivo = atrasar). É a primitiva que cartas Cinético/Sônico e o Gambito "reordenar/redirecionar vetor" usam para empurrar um inimigo para trás na ordem (ou puxar um aliado para frente, quando aplicável).
+Ao empatar em instante-de-próxima-ação, a ordem segue, nesta sequência, até resolver:
 
-- Clamp nos limites da fila (não sai do range válido).
-- Gambito-reordenar (2 AP) chama `ReorderActor(alvo, +deltaUpgradavel)`.
-- A fila é recomputada por SPD apenas na entrada de novos atores ou em mudança de SPD (Haste/Slow); reordenações manuais persistem até a próxima recomputação natural.
+1. Menor instante-de-próxima-ação.
+2. Em empate, menor instante-em-que-agiu-pela-última-vez.
+3. Em empate, maior velocidade efetiva (SPD).
+4. Em empate, preferência do jogador (quando existir escolha do lado do jogador).
+5. Em empate ainda, **identificador único do ator**. Chave final obrigatória: sem ela, dois inimigos idênticos empatam e a ordem cai na ordem do contêiner, a armadilha 4 da L-17 (achado do parecer do CTO, 25/08/2026; o `ADR-017` termina a cadeia em "preferência do jogador", que nem sempre existe).
+
+### Reset pós-ação (aritmética inteira)
+
+```
+next_action_at(ator) = instante_corrente + resultado_inteiro_de(
+    BASE_CLOCK, velocidade_efetiva(ator), fator_da_acao(carta), fator_do_estilo(estilo, cadeia_de_agil)
+)
+```
+
+- `BASE_CLOCK` e os fatores de ação/estilo são parâmetros nomeados, marcados `//PLAYTEST`, carregados como dado, nunca literais no corpo da regra.
+- **A cadeia inteira é aritmética inteira, com uma única regra de arredondamento declarada.** ⚠️ Ponto de risco marcado pelo parecer do CTO (25/08/2026): a redação original do `ADR-017` escreve a fórmula com ponto flutuante intermediário (`BASE_CLOCK / SPD × 0.85 × 0.55`); com a matriz de cinco plataformas de CI (L-20, MSVC incluído), contração de operações e ordem de avaliação podem divergir um bit e mudar o arredondamento. Este documento fecha essa porta: os fatores de ação e de estilo são expressos como razões inteiras (por exemplo 85/100, 55/100), e a divisão por velocidade e a aplicação dos fatores seguem sempre a mesma ordem de operações e a mesma regra de arredondamento, qualquer que seja a plataforma. A regra exata de arredondamento é detalhe de implementação; o que este canon fixa é que ela é ÚNICA, e o detector permanente é o replay byte-exato do D13.
+
+### Ação agendada (cast interpretado)
+
+Cartas com resolução em atraso (`combat-flavor.md §1`, "interpretada") não saem do relógio: agendam um evento de resolução no mesmo relógio, com um instante-de-resolução. O evento é cancelável pelos gatilhos canônicos (Stun/Disrupt/Silence/dano) antes do instante de resolução. A fronteira exata (um instante antes de resolver, versus o próprio instante) é caso de teste obrigatório.
+
+### Trava anti-inanição
+
+Nenhum ator da party fica sem agir além de um limite parametrizado (`//PLAYTEST`); ao estourar, o motor aplica um catch-up determinístico ao instante-de-próxima-ação do ator. A trava é função do estado, nunca de sorteio.
+
+### O relógio não consome sorteio
+
+A seleção de quem age (posição no relógio, desempate, catch-up) nunca consome RNG. A ordem de consumo do sorteio (§11) continua exclusiva da fórmula de dano: o relógio decide QUEM age, nunca QUANTO.
+
+### Operações que ajustam o relógio (substituem `ReorderActor`)
+
+As primitivas que empurravam um ator numa fila viram ajustes diretos ao instante-de-próxima-ação do alvo:
+
+- **Gambito-Reordenar** (2 AP): soma ticks ao `next_action_at` do alvo, empurrando-o para mais longe do próprio próximo turno.
+- **Knockback** (status, §9): soma ticks ao `next_action_at` do alvo afetado, one-shot.
+- **Haste / Slow** (status, §9): mexem na velocidade efetiva do ator, o que muda o RESULTADO da próxima fórmula de reset acima; não existe mais fila pra recomputar.
+
+Como o instante corrente só anda para a frente, empurrar um ator não pode fazê-lo "repetir o turno" nem "pular" um vizinho: as duas classes de bug documentadas abaixo (achado QA do modelo antigo, corrigidas à mão duas vezes) somem por construção no relógio.
+
+> ⚠️ **Histórico superado (COMBATE-FILA-CURSOR-FIX, decisões do líder de 2026-07-15 e 2026-07-27/28).** As duas notas abaixo descreviam bugs e correções de `ReorderActor`/`RecomputeBySpeed` sobre a fila array+cursor (`InitiativeQueue`) do modelo 1B. O `ADR-017` (16/07/2026) substitui essa estrutura pelo relógio de ação acima; o próprio parecer do CTO (25/08/2026) registra que "tempo só anda para frente" no relógio elimina por construção a classe de bug que essas duas correções consertaram à mão. Ficam registradas como histórico do problema (L-24: revogar não é apagar o registro de que a decisão existiu), não como especificação vigente.
 
 > **Correção de implementação (COMBATE-FILA-CURSOR-FIX, decisão do líder 2026-07-15).**
 > `ReorderActor` cru clampa nos limites da fila inteira `[0, count-1]`, **sem olhar o cursor** — pode cruzar `current()` e reescrever a região de quem já agiu nesta rodada, dessincronizando identidade (achado QA: o Gambito-reordenar fazia o ator repetir o turno e um vizinho ser pulado). A implementação real (`InitiativeQueue`) usa duas primitivas SEGURAS pra qualquer reordenação intra-rodada:
@@ -118,79 +158,54 @@ Move um ator `deltaPosicao` casas na fila (negativo = adiantar, positivo = atras
 
 ---
 
-## 4.1 Janela de Comando da Party (comando livre sobre o CTB, modelo 1B)
+## 4.1 Comando da party sobre o relógio (escolher entre os prontos + segurar)
 
-**Status:** canonizado pelo criador supremo em 2026-06-25 (decisão D1/D2 via AskUserQuestion). Substitui o "agir só com o ator do topo da fila" pelo comando LIVRE da party dentro do seu bloco, mantendo o CTB por SPD como esqueleto. O criador ACEITOU o contra-argumento do lead-game-designer: SPD NÃO vira pura sugestão; continua sendo um stat de build que decide o que importa.
+**Status:** canonizado pelo `ADR-017` (16/07/2026, decisão do líder), reconciliado com este canon em 25/08/2026 (parecer do CTO, decisão do líder). Substitui o modelo 1B (§3, nota superada) de "comando livre dentro do bloco da party sobre uma fila CTB por SPD". Não existe mais "bloco da party" nem "bloco de inimigos" tomando a rodada inteira: cada ator, de qualquer lado, fica pronto no seu próprio instante (§4), e os dois lados se intercalam de verdade no relógio.
 
 ### Conceito
 
-A ordem de turno continua sendo o CTB por SPD (§4). A mudança é a fantasia de comando: quando chega a vez da party, o jogador comanda o BLOCO da party na ordem que quiser (escolhe qual membro age, em que ordem, qual ação e qual alvo de cada um), em vez de ser forçado a agir só com o ator do topo. É o feel Final Fantasy clássico / Dragon Quest (comando de bloco por lado).
+Quando um ou mais membros da party ficam prontos (elegíveis pelo relógio, §4), o jogador:
 
-- **SPD = pré-seleção sugerida** dentro do bloco: ao abrir a Janela, o membro com maior SPD entre os ainda-não-agiram fica pré-selecionado, mas o jogador pode escolher qualquer um.
-- **SPD = quem ABRE a rodada:** a SPD do lado decide se o party-block ou o enemy-block joga primeiro na rodada. É aqui que o stat SPD preserva peso real (o inimigo rápido ainda te pega primeiro).
+- **Escolhe qual membro pronto age** (ação + alvo), entre os prontos no momento; ou
+- **Segura** um membro pronto, esperando outro ficar pronto também, para decidir a ordem dos dois.
 
-### Fluxo de rodada (modelo 1B)
+O jogador sempre escolhe o alvo da ação (single/AoE), isso é ortogonal ao relógio e não muda (modo-mira, `battle-screen.md §3.5`).
 
-```
-RODADA = uma volta completa da fila CTB (turnoIndex / RoundIndex, igual antes).
+**O que se perde em relação ao modelo 1B:** forçar um membro a agir ANTES do relógio dele deixar. O "comando livre dentro do bloco" caía nisso; a party deixa de ser um bloco.
 
-1. SetupPhase / início de rodada: a fila é ordenada por SPD e os atores são
-   agrupados por LADO. A SPD comparada entre os lados decide quem abre:
-   party-block primeiro OU enemy-block primeiro.
+### Por que SPD continua sendo um stat com peso
 
-2. JANELA DE COMANDO DA PARTY (quando é a vez do bloco da party):
-   - Membros vivos da party que ainda não agiram nesta rodada ficam elegíveis.
-   - Pré-selecionado = o de maior SPD entre os elegíveis (sugestão, não trava).
-   - O jogador escolhe QUAL membro age -> entra no loop de AP normal (ActionSelect,
-     3 AP, §5): Scan / Gambito / Atacar / Defender / COMPILAR / Flee / passar, com
-     ALVO escolhido (modo-mira, battle-screen §3.5).
-   - Resolve a ação imediatamente (feedback na hora, pacing battle-screen §5.2).
-   - Repete até todos os membros da party terem agido nesta rodada.
+O SPD não decide mais "qual lado abre a rodada": não existe mais rodada nem lado. No relógio (§4), o SPD entra direto na fórmula de reset: quanto maior a velocidade efetiva, menor o `next_action_at`, ou seja, o ator volta a ficar pronto mais cedo. É um efeito estrutural, não um bônus de abertura. SPD também segue decidindo o desempate (posição 3 da ordem total, §4), o alvo/efeito de Gambito-Reordenar, Haste/Slow e ambientes que mexem SPD (§18), e o valor do item de iniciativa (INBOX).
 
-3. BLOCO DOS INIMIGOS: agem na ordem de SPD entre eles (ScriptedBrain / UtilityBrain,
-   §13; AP por tier §13.1). O PacingDirector itera por-ação (battle-screen §5.2 D8-D12).
+### Impacto nos sistemas canônicos
 
-4. CheckEnd -> próxima rodada (recomputa quem abre por SPD).
-```
-
-A rodada é, portanto, "um lado age todo, depois o outro", com a SPD decidindo a ordem dos lados. Dentro do bloco da party o comando é 100% livre; dentro do bloco inimigo a ordem segue SPD (IA).
-
-### Impacto nos sistemas canônicos (todos PRESERVADOS em 1B)
-
-| Sistema | Efeito em 1B |
+| Sistema | Efeito no relógio |
 |---|---|
-| **Fila CTB (§4)** | Preservada. Continua a estrutura, reagrupada por lado/rodada via SPD. A faixa visível (battle-screen §2) segue mecânica, não cosmética. |
-| **Gambito-Reordenar (§12, `ReorderActor`)** | Preservado e mais valioso. Empurrar um inimigo o atrasa para a rodada seguinte ou adia a abertura do enemy-block; puxar um aliado para frente afeta a ordem entre os lados. |
-| **Gambito-Prever (§12, `IntentPreview`)** | Preservado e mais valioso. O jogador lê o intent e ordena a party para responder (proteger o Gus, focar quem vai bater). |
-| **AP por ator (§5)** | Intacto. Cada membro mantém seus 3 AP independentes; o loop interno de `ActionSelect` não muda. Só muda QUEM o jogador seleciona para entrar nele. |
-| **Iniciativa / SetupPhase (§3)** | Estendida: passa a calcular qual lado abre (comparação de SPD entre os lados). |
-| **Cast-time / cartas lentas (CARTAS-CAST-TIME, INBOX)** | Preservado (D4). Como 1B mantém a fila, a carta lenta segue resolvendo posições à frente na fila/rodada; o Gambito ainda a vê e pode proteger/reordenar. |
-| **Haste / Slow (§9/§18)** | Preservados: mexem na SPD, logo em quem abre a rodada e na posição na fila. Continuam decisões táticas reais. |
-| **Ambientes que mexem SPD/fila (§18: T8 Elevação "1º a agir", T2 Talude, Aurora, Gelo)** | Preservados: o "1º da fila/rodada" continua definido por SPD. |
-| **ITEM-SPD-INICIATIVA (INBOX)** | Preservado e justificado: usar o item aumenta SPD e faz o party-block abrir a rodada. O item ganha razão de existir exatamente por causa de 1B. |
-| **IA / AP por tier (§13.1)** | Intacto. Inimigos agem em bloco por SPD; o PacingDirector já itera por-ação (2 beats por inimigo). |
-| **Auto-resolve / AutoResolveBrain (§19)** | Intacto. Roda a FSM headless; comando livre é seleção de ator na apresentação, não muda o headless (o AutoResolveBrain já decide ações sozinho). |
-| **Análise Preditiva / fragilidade do Gus (§2.1)** | Intacta. Bônus: comando livre deixa o jogador proteger melhor o Gus frágil (coerente com Pillar 4). |
-| **Fórmula de dano (§11)** | NÃO muda. Comando livre não toca a resolução de ação, só a seleção de ator. |
-
-### Por que SPD continua sendo um stat com peso (preservação do equilíbrio)
-
-O comando livre tira do SPD apenas o microgerenciamento da ordem DENTRO da party (a parte que o criador quis libertar). O SPD continua decidindo o que importa: (a) qual lado abre a rodada (o inimigo rápido te pega primeiro); (b) o membro pré-selecionado ao abrir a Janela; (c) o alvo/efeito de Gambito-Reordenar, Haste/Slow e ambientes; (d) o valor do item de iniciativa. Um stat que não decide nada seria decoração (viola "tensão > complexidade"); 1B impede isso.
+| **Relógio de ação (§4)** | É o motor. Cada ator compete individualmente pelo próprio `next_action_at`; os dois lados se intercalam de verdade (honra o pedido do Gus Dragon, "P2 pode agir várias vezes seguidas"). |
+| **Gambito-Reordenar (§12)** | Preservado e mais legível: soma ticks ao `next_action_at` do alvo (§4), em vez de mover posição numa fila. |
+| **Gambito-Prever (§12, `IntentPreview`)** | Preservado. O `IntentPreview` ganha os campos `EstiloProjetado` + `TicksProjetados` (`ADR-017`, "Transparência"): o jogador lê o estilo e o tempo projetado do inimigo, não só a ação. Gate de teste permanente: `PreviewIntent()` e a decisão real do MESMO inimigo têm de devolver o MESMO estilo pré-comprometido, senão o preview mente. |
+| **AP por ator (§5)** | ⚠️ Ver a lacuna de ativação registrada em §3: o `ADR-017` não fecha o que acontece com os 3 AP fixos e o loop de multi-ação. Não decidida aqui. |
+| **SetupPhase (§3)** | Inicializa o relógio (instante corrente = 0, `next_action_at` inicial de cada ator); não calcula mais "qual lado abre". |
+| **Cast-time / cartas lentas (CARTAS-CAST-TIME, INBOX)** | Preservado como resolução agendada no mesmo relógio (§4), não mais como "posição à frente na fila". |
+| **Haste / Slow (§9/§18)** | Preservados: mexem na velocidade efetiva, o que muda o resultado da fórmula de reset (§4). |
+| **Ambientes que mexem SPD (§18)** | O efeito de SPD sobre o relógio (reset mais cedo) substitui o efeito antigo sobre "posição na fila/rodada". Os efeitos específicos do §18 que ainda citam "posição-de-fila" ficam fora do escopo desta reconciliação (relatório do agente que fez esta edição, item 6). |
+| **ITEM-SPD-INICIATIVA (INBOX)** | O item aumenta SPD; no relógio isso significa resets mais rápidos, não mais "abrir a rodada". Precisa de re-derivação; fora do escopo desta reconciliação. |
+| **Análise Preditiva / fragilidade do Gus (§2.1)** | Intacta. |
+| **Fórmula de dano (§11)** | NÃO muda. O relógio decide seleção de ator, não resolução de ação. |
 
 ### Bônus de iniciativa (PENDENTE de playtest, D5)
 
-Opcional, decidido depois com dados: o lado que abre a rodada por SPD poderia ganhar um pequeno bônus tático (ex.: na linha do T8 Elevação, que já dá Haste ao 1º da fila), reforçando que correr na frente vale sem ser dominante. Registrado como pendência; não entra agora. Mede-se em playtest.
+Opcional, decidido depois com dados: o ator que fica pronto primeiro por SPD poderia ganhar um pequeno bônus tático (ex.: na linha do que o T8 Elevação já dá de Haste), reforçando que correr na frente vale sem ser dominante. Registrado como pendência; não entra agora. Mede-se em playtest.
 
-### Nota técnica para o backend-engineer (mudança mínima, FSM e §11 NÃO mudam)
+### Nota técnica (mudança de contrato, não de camada)
 
-A implementação é uma extensão ADITIVA ao `CombatStateMachine`. A auditoria do motor permanece válida porque a FORMA da FSM e a fórmula de dano (§11) não mudam; muda a seleção de ator, não a resolução de ação. Os testes de transição existentes continuam passando (forçar o topo é o caso particular de o conjunto elegível ter 1 elemento).
+A implementação troca o escalonador: `InitiativeQueue` (array + cursor) morre; `ActionClock` (heap por `next_action_at`) nasce. Isso é REWRITE, não extensão (`ADR-017`, "Migração"): a fila por-lado (`PendingPartyActors`) do modelo 1B deixa de existir; o estado passa a ser "conjunto de atores prontos neste instante", de qualquer lado. Os testes de transição de FSM que não dependiam de ORDEM (dano, status, roda de fraqueza) continuam válidos; os de ordem/cursor/rodada são re-derivados sobre o relógio (L-19, TDD estrito: o contrato é testável antes de existir código).
 
-- **Campo novo no estado:** `PendingPartyActors` (membros vivos da party que ainda não agiram NESTA rodada). Análogo do lado inimigo já é coberto pela fila por SPD.
-- **`ActionSelect`:** quando o lado ativo é a party, consulta `PendingPartyActors` (membros elegíveis) em vez de só `fila.Peek()`. O jogador escolhe qual entra no loop de AP; o pré-selecionado é o de maior SPD entre os elegíveis.
-- **`SetupPhase` / início de rodada:** agrupa a fila por lado e compara SPD para decidir quem abre (party-block ou enemy-block). É reordenação da fila já existente, não reescrita do loop.
-- **`CheckEnd` / avanço:** marca o ator escolhido como "já agiu nesta rodada" (em vez de `Dequeue` cego) e, quando o party-block esvazia, passa para o enemy-block (ou inicia nova rodada). Recomputa quem abre por SPD na nova rodada.
-- **Determinismo preservado:** a ordem de consumo do RNG (§11) não muda; a seleção de ator é input de jogador (ou do AutoResolveBrain headless), não consome RNG.
-- **Escopo (D6):** o target selection (modo-mira, zero motor, battle-screen §3.5) entra JÁ; a Janela de Comando da Party (extensão do motor acima) entra logo após, briefada ao backend-engineer + gameplay_engineer.
+- **Campo novo no estado, por ator:** `next_action_at` (inteiro), `last_acted_at` (inteiro), contagem de ágeis consecutivos, contagem própria de turnos (substitui `turnoIndex` global, §2).
+- **Elegibilidade:** qualquer ator vivo com `next_action_at <= instante_corrente` está pronto; entre os prontos do lado do jogador, o jogador escolhe quem age ou segura.
+- **Avanço do relógio:** o instante corrente avança para o menor `next_action_at` pendente sempre que ninguém está pronto.
+- **Determinismo preservado:** a ordem de consumo do RNG (§11) não muda; a seleção de ator nunca consome sorteio (§4).
+- **Escopo (D6):** o target selection (modo-mira, zero motor, battle-screen §3.5) entra JÁ; o comando sobre o relógio (extensão do motor acima) entra logo após, briefado ao backend-engineer + gameplay_engineer.
 
 ---
 
@@ -203,14 +218,14 @@ Dois recursos, propósitos distintos. AP limita **quantas** ações; Mana limita
 - `AP = 3` fixo por turno no vertical slice.
 - Reseta no `TurnStart`. Sem carry-over.
 - Cresce via skill tree em jogo posterior (fora do escopo do slice; o campo é parametrizável).
-- **Por-ator** (CTB, §3): AP pertence ao ator ativo no turno. Cada membro da party tem seus 3 AP independentes quando age na fila. Canonizado D.1 Sprint 1 W2, 2026-06-03.
+- **Por-ator** (relógio de ação, §4): AP pertence ao ator eleito pelo relógio. Cada membro da party tem seus 3 AP independentes quando age. Canonizado D.1 Sprint 1 W2, 2026-06-03. ⚠️ Ver a lacuna de ativação registrada em §3 (AP=3/multi-ação vs uma carta por ativação).
 
 ### Mana / Compilação
 
-- `manaMax = 2 + turnoIndex`, com `cap = 8`.
+- `manaMax = 2 + contagemPropriaDeTurnos`, com `cap = 8`. Contagem por-ator, substitui o antigo `turnoIndex` global (reconciliado com `ADR-017` em 25/08/2026; ver §2).
 - Recarrega ao **máximo** a cada `TurnStart`. **Sem carry-over** (impossível bankar mana entre turnos: anti-degeneração, ver §13).
 - Ramp linear garante que combos premium só ficam viáveis no mid-late do combate, preservando curva de tensão.
-- **Por-ator** (CTB, §3): cada ator tem seu próprio pool de mana independente. Sem pool compartilhado entre personagens. Canonizado D.1 Sprint 1 W2, 2026-06-03.
+- **Por-ator** (relógio de ação, §4): cada ator tem seu próprio pool de mana independente. Sem pool compartilhado entre personagens. Canonizado D.1 Sprint 1 W2, 2026-06-03.
 
 ### Tabela de custos canônica
 
