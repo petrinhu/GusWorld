@@ -50,7 +50,7 @@ Transcrito de `GODS_LAWS.md` (34 leis, medido em 25/08/2026 por `grep -c "^## L-
 | [L-26](GODS_LAWS.md#l-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, quatro direções cardeais, grade quadrada |
 | [L-27](GODS_LAWS.md#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
 | [L-28](GODS_LAWS.md#l-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
-| [L-29](GODS_LAWS.md#l-29) | propor recurso, sistema ou escopo novo | Os 16 cortes: a cerca do que o jogo NÃO é |
+| [L-29](GODS_LAWS.md#l-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é |
 | [L-30](GODS_LAWS.md#l-30) | escrever, reordenar ou acrescentar item na tabela | Todo item aponta para o documento que o especifica, se existir |
 | [L-31](GODS_LAWS.md#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](GODS_LAWS.md#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
@@ -63,11 +63,11 @@ Jogo **2D pixel-art**, single-player e offline, em **C++23**, assentado sobre o 
 
 - **Perspectiva:** 3/4 top-down fixa, quatro direções cardeais desenhadas à mão (sem espelhamento), grade quadrada (L-26).
 - **Estrutura de mundo:** hub central mais incursões radiais; sem mundo aberto, sem mundo persistente (corte C-02).
-- **Progressão de cartas:** obtidas por progresso narrativo, nunca craftadas (corte C-13).
+- **Progressão de cartas:** por progresso narrativo **e por crafting**. O corte `C-13`, que proibia carta craftada, foi **revogado pelo líder em 25/08/2026** junto com o `C-03`, restaurando canon do projeto anterior (L-29).
 - **Escopo da campanha:** 4 a 8 horas de campanha principal, mais cerca de 2 horas de puzzle opcional (corte C-15).
 - **Distribuição:** FOSS, código sob AGPL-3.0-or-later; assets e lore com todos os direitos reservados (L-08).
 
-A cerca completa do que o jogo **não** é (16 cortes, `C-01` a `C-16`) está na L-29.
+A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C-16` com os buracos do `C-03` e do `C-13`, revogados em 25/08/2026) está na L-29. Os números revogados **não se reaproveitam**.
 
 ## Estado atual do repositório (24/08/2026)
 
