@@ -232,6 +232,13 @@ E o bullet espelhado em "Sistemas-âncora > Dificuldade Normal / Hard" (linhas 2
 
 ## §6. Plano de implementação incremental (anti-OE)
 
+> ⚠️ **REVOGADO em 24/08/2026 por decisão do líder (item `G3`).** Tudo abaixo desta linha foi escrito contra o código do projeto ANTERIOR e **não é base** (L-01): cita esquema de save V4→V5 e seu migrador, telas e tipos daquela árvore, e os marcos M2 e M7, nada disso existe hoje. Pior, manda a criptografia vir de biblioteca de terceiro vendorizada, o que a **LEI ZERO** proíbe — a cripto vem do **GlintFx** (L-25), e o ADR que a registrava foi apagado.
+>
+> **O que SOBREVIVE e continua canon:** tudo de §1 a §5 — os quatro modos, a dificuldade fixa por save, o quebra-cabeça de última chance no Hardcore, os três marcos de recuperação do Difícil, o enquadramento narrativo do despertar, e as sete sinalizações abertas do §5.
+>
+> **O que morre:** apenas o plano de fases abaixo. Ele será **re-derivado** sobre a arquitetura de cinco camadas (L-17) por agente especialista, como item próprio da tabela, quando a onda do núcleo de regra chegar. Fica aqui, e não é apagado, porque ainda é o registro de como o problema foi fatiado uma vez — a **ordem** das fases (Fácil primeiro, Hardcore por último) continua sendo raciocínio válido; o que não vale são os nomes e as dependências.
+
+
 **Fase 0 — pode entrar já, zero dependência nova de conteúdo:**
 - `DifficultyLevel` enum + campo `SaveData.difficulty` (+ `difficult_recovery_stage`), schema V5 aditivo + migrator V4→V5 (default `Medio`).
 - Tela de seleção de dificuldade (`DifficultyMenuState` + __DEP_REMOVIDA__ + loop) encaixada no fluxo de Novo Jogo — Aviso #1 (legenda) + Aviso #2 (splash confirmar/cancelar).
