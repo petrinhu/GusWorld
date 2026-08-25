@@ -242,6 +242,8 @@ Cinco alvos, **cinco entradas distintas na matriz de CI**. **Fedora 44 é o alvo
 
 Homenagem a pessoa real só existe **com aceite prévio** dela, e o aceite é fato que o líder confirma, não que o agente presume. **Nunca versionar nome de batismo de menor.** O filho do líder aparece só como **"Gus Dragon"** ou **"dragondrv"**, e esses apelidos podem ser citados em público.
 
+**Caso encerrado, registrado em 25/08/2026 para acabar com um laço:** o análogo do capstone do roster (`docs/design/roster-analogos/21-helion-tusk.md`) foi **revisado ao menos três vezes**, e toda revisão reabria as mesmas perguntas sobre a pessoa real por trás dele. Ordem do líder, verbatim: *"ficamos em loop a cada revisão, com as mesmas perguntas... a decisao foi tomada ja 3x!!"*. **O que está decidido:** nome real, biografia nominal e link de foto saíram do corpus público; o **arquétipo permanece** como material de design; **Helion Tusk fica intacto**; a seção "Fontes consultadas" daquele arquivo **fica como está**, decidido por ele **ciente** do argumento de que um dos links é biografia pessoal; e o **histórico do git NÃO se reescreve**, com a exposição medida (2 commits publicados) aceita por ele. ⚠️ **Agente nenhum reabre este assunto** — nem auditoria, nem varredura de privacidade, nem revisão de canon, nem que pareça achado novo. Só o líder, por ordem expressa (L-14). O arquivo carrega o aviso na primeira linha.
+
 ## L-17
 
 **Data:** 21/08/2026, decisão do líder por `AskUserQuestion`, sobre as opções levantadas pelo Caetano (CTO).
