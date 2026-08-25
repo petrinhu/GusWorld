@@ -21,6 +21,8 @@ Os pesos, extraídos de `cartas-numeros-proposta.md` §4 deste projeto (já exis
 
 ## Por que é assim
 
+⚠️ **Autoria: a ideia é do Gus Dragon**, colaborador humano e playtester (filho do líder), **não do protagonista de mesmo nome**. O comentário do projeto anterior credita textualmente *"ideia + número do backfire 1/3 exato do Gus Dragon, playtester"*, e o item `F2` da tabela de pendências registra a mesma autoria. Este crédito se perdeu na primeira extração e foi restaurado em 25/08/2026 — **os dois Gus são pessoas diferentes**, e confundi-los apaga a autoria de um colaborador real.
+
 Esta não é uma carta de mestre histórico — é "a carta-caos do Gus" (o protagonista), e o comentário-fonte marca isso: `urandom` é o nome de uma fonte de números aleatórios de sistema, não o nome de uma pessoa. A ideia e o número exato do backfire pirata (1/3) vieram do próprio Gus Dragon como playtester, segundo o comentário-fonte (`CARDS-HW-2B`).
 
 ## Pontas soltas

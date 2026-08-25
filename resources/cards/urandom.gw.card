@@ -1,6 +1,14 @@
 // urandom.gw.card
 //
 // urandom (a carta-caos do Gus, não é um mestre histórico): Ativa,
+//
+// ⚠️ AUTORIA: a ideia da carta e o número exato do tiro-pela-culatra (1 em 3)
+// são do GUS DRAGON, colaborador humano e playtester — não do protagonista de
+// mesmo nome. O comentário do projeto anterior credita: "ideia + número do
+// backfire 1/3 exato do Gus Dragon, playtester". A tabela de pendências
+// registra a mesma autoria no item F2. Este crédito se perdeu na primeira
+// extração e foi restaurado em 25/08/2026 — os dois Gus são pessoas
+// diferentes, e confundi-los apaga a autoria de um colaborador real (L-16).
 // Universal, mana 0, alvo Self. O "programa" de verdade não vive num
 // EffectSpec — vive em duas tabelas de peso GLOBAIS fora deste registro
 // (uma para carta original, outra para carta pirata), que sorteiam uma

@@ -1,0 +1,41 @@
+// bastiat.gw.card
+//
+// Hidden-Cost (Bastiat): a lente do "não-visto". Passiva mana-0 que revela o
+// CUSTO ou a CONSEQUÊNCIA oculta — efeito colateral adiado de buff e de ataque
+// inimigo, o "grátis" com pegadinha, o trade-off invisível.
+//
+// ⚠️ ESTA CARTA NUNCA FOI IMPLEMENTADA. O efeito e o nome estão ESCOLHIDOS no
+// canon (docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md, mestre 20 de 20),
+// mas ela não existia no catálogo do projeto anterior — o lugar dela lá era
+// ocupado pelo urandom, que não é mestre histórico. O líder decidiu em
+// 25/08/2026 manter as duas.
+//
+// TODO NÚMERO ABAIXO ESTÁ AUSENTE, NÃO ESTIMADO. Nenhum valor foi inventado:
+// as outras 20 cartas carregam número validado em teste de jogo, e misturar
+// chute com valor testado é o defeito que este comentário existe para impedir.
+// Os números entram na onda de balanceamento, não antes.
+
+#meta id bastiat
+#meta display_name CARD_EXEC_BASTIAT_NAME   // chave a criar nas traduções (i18n)
+#meta tier especial
+#meta category passiva
+#meta family universal
+#meta base_type glifo   // por analogia com os outros posse-only; a confirmar
+#meta target_shape single   // irrelevante — passiva, a carta nunca é jogada
+#meta mana_cost 0   // "passiva mana-0", canon
+#meta ap_cost 0   // passiva não gasta ação
+#meta power 0   // não causa dano; é lente, não arma
+#meta ignores_weakness_wheel false   // ausente no canon; default conservador
+
+// SEM BLOCO @effect: o canon fixou a INTENÇÃO ("revela custo/consequência
+// oculta") e não o programa. Escrever @effect aqui seria inventar mecânica.
+// A carta é posse-only, como o Menger, o Euler e o Turing: o efeito existe por
+// possuir a carta, não por jogá-la.
+
+// A FRONTEIRA QUE O CANON EXIGE, e ela é a razão de a carta existir separada:
+// há três reveladores no roster e eles NÃO se sobrepõem —
+//   John Dee  = objetos e passagens ocultas
+//   Turing    = cifras e cadeados
+//   Bastiat   = consequência e custo causal oculto, NUNCA objeto físico
+// Implementar o Bastiat como "revela coisa escondida" genérico apagaria a
+// distinção e tornaria três cartas em uma.
