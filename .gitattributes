@@ -7,10 +7,8 @@ docs/book/** filter=git-crypt diff=git-crypt
 
 # git-crypt: lista de termos proibidos do gate de commit-msg (ordem do
 # lider por AskUserQuestion, 22/08/2026; segredo por natureza -- em texto
-# puro ELA seria o vazamento). NOVO caminho de cifra alem dos tres da
-# GODS_LAWS.md L-25; falta lider/orquestrador registrar a linha nova na
-# tabela do L-25 (nao alterado aqui por restricao explicita da ordem de
-# servico). Ver docs/security/commit-gate.md.
+# puro ELA seria o vazamento). Ja registrado na tabela dos quatro caminhos
+# cifrados da GODS_LAWS.md L-25. Ver docs/security/commit-gate.md.
 tools/security/termos_proibidos.txt filter=git-crypt diff=git-crypt
 
 # Git LFS: binario pesado sob resources/ e assets/ (GODS_LAWS.md L-15)

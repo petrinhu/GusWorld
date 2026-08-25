@@ -26,6 +26,21 @@ path = "resources/**"
 SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
 SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
 
+# Fonte PixelOperatorMono: obra de TERCEIRO sob CC0 1.0, nao asset reservado do
+# titular. Reprovacao do A7 em 25/08/2026 (Claudio/CLO): a regra resources/**
+# acima alcancava resources/fonts/**, declarando copyright de Petrus e "todos os
+# direitos reservados" sobre uma fonte de Jayvee Enaguas (HarvettFox96) dedicada
+# ao dominio publico -- misdeclaracao de proveniencia, nao ilicito (CC0 permite
+# redistribuir sob qualquer termo). THIRD-PARTY-LICENSES.md ja documentava a
+# licenca real; esta tabela so faz o REUSE.toml concordar com ele. Vem DEPOIS de
+# resources/** de proposito, para vencer pela regra "a ultima que casa vence"
+# (REUSE Spec 3.3, mesmo padrao ja usado para docs/narrative/** e para
+# resources/cards/**, abaixo). Conserto: A14.
+[[annotations]]
+path = "resources/fonts/**"
+SPDX-FileCopyrightText = "Jayvee Enaguas (HarvettFox96)"
+SPDX-License-Identifier = "CC0-1.0"
+
 # Catalogo de conteudo em formato proprio (.gw.<tipo>): NUMERO E REGRA de jogo,
 # nao asset. Decisao do lider em 25/08/2026, resolvendo uma contradicao que o
 # comentario de resources/** acima ja declarava sem que regra nenhuma a
@@ -95,5 +110,37 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 # regra ["*.md", "NOTICE"] para vence-la (ultima que casa vence).
 [[annotations]]
 path = ["CHARS.md", "PLACES.md", "sinopse.md"]
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
+
+# Configuracao de repositorio (NAO e asset nem lore): .gitignore,
+# .gitattributes e .claude/settings.json sao infraestrutura tecnica do
+# projeto, mesma natureza de CMakeLists.txt e docs/** acima -- acompanham a
+# licenca do codigo. .bigtech-porte idem; decisao do lider em 25/08/2026,
+# verbatim registrada em GODS_LAWS.md L-14: "fica versionado e ganha
+# anotacao", nao sai do git. Descoberto sem cobertura pelo `reuse lint`
+# depois de instalado por pipx em 25/08/2026 (L-28). Conserto: A14.
+[[annotations]]
+path = [".gitignore", ".gitattributes", ".claude/settings.json", ".bigtech-porte"]
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# Ferramenta do gate de commit-msg (L-19 portao 5): tools/security/termos_proibidos.txt
+# e cifrado por git-crypt (L-25) -- cabecalho SPDX inline e IMPOSSIVEL porque o
+# conteudo do arquivo e cifrado, so a anotacao aqui cobre. Mesma classificacao das
+# demais ferramentas do projeto (script de tooling, nao asset nem lore); o CONTEUDO
+# cifrado nao e lido nem citado aqui, so o caminho (L-25). Conserto: A14.
+[[annotations]]
+path = "tools/security/termos_proibidos.txt"
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+# resumo.pdf NAO e configuracao: e "GUSWORLD(1) -- Resumo da Historia", o
+# enredo do jogo em formato de pagina de manual. Pela L-08, lore e TODOS OS
+# DIREITOS RESERVADOS -- classifica-lo como AGPL licenciaria a historia do
+# jogo como software livre, erro de mao unica em repositorio publico.
+# Conserto: A14.
+[[annotations]]
+path = "resumo.pdf"
 SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
 SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
