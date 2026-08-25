@@ -69,15 +69,15 @@ Jogo **2D pixel-art**, single-player e offline, em **C++23**, assentado sobre o 
 
 A cerca completa do que o jogo **não** é (**13 cortes**, numerados `C-01` a `C-16` com os buracos do `C-03`, do `C-08` e do `C-13`, revogados em 25/08/2026) está na L-29. Os números revogados **não se reaproveitam**.
 
-## Estado atual do repositório (24/08/2026)
+## Estado atual do repositório (25/08/2026)
 
-Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de memória.
+Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de memória. ⚠️ **Contagem de commit e SHA de remoto envelhecem em horas** — em 25/08/2026 esta seção declarava 16 commits quando havia 83, e um SHA de remoto vencido, porque foi atualizada nas contagens de tabela e não nas de git. **Rode o comando; não cite o número daqui.**
 
 **Git e remoto:**
 
-- `git rev-list --count HEAD`: **16 commits** no branch local `main`.
-- `git ls-remote git@github.com:petrinhu/GusWorld.git main`: `1d5051fe120844bf55132cd8b7c5baca9145ddd4`.
-- `git rev-parse HEAD` bate com o SHA acima e `git log origin/main..HEAD --oneline` não lista nada: **local e remoto estão sincronizados**, sem commit pendente de push.
+- `git rev-list --count HEAD`: **83 commits** no branch local `main`.
+- `git ls-remote git@github.com:petrinhu/GusWorld.git main`: `97e2a3954ae70d1bc51c076f411001dfb848136d`.
+- `git rev-list --count origin/main..HEAD`: **12 commits locais ainda NÃO pushados**. O remoto é ancestral do HEAD local. ⚠️ **Este número envelhece a cada commit; meça, não cite daqui.**
 - Não há workflow de CI: `find . -path "*/.github/workflows*"` devolve vazio. **Não existe verificação automática configurada ainda** — a L-32 (push só com o GHA verde) ainda não tem o que checar.
 
 **Código-fonte: não existe.** Confirmado por comando, não por suposição:
@@ -92,7 +92,7 @@ Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de 
 - **23 arquivos `.md` na raiz** (`ls *.md | wc -l`, inclui este `CLAUDE.md`): os manuais listados em "Autoridade documental" abaixo, mais `GODS_LAWS.md`, `TODO.md`, `inicial.md`, `README.md`, `sinopse.md`, `CHARS.md`, `PLACES.md`.
 - `LICENSE` (AGPL-3.0), `NOTICE`, `REUSE.toml`, `.gitattributes`, `.gitignore`, `.bigtech-porte` (`porte=bigtech`), `LICENSES/` (textos integrais SPDX).
 - `docs/`: **12 diretórios de primeiro nível** (`art`, `audio`, `book`, `design`, `narrative`, `_processo`, `production`, `qa`, `_secret`, `security`, `specs`, `tech`; medido por `find docs -maxdepth 1 -mindepth 1 -type d | wc -l` — sem o `-mindepth 1` o comando conta o próprio `docs/` e devolve 13) mais `docs/licoes-aprendidas.md` na raiz de `docs/`. `docs/_secret/` é área cifrada por `git-crypt` (L-25) — só o caminho é citável, nunca o conteúdo.
-- `docs/tech/adr/`: **20 ADRs** (`ls docs/tech/adr | wc -l`), numerados `001` a `021` com o **`010` ausente** — foi apagado por ordem do líder junto com o modelo de arquitetura que ele registrava (LEI ZERO, L-24).
+- `docs/tech/adr/`: **25 ADRs** (`ls docs/tech/adr | wc -l`, medido em 25/08/2026), com o **`010` ausente** — foi apagado por ordem do líder junto com o modelo de arquitetura que ele registrava (LEI ZERO, L-24).
 - `tools/`: o portão 5 da L-19 (`tools/security/commit_gate.py`, `tools/security/test_commit_gate.py`, `tools/security/termos_proibidos.txt` cifrado, `tools/git-hooks/commit-msg`, `tools/git-hooks/install.py`).
 - `resources/` e `assets/`: existem (`ls` confirma), não inventariados aqui — fora do escopo desta tarefa.
 
