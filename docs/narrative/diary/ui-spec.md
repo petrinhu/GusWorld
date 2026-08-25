@@ -396,7 +396,7 @@ Lista completa de plants/payoffs em [[foreshadow-links]] (130 plants canônicos 
   - Verde: post-it com canto dobrado (forma 2)
   - Vermelho: post-it com fita adesiva atravessada (forma 3)
   - Cyan: post-it triangular (forma 4)
-- **Voice-over por entry:** opcional, ativado em opções. Lê em voz neutra (não dramatizada) o conteúdo da entry. Gus aos 11 não é dublado; voice-over é UI assistiva, não personagem. Suporte dependente de localização (G1: pt-br + en).
+- **Voice-over por entry:** ideia registrada, **fora da 1.0** (`C-04`, `GODS_LAWS.md` L-29: o corte é amplo, o jogo não tem voz nenhuma, e a distinção "UI assistiva, não personagem" não abre exceção). Se voltar, é como **add-on pós-lançamento**, preservando a descrição original: opcional, ativado em opções, lê em voz neutra (não dramatizada) o conteúdo da entry; Gus aos 11 não seria dublado, a leitura seria assistiva, nunca personagem. Cobertura de idioma nesse cenário futuro deixa de ser dúvida: pt-br e inglês já nascem juntos na 1.0 (`C-09`), então o add-on herdaria os dois locales prontos.
 - **Navegação keyboard-only completa:** zero ação exige mouse. Hint de input sempre visível no rodapé.
 - **Indicador de "página nova" multimodal:** cor + número + ícone + (opcional) som de notificação. Pillar 4 já exige multimodalidade (sangue + postura + ícone + barra HP no combate); Diário herda mesmo princípio.
 - **Pausa de gameplay ao abrir:** combate turn-based pausa naturalmente fora do turno; em exploração, abrir Diário pausa o mundo (sem inimigos atacando enquanto lê). Reduz ansiedade temporal.
