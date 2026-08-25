@@ -252,6 +252,47 @@ A derrota (§3.3) NUNCA anula os ganhos de vitórias anteriores — o wipe é um
 
 ---
 
+## §5.5. Lanches (itens de cura, canon do Gus Dragon)
+
+> **Canon pessoal (L-16 de `GODS_LAWS.md`).** Os quatro itens abaixo são os lanches favoritos reais
+> do Gus Dragon, filho do líder e colaborador humano do projeto, transformados em item de cura do
+> jogo com aceite dele. Decisão original em 2026-07-17 (chocolate, suco de uva; suco de limão e
+> água com gás ficaram com efeito aberto); completada pelo líder em 2026-08-25. **Não confundir com
+> o PERSONAGEM Gus** (Gustaf VII Tavus Vance), canon público e distinto. Fora do apelido "Gus
+> Dragon" (ou `Dragon-Drv`), o nome de batismo dele não é citado, aqui nem em nenhum outro lugar do
+> projeto.
+
+Quatro consumíveis, cada um com efeito PRÓPRIO: nenhum duplica o de outro.
+
+| Item | Efeito | Craft/refino | Decisão |
+|---|---|---|---|
+| **Chocolate** | cura de HP, a MAIOR dos quatro (é o favorito real do Gus Dragon) | nenhum; consumível simples | líder, 2026-07-17 |
+| **Suco de uva** | cura de HP, média | nenhum; consumível simples | líder, 2026-07-17 |
+| **Suco de limão** | limpa efeito negativo (debuff) da party | refina em **suco puro de limão** | líder, 2026-08-25 |
+| **Água com gás** | restaura **fôlego OU energia de ação** (as duas leituras possíveis não foram decididas entre si, ver nota abaixo) | refina em **água destilada** | líder, 2026-08-25 |
+
+**Nota sobre "fôlego ou energia de ação" (água com gás, entre colchetes na própria ordem do
+líder):** existem DOIS recursos canônicos distintos que a frase pode estar mirando, e o líder não
+escolheu entre eles: fica registrado aqui como LACUNA, não decidido por este documento.
+
+1. **Fôlego do corpo** (`core::player::WindedTimer`, `stamina.md`), a inércia da respiração
+   ofegante do Gus no overworld, distinta da Carga do aparato.
+2. **Energia de ação (AP)** de combate, o recurso já usado pela Bio-Ampola (§4) e pelo custo de
+   troca de bateria em batalha (`cartas-hardware-pirataria-energia.md` §5, "In-battle (arena)").
+
+Números finais (magnitude de cura, quantidade de debuff limpo, valor de fôlego/AP restaurado,
+preço, fonte de drop/compra) são do `economy-designer`, na MESMA curva numérica canônica já usada
+para Bio-Ampola (§4) e Life Ampola (§5): nenhum decidido aqui.
+
+**O refino e o destino do que sai dele são canon de carta, não de crédito, e vivem em
+`cartas-hardware-pirataria-energia.md` §5** ("Bateria de baixa qualidade craftada"), porque o
+consumo final é energia de carta, o mesmo domínio que já governa bateria, pirataria e RSB. Este
+documento é o dono do CATÁLOGO dos quatro itens e da curva de crédito deles; o outro é o dono do que
+acontece quando suco de limão e água com gás viram insumo de hardware, inclusive o trade-off entre
+consumir agora e guardar para refinar.
+
+---
+
 ## §6. Companion KO
 
 - `ActorIncapacitated` emitido (engine/foundation/turn_combat — já implementado).
@@ -395,7 +436,11 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 
 ---
 
-**Última revisão:** 2026-08-01 (adição §0, doutrina do comedimento: "quem é comedido sofre menos
+**Última revisão:** 2026-08-25 (adição §5.5, catálogo dos quatro lanches favoritos reais do Gus
+Dragon como itens de cura, canon pessoal sob L-16 de `GODS_LAWS.md`; suco de limão e água com gás
+ganham efeito e viram matéria-prima de craft de bateria de baixa qualidade, canonizado em
+`cartas-hardware-pirataria-energia.md` §5). Revisão anterior: 2026-08-01 (adição §0, doutrina do
+comedimento: "quem é comedido sofre menos
 no final, o esbanjador sofre mais", canonizada pelo líder e escalonada por periculosidade do
 inimigo; régua de validação aplicável a toda mecânica de economia nova; auditoria de coerência e
 mapeamento de mira por tier derivados em `proposta-economia-comedimento.md`, ainda PROPOSTA).
