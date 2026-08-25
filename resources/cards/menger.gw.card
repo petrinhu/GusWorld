@@ -1,0 +1,20 @@
+// menger.gw.card
+//
+// Barter (Menger): ForaDeCombate, Universal, mana 0. Posse-only (valor
+// marginal + escambo loot->Crédito); economia, sem programa de combate.
+// Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/menger.md.
+
+#meta id menger
+#meta display_name CARD_EXEC_MENGER_NAME
+#meta tier especial
+#meta category fora_de_combate
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // default do registro; irrelevante — carta nunca é jogada
+#meta mana_cost 0
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Sem blocos @effect: carta posse-only, sem programa de combate.

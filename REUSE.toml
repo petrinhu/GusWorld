@@ -26,6 +26,21 @@ path = "resources/**"
 SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
 SPDX-License-Identifier = "LicenseRef-GusWorld-Assets-Reserved"
 
+# Catalogo de conteudo em formato proprio (.gw.<tipo>): NUMERO E REGRA de jogo,
+# nao asset. Decisao do lider em 25/08/2026, resolvendo uma contradicao que o
+# comentario de resources/** acima ja declarava sem que regra nenhuma a
+# cumprisse: "numero e regra de carta sao codigo sob AGPL". Motivo de fundo: a
+# Lei 9.610/98 art. 8 II exclui REGRA DE JOGO da protecao autoral, entao marcar
+# custo, poder e duracao como asset reservado seria afirmar protecao que nao
+# existe. Vem DEPOIS de resources/** de proposito: a ultima regra que casa vence
+# (mesmo padrao ja usado para docs/narrative/**). TEXTO DE SABOR nao mora
+# nestes arquivos -- ele e chave de traducao, resolvida em resources/translations/,
+# que segue asset reservado.
+[[annotations]]
+path = ["resources/cards/**", "resources/**/*.gw.card", "resources/**/*.gw.batt", "resources/**/*.gw.virus", "resources/**/*.gw.item", "resources/**/*.gw.foe", "resources/**/*.gw.stat", "resources/**/*.gw.quest", "resources/**/*.gw.bag", "resources/**/*.gw.box", "resources/**/*.gw.table"]
+SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
 [[annotations]]
 path = "assets/**"
 SPDX-FileCopyrightText = "2026 Petrus Alves da Silva Costa"

@@ -1,0 +1,24 @@
+// pythagoras.gw.card
+//
+// Hypotenuse (Pythagoras): Passiva, Universal, mana 0. Combo cross-ator:
+// quando >=2 aliados batem no mesmo alvo na mesma rodada, golpe-bonus de
+// potencia = raiz(a^2+b^2). Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/pythagoras.md.
+
+#meta id pythagoras
+#meta display_name CARD_EXEC_PYTHAGORAS_NAME
+#meta tier especial
+#meta category passiva
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // default do registro; carta é passiva/equip-only, nunca jogada
+#meta mana_cost 0
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// O cálculo em si (raiz da soma dos quadrados dos dois golpes) não é um
+// parâmetro numérico afinável — é o teorema literal, sem //PLAYTEST.
+@effect
+trigger: OnRoundEnd
+kind: HypotenuseCombo

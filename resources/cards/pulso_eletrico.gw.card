@@ -1,0 +1,23 @@
+// pulso_eletrico.gw.card
+//
+// Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
+// Eletrico - Pulso: dano direto + Stun (controle curto). Extraida do projeto
+// anterior (L-01, GODS_LAWS.md) - conhecimento, nao codigo. Ver
+// docs/design/mecanicas/cartas/pulso_eletrico.md para o "porque".
+
+#meta id pulso_eletrico
+#meta display_name CARD_PULSO_ELETRICO_NAME
+#meta tier comum
+#meta family eletrico
+#meta base_type pulso
+#meta target_shape single
+#meta mana_cost 1   // origem não documentada (sem comentário no legado)
+#meta ap_cost 1
+#meta power 6   // origem não documentada (sem comentário no legado)
+
+@status_applied
+status: Stun
+magnitude: 2   // origem não documentada
+duration: 1    // origem não documentada
+stack_rule: Replace
+family_origin: eletrico

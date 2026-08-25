@@ -1,0 +1,27 @@
+// bruno.gw.card
+//
+// Echo-Self (Giordano Bruno): Ativa, Universal, alvo Self. Mesma mecânica
+// do von Neumann (status Eco), mas SELF-ONLY e com números distintos — "a
+// imagem de dois Gus". Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/bruno.md.
+
+#meta id bruno
+#meta display_name CARD_EXEC_BRUNO_NAME
+#meta tier especial
+#meta category ativa
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape self
+#meta mana_cost 6   // kActiveManaCost, //PLAYTEST
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+@effect
+trigger: OnCast
+kind: CloneAlly
+magnitude: 62   // kBrunoEcoPercent, //PLAYTEST: % de replicação — maior que o von Neumann (50%)
+duration: 2     // kBrunoEcoDuration, //PLAYTEST: turnos próprios — menor que o von Neumann (3)
+status: Eco
+stack_rule: Refresh
+side_filter: AllyOnly

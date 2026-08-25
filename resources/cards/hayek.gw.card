@@ -1,0 +1,44 @@
+// hayek.gw.card
+//
+// Free-Order (Hayek): Passiva, Universal, mana 0, equip-only, alvo Self.
+// "Ordem espontânea": quando os membros do lado do portador agem de formas
+// DIFERENTES na mesma rodada, o lado inteiro ganha um bônus escalonado de
+// dano e um desconto no limiar de falha. Nunca pune, só premia. Extraida
+// do projeto anterior (L-01). Ver docs/design/mecanicas/cartas/hayek.md.
+
+#meta id hayek
+#meta display_name CARD_EXEC_HAYEK_NAME
+#meta tier especial
+#meta category passiva
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape self
+#meta mana_cost 0
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Um bloco por degrau: magnitude = limiar de assinaturas de ação DISTINTAS
+// já registradas pelo lado antes da ação corrente; percent = bônus% de
+// dano; duration = redução em pontos-percentuais do limiar de falha (reuso
+// deliberado do campo, mesmo padrão data-driven de outros efeitos).
+@effect
+trigger: OnCast
+kind: DiversityBonus
+magnitude: 2   // kHayekTier2Distinct, //PLAYTEST: limiar do degrau 1 (2 assinaturas distintas)
+percent: 5     // kHayekTier2DamagePct, //PLAYTEST: bônus de dano do degrau 1
+duration: 1    // kHayekTier2FumblePp, //PLAYTEST: redução (pp) do limiar de falha, degrau 1
+
+@effect
+trigger: OnCast
+kind: DiversityBonus
+magnitude: 3   // kHayekTier3Distinct, //PLAYTEST
+percent: 8     // kHayekTier3DamagePct, //PLAYTEST
+duration: 2    // kHayekTier3FumblePp, //PLAYTEST
+
+@effect
+trigger: OnCast
+kind: DiversityBonus
+magnitude: 4   // kHayekTier4Distinct, //PLAYTEST: teto — o degrau "4+" nunca busca acima de 4
+percent: 13    // kHayekTier4DamagePct, //PLAYTEST
+duration: 3    // kHayekTier4FumblePp, //PLAYTEST

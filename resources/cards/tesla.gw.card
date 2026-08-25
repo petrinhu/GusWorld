@@ -1,0 +1,26 @@
+// tesla.gw.card
+//
+// Alcunha de efeito "Coil-Arc" no design (_EFEITOS-ESCOLHIDOS.md), mas a
+// chave de tradução em uso resolve literalmente para "Tesla" — ver o .md
+// irmão, secão Pontas soltas. Ativa, Eletrico. Descarga em cadeia: o
+// dano-base atinge o alvo primário e SALTA para os próximos inimigos vivos,
+// retendo uma fração a cada salto. Extraida do projeto anterior (L-01).
+// Ver docs/design/mecanicas/cartas/tesla.md.
+
+#meta id tesla
+#meta display_name CARD_EXEC_TESLA_NAME
+#meta tier especial
+#meta category ativa
+#meta family eletrico
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // o alvo primário; os saltos são resolvidos pelo efeito, não por target_shape
+#meta mana_cost 6   // kActiveManaCost, //PLAYTEST
+#meta ap_cost 1
+#meta power 8   // kTeslaPower, //PLAYTEST — EXCEÇÃO das especiais: a cadeia escala do dano-base do primário
+#meta ignores_weakness_wheel false
+
+@effect
+trigger: OnCast
+kind: ChainDamage
+magnitude: 2    // //PLAYTEST: 2 saltos = 3 alvos no total
+percent: 62     // kTeslaChainRetentionPercent, //PLAYTEST: retenção por salto (decaimento multiplicativo)

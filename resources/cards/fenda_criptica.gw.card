@@ -1,0 +1,23 @@
+// fenda_criptica.gw.card
+//
+// Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
+// Criptografico - Fenda: dano + Expose (abre o alvo a mais dano). Extraida
+// do projeto anterior (L-01) - conhecimento, nao codigo. Ver
+// docs/design/mecanicas/cartas/fenda_criptica.md para o "porque".
+
+#meta id fenda_criptica
+#meta display_name CARD_FENDA_CRIPTICA_NAME
+#meta tier comum
+#meta family criptografico
+#meta base_type fenda
+#meta target_shape single
+#meta mana_cost 2   // origem não documentada
+#meta ap_cost 1
+#meta power 5   // origem não documentada
+
+@status_applied
+status: Expose
+magnitude: 30   // origem não documentada
+duration: 2     // origem não documentada
+stack_rule: Refresh
+family_origin: criptografico

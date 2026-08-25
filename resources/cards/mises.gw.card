@@ -1,0 +1,29 @@
+// mises.gw.card
+//
+// Calc-Edge (Mises): Passiva, Universal, mana 0, equip-only, alvo Self.
+// Passiva DUPLA num único efeito: face 1 concede AP extra ao dono; face 2
+// atrasa e desconta o dano de inimigos marcados "comando central" do lado
+// oposto. Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/mises.md.
+
+#meta id mises
+#meta display_name CARD_EXEC_MISES_NAME
+#meta tier especial
+#meta category passiva
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape self
+#meta mana_cost 0
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// magnitude = +AP concedido ao DONO no turno (face 1, "party aloca
+// melhor"); percent = desconto% de dano dos inimigos taggeados "comando
+// central" enquanto esta carta está equipada do lado oposto (face 2). A
+// tag "comando central" em si é curadoria de design/lore, fora desta carta.
+@effect
+trigger: OnCast
+kind: ApEfficiency
+magnitude: 1    // kMisesBonusAp, //PLAYTEST: +1 AP da face 1
+percent: 13     // kMisesAimErrorPercent, //PLAYTEST: desconto% da face 2

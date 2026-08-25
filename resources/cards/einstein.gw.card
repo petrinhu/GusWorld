@@ -1,0 +1,27 @@
+// einstein.gw.card
+//
+// Alcunha de efeito "Time-Dilate" no design (_EFEITOS-ESCOLHIDOS.md), mas a
+// chave de tradução em uso resolve literalmente para "Einstein" — ver o .md
+// irmão, secão Pontas soltas. Ativa, Cinetico. Empurra a ação do alvo para
+// o FIM da fila da rodada corrente. Extraida do projeto anterior (L-01).
+// Ver docs/design/mecanicas/cartas/einstein.md.
+
+#meta id einstein
+#meta display_name CARD_EXEC_EINSTEIN_NAME
+#meta tier especial
+#meta category ativa
+#meta family cinetico   // decisão do criador: a dilatação empurra a fila, mesma família das comuns de reordenar/knockback
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // default do registro
+#meta mana_cost 6   // kActiveManaCost, //PLAYTEST
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Um alvo que já agiu nesta rodada faz a carta dissipar (não fica guardada
+// para a rodada seguinte). Modo-aliado é o espelho benéfico (o aliado
+// avança, em vez de recuar) — ver o .md irmão.
+@effect
+trigger: OnCast
+kind: DelayAction
+magnitude: 0   // kEinsteinDelayMagnitude — 0 = fim da fila (decisão do criador, 2026-07-15)

@@ -1,0 +1,26 @@
+// planck.gw.card
+//
+// Quantum-Lock (Planck): Passiva, Universal, mana 0. Quantiza o dano de
+// carta do portador em 3 degraus fixos (piso/centro/teto), chances FIXAS.
+// Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/planck.md.
+
+#meta id planck
+#meta display_name CARD_EXEC_PLANCK_NAME
+#meta tier especial
+#meta category passiva
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // default do registro; carta é passiva/equip-only, nunca jogada
+#meta mana_cost 0
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Números FECHADOS PELO LÍDER (não //PLAYTEST-livre, ao contrário da
+// maioria dos outros): a proporção 25/50/25 é decisão de balance definitiva.
+@effect
+trigger: OnCast
+kind: DamageQuantize
+magnitude: 50   // kPlanckStepCenterPercent: chance% do degrau CENTRAL — FECHADO
+percent: 25     // kPlanckStepExtremePercent: chance% de CADA extremo (piso e teto) — FECHADO
