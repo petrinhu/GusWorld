@@ -1,0 +1,28 @@
+// faraday.gw.card
+//
+// EM-Shield (Faraday): Hibrida, Eletrico. Face de combate castável (a face
+// fora-de-combate anti-PEM original segue sem programa, feat futura).
+// Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/faraday.md.
+
+#meta id faraday
+#meta display_name CARD_EXEC_FARADAY_NAME
+#meta tier especial
+#meta category hibrida
+#meta family eletrico
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // default do registro
+#meta mana_cost 6   // kActiveManaCost, //PLAYTEST
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Previne + limpa debuffs elétricos no alvo. Mirar um inimigo dissipa (a
+// blindagem não "vaza" benefício pro lado oposto).
+@effect
+trigger: OnCast
+kind: ApplyStatus
+duration: 3   // kFaradayShieldDuration, //PLAYTEST: duração da BlindagemEM
+status: BlindagemEM
+stack_rule: Refresh
+side_filter: AllyOnly

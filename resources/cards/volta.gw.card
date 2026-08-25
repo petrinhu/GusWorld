@@ -1,0 +1,26 @@
+// volta.gw.card
+//
+// Volt-Leech (Volta): Ativa, Eletrico. Dreno termodinamico do alvo,
+// devolvido a party como mana+HP. Extraida do projeto anterior (L-01) -
+// conhecimento, nao codigo. Ver docs/design/mecanicas/cartas/volta.md.
+
+#meta id volta
+#meta display_name CARD_EXEC_VOLTA_NAME
+#meta tier especial
+#meta category ativa
+#meta family eletrico
+#meta base_type glifo   // //PLAYTEST: sem convenção fechada de tipo-base para especiais
+#meta target_shape single
+#meta mana_cost 6   // kActiveManaCost, //PLAYTEST: mana das ativas/hibridas
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Leech termodinamico: drena uma fracao do dano causado e devolve como
+// recurso ao conjurador. A fracao exata de conversao (VOLTA-LEECH-%) e
+// design ainda em aberto no doc-fonte; o valor abaixo e o que o codigo
+// usava em runtime.
+@effect
+trigger: OnDamageDealt
+kind: Leech
+percent: 50   // kVoltaLeechPercent, //PLAYTEST

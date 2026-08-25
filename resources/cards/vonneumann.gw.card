@@ -1,0 +1,38 @@
+// vonneumann.gw.card
+//
+// Fork (von Neumann): Hibrida, Universal. Duas faces: clona um aliado
+// qualquer (Eco, reaplica uma fração do último dano dele por N turnos) +
+// devolve o uso da primeira especial ativa/híbrida jogada na batalha.
+// Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/vonneumann.md.
+
+#meta id vonneumann
+#meta display_name CARD_EXEC_VONNEUMANN_NAME
+#meta tier especial
+#meta category hibrida
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // default do registro; o alvo é o aliado clonado (self incluso)
+#meta mana_cost 6   // kActiveManaCost, //PLAYTEST
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// "Molde Fiel": aplica o status Eco no aliado alvo (self incluso). Mirar um
+// inimigo dissipa. Ao fim de cada turno próprio do portador, reaplica o
+// último dano dele a esta fração.
+@effect
+trigger: OnCast
+kind: CloneAlly
+magnitude: 50   // kVonNeumannEcoPercent, //PLAYTEST: % de replicação do Eco
+duration: 3     // kVonNeumannEcoDuration, //PLAYTEST: turnos próprios do portador
+status: Eco
+stack_rule: Refresh
+side_filter: AllyOnly
+
+// "Construtor Universal": enquanto equipada, a 1ª carta especial
+// ativa/híbrida jogada na batalha (inclusive esta própria) não consome o
+// gate de uso único — 1x/batalha (o refund em si, não a carta).
+@effect
+trigger: OnCast
+kind: TokenRefund

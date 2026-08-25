@@ -1,0 +1,32 @@
+// urandom.gw.card
+//
+// urandom (a carta-caos do Gus, não é um mestre histórico): Ativa,
+// Universal, mana 0, alvo Self. O "programa" de verdade não vive num
+// EffectSpec — vive em duas tabelas de peso GLOBAIS fora deste registro
+// (uma para carta original, outra para carta pirata), que sorteiam uma
+// faixa e redirecionam para uma carta JÁ EXISTENTE. Este efeito só marca o
+// GATILHO desse branch dedicado. Números completos das duas tabelas de
+// peso: docs/design/mecanicas/cartas-numeros-proposta.md §4 (não
+// duplicados aqui — pertencem à carta, mas vivem fora do registro Card).
+// Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/urandom.md.
+
+#meta id urandom
+#meta display_name CARD_EXEC_URANDOM_NAME
+#meta tier especial
+#meta category ativa
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape self   // o alvo real (self ou inimigo) é sorteado dentro do branch dedicado, não pelo pipeline normal
+#meta mana_cost 0   // aquisição/preço é fatia futura, fora do escopo do registro
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Nenhum parâmetro aqui: o EffectSpec só existe para que o GATILHO deste
+// branch seja vocabulário compartilhado (qualquer carta futura com
+// RandomRedirect entra no mesmo branch), não mais um "if" por id literal
+// de uma carta só.
+@effect
+trigger: OnCast
+kind: RandomRedirect

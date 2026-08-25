@@ -1,0 +1,47 @@
+// newton.gw.card
+//
+// Force-Law (Newton): Hibrida, Universal, Grupo. Duas faces, roteadas por
+// side_filter (ambas dissipam-no-lado-errado, sem erro e sem excecao).
+// Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/newton.md para o "porque" completo.
+
+#meta id newton
+#meta display_name CARD_EXEC_NEWTON_NAME
+#meta tier especial
+#meta category hibrida
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape grupo
+#meta mana_cost 6   // kActiveManaCost, //PLAYTEST
+#meta ap_cost 1
+#meta power 0   // o dano vem só do ATK do conjurador, não de power próprio
+#meta ignores_weakness_wheel false
+
+// Face ofensiva (Poço Gravitacional): imobiliza TODOS os inimigos vivos do
+// grupo. Mirar um aliado dissipa (a face ofensiva não recai no próprio time).
+@effect
+trigger: OnCast
+kind: ApplyStatus
+duration: 1   // //PLAYTEST: 1 turno de Stun
+status: Stun
+stack_rule: Replace
+side_filter: EnemyOnly
+
+// Face de benefício (Ação e Reação, modo-aliado): concede Reflect ao aliado
+// alvo. Mirar um inimigo dissipa.
+@effect
+trigger: OnCast
+kind: ApplyStatus
+magnitude: 30   // kNewtonReflectPercent, //PLAYTEST: fração do Reflect
+duration: 3     // kNewtonReflectDuration, //PLAYTEST: 3 turnos
+status: Reflect
+stack_rule: Refresh
+side_filter: AllyOnly
+
+// Passiva própria do dono (intocada, sempre ligada): reflete dano recebido.
+// Se o dono TAMBÉM tiver o status Reflect acima, as duas fontes SOMAM (sem
+// dedup no motor original — cada fonte dispara em ponto separado do código).
+@effect
+trigger: OnDamageReceived
+kind: Reflect
+percent: 30   // kNewtonReflectPercent, //PLAYTEST: mesma fração da face 2

@@ -1,0 +1,23 @@
+// raiz_cura.gw.card
+//
+// Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
+// Bioquimico - Raiz: sem dano, aplica Regen no proprio caster. Extraida do
+// projeto anterior (L-01) - conhecimento, nao codigo. Ver
+// docs/design/mecanicas/cartas/raiz_cura.md para o "porque".
+
+#meta id raiz_cura
+#meta display_name CARD_RAIZ_CURA_NAME
+#meta tier comum
+#meta family bioquimico
+#meta base_type raiz
+#meta target_shape self
+#meta mana_cost 2   // origem não documentada
+#meta ap_cost 1
+#meta power 0   // sem dano: o efeito inteiro é a cura por Regen abaixo
+
+@status_applied
+status: Regen
+magnitude: 8   // origem não documentada
+duration: 2    // origem não documentada
+stack_rule: Refresh
+family_origin: bioquimico

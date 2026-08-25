@@ -1,0 +1,27 @@
+// ada.gw.card
+//
+// Re-Run (Ada Lovelace): Passiva, Universal, mana 0. No fim do turno de
+// OUTRO aliado, chance de ecoar a última ação de dano dele por completo.
+// Extraida do projeto anterior (L-01). Ver
+// docs/design/mecanicas/cartas/ada.md.
+
+#meta id ada
+#meta display_name CARD_EXEC_ADA_NAME
+#meta tier especial
+#meta category passiva
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // default do registro; carta é passiva/equip-only
+#meta mana_cost 0
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Q3 (decisão do líder, 2026-07-14): o freio da Ada é a CHANCE, não a
+// escala — por isso ela ecoa a 100% quando dispara, ao contrário do
+// Mandelbrot (que sempre dispara, mas só a 50%).
+@effect
+trigger: OnAllyTurnEnd
+kind: RepeatLastAction
+magnitude: 34   // kAdaEchoChance, //PLAYTEST: chance% (0..99 roll < magnitude)
+percent: 100    // kAdaEchoPercent: eco a 100% (Q3, o freio é a chance)

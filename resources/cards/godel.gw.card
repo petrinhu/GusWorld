@@ -1,0 +1,30 @@
+// godel.gw.card
+//
+// Null-Proof (Godel): Ativa, Universal, mana 0. Duas vias fura-defesa
+// INDEPENDENTES: a flag ignores_weakness_wheel (sempre-ligada) e o status
+// NullProof castavel (consumido no golpe que fura). Extraida do projeto
+// anterior (L-01). Ver docs/design/mecanicas/cartas/godel.md.
+
+#meta id godel
+#meta display_name CARD_EXEC_GODEL_NAME
+#meta tier especial
+#meta category ativa
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape single   // default do registro
+#meta mana_cost 0
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel true   // o trunfo ORIGINAL de Gödel: sempre mult 1.0 na roda de fraqueza
+
+// Segunda via, independente da flag acima: concede o status NullProof ao
+// portador (o próprio Gödel ou um aliado). No próximo golpe do portador
+// contra alvo Resistente OU Imune, força mult 1.0 e CONSOME o status;
+// contra Neutro/Fraco fica intacto (só consome quando há algo a furar).
+@effect
+trigger: OnCast
+kind: ApplyStatus
+duration: 99   // kNullProofDuration, //PLAYTEST: sentinela alta — sai por CONSUMO, não por tick
+status: NullProof
+stack_rule: Refresh
+side_filter: AllyOnly

@@ -1,0 +1,30 @@
+// dee.gw.card
+//
+// Black-Mirror (John Dee): Hibrida, Universal, alvo Self. Duas faces:
+// Scrying (ativa, revela intenção de todos os inimigos) + Scan aprimorado
+// (passiva, quando equipada) + a face de mundo "Espelho Negro" fica STUB
+// posse-only (sem sistema de ocultos no overworld ainda). Extraida do
+// projeto anterior (L-01). Ver docs/design/mecanicas/cartas/dee.md.
+
+#meta id dee
+#meta display_name CARD_EXEC_DEE_NAME
+#meta tier especial
+#meta category hibrida
+#meta family universal
+#meta base_type glifo   // //PLAYTEST
+#meta target_shape self
+#meta mana_cost 6   // kActiveManaCost, //PLAYTEST — D4, mesmo custo das outras Ativa/Híbrida
+#meta ap_cost 1
+#meta power 0
+#meta ignores_weakness_wheel false
+
+// Aplica o buff Scrying no PRÓPRIO conjurador + dump read-only do intent de
+// cada inimigo vivo. Enquanto QUALQUER aliado vivo portar Scrying, o intent
+// é re-revelado na fronteira de cada rodada. Contra um inimigo de
+// comportamento caótico, retorna ruído (nunca revela o intent real).
+@effect
+trigger: OnCast
+kind: RevealIntent
+duration: 3   // kDeeScryingDuration — D3, FECHADO pelo líder (não //PLAYTEST-livre)
+status: Scrying
+stack_rule: Refresh

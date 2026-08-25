@@ -1,0 +1,23 @@
+// impacto_cinetico.gw.card
+//
+// Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
+// Cinetico - Pulso: maior dano direto + Knockback (reposiciona). Extraida
+// do projeto anterior (L-01) - conhecimento, nao codigo. Ver
+// docs/design/mecanicas/cartas/impacto_cinetico.md para o "porque".
+
+#meta id impacto_cinetico
+#meta display_name CARD_IMPACTO_CINETICO_NAME
+#meta tier comum
+#meta family cinetico
+#meta base_type pulso
+#meta target_shape single
+#meta mana_cost 1   // origem não documentada
+#meta ap_cost 1
+#meta power 7   // origem não documentada (o maior das 5 comuns — "maior dano direto")
+
+@status_applied
+status: Knockback
+magnitude: 1   // origem não documentada
+duration: 1    // origem não documentada
+stack_rule: Replace
+family_origin: cinetico
