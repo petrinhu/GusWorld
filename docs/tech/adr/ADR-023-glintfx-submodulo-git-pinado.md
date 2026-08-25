@@ -29,18 +29,20 @@ diagnosticar: qual dos dois repositórios mudou primeiro?
 ## Decisão
 
 **O GlintFx entra no build do GusWorld como submódulo git, pinado num commit
-específico.** `git submodule add https://github.com/petrinhu/GlintFx.git
-<caminho>` (caminho exato: pergunta devolvida ao líder, ver seção própria),
-seguido de `add_subdirectory(<caminho>)` no `CMakeLists.txt` do GusWorld —
-o mesmo mecanismo de consumo que os testes `tests/embed/` e
+específico, em `framework/GlintFx`.** `git submodule add
+https://github.com/petrinhu/GlintFx.git framework/GlintFx`, seguido de
+`add_subdirectory(framework/GlintFx)` no `CMakeLists.txt` do GusWorld — o
+mesmo mecanismo de consumo que os testes `tests/embed/` e
 `tests/embed_name_collision/` do próprio GlintFx já exercitam e provam
 funcionar (`add_subdirectory`/`FetchContent` embutido, ver `FIX-CONSUMO` nos
-comentários do `CMakeLists.txt` raiz do GlintFx).
+comentários do `CMakeLists.txt` raiz do GlintFx). A razão do nome
+`framework/`, escolhido pelo líder em vez das três convenções oferecidas,
+está na seção "Caminho do submódulo" abaixo.
 
 **Atualizar o ponteiro do submódulo é ato deliberado**, nunca automático:
 avançar para um commit novo do GlintFx é um commit próprio no GusWorld
-(`git submodule update --remote` seguido de `git add <caminho>`), revisável
-e reversível como qualquer outro.
+(`git submodule update --remote` seguido de `git add framework/GlintFx`),
+revisável e reversível como qualquer outro.
 
 ## Por que reprodutibilidade exata, dita sem retórica
 
@@ -98,7 +100,7 @@ build** que o jogo, dentro de cada entrada da matriz (ADR-024). Cada entrada
 da matriz usa **um único compilador** para compilar tanto a biblioteca quanto
 o executável do jogo (`-DCMAKE_CXX_COMPILER=${{ matrix.cc }}` aplicado ao
 `add_subdirectory` inteiro, a mesma técnica que o próprio GlintFx usa em
-`../GlintFx/.github/workflows/ci.yml:212`). Não existe, em nenhuma das sete
+`../GlintFx/.github/workflows/ci.yml:212`). Não existe, em nenhuma das nove
 entradas da matriz (ADR-024), uma combinação onde o GlintFx nasce de um
 compilador e o jogo de outro. **O nosso CI nunca exercita o cenário de
 quebra**, porque ele nunca constrói a combinação que quebraria.
@@ -230,13 +232,29 @@ atualizar é um ato visível e deliberado, nunca silencioso; combina bem com
   mitigado para quem monta a combinação GlintFx-de-um-compilador +
   jogo-de-outro fora dele — risco assumido, não uma lacuna descoberta depois.
 
-## Bifurcação devolvida ao líder
+## Caminho do submódulo: `framework/GlintFx`, decidido pelo líder em 25/08/2026
 
-O caminho exato do submódulo dentro da árvore do GusWorld não foi decidido
-aqui — três convenções comuns existem (`external/GlintFx`, `vendor/GlintFx`,
-ou `GlintFx/` na raiz, espelhando `../GlintFx` do ambiente de
-desenvolvimento) e a escolha é estética/organizacional, não técnica. Fica
-como pergunta ao líder (ver relatório final).
+O caminho exato do submódulo dentro da árvore do GusWorld não tinha sido
+decidido na primeira leitura desta ADR — três convenções comuns foram
+oferecidas ao líder (`external/GlintFx`, `vendor/GlintFx`, ou `GlintFx/` na
+raiz, espelhando `../GlintFx` do ambiente de desenvolvimento).
+
+**O líder não escolheu nenhuma das três. Escolheu `framework/GlintFx`.**
+
+**A razão, registrada porque é boa e vale para qualquer consumidor futuro do
+GlintFx, não só para este projeto:** `vendor/` sugere fornecedor de
+terceiro — uma dependência de fora, cuja evolução não é responsabilidade de
+quem a consome. O GlintFx **não é isso**: é projeto irmão deste, do mesmo
+autor, e os dois evoluem juntos (ver "Por que reprodutibilidade exata"
+acima). `external/` tem o mesmo problema em grau menor — descreve
+localização, não natureza. `framework/` diz exatamente o que a pasta é, e
+mantém legível, pelo próprio nome do diretório, a fronteira que a LEI ZERO
+protege: o GusWorld liga em exatamente duas coisas, e uma delas mora num
+diretório cujo nome não deixa dúvida sobre qual das duas é.
+
+**Aplicação:** `git submodule add https://github.com/petrinhu/GlintFx.git
+framework/GlintFx`, e `add_subdirectory(framework/GlintFx)` no
+`CMakeLists.txt` raiz do GusWorld.
 
 ## Riscos / pontos de atenção
 
@@ -270,7 +288,7 @@ retrabalhar lógica de jogo.
 ## Cross-refs
 
 - [ADR-022](ADR-022-cmake-versao-minima-fixada.md) (o sistema de build que hospeda este `add_subdirectory`, e o gerador Ninja que compila os dois lados; ADR irmão, razão de mudar distinta por L-33)
-- [ADR-024](ADR-024-ci-cinco-plataformas-cachyos-container.md) (a matriz de sete entradas cujo compilador único por célula é o que torna a ABI coerente dentro do nosso CI)
+- [ADR-024](ADR-024-ci-cinco-plataformas-cachyos-container.md) (a matriz de nove entradas cujo compilador único por célula é o que torna a ABI coerente dentro do nosso CI)
 - `../../../GODS_LAWS.md` LEI ZERO, L-05, L-06, L-07 (de onde vem a função, não como ela chega ao build), L-08 (AGPL-3.0-or-later — por que o jogo é FOSS e por que alguém fora do nosso CI pode compilar da fonte), L-33
 - `../../../GlintFx/CMakeLists.txt` (comentários `FIX-CONSUMO`, `PROJECT_SOURCE_DIR`/`PROJECT_BINARY_DIR` — o desenho do GlintFx já assume ser consumido por `add_subdirectory`)
 - `../../../GlintFx/tests/embed/`, `tests/embed_name_collision/`, `tests/embed_dll_colocation/`, `tests/package/` (os quatro modos de consumo que o próprio GlintFx já testa)

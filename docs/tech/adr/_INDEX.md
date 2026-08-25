@@ -87,17 +87,24 @@ serviço.
 - [`ADR-022`](ADR-022-cmake-versao-minima-fixada.md) — CMake como sistema de build, com
   `cmake_minimum_required(VERSION 3.28)` medido (não suposto) contra as cinco plataformas
   obrigatórias (L-09, L-20); piso real é o Ubuntu 24.04 (3.28.3), e não conflita com o que o
-  GlintFx já exige. Ninja como gerador, registrado como decisão, sem piso de versão fixado.
+  GlintFx já exige. Ninja como gerador **nas cinco plataformas, Windows incluído** — divergência
+  consciente do próprio job Windows do GlintFx (que usa o gerador padrão do Visual Studio),
+  declarada como consequência, não escondida. Sem piso de versão fixado para o Ninja.
 - [`ADR-023`](ADR-023-glintfx-submodulo-git-pinado.md) — o GlintFx entra no build como submódulo
-  git, pinado num commit específico; atualizar o ponteiro é ato deliberado, nunca automático.
-  Vínculo **compartilhado** (`.so`), espelhando o próprio GlintFx — decisão consciente do líder,
-  contra a recomendação técnica (estático); consequência de ABI entre compiladores declarada
-  explicitamente, com o que o submódulo pinado protege e o que não protege fora do nosso CI.
+  git, pinado num commit específico, em **`framework/GlintFx`** (nome escolhido pelo líder: nem
+  `external/`, nem `vendor/` — `vendor` sugeriria fornecedor de terceiro, e o GlintFx é projeto
+  irmão dele; `framework` diz o que a pasta é e mantém legível a fronteira da LEI ZERO); atualizar
+  o ponteiro é ato deliberado, nunca automático. Vínculo **compartilhado** (`.so`), espelhando o
+  próprio GlintFx — decisão consciente do líder, contra a recomendação técnica (estático);
+  consequência de ABI entre compiladores declarada explicitamente, com o que o submódulo pinado
+  protege e o que não protege fora do nosso CI.
 - [`ADR-024`](ADR-024-ci-cinco-plataformas-cachyos-container.md) — CachyOS entra na matriz de CI
   como container da imagem oficial `cachyos/cachyos:latest` (confirmada por precedente já em
   produção no próprio GlintFx), nunca como Arch reconfigurado. Linux compila com GCC **e** Clang,
-  os dois, ambos bloqueantes (L-20); Windows compila com MSVC. Contagem exata da matriz (sete ou
-  nove entradas) devolvida ao líder como pergunta aberta — ver a ADR.
+  os dois, em cada uma das quatro plataformas, ambos bloqueantes (L-20); Windows compila com MSVC.
+  Matriz de **NOVE** entradas, confirmado pelo líder (a leitura literal e uniforme, corrigindo um
+  "sete" que era erro aritmético do relay, não do trabalho já feito) — razão dele: cobertura
+  desigual esconde bug.
 - [`ADR-025`](ADR-025-harness-teste-proprio-minimo.md) — harness de teste próprio e mínimo
   (asserção, registro, `main`), e a correção registrada de que a LEI ZERO não fala sobre
   ferramenta de build nem de teste; a cultura de dependência zero vem da L-07 do `GODS_LAWS.md`
