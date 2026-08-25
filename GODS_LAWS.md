@@ -51,6 +51,7 @@
 | [L-30](#l-30) | escrever, reordenar ou acrescentar item na tabela | Todo item aponta para o documento que o especifica, se existir |
 | [L-31](#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
+| [L-33](#l-33) | escrever documento, teste, commit, item da tabela ou asset | Atomizar fora do código também; monolito é acoplamento, não tamanho |
 
 
 ---
@@ -585,3 +586,33 @@ Registrado aqui para não se perder. Nada nesta seção é lei ainda.
 **Merge em `main` por PR e criação de tag continuam exigindo aval explícito no contexto** — aprovação dada antes não vale para a próxima.
 
 **Aplicação:** a mensagem do `push` mente; confirme o SHA no remoto por `git ls-remote <url> <branch>` sempre que o push importar. Confira `git diff --cached --stat` antes de commitar e `git show --stat` depois: `git add` é atômico, e um caminho inválido derruba o add inteiro em silêncio, deixando o commit mutilado sem dar erro.
+
+## L-33
+
+**Data:** 24/08/2026, decisão do líder. **Verbatim:** *"tudo DEVE ser atomizado e NADA pode ser monolítico"*.
+
+**Estende a L-04 para fora do código.** A L-04 proíbe monolito em função, arquivo, classe e módulo, e manda cada elemento do jogo ser átomo com POCO próprio. Esta lei diz que **a mesma régua vale em documento, teste, commit, item da tabela e asset de origem**. A L-04 não é tocada: ela guarda o texto verbatim do líder sobre código, e esta apenas alcança as superfícies que ela nunca mencionou.
+
+**Monolito não é definido por tamanho, e sim por acoplamento sem fronteira.** Arquivo longo cujo conteúdo só faz sentido junto **não** é monolito. Arquivo curto que mistura dois assuntos **é**. Os três testes, na ordem em que se aplicam:
+
+1. **Nome** — consigo dar nome próprio e honesto a uma parte? Então ela já era um átomo preso dentro de outra coisa.
+2. **Mudança** — para alterar uma parte, preciso entender ou tocar as outras? Então há acoplamento sem fronteira.
+3. **Consumidor** — alguém quer só uma parte e é obrigado a levar tudo?
+
+**Aplicação por superfície:**
+
+- **Documento** é átomo de assunto, e o nome do arquivo diz qual.
+- **Teste** verifica **um** comportamento. Teste que falha por três motivos não diz qual.
+- **Commit** faz uma coisa só. Mensagem que precisa de "e" para ser verdadeira são dois commits.
+- **Item da tabela** é uma entrega, não um pacote de entregas.
+- **Asset de origem** é uma peça. Folha reunindo várias é artefato de **compilação**, nunca de fonte.
+
+**Onde agregar é a resposta CERTA, e fatiar seria o erro.** Três casos, e eles não são exceção concedida por conveniência — são a mesma regra lida direito:
+
+1. Quando as partes **só têm sentido juntas**.
+2. Quando a **ordem de leitura é o conteúdo** — prosa narrativa é o caso, e fatiá-la destrói algo que índice nenhum devolve.
+3. Quando o agregado é **artefato de compilação**: pacote binário selado é monolito por desenho, e deve ser (L-25).
+
+**A lei alcança o que este projeto AUTORA e POSSUI.** Formato ou esquema de terceiro fica **fora**, e a distinção foi estabelecida em três casos medidos no mesmo dia: o **esquema da tabela** é da ferramenta externa `tab_pendencias` (repositório próprio; nós escrevemos os itens, não o formato); o **formato de mapa** é do GlintFx (L-30 dele, e nossa é só a extensão `.gw.map`); e **artefato binário** pertence à cadeia de ferramentas do sistema. Detalhe em `docs/tech/convencao-formatos-gw.md`.
+
+**O que a lei NÃO é**, herdado da L-04 e repetido aqui porque é a parte que mais se perde: não é licença para fatiar em pedaços sem sentido próprio, nem para criar abstração especulativa. **Átomo é a menor unidade com significado, não a menor unidade possível.**
