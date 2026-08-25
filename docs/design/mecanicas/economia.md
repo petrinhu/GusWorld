@@ -288,22 +288,117 @@ documento (L-11: quem decide é o líder, não o agente).
 
 ### 5.5.2 Ingredientes de craft (8)
 
-Catálogo à parte, ditado no mesmo dia. São insumos de craft, não consumíveis de cura — não
-confundir com os 18 ingredientes já canônicos do sistema de Poções/Implantes (§7.8 acima), que são
-de outra família temática (hardware/Selve/cripto). O papel exato de cada um (que receita consomem,
-quantidade, se pertencem a uma bancada nova ou já existente) **não foi decidido**; só a composição
-nominal (qual comida cita qual ingrediente pelo próprio nome) está registrada aqui.
+Catálogo à parte, ditado no mesmo dia. São insumos de craft, não consumíveis de cura (não
+confundir com os 18 ingredientes já canônicos do sistema de Poções/Implantes, §7.8 acima, que são
+de outra família temática: hardware/Selve/cripto). **Origem (§5.5.2a) e papel (§5.5.2b) fechados
+nesta rodada (2026-08-25, ditado direto do líder).** Quantidade por receita, se pertencem a uma
+bancada nova ou já existente, e todo número (preço, taxa de sucesso) continuam **não decididos**:
+ver §5.5.2c e "Não decidido" ao fim de cada subseção.
 
-| Ingrediente | Comida onde a ligação é óbvia pelo nome | Decisão |
-|---|---|---|
-| Queijo parmesão ralado | — (nenhuma ligação óbvia) | líder, 2026-08-25 |
-| Orégano | Pizza de atum | líder, 2026-08-25 |
-| Alho | Macarrão ao alho e óleo; Pão de alho | líder, 2026-08-25 |
-| Manteiga | Pão de alho | líder, 2026-08-25 |
-| Páprica | — (nenhuma ligação óbvia) | líder, 2026-08-25 |
-| Atum em lata | Pizza de atum | líder, 2026-08-25 |
-| Tempero composto seco (cebola, alho, salsa) | — (nenhuma das doze comidas cita o tempero composto pelo nome) | líder, 2026-08-25 |
-| Camarões sem casca | — (nenhuma das doze comidas cita camarão) | líder, 2026-08-25 |
+| Ingrediente | Papel | Origem | Comida onde a ligação é óbvia pelo nome | Decisão |
+|---|---|---|---|---|
+| Queijo parmesão ralado | **EM ABERTO** | loja/conhecimento/exploração (§5.5.2a) | nenhuma ligação óbvia | papel não decidido; origem líder, 2026-08-25 |
+| Orégano | **Temperar** | loja/conhecimento/exploração (§5.5.2a) | Pizza de atum | líder, 2026-08-25 |
+| Alho | **Cozinhar** | loja/conhecimento/exploração (§5.5.2a) | Macarrão ao alho e óleo; Pão de alho | líder, 2026-08-25 (papel cozinhar); ver nota abaixo sobre 2º papel |
+| Manteiga | **Cozinhar** | loja/conhecimento/exploração (§5.5.2a) | Pão de alho | líder, 2026-08-25 |
+| Páprica | **Temperar** | loja/conhecimento/exploração (§5.5.2a) | nenhuma ligação óbvia | líder, 2026-08-25 |
+| Atum em lata | **Cozinhar** | loja/conhecimento/exploração (§5.5.2a) | Pizza de atum | líder, 2026-08-25 |
+| Tempero composto seco (cebola, alho, salsa) | **Temperar** | loja/conhecimento/exploração (§5.5.2a) | nenhuma das doze comidas cita o tempero composto pelo nome (evidência vem do próprio nome do ingrediente) | líder, 2026-08-25 |
+| Camarões sem casca | **EM ABERTO** | loja/conhecimento/exploração (§5.5.2a) | nenhuma das doze comidas cita camarão | papel não decidido; origem líder, 2026-08-25 |
+
+#### 5.5.2a Origem dos oito (decisão do líder, 2026-08-25)
+
+Perguntado entre "só loja", "loja mais drop travado por conhecimento" e "exploração e mundo", o
+líder respondeu **"2+3"**: as duas opções combinadas, não uma escolha entre elas.
+
+1. **Loja e negociação com personagens**, mesmo canal já usado pro suco puro de limão
+   (`cartas-hardware-pirataria-energia.md` §5: *"O suco puro de limão também pode ser obtido em
+   lojas e negociações com personagens"*), estendido aqui à família dos ingredientes de cozinha.
+   Mais **drop travado por conhecimento** para o que for raro, precedente já fixado pros outros 18
+   ingredientes do sistema de Poções/Implantes (§7.8 acima).
+2. **Exploração do mundo**: armário, cozinha, baú, horta. Achado físico no cenário, não comprado
+   nem dropado de inimigo.
+
+**Exclusão explícita, escrita para não se reabrir sozinha:** nenhum dos oito vem de **drop de
+inimigo comum (trash mob) repetido**. O corpus já fecha essa porta pros 18 ingredientes irmãos,
+verbatim: *"não dá pra farmar trash mob pra conseguir componente-boss"* (§7.8 acima, nota
+anti-grind). A mesma frase vale aqui palavra por palavra, porque a mesma porta furaria o mesmo
+corte, **C-15** (campanha de 4 a 8 horas: farm de trash mob é tempo de jogo que a campanha não
+tem), e o **Pilar 1** ("resolve por análise, nunca por grind"). Farm de inimigo comum não é fonte do
+craft de cozinha; isto não é omissão a ler como brecha, é vetado pelo mesmo racional que já veta
+pro resto do jogo.
+
+**Não decidido:** qual ingrediente específico vem de qual canal específico (esta loja, aquele NPC,
+aquele baú, aquela horta) é posicionamento de conteúdo/level design, não princípio; fica para
+`economy-designer` e para quem desenhar os espaços de exploração. A tabela acima registra a mesma
+política de origem pros oito porque foi isso que o líder decidiu: uma política uniforme pra família
+inteira, não uma distribuição individual item a item.
+
+#### 5.5.2b Papel de cada um (decisão do líder, 2026-08-25)
+
+Perguntado se os oito craftam as doze comidas, se temperam comida já existente, se são insumo de
+bateria, ou os três, o líder respondeu: **os três papéis, conforme o ingrediente.** Ele não disse
+qual é qual; o mapeamento abaixo vem só de onde o próprio nome do ingrediente ou o nome do prato já
+falam. Onde não é evidente, o papel fica **EM ABERTO**, não distribuído por simetria.
+
+- **Cozinhar** (vira comida, base/fundação do prato, não aditivo de prato pronto): **Alho**
+  (Macarrão ao alho e óleo: o prato É alho refogado no óleo. Pão de alho: alho+manteiga viram
+  estrutura do pão assado), **Manteiga** (Pão de alho, funde e vira estrutura do pão), **Atum em
+  lata** (Pizza de atum, é a proteína que dá identidade ao prato, não algo polvilhado por cima).
+- **Temperar** (não cria prato, melhora um que já existe): **Orégano** e **Páprica**. Nenhuma das
+  doze comidas cita a páprica pelo nome, e o orégano só aparece ligado à Pizza de atum; a evidência
+  aqui não é nome de prato, é a natureza do próprio ingrediente: as duas são especiarias clássicas,
+  sempre usadas em pequena quantidade pra realçar sabor de um prato já pronto, nunca como
+  base/corpo dele (diferente do Alho, que É a base do prato nas duas citações que tem). **Tempero
+  composto seco (cebola, alho, salsa)**: mesma lógica de evidência-pelo-nome-do-ingrediente, mais
+  direta ainda. Nenhuma das doze comidas o cita pelo nome, mas o PRÓPRIO NOME do ingrediente já
+  declara a natureza ("Tempero composto").
+- **Insumo técnico** (vai para craft de bateria): **nenhum dos oito.** Essa família já está
+  representada no catálogo por **suco puro de limão** e **água destilada**, refinados das comidas
+  #3 e #4 (`cartas-hardware-pirataria-energia.md` §5), que não fazem parte deste catálogo de oito.
+  Não forçado aqui por não haver evidência.
+- **EM ABERTO** (nome não diz): **Queijo parmesão ralado**. Nenhuma das doze comidas o cita pelo
+  nome (nem a #12, Macarrão ao molho pesto: pesto tradicional leva parmesão, mas o NOME do prato
+  não cita o ingrediente, e o §5.5.1 já registrou "não presumido aqui"; a mesma cautela se aplica
+  de novo, agora ao papel). Natureza (queijo ralado) não decide sozinha entre temperar e cozinhar.
+  **Camarões sem casca**: nenhuma das doze comidas cita camarão pelo nome; natureza (proteína) não
+  decide sozinha entre cozinhar e insumo técnico.
+
+**Alho: papel duplo sinalizado, não confirmado.** Alho está confirmado como **Cozinhar** por
+citação de nome em dois pratos, nos dois como base do prato, nunca como tempero de prato pronto. A
+convenção culinária brasileira comum trata alho como base de "tempero" (refogado de alho e cebola),
+mas essa é convenção cultural geral, não evidência textual deste corpus: nenhuma das doze comidas
+usa alho no sentido de "tempera um prato já pronto". Fica sinalizado, não decidido: se o líder
+quiser um segundo papel pro alho (temperar, além de cozinhar), é decisão dele, não inferência deste
+documento.
+
+**Não decidido:** quantidade por receita, se um ingrediente EM ABERTO acaba tendo papel único ou
+duplo quando o líder decidir, e todo número de balanceamento (`economy-designer`, quando a onda
+chegar lá).
+
+#### 5.5.2c Bancada de cozinha: sistema novo, e a existência dela não está confirmada como decisão do líder
+
+**Achado, não decisão:** não existe, em nenhum lugar do canon deste projeto, uma "bancada de
+cozinha" ou sistema equivalente de craft de comida (busca dirigida no `docs/` inteiro por
+`bancada de cozinha`, `estação de cozinha`, `kitchen`, `craft.*comida`, `cozinhar comida`: zero
+ocorrências fora deste parágrafo). As três estações de craft já canônicas (§7.1: Bancada de
+Compilação/Jaci, Forja de Firmware/Gus, Patch/Recompilação/Gus) são todas temáticas de
+hardware/compilação (Pillar 1: "craft = compilação de componentes via hardware... nunca
+caldeirão"), e a bancada RSB das oficinas do mercado negro/ferro-velho
+(`cartas-hardware-pirataria-energia.md` §4/§14, usada pro refino de suco puro de limão/água
+destilada e pela cópia pirata de carta) também é hardware/pirataria-themed. Nenhuma das quatro
+cozinha comida. **Conclusão: se "bancada de cozinha" existir como sistema de jogo, ela é NOVA, não
+é reuso de nenhuma bancada hoje canônica.**
+
+**Ressalva sobre a origem da própria frase:** a ordem de serviço desta rodada cita "bancada de
+cozinha" como o local onde o papel Cozinhar acontece, atribuído ao ditado do líder registrado em
+`DITADO-COMIDAS.md`. Esse arquivo, porém, não existe neste checkout do repositório (busca por
+`DITADO-COMIDAS.md` no projeto inteiro: nenhum resultado), então este documento **não pôde
+verificar se "bancada de cozinha" é o termo literal do líder ou paráfrase de quem redigiu a ordem
+de serviço.** Por cautela (memória de sessão: exemplo/paráfrase de quem explica uma decisão não é a
+decisão em si), este documento registra o PAPEL "cozinhar" como fechado pelo líder, mas trata a
+EXISTÊNCIA, o NOME e a LOCALIZAÇÃO de uma "bancada de cozinha" como **não confirmados**: pergunta
+para o líder, não fato assentado aqui.
 
 ### 5.5.3 Fôlego do corpo × energia de ação (LACUNA FECHADA, 2026-08-25)
 
@@ -480,7 +575,16 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 
 ---
 
-**Última revisão:** 2026-08-25, mesmo dia (expansão §5.5: o líder dita, direto, a ampliação de
+**Última revisão:** 2026-08-25, mesma data, mais uma rodada (§5.5.2a/b/c: fecha as duas lacunas que
+a expansão anterior deixava nomeadas, a origem dos oito ingredientes de craft ("2+3": loja/negociação
+com personagens mais drop travado por conhecimento, E exploração do mundo; exclusão explícita de
+drop de inimigo comum repetido) e o papel de cada um (cozinhar/temperar/insumo técnico, atribuído só
+onde nome de ingrediente ou de prato já diz: Alho/Manteiga/Atum em lata cozinham; Orégano/Páprica/
+Tempero composto seco temperam; Queijo parmesão ralado e Camarões sem casca ficam EM ABERTO; nenhum
+mostra evidência de insumo técnico). Sinaliza, sem confirmar, um possível segundo papel de temperar
+pro Alho, e registra que "bancada de cozinha" não tem precedente em canon nenhum: se existir, é
+sistema novo, e a própria existência/nome dela não pôde ser verificada contra o ditado original.
+Revisão anterior, mesmo dia (expansão §5.5: o líder dita, direto, a ampliação de
 quatro para **doze comidas** mais **oito ingredientes de craft**; fecha a lacuna fôlego-do-corpo ×
 energia-de-ação para água com gás, extensiva ao sanduíche de queijo; liga ingrediente a comida só
 onde o nome já diz — pão de alho/Alho+Manteiga, pizza de atum/Atum em lata+Orégano, macarrão ao
