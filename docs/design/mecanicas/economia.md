@@ -267,9 +267,12 @@ A derrota (§3.3) NUNCA anula os ganhos de vitórias anteriores — o wipe é um
 
 ### 5.5.1 Comidas (12)
 
-Doze consumíveis. Seis têm efeito FECHADO pelo líder; seis foram citadas por nome no ditado de
-2026-08-25 mas ainda aguardam efeito — marcadas abaixo com ⚠️, sem nenhum efeito sugerido neste
-documento (L-11: quem decide é o líder, não o agente).
+Doze consumíveis. Todos os doze têm efeito fechado pelo líder ao fim desta rodada (2026-08-25:
+pizza de atum e macarrão ao molho pesto, as duas últimas, fecharam agora, ver §5.5.1e e §5.5.1f).
+A única nuance que resta é o item 6 (tirinhas de frango): a CATEGORIA do buff ("buff ofensivo
+temporário") está fechada, só a estatística exata (Ataque ou Força) não foi escolhida; por isso
+não carrega marcador de pendência, é uma escolha binária dentro de efeito já fechado, não um
+efeito em aberto (L-11: quem decide é o líder, não o agente).
 
 | # | Item | Efeito | Craft / refino | Decisão |
 |---|---|---|---|---|
@@ -283,8 +286,8 @@ documento (L-11: quem decide é o líder, não o agente).
 | 8 | **Pastilha de menta** | **consumo sem custo de turno, só no overworld** (não vale em combate; ver amarra §5.5.1b) | nenhuma ligação óbvia | líder, 2026-08-25 |
 | 9 | **Macarrão ao alho e óleo** | **imunidade temporária a UM tipo de efeito negativo** (ver amarra §5.5.1c) | nome cita **Alho** (§5.5.2) | líder, 2026-08-25 |
 | 10 | **Pão de alho** | **escudo temporário**: absorve dano antes de o HP cair (ver amarra §5.5.1d) | nome e composição óbvia citam **Alho** e **Manteiga** (§5.5.2) | líder, 2026-08-25 |
-| 11 | Pizza de atum | ⚠️ EFEITO A DECIDIR PELO LÍDER | nome e composição óbvia citam **Atum em lata** e **Orégano** (§5.5.2) | líder cita o item, 2026-08-25 |
-| 12 | Macarrão ao molho pesto | ⚠️ EFEITO A DECIDIR PELO LÍDER | nenhuma ligação óbvia (pesto tradicional leva parmesão, mas o NOME do item não cita o ingrediente — não presumido aqui) | líder cita o item, 2026-08-25 |
+| 11 | Pizza de atum | **buff pequeno em toda a party, dura até o próximo descanso** (ver amarra §5.5.1e) | nome e composição óbvia citam **Atum em lata** e **Orégano** (§5.5.2) | líder, 2026-08-25 |
+| 12 | Macarrão ao molho pesto | **limpa veneno e corrosão, especificamente** (ver amarra §5.5.1f; par com macarrão ao alho e óleo) | nenhuma ligação óbvia (pesto tradicional leva parmesão, mas o NOME do item não cita o ingrediente, não presumido aqui) | líder, 2026-08-25 |
 
 #### 5.5.1a Churrasco: amarra de preço (`economy-designer`)
 
@@ -331,6 +334,52 @@ novo). O único cuidado: o Shield do pão de alho tem de ficar **mais fraco** qu
 própria ação de Defender (`combat.md` §9: "`Defend` aplica Shield com Magnitude = Def"),
 senão o item comum compete com (ou substitui) a ação tática de defender. O número exato
 (Magnitude, Duration) é do `economy-designer`.
+
+#### 5.5.1e Pizza de atum: amarra de duração e o risco de virar ritual (`economy-designer`)
+
+**A duração "até o próximo descanso" não é um número solto: ela existe porque dormir virou
+mecânica própria nesta mesma rodada** (`modos-morte.md` §5, sinalização 4). Antes disso, "até o
+próximo descanso" não tinha onde ancorar (dormir ainda era um "beat narrativo" genérico sem
+identidade própria). Agora tem.
+
+**Risco de degeneração nomeado, não numerado:** buff pequeno e barato, aplicado à party inteira,
+é o padrão clássico de comida-buff que vira ritual obrigatório antes de toda incursão (comer
+sempre, porque não comer é estritamente pior). A duração escolhida pelo líder já trabalha CONTRA
+esse risco, mas não o resolve sozinha: como o efeito dura até dormir de novo, e não até a próxima
+incursão nem por um número fixo de turnos, reaplicar a pizza só é necessário depois de um
+descanso, não antes de cada masmorra. Isso desloca a cadência de "sempre antes de lutar" pra "só
+depois de dormir", e dormir, pelo mesmo §5 do `modos-morte.md` (mesma sinalização 4), **custa
+tempo** (amarra direta com o item `F4` do `TODO.md`, missão cronometrada, ideia do Gus Dragon). Se
+dormir for raro e caro, comer pizza também fica raro; o ritual de pré-incursão não chega a se
+formar.
+
+**A ressalva que fica escrita para não se perder:** essa mitigação é CONDICIONAL ao resto da
+mecânica de dormir, que está bloqueada aguardando a resposta do Gus Dragon (issue 8 do bus
+`gusworld_ia_autocomm`, `modos-morte.md` §5 sinalização 4; cobre onde se dorme, se pode ser
+interrompido, quanto tempo custa, e se o jogador usaria). Se a resposta dele tornar dormir barato,
+frequente ou disponível sem custo real, o argumento acima enfraquece e a pizza volta a correr
+risco de virar hábito automático. O `economy-designer` revisita esta amarra quando a mecânica de
+dormir fechar de vez, não antes.
+
+#### 5.5.1f Macarrão ao molho pesto: amarra de par e de precedente (`economy-designer`)
+
+**Forma um par com o macarrão ao alho e óleo (#9, §5.5.1c), não uma variação dele.** Alho e óleo
+já fechou como imunidade temporária a UM tipo de efeito negativo: previne, olhando pra frente.
+Pesto limpa veneno e corrosão que a party JÁ tem: cura, olhando pra trás. É essa oposição de
+função (um previne, o outro limpa) que dá identidade aos dois pratos de massa, não o nome
+parecido ("macarrão ao X"). Registrado aqui pra ninguém, numa rodada futura, fundir os dois por
+parecerem semelhantes.
+
+**Amarra de precedente, no mesmo formato do §5.5.1c:** a Ampola de Antídoto (P2, §7.2) já entrega
+"Dispel Poison/Corrode + imune a DoT por 2 turnos", o MESMO par de efeitos negativos que o pesto
+ataca (veneno e corrosão), só que a poção crafta soma uma imunidade temporária por cima do
+dispel, e o pesto (pelo que o líder decidiu: "limpa veneno e corrosão, especificamente") só
+dispensa o que já está aplicado, sem cauda de imunidade. **Essa diferença de escopo é o teto:** se
+uma implementação futura der ao pesto a mesma imunidade temporária que a P2 tem, o item comum
+passa a igualar (ou substituir) o item craftado, esvaziando o investimento em ingrediente e craft
+daquela poção, o mesmo risco de dominância que o §5.5.1c já vetou pro alho e óleo, agora
+incidindo sobre o par pesto/P2 em vez de alho e óleo/P2. O `economy-designer` calibra o número
+(magnitude, se dispensa 1 ou os 2 efeitos de uma vez) dentro deste teto, não fora dele.
 
 ### 5.5.2 Ingredientes de craft (8)
 
@@ -446,6 +495,13 @@ decisão em si), este documento registra o PAPEL "cozinhar" como fechado pelo l�
 EXISTÊNCIA, o NOME e a LOCALIZAÇÃO de uma "bancada de cozinha" como **não confirmados**: pergunta
 para o líder, não fato assentado aqui.
 
+**Resolvido em 2026-08-25, mesmo dia, rodada seguinte: ver §5.5.4.** O líder respondeu a
+pergunta registrada acima. Não existe "bancada de cozinha" nova: cozinhar acontece na **cozinha
+do apartamento Vance**, usando a caderneta de receitas que já é canon (`in-world-docs.md`,
+Documento 19). O termo "bancada de cozinha" está confirmado como NÃO sendo do líder: nasceu de
+um orquestrador numa opção de pergunta que ele não escolheu. Este parágrafo e a busca acima ficam
+como estavam (L-14: nada se apaga), a resolução vem depois, em §5.5.4.
+
 ### 5.5.3 Fôlego do corpo × energia de ação (LACUNA FECHADA, 2026-08-25)
 
 A versão anterior deste documento registrava como lacuna aberta se "água com gás" mirava o
@@ -475,6 +531,50 @@ documento é o dono do CATÁLOGO das doze comidas, dos oito ingredientes de craf
 crédito deles; o outro é o dono do que acontece quando suco de limão e água com gás viram insumo
 de hardware, inclusive o trade-off entre consumir agora e guardar para refinar, e agora também da
 herança de risco da bateria craftada (mesma subseção, ver relatório desta rodada).
+
+### 5.5.4 Onde se cozinha: cozinha do apartamento Vance (decisão do líder, 2026-08-25)
+
+**Decisão, escolhida pelo líder entre três opções apresentadas:** cozinhar acontece na cozinha do
+apartamento Vance, usando a caderneta de receitas que já é canon (`in-world-docs.md`, Documento
+19, "Caderneta de saudações de Gargi Vance"). Não é sistema novo, não é "bancada de cozinha" (a
+pergunta que a §5.5.2c deixou aberta está resolvida acima, apontando pra cá): é o mesmo objeto
+que já existia no lore, agora com função mecânica.
+
+**Reusado verbatim da caderneta** (`in-world-docs.md`, Documento 19, linha ~793-800): "caderneta
+de cozinha barata, capa de oleado florido, ~50 páginas; receitas escritas à mão", de autoria de
+Gargi Vance (mãe do Gus), encontrada na "gaveta da cozinha do apartamento Vance", "acessível desde
+o início" do jogo. Este documento de economia usa esse vocabulário como âncora do local; não
+redefine nem acrescenta a ele: a caderneta segue sendo canon narrativo, não canon mecânico, e
+quem é dono dela continua sendo `in-world-docs.md`.
+
+**O que NÃO é estendido aqui:** a caderneta, à parte, já tem uma trava própria de INTERAÇÃO
+(Knowledge baixa, e Gus precisa ter voltado pra casa 3 vezes usando a mecânica de save base pra
+destravar a interação com o objeto). Isto é fato já canônico do documento narrativo, não uma
+decisão nova. Se a mecânica de COZINHAR herda esse mesmo gate ou tem o próprio é pergunta que
+ainda não foi feita ao líder: fica registrada como pendência de amarração futura, não decidida
+por presunção de simetria aqui.
+
+**Por que o líder escolheu isto contra as outras duas opções (razão dele, verbatim resumida na
+ordem de serviço):** cozinhar fica preso a um lugar, como dormir, e por isso não vira hábito
+repetido antes de cada incursão, o mesmo mecanismo de contenção que a amarra do §5.5.1e descreve
+pra pizza, agora aplicado à AÇÃO de cozinhar, não só ao efeito do prato pronto. E amarra a comida
+à casa, que é onde comida de criança mora (a própria caderneta já é lore da mãe cozinhando pro
+Gus).
+
+**Implicação de custo, sem número novo:** cozinhar exige voltar pra casa, e voltar custa tempo. O
+jogador numa incursão, ou numa missão cronometrada (`missoes-cronometradas.md`, item `F4`), que
+quer comer pizza fresca ou pesto recém-feito decide entre passar pelo apartamento Vance e seguir
+direto: a mesma tensão que já existe pra dormir (§5.5.1e) e que o item `F4` já formaliza pro
+tempo fora de batalha: "fora da batalha o relógio corre em todos os quatro modos de dificuldade"
+(decisão `G5`, 24/08/2026, `missoes-cronometradas.md`). Nenhuma duração, nenhum número de minutos
+é fixado aqui; isso é do `level-designer` e do `economy-designer`, juntos, na onda de
+balanceamento.
+
+**Correção de origem que fica registrada:** o termo "bancada de cozinha", que apareceu em
+documento de trabalho antes desta rodada, não é do líder: nasceu de um orquestrador, numa opção
+de pergunta que ele não escolheu (busca no corpus inteiro: zero ocorrências fora do §5.5.2c, que
+já registrava isso como achado, não decisão). Onde esse termo aparecer em qualquer lugar do
+projeto, o lugar correto é "a cozinha do apartamento Vance".
 
 ---
 
@@ -621,7 +721,17 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 
 ---
 
-**Última revisão:** 2026-08-25, mesma data, mais uma rodada (§5.5.1a/b/c/d: o líder fecha o
+**Última revisão:** 2026-08-25, mesma data, mais uma rodada (§5.5.1e/f + §5.5.4: o líder fecha as
+DUAS ÚLTIMAS comidas ainda com marcador de pendência: pizza de atum (buff pequeno em toda a
+party, dura até o próximo descanso, amarrado à mecânica de dormir que nasceu na mesma sessão em
+`modos-morte.md` §5 sinalização 4, e por isso ainda depende da resposta do Gus Dragon pro resto
+daquela mecânica) e macarrão ao molho pesto (limpa veneno e corrosão, especificamente, formando
+par com o macarrão ao alho e óleo, um previne, o outro limpa, amarrado como teto de escopo
+contra a Ampola de Antídoto `P2` já canônica). Com isso, nenhuma das doze comidas segue com efeito
+em aberto. Fecha também onde se cozinha: a cozinha do apartamento Vance, usando a caderneta de
+receitas já canônica de Gargi Vance (`in-world-docs.md`, Documento 19), não uma "bancada de
+cozinha" nova, termo que fica confirmado como não sendo do líder). Revisão anterior, mesma data,
+mais uma rodada (§5.5.1a/b/c/d: o líder fecha o
 efeito de quatro das seis comidas que ainda estavam com ⚠️: churrasco (cura leve de toda a
 party, com amarra de preço escalando por tamanho de party), pastilha de menta (consumo sem
 custo de turno, restrito ao overworld, restrição que É o efeito), macarrão ao alho e óleo
