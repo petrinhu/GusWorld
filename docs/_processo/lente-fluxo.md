@@ -37,9 +37,9 @@ O primeiro commit (A12) não deve conter o corpus (`docs/`, `resources/`) ainda,
 **[FATO: A12 exige tudo de A1-A11 antes, por ordem direta do escopo desta lente.]** Item único, gate do primeiro commit. Sem paralelismo possível aqui: é literalmente o ato de configurar o remoto e commitar. **WIP: 1.**
 
 ### W5: B1, B2, B6 | C1 (duas trilhas paralelas)
-- **Trilha B:** B1 (reparo do `__DEP_REMOVIDA__`) só começa depois de G1 resolvido (aprovação em bloco da lista). B2 (remover nome/bio/foto do Elon Musk de dois arquivos específicos) e B6 (conferência visual amostral das 1266 imagens) não dependem de G1 e tocam arquivos totalmente diferentes de B1.
+- **Trilha B:** B1 (reparo do `__DEP_REMOVIDA__`) só começa depois de G1 resolvido (aprovação em bloco da lista). B2 (remover nome/bio/foto da pessoa real por trás do Helion Tusk de dois arquivos específicos — na execução, achado 5 arquivos, ver conserto `B2`) e B6 (conferência visual amostral das 1266 imagens) não dependem de G1 e tocam arquivos totalmente diferentes de B1.
 - **Trilha C:** C1 (`CMakeLists.txt` raiz) é o primeiro item de C, sem dependência.
-- **De fato paralelo:** B (trilha de corpus/texto) e C (trilha de build/CI) não compartilham nenhum arquivo, então correm em paralelo verdadeiro entre si. Dentro de B, B1/B2/B6 tocam arquivos diferentes (corpus geral vs os dois arquivos do Elon Musk vs imagens), paralelo real.
+- **De fato paralelo:** B (trilha de corpus/texto) e C (trilha de build/CI) não compartilham nenhum arquivo, então correm em paralelo verdadeiro entre si. Dentro de B, B1/B2/B6 tocam arquivos diferentes (corpus geral vs os arquivos do B2 vs imagens), paralelo real.
 - **WIP: 4** (B1, B2, B6, C1).
 
 ### W6: B4 | C2, C3, C4, C5, C6, C8
