@@ -612,6 +612,17 @@ Registrado aqui para não se perder. Nada nesta seção é lei ainda.
 1. Quando as partes **só têm sentido juntas**.
 2. Quando a **ordem de leitura é o conteúdo** — prosa narrativa é o caso, e fatiá-la destrói algo que índice nenhum devolve.
 3. Quando o agregado é **artefato de compilação**: pacote binário selado é monolito por desenho, e deve ser (L-25).
+4. Quando a **coesão é exigida por contrato de terceiro**. *(Acrescentado em 24/08/2026; o achado é da sessão do `gusworld_mapeditor`, que encontrou o mesmo buraco na lei dela ao aplicar o freio que esta lei tinha e a dela não.)*
+
+**A quarta merece explicação, porque as três primeiras cobrem o ARTEFATO e nenhuma cobre o CAMINHO DE CÓDIGO que o escreve** — foi exatamente aí que a lei estava furada. Três casos vivos neste projeto, medidos antes de escrever esta cláusula:
+
+- **O envelope binário da L-25** tem ordem de campos normativa: magia, versão de formato, tipo, nonce, dado, selo de autenticação.
+- **O item `E2` exige ida e volta byte-exata por átomo**, e é a ordem dos bytes que sustenta essa prova.
+- **O formato de mapa é do GlintFx** (L-30 dele); somos consumidores e a ordem não é nossa para mudar.
+
+Um revisor aplicando a primeira pergunta ao escritor de envelope veria selo, serialização, gravação atômica e validador na mesma unidade, contaria razões demais para mudar, e mandaria dividir — **com razão aparente e resultado errado**, porque dividir ali quebra a garantia de ida e volta. Coesão que um contrato externo impõe **não** é acúmulo de razões de mudar: é **uma** razão, que mora fora de casa.
+
+⚠️ **Isto não é porta dos fundos.** Vale só quando o contrato é de terceiro, verificável e citável (a lei, o formato publicado, o teste de ida e volta). "Fica melhor junto" não é contrato.
 
 **A lei alcança o que este projeto AUTORA e POSSUI.** Formato ou esquema de terceiro fica **fora**, e a distinção foi estabelecida em três casos medidos no mesmo dia: o **esquema da tabela** é da ferramenta externa `tab_pendencias` (repositório próprio; nós escrevemos os itens, não o formato); o **formato de mapa** é do GlintFx (L-30 dele, e nossa é só a extensão `.gw.map`); e **artefato binário** pertence à cadeia de ferramentas do sistema. Detalhe em `docs/tech/convencao-formatos-gw.md`.
 
