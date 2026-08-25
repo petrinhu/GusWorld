@@ -2,7 +2,7 @@
 
 > **Atualização 2026-08-25 (líder, revogação de C-03/C-13 na L-29 de `GODS_LAWS.md`):** o craft de cópia pirata deixa de ser exclusivo da COMUM e passa a alcançar **ESPECIAL e SUPER**, sempre em qualidade inferior ao original — ver §15, seção nova. A SUPER também deixa de ser descrita como "forjada" em `cartas-technomagik.md` (ela é carta original; reflexo já aplicado lá, §2.4).
 >
-> **Atualização 2026-08-25 (líder, canon pessoal do Gus Dragon, L-16 de `GODS_LAWS.md`):** o líder dita, no mesmo dia, a expansão de quatro para **doze comidas** favoritas reais dele como itens de cura do jogo, mais **oito ingredientes de craft** (catálogo completo em `economia.md` §5.5). Duas das doze, suco de limão e água com gás, continuam alimentando craft de **bateria de baixa qualidade**, via refino em suco puro de limão / água destilada: ver §5, subseção "Bateria de baixa qualidade (craftada)", que nesta rodada também fecha se a bateria craftada herda os riscos da pirata comprada (herda, sim).
+> **Atualização 2026-08-25 (líder, canon pessoal do Gus Dragon, L-16 de `GODS_LAWS.md`):** o líder dita, no mesmo dia, a expansão de quatro para **doze comidas** favoritas reais dele como itens de cura do jogo, mais **oito ingredientes de craft** (catálogo completo em `comidas-ingredientes-craft.md` §5.5 (catálogo movido de `economia.md` em 25/08/2026, L-33)). Duas das doze, suco de limão e água com gás, continuam alimentando craft de **bateria de baixa qualidade**, via refino em suco puro de limão / água destilada: ver §5, subseção "Bateria de baixa qualidade (craftada)", que nesta rodada também fecha se a bateria craftada herda os riscos da pirata comprada (herda, sim).
 >
 > **Status:** ✅ **CANON FECHADO (líder, 2026-07-28).** Os quatro pontos que este cabeçalho listava como abertos foram entregues: os **números** viraram `cartas-numeros-proposta.md` (com as últimas duas ambiguidades fechadas em 2026-07-28), a **spec de implementação** virou `cartas-spec-dados.md` (aprovada em 2026-07-28) e `cartas-spec-logica.md`, e os **efeitos do vírus** e o **mercado negro** estão fixados aqui e nos docs de números. Reflexo pendente em `cartas-technomagik.md` e na terminologia, que é passo de escrita, não decisão. _(Status original, por registro: BRAINSTORM EM ANDAMENTO, líder, 2026-07-18.)_ Decisões fechadas via AskUserQuestion capturadas fielmente. Ainda ABERTO: efeitos exatos do vírus, o mercado negro (lugar/vendedor), números (delegar ao `economy-designer`), spec de implementação (delegar a `gameplay_engineer`/`backend-engineer`). NÃO é canon fechado até o líder revisar o doc consolidado.
 >
@@ -128,7 +128,8 @@ Existe: mais barata, mas **mente sobre a carga**, morre cedo, pode **danificar a
 > energia de ação]. E pode ser usada em craft de bateria, após refinada para 'agua destilada'.
 > Mesma logica do suco de limao."*
 
-Duas das doze comidas (`economia.md` §5.5) alimentam este sistema por DOIS insumos refinados:
+Duas das doze comidas (`comidas-ingredientes-craft.md` §5.5.1, catálogo movido de `economia.md`
+§5.5 em 2026-08-25, L-33) alimentam este sistema por DOIS insumos refinados:
 
 - **Suco de limão** → refinado em **suco puro de limão**.
 - **Água com gás** → refinada em **água destilada**.
@@ -161,8 +162,8 @@ não decidido aqui.
 **O trade-off É a mecânica, não efeito colateral (verbatim do líder: "se gastar para bateria, fica
 sem item para limpar debuff e vice-versa").** Suco de limão e água com gás são, cada um, UM item que
 serve a DOIS fins mutuamente exclusivos: consumir agora (limpa debuff / restaura fôlego-AP, ver
-`economia.md` §5.5) OU guardar e refinar (insumo de bateria de baixa qualidade). Gastar um lado
-fecha o outro para aquela unidade do item. É a Doutrina do Comedimento (`economia.md` §0) em
+`comidas-ingredientes-craft.md` §5.5.1) OU guardar e refinar (insumo de bateria de baixa
+qualidade). Gastar um lado fecha o outro para aquela unidade do item. É a Doutrina do Comedimento (`economia.md` §0) em
 miniatura: quem administra o estoque dos dois lanches com cuidado tem, ao mesmo tempo, cura
 disponível E bateria de reserva; quem esbanja um lado fica sem o outro bem na hora que precisar.
 
