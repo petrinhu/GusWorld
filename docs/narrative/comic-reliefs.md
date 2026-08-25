@@ -1078,6 +1078,43 @@ Mensagem opcional discreta no canto da tela durante carregamento:
 
 ---
 
+### Among Us (2)
+
+**EE-19: O Time de Tarefas**
+
+No Caleidoscópio do Setor Mirage, Gus encontra um grupo de figurinhas atarracadas em formato de feijão, cada uma num macacão de cor diferente, viseira oval refletora e mochila retangular nas costas. Elas cumprem tarefas repetitivas pela sala: ligar fios da mesma cor, acender um painel, alimentar um reator improvisado. De repente as luzes caem e uma das figurinhas some por uma grade de ventilação que desce direto pras Catacumbas. Quando a luz volta, falta uma. NPC de macacão amarelo:
+> "Sumiu de novo. Ninguém viu nada. Ninguém nunca vê nada por aqui."
+
+Se Gus aperta o botão vermelho enferrujado no centro da sala, todas as figurinhas param e se encaram em silêncio, desconfiadas umas das outras. Vencer o minigame (adivinhar por qual grade a sumida saiu) dá **Token-do-Infiltrado** (bônus de furtividade por 2 turnos).
+
+**EE-20: "Reunião de Emergência"**
+
+Conquista oculta: destrava se Gus aperta o botão vermelho três vezes seguidas sem nunca acertar quem sumiu pela grade.
+> **"Reunião de Emergência: Você chamou todo mundo pra sala e não resolveu nada. De novo. Aqui, confiança é opcional."**
+
+---
+
+### One Piece (2)
+
+**EE-21: O Velho da Rota Riscada**
+
+Na margem do Rio Lentíssimo, dentro da Orla Recursiva, Gus encontra um velho marujo sentado num barco encalhado havia anos: tapa-olho, bandana puída, casaco remendado com dúzias de retalhos de tecido diferente. Ele não larga um mapa rasgado, cheio de X riscados a carvão, e fala sem tirar os olhos dele:
+> "Comi uma coisa, uma vez. Ganhei força. Perdi o mar pra sempre, não boio mais, nem tentando. Engraçado o preço que a gente paga sem ler o rótulo antes."
+
+Ele nunca entra na água, nem se Gus oferecer ajudar. Se Gus se oferece pra consertar o barco encalhado, ele recusa:
+> "Esse aí não sai mais do lugar. Mas o mapa sai. Leva um pedaço, se quiser sonhar também."
+
+Dá ao jogador um **Fragmento-de-Rota** (item de lore, sem função mecânica; desbloqueia entrada de Diário sobre um mar que ninguém no mundo GusWorld já viu de verdade).
+
+**EE-22: A Bandeira Encalhada**
+
+Rio acima, presa numa raiz da margem do Lentíssimo, uma bandeira preta desbotada com uma caveira cruzada balança meio submersa na correnteza. Diary entry ao examinar de perto:
+> *"Uma tripulação de gente estranha, cada um sonhando uma coisa impossível diferente, tentando chegar juntos ao fim do mapa. Não sei se chegaram. A bandeira ficou pra trás. Talvez não tenham chegado. Ou talvez tenham só trocado de bandeira no caminho."*
+
+Não há recompensa mecânica. É só flavor: a bandeira balança na água, e Gus segue viagem.
+
+---
+
 ## Cena 15: "Pergunta amanhã" (o Cauã descobre)
 
 **Origem:** decisão do criador em 2026-07-26. Nasce da tensão X-01 do inventário de disputas de linguagem: o bordão do Cauã é "compila e roda" (`vozes-party.md:145-152`) e o Bento diz na Cena 2 que Pythia **nem vira máquina**. Duas peças canônicas que se chocam de frente, e o criador decidiu que o Cauã **descobre**. _(A fala do Bento foi ajustada em 2026-07-26, decisão X-06: era "PYTHIA SEQUER COMPILA". Esta cena depende da substância, não da redação, e por isso sobreviveu ao ajuste sem retrabalho.)_
@@ -2047,8 +2084,8 @@ Isso eu sei fazer.
 | Ato 2 (pares sem o Gus, requer o Gus fora do grupo ativo) | 16 (Ela está pensando, Cauã x Iara), 17 (Pra frente e pra trás, Jaci x Linda) |
 | Ato 2 tardio (pós-Cena 4, a partir de ~75%) | 18 (A peça que ainda gira, fase tardia do deslize do Dante) |
 | Ato 2 (fase 2 do retorno do Cauã, ANTES da Cena 15 na cronologia) | 19 (Pra tudo que aguentou, Cauã x Bento, fundação da Cena 15) |
-| Ato 2 (regional) | EE-1, EE-2 (Dutos), EE-5, EE-6 (Selve), EE-8 (fronteira), EE-11, EE-15 (Mirage), EE-13, EE-14 (vilarejo Jaci), EE-17 (Catedrais) |
-| Cross-ato (conquistas) | EE-4 (cogumelo), EE-9 (100 inimigos), EE-10 (placa hospital), EE-12 (100 mortes mesma cena), EE-16 (diálogo casca azul), EE-18 (encorajador) |
+| Ato 2 (regional) | EE-1, EE-2 (Dutos), EE-5, EE-6 (Selve), EE-8 (fronteira), EE-11, EE-15, EE-19 (Mirage), EE-13, EE-14 (vilarejo Jaci), EE-17 (Catedrais), EE-21, EE-22 (Orla Recursiva) |
+| Cross-ato (conquistas) | EE-4 (cogumelo), EE-9 (100 inimigos), EE-10 (placa hospital), EE-12 (100 mortes mesma cena), EE-16 (diálogo casca azul), EE-18 (encorajador), EE-20 (reunião de emergência) |
 
 ---
 
