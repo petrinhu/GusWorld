@@ -7,10 +7,10 @@ Hub dos manuais deste repositório. Todos vivem na **raiz** deste projeto.
 ## Manuais canônicos
 
 - `CONTRACT.md` : AI Coder Contract (padrões de código, SOLID, Clean Code, Git, RFC 2119). Onde a L-22 substitui uma cláusula dele, a L-22 vence.
-- `TESTES.md` : guia de testes, qualidade e auditoria, adaptado ao TDD estrito e aos quatro portões da L-19.
+- `TESTES.md` : guia de testes, qualidade e auditoria, adaptado ao TDD estrito e aos cinco portões da L-19.
 - `AGILE.md` : metodologia ágil (Manifesto, Scrum, Kanban, PDCA, INVEST, SAFe) aplicada ao ritmo de sprint deste projeto.
 - `DEPLOY_CHECKLIST.md` : checklist de release irreversível (tag, publicação, quebra de compatibilidade de save), ancorado na L-23.
-- `AUDITORIAS.md` : índice das auditorias do GusWorld, ancoradas nos quatro portões da L-19 e na proteção de dado da L-25.
+- `AUDITORIAS.md` : índice das auditorias do GusWorld, ancoradas nos cinco portões da L-19 e na proteção de dado da L-25.
 - `TOOLING.md` : ferramentas FOSS do stack C++23 deste projeto (build, análise estática, sanitizers, scan de segredo).
 
 ## Organização e pipeline (constelação de agents)

@@ -21,6 +21,9 @@ Dois níveis, os dois obrigatórios:
 2. **ASan e UBSan** a cada fatia fechada, em build separado.
 3. **Análise estática:** `clang-tidy` e `cppcheck` no CI.
 4. **Scan de segredo:** `gitleaks`. Cobre a árvore por padrão; para dado sensível, a verificação correta é `git log --all -p | grep -ci <termo>`, com `-i`, nunca `git grep`.
+5. **Gate de mensagem de commit:** `tools/security/commit_gate.py`, gancho `commit-msg` **local**, instalado por `tools/git-hooks/install.py`. Existe porque o `git-crypt` cifra o **conteúdo** do arquivo e **não** cifra a mensagem de commit, o nome do arquivo nem o do diretório — sem ele, o texto que a L-25 protege sai pela porta que ninguém trancou. Barra quatro classes: termo da lista cifrada, caminho de área cifrada, dado pessoal e credencial. **Sem a chave, reprova o commit** em vez de aprovar em silêncio.
+
+**Como auditar o portão 5, que é diferente dos outros quatro:** os quatro primeiros deixam rastro no CI, então basta ler o log do job. Este é **local**, e um clone onde `install.py` nunca rodou simplesmente não o tem — **CI verde não prova que ele existe**. A auditoria confere três coisas: que `.git/hooks/commit-msg` está presente e executável; que o teste próprio passa (`python3 tools/security/test_commit_gate.py`); e que um `core.hooksPath` global, se houver, **encadeia** de volta ao gancho local em vez de sombreá-lo — foi o que quase aconteceu nesta máquina, e só um teste de execução real mostrou que o encadeamento funcionava.
 
 **Sem meta numérica de cobertura.** Cobertura é consequência do TDD estrito, não alvo de auditoria.
 
