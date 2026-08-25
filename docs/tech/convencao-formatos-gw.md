@@ -36,7 +36,7 @@ O líder determinou que os arquivos de mapa do GusWorld usem a extensão **`.gw.
 
 **Por que isto importa na prática, e não é formalidade:** a sessão do `gusworld_mapeditor` está construindo o editor **sobre o formato do GlintFx**, declarando-se *"implementador de referência do escritor"*. Um formato paralelo nosso criaria dois formatos incompatíveis — o que o editor escreve e o que o jogo lê — e o editor de mapas do projeto deixaria de servir ao jogo. Como o formato do GlintFx é tratado lá como **API pública e contrato de compatibilidade binária**, com revisão dedicada e versionamento, um formato próprio também jogaria fora esse trabalho e recriaria em casa o que a LEI ZERO manda pedir ao framework.
 
-## Os doze tipos, fixados em 25/08/2026
+## Os treze tipos, fixados em 25/08/2026
 
 O líder fechou a lista. **Um tipo por elemento de jogo**, e não um tipo genérico — é a **L-04** aplicada ao nome do arquivo: *"cada elemento do jogo é um átomo com POCO próprio"*.
 
@@ -51,11 +51,14 @@ O líder fechou a lista. **Um tipo por elemento de jogo**, e não um tipo genér
 | `.gw.foe` | inimigo | **nós** | a criar |
 | `.gw.stat` | efeito de status | **nós** | a criar |
 | `.gw.quest` | missão | **nós** | a criar |
+| `.gw.achv` | conquista (só a **definição**: nome, dica, condição de destravar, se é oculta) | **nós** | a criar |
 | `.gw.bag` | o que o personagem carrega | **nós** | a criar |
 | `.gw.box` | recipiente que fica no mundo | **nós** | a criar |
 | `.gw.table` | mesa que **transforma** item | **nós** | a criar |
 
-**A lista veio do canon, não de invenção:** a **L-04** nomeia *"carta, item, inimigo, efeito de status, diálogo, missão"*, e a **L-18** acrescenta que *"'item' inclui o catálogo de conteúdo"*. Os cortes da **L-29** eliminam dois candidatos que continuam fora: **conquista** pelo **C-08**, **afinidade de companion** pelo **C-12**.
+**A lista veio do canon, não de invenção:** a **L-04** nomeia *"carta, item, inimigo, efeito de status, diálogo, missão"*, e a **L-18** acrescenta que *"'item' inclui o catálogo de conteúdo"*. O corte da **L-29** que ainda elimina um candidato é o **C-12**: **afinidade romântica de companion** (medidor de afeto e simulador de namoro) continua fora. Afinidade de NPC como estado de reação social é outra coisa, e está dentro (L-29, alcance corrigido em 25/08/2026); ela não é catálogo, é resultado de diálogo, e não abre tipo próprio aqui.
+
+**Conquista deixou de ser candidato eliminado por corte** (correção 25/08/2026): a citação antiga — "fora pelo `C-08`" — caiu junto com a revogação desse corte na mesma data (`GODS_LAWS.md` L-29). O jogo **tem** conquistas, e a definição de cada uma vira o tipo `.gw.achv` (ver a tabela acima e a seção dedicada abaixo). O que ficou de fora foi só a integração com a Steam, por colisão de licença (SDK Steamworks e AGPL), e isso não é assunto de formato.
 
 **Receita deixou de ser candidato eliminado por corte** (correção 25/08/2026): a razão original — "fora pelo C-03 e pelo C-13" — caiu junto com a revogação desses dois cortes na mesma data (`GODS_LAWS.md` L-29). Isso não abre um décimo-terceiro tipo: **receita não vira tipo próprio porque o dado de criação passou a morar dentro do próprio `.gw.table`**, no ramo de criação (ver abaixo), não porque esteja cortada.
 
@@ -70,7 +73,7 @@ O líder fechou a lista. **Um tipo por elemento de jogo**, e não um tipo genér
 - **Reparo** (o que a cerca antiga descrevia por inteiro): recarrega, repara, troca bateria, limpa vírus. O item entra e sai o MESMO item, com outro estado.
 - **Criação:** craft de cópia pirata de carta — comum, ESPECIAL ou SUPER (`cartas-hardware-pirataria-energia.md` §15). Aqui o item que sai é **novo**, e é **sempre inferior** ao original: qualidade pior, efeito trocado, ou só o nome sem função nenhuma. A original de ESPECIAL/SUPER **nunca** nasce numa bancada, continua só por progresso narrativo.
 
-**`.gw.table` carrega um campo dizendo qual das duas operações está em curso.** Reparo e criação não são o mesmo evento tratado como se fossem — são dois ramos explícitos do mesmo formato, não dois formatos. Isso **não abre a lista de doze tipos**: continua havendo um tipo por elemento de jogo (L-04), e a mesa continua sendo o único tipo que transforma; só a NATUREZA do que ela pode produzir mudou. A fronteira segue escrita aqui porque continua fácil de erodir em silêncio: agora o risco não é "recarrega virar fabrica", é a criação virar fabricação **do original** — e isso a cerca proíbe com a mesma firmeza de antes.
+**`.gw.table` carrega um campo dizendo qual das duas operações está em curso.** Reparo e criação não são o mesmo evento tratado como se fossem — são dois ramos explícitos do mesmo formato, não dois formatos. Isso **não abre a lista de treze tipos**: continua havendo um tipo por elemento de jogo (L-04), e a mesa continua sendo o único tipo que transforma; só a NATUREZA do que ela pode produzir mudou. A fronteira segue escrita aqui porque continua fácil de erodir em silêncio: agora o risco não é "recarrega virar fabrica", é a criação virar fabricação **do original** — e isso a cerca proíbe com a mesma firmeza de antes.
 
 ### Recipiente tem duas naturezas, e elas não moram juntas
 
@@ -82,6 +85,33 @@ O líder fechou a lista. **Um tipo por elemento de jogo**, e não um tipo genér
 | **o que aconteceu com ele** | *"este baú já foi aberto"* | estado do jogador, envelope selado (L-25) |
 
 **Por que isto não é formalidade:** o item `D17` (coleta idempotente, achado do Gus Dragon) exige que abrir o baú duas vezes não gere duas cartas. Isso **só funciona se o baú guardar o próprio estado de já-aberto**. Estado no arquivo de conteúdo seria igual para todos os saves, e a proteção não existiria.
+
+### Conquista tem duas naturezas, e elas não moram juntas
+
+**Decisão do líder, 25/08/2026, sobre a pergunta "conquista vira tipo `.gw` próprio ou mora dentro do save": "1+2", as duas coisas.** É o mesmo corte que a carta e o recipiente já têm, aplicado ao tipo que a revogação do `C-08` (L-29, 25/08/2026) trouxe de volta:
+
+| | O que é | Onde mora |
+|---|---|---|
+| **o que a conquista É** | *"esta conquista se chama X, a dica é Y, a condição de destravar é Z, e ela é oculta (ou não) até lá"* | dado autorado, arquivo `.gw.achv` |
+| **o que aconteceu com ela** | *"o jogador já destravou esta conquista"* | estado do jogador, envelope selado (L-25) |
+
+**Por que a definição não pode morar no save:** ela é igual para todo save, autorada e revisada junto com o resto do conteúdo, e compilada dentro do pacote binário selado pelo gerador de build (`E8`/`G2`). Guardar nome e condição dentro de cada save duplicaria o mesmo dado em todo save do jogador e tornaria a conquista editável exatamente no arquivo que a L-18 protege contra edição — a mesma mistura de fonte de compilação com estado de tempo de execução que a seção "Fora desta lista de propósito" já recusa para save e configuração.
+
+**Por que o destravamento não pode morar no catálogo:** é o mesmo motivo do baú do `D17`, citado acima. É fato de UM jogador, nasce jogando; se morasse no arquivo de conteúdo, seria igual para todo mundo, e "destravei" deixaria de significar alguma coisa.
+
+**O que o save guarda, e nada além disso:** o conjunto dos identificadores (`id`) estáveis das conquistas já destravadas. Não o nome, não a dica, não a condição — esses três só existem no `.gw.achv`, e são lidos de lá toda vez que a conquista precisa ser mostrada. **O `id` é estável e não posicional**: a ordem das conquistas no catálogo pode mudar sem que o save saiba, porque o save nunca guardou posição, só identidade.
+
+**Razão de mudar própria, pela régua da L-33:** conquista não muda pela mesma razão que carta, inimigo ou efeito de status (L-17, regra de combate e balanço), nem é recipiente que ocupa lugar no mundo (`.gw.box`). Ela muda por design de progressão e narrativa — o que conta como marco, como se anuncia ao jogador — e carrega a mesma dualidade jurídica que a L-25 já reconhece para carta (número e regra são código; texto de sabor é asset reservado): nome e dica são prosa, a condição é regra. Nenhuma unidade hoje no catálogo cobre as duas coisas juntas; forçar conquista para dentro de `.gw.quest` misturaria "o jogo progride" com "o jogador foi reconhecido por algo", que são razões de mudar diferentes.
+
+#### O que acontece quando o catálogo muda e o save é velho
+
+Três mudanças possíveis no `.gw.achv`, e o save reage diferente a cada uma, precisamente porque só guarda o `id`:
+
+1. **Conquista renomeada, ou dica reescrita.** O save não muda nada, porque nunca guardou o texto. Na próxima leitura, o mesmo `id` já destravado aparece com o nome novo. **Isto é o ganho estrutural de separar definição de destravamento**, não um caso a tratar à parte: renomear é de graça.
+2. **Conquista removida do catálogo.** O `id` continua no save como dado órfão. Ele não é apagado e não reprova o carregamento: é um fato histórico do jogador ("isto já aconteceu"), não uma alegação sobre o estado atual das regras — a mesma leitura que já vale para um baú do `D17` já aberto numa dungeon redesenhada depois. Deixar de existir definição para exibir é problema de apresentação (`present/`, que ainda não nasceu, L-06), não de dado, e este documento não decide o que a interface faz com um `id` órfão.
+3. **Condição de destravar alterada.** Quem já destravou continua destravado; a condição nova só rege quem ainda não destravou. É a mesma postura da seção "A mochila registra, não age": o save é registro do que já ocorreu, não recomputação sob a regra de hoje.
+
+⚠️ **A lacuna que esta seção NÃO fecha, porque não é decisão de formato:** a L-25 promete, na fase 2, verificar o save por **re-execução** do histórico de comandos — *"para forjar um save que passe, é preciso produzir uma história de comandos que legitimamente chegue àquele estado"*. Se o destravamento de conquista for modelado como regra de domínio de verdade (comando/evento, L-17, o que ele deveria ser pela mesma lei que rege toda transição de estado), a re-execução completa tem de rodar contra **algum** ruleset — e não está decidido se é o vigente no momento em que o save foi gravado (exige versionar o catálogo e o verificador saber escolher a versão certa) ou o vigente no momento da verificação (quebra todo save cuja conquista já destravada dependia de uma condição afrouxada ou apertada depois). **Isto não é exclusivo de conquista** — vale para qualquer regra sujeita a replay —, e a fase 2 inteira ainda não tem desenho: só a fase 1 está na tabela hoje (`E2`, `E3`, `E4`). Fica registrado aqui para não ser descoberto tarde, e a decisão é do líder, quando a fase 2 for desenhada.
 
 ### Nem tudo que parece recipiente é recipiente
 
