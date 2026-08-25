@@ -36,7 +36,7 @@ A12 | Valor: 3 | Criticidade: 20 | Risco: 13 | CoD: 36 | O primeiro commit É a 
 
 B1 | Valor: 2 | Criticidade: 13 | Risco: 8 | CoD: 23 | 28 ocorrências de `__DEP_REMOVIDA__` a reparar caso a caso; depende de G1 (aprovação em bloco do líder), portão que ainda não existe.
 
-B2 | Valor: 1 | Criticidade: 20 | Risco: 13 | CoD: 34 | Nome real, biografia e link de foto de pessoa viva num repo que vai ficar público: L-16 exige aceite prévio para homenagem, e o item bruto não indica aceite do Elon Musk (INFERÊNCIA: trato como exposição de dado de terceiro sem consentimento confirmado, mesma classe de irreversibilidade citada na tarefa). Personagem Helion Tusk fica intacto, só o vínculo com a pessoa real sai.
+B2 | Valor: 1 | Criticidade: 20 | Risco: 13 | CoD: 34 | Nome real, biografia e link de foto de pessoa viva num repo que vai ficar público: L-16 exige aceite prévio para homenagem, e o item bruto não indica aceite da pessoa real por trás do Helion Tusk (INFERÊNCIA: trato como exposição de dado de terceiro sem consentimento confirmado, mesma classe de irreversibilidade citada na tarefa). Personagem Helion Tusk fica intacto, só o vínculo com a pessoa real sai.
 
 B3 | Valor: 1 | Criticidade: 13 | Risco: 5 | CoD: 19 | Caminho absoluto de máquina (o diretório de usuário do líder, escrito por extenso) expõe usuário e estrutura de disco do líder; menor gravidade que B2 porque não é identidade de terceiro nem dado de saúde, mas ainda é vazamento pessoal evitável.
 

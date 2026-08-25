@@ -2,7 +2,7 @@
 
 > **STATUS: PROPOSTA** (Fase B do roster de análogos, item `LORE-ORIGEM-MULTIVERSO`). Aguarda aprovação do criador. Segue o TEMPLATE POR FIGURA de `docs/design/brainstorm-backlog.md` #1, já validado no piloto `01-faraday.md`. Não é canon até aprovação; a prosa canônica final (quando entrar no deep-lore) vai via narrative-writer.
 >
-> Nota de escopo: Tesla e Helion Tusk (análogo de Musk, capstone do roster) são figuras SEPARADAS. Tesla é o mago da energia e da ressonância, figura falecida (nome real mantido); Tusk é a carta-capstone à parte, discutida em documento próprio.
+> Nota de escopo: Tesla e Helion Tusk (análogo de uma figura industrial contemporânea viva, capstone do roster; nome real não citado neste corpus, `L-16`, conserto `B2` 25/08/2026) são figuras SEPARADAS. Tesla é o mago da energia e da ressonância, figura falecida (nome real mantido); Tusk é a carta-capstone à parte, discutida em documento próprio.
 
 ## 1. Figura real
 
