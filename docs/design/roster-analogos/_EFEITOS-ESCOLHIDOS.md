@@ -1,6 +1,6 @@
 # Efeitos ESCOLHIDOS das 20 cartas dos mestres (ROSTER-EFEITOS-CARTAS)
 
-> Registro das escolhas do criador (feat ROSTER-EFEITOS-CARTAS, iniciada 2026-07-12). Substitui o rascunho provisório (`cartas-statlines-rascunho.md`) conforme cada mestre é decidido. Quando os 20 estiverem escolhidos, o statline final por-carta fecha (com a baseline de `cartas-technomagik.md` §2.2) e a redação do diálogo do encontro (molde de 2 movimentos, `techmagic.md`) vira handoff do `narrative-writer`.
+> Registro das escolhas do criador (feat ROSTER-EFEITOS-CARTAS, iniciada 2026-07-12). Substitui o rascunho provisório (`cartas-statlines-rascunho.md`) conforme cada mestre é decidido. Quando os 20 estiverem escolhidos, o statline final por-carta fecha (com a baseline de `cartas-technomagik.md` §2.2) e a redação do diálogo do encontro (molde de 2 movimentos, `technomagik.md`) vira handoff do `narrative-writer`.
 >
 > **Diretriz do encontro (criador 2026-07-12):** no encontro (Morlhin/Tavus-Eco), o mestre (1) conta seus feitos reais em linguagem de leigo, depois (2) deriva: "portanto, o efeito desta carta é [X]". O efeito nunca é arbitrário.
 
@@ -263,7 +263,7 @@ Implementação: `EffectKind::CloneAlly` (ordinal 4, ganhou handler `handle_clon
 ## Sub-brainstorms / feats que emergiram (a fazer depois)
 - **MAXWELL-AREAS-ESCURAS:** áreas escuras percorríveis só com a carta Maxwell (a "luz" dele); definir o que são, quantas, gate contornável (gdd §7.1).
 - **VOLTA-LEECH-%:** a fração de conversão do leech do Volta (calor perdido, 2ª lei) + absorve % ou absoluto, com argumentos de termodinâmica.
-- **CARTAS-FRASES-PEDAGOGICAS (criador 2026-07-12):** cada carta, ao ser usada, mostra uma **frasezinha didática** que desperta curiosidade sobre a figura/lei real (ex.: Volta = "Você recebeu X mana e Y HP; X% perdido pela 2ª lei da termodinâmica [texto simpático]"). Uma frase por mestre. É a função pedagógica do jogo. Handoff futuro (narrative-writer + criador). Cross-ref o molde de 2 movimentos do encontro (`techmagic.md`).
+- **CARTAS-FRASES-PEDAGOGICAS (criador 2026-07-12):** cada carta, ao ser usada, mostra uma **frasezinha didática** que desperta curiosidade sobre a figura/lei real (ex.: Volta = "Você recebeu X mana e Y HP; X% perdido pela 2ª lei da termodinâmica [texto simpático]"). Uma frase por mestre. É a função pedagógica do jogo. Handoff futuro (narrative-writer + criador). Cross-ref o molde de 2 movimentos do encontro (`technomagik.md`).
 - **VFX-CARTAS (criador 2026-07-12):** brainstormar o efeito VISUAL de cada poder, do mais barato (sprite representando magia/eletricidade) ao efeito-de-tela via glintfx (existente ou a criar), pesando o CUSTO de criação (dev solo). 
   - **Pergunta pro dev do glintfx (Einstein):** o glintfx faz (ou pode fazer) um efeito de **onda/distorção varrendo a tela de um lado ao outro** (screen-space wave)? Mandar o prompt pro dev (não mexer na lib eu mesmo, [[feedback_glintfx_nao_mexer_so_pedir]]).
   - **VFX já definido:** Pythagoras = traça linha vertical + horizontal até o inimigo, poder sai pela hipotenusa (diagonal) — barato (linhas geométricas).

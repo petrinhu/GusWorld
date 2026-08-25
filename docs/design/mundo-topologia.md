@@ -120,7 +120,7 @@ Hubs populados (cheias) têm poucos/zero; os ermos concentram (Zona do Silêncio
 
 ## 6. Interiores dos 20 mestres do Codex (superfície, não-bloqueantes)
 
-**Decisão do criador (2026-07-12):** cada um dos **20 mestres do Codex** (as 20 figuras históricas; Tusk é o capstone à parte) tem sua **área especial própria** — mas na **SUPERFÍCIE**, como **interior de casa / prédio / construção**, **NÃO bloqueante de passagem** (coerente com gdd §7.1). O jogador entra, resolve a missão/puzzle do mestre, encontra o **Tavus-Eco** (o self compilado do mestre) e **ganha a carta** dele (cross-ref `techmagic.md` Tavus-Eco + AMB-24 + `MESTRES-TAVUS-ECO-ENCONTRO` + cartas especiais `cartas-technomagik.md`).
+**Decisão do criador (2026-07-12):** cada um dos **20 mestres do Codex** (as 20 figuras históricas; Tusk é o capstone à parte) tem sua **área especial própria** — mas na **SUPERFÍCIE**, como **interior de casa / prédio / construção**, **NÃO bloqueante de passagem** (coerente com gdd §7.1). O jogador entra, resolve a missão/puzzle do mestre, encontra o **Tavus-Eco** (o self compilado do mestre) e **ganha a carta** dele (cross-ref `technomagik.md` Tavus-Eco + AMB-24 + `MESTRES-TAVUS-ECO-ENCONTRO` + cartas especiais `cartas-technomagik.md`).
 
 - Camada **distinta** das 13 dungeons e dos lugares secretos: são espaços-interiores de missão, não dungeons de exploração.
 - **Custo:** MÉDIO no agregado (20 interiores), mas cada um é barato (interior + 1 puzzle + diálogo do Tavus-Eco); reusa moldura de puzzle e o mecanismo Tavus-Eco. Escala com o roster já desenhado.
