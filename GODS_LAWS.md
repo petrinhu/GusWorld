@@ -510,7 +510,7 @@ Ferramenta: `git-crypt`, **uma chave só**, a simétrica exportada para fora da 
 | # | O corte |
 |---|---|
 | **C-01** | Sem multiplayer e sem cooperativo. Single-player puro. |
-| **C-02** | Sem mundo aberto e sem mundo persistente. Hub central mais incursões radiais. |
+| **C-02** | Sem mundo **persistente**. A **estrutura** é hub central mais incursões radiais. ⚠️ **Alcance corrigido em 25/08/2026, pelo líder:** o corte é de **estrutura**, não de **acesso**. A decisão dele de **12/07/2026**, canônica em `docs/design/gdd.md` §7.1, diz que *"o jogador pode tentar chegar a qualquer área desde o início"*, e o gating **nunca é trava dura**. A transcrição de 21/08 recuperou a forma anterior a essa revisão e travou `docs/design/mundo-topologia.md` contra o `gdd.md` por quatro dias. |
 | **C-04** | Sem dublagem. |
 | **C-05** | Sem captura de movimento. |
 | **C-06** | Sem dificuldade dinâmica adaptativa. A dificuldade é escolhida e fixa por save. |
@@ -519,7 +519,7 @@ Ferramenta: `git-crypt`, **uma chave só**, a simétrica exportada para fora da 
 | **C-09** | Conteúdo em pt-br; tradução real fica para depois do lançamento. A **estrutura** nasce pronta para internacionalização desde já. |
 | **C-10** | Sem certificação de console agora. Verificação para Steam Deck fica para depois. |
 | **C-11** | Sem romance, sem sistema de moralidade e sem múltiplos finais. Um final, com variantes mínimas. |
-| **C-12** | Sem sistema de afinidade com companion e sem simulador de namoro. |
+| **C-12** | Sem **simulador de namoro** e sem **medidor de afeto romântico**. ⚠️ **Alcance corrigido em 25/08/2026, pelo líder:** **afinidade de NPC como estado de reação social está FORA da cerca**. A decisão dele de **04/08/2026**, em `docs/narrative/characters/gus.md`, diz que NPC que insiste em assunto induzido **perde afinidade** e muda de estado de diálogo, e ele mandou desenhar isso. A transcrição de 21/08 recuperou a forma anterior e bloqueava uma tarefa que ele mesmo despachara. |
 | **C-14** | Sem conteúdo pago adicional, sem passe de temporada, sem serviço contínuo. |
 | **C-15** | Campanha principal de **4 a 8 horas**, mais cerca de 2 horas de puzzle opcional. Não mais que isso. |
 | **C-16** | Sem tutorial em parede de texto e sem abertura cinematográfica acima de 90 segundos. Onboarding orgânico. |

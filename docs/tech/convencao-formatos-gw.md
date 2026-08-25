@@ -55,15 +55,22 @@ O líder fechou a lista. **Um tipo por elemento de jogo**, e não um tipo genér
 | `.gw.box` | recipiente que fica no mundo | **nós** | a criar |
 | `.gw.table` | mesa que **transforma** item | **nós** | a criar |
 
-**A lista veio do canon, não de invenção:** a **L-04** nomeia *"carta, item, inimigo, efeito de status, diálogo, missão"*, e a **L-18** acrescenta que *"'item' inclui o catálogo de conteúdo"*. Os cortes da **L-29** eliminaram candidatos: **receita** de fabricação está fora pelo **C-03** e pelo **C-13**, **conquista** pelo **C-08**, **afinidade de companion** pelo **C-12**.
+**A lista veio do canon, não de invenção:** a **L-04** nomeia *"carta, item, inimigo, efeito de status, diálogo, missão"*, e a **L-18** acrescenta que *"'item' inclui o catálogo de conteúdo"*. Os cortes da **L-29** eliminam dois candidatos que continuam fora: **conquista** pelo **C-08**, **afinidade de companion** pelo **C-12**.
+
+**Receita deixou de ser candidato eliminado por corte** (correção 25/08/2026): a razão original — "fora pelo C-03 e pelo C-13" — caiu junto com a revogação desses dois cortes na mesma data (`GODS_LAWS.md` L-29). Isso não abre um décimo-terceiro tipo: **receita não vira tipo próprio porque o dado de criação passou a morar dentro do próprio `.gw.table`**, no ramo de criação (ver abaixo), não porque esteja cortada.
 
 **Fora desta lista de propósito:** save e configuração. Não são catálogo de conteúdo — são **estado do jogador**, e a **L-25** já os põe no envelope binário selado. Misturá-los aqui confundiria fonte de compilação com estado de tempo de execução.
 
 ### Guardar não é transformar
 
-`.gw.bag` e `.gw.box` **guardam**; `.gw.table` **transforma**. São tipos separados porque mudam por razões diferentes: bolsa cresce com melhoria de equipamento, mesa muda quando a regra de transformação muda.
+`.gw.bag` e `.gw.box` **guardam**; `.gw.table` **transforma**. São tipos separados porque mudam por razões diferentes: bolsa cresce com melhoria de equipamento, mesa muda quando a regra de transformação muda. **Essa distinção sobrevive intacta à revisão abaixo:** ela não é sobre o que a mesa faz por dentro, é sobre guardar contra agir — e continuar guardando não virou agir. `.gw.bag` e `.gw.box` não ganharam poder de transformar nada; só `.gw.table` transforma, como sempre.
 
-⚠️ **A cerca da mesa, decidida pelo líder no mesmo ato:** ela **só transforma o que já existe** — recarrega, repara, troca bateria, limpa vírus. **O item entra e sai o MESMO item, com outro estado. Nada nasce na mesa.** Combinar peças para criar item novo é **crafting**, e está cortado pelo **C-03** e pelo **C-13**. A fronteira está escrita aqui porque é fácil de erodir em silêncio: o desenho escorrega de "recarrega" para "fabrica" sem ninguém marcar o dia.
+⚠️ **A cerca da mesa, revista em 25/08/2026 (revogação de `C-03` e `C-13`, `GODS_LAWS.md` L-29):** a cerca antiga dizia que a mesa **só transforma o que já existe** e que **nada nasce nela**. Isso deixou de ser verdade: o líder revogou os dois cortes que sustentavam a frase, e **a mesa vira a bancada**. `.gw.table` passa a cobrir **duas** operações, não uma:
+
+- **Reparo** (o que a cerca antiga descrevia por inteiro): recarrega, repara, troca bateria, limpa vírus. O item entra e sai o MESMO item, com outro estado.
+- **Criação:** craft de cópia pirata de carta — comum, ESPECIAL ou SUPER (`cartas-hardware-pirataria-energia.md` §15). Aqui o item que sai é **novo**, e é **sempre inferior** ao original: qualidade pior, efeito trocado, ou só o nome sem função nenhuma. A original de ESPECIAL/SUPER **nunca** nasce numa bancada, continua só por progresso narrativo.
+
+**`.gw.table` carrega um campo dizendo qual das duas operações está em curso.** Reparo e criação não são o mesmo evento tratado como se fossem — são dois ramos explícitos do mesmo formato, não dois formatos. Isso **não abre a lista de doze tipos**: continua havendo um tipo por elemento de jogo (L-04), e a mesa continua sendo o único tipo que transforma; só a NATUREZA do que ela pode produzir mudou. A fronteira segue escrita aqui porque continua fácil de erodir em silêncio: agora o risco não é "recarrega virar fabrica", é a criação virar fabricação **do original** — e isso a cerca proíbe com a mesma firmeza de antes.
 
 ### Recipiente tem duas naturezas, e elas não moram juntas
 
