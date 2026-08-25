@@ -60,7 +60,7 @@ Para um jogo FOSS de autor, discovery não é pesquisa de mercado: é o **canon 
 
 O equivalente de PRD é a soma de `inicial.md` + `GODS_LAWS.md` + os documentos de design em `docs/design/`. Escopo do "MVP": núcleo de regra de jogo jogável por replay determinístico (L-17), antes mesmo de existir tela (L-06).
 
-**Métricas de sucesso não são de aquisição/retenção** (não há usuário externo nem telemetria, L-08): são de **qualidade técnica**, os quatro portões da L-19, e de fidelidade ao canon.
+**Métricas de sucesso não são de aquisição/retenção** (não há usuário externo nem telemetria, L-08): são de **qualidade técnica**, os cinco portões da L-19, e de fidelidade ao canon.
 
 ---
 
