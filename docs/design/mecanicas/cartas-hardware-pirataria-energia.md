@@ -2,6 +2,8 @@
 
 > **Atualização 2026-08-25 (líder, revogação de C-03/C-13 na L-29 de `GODS_LAWS.md`):** o craft de cópia pirata deixa de ser exclusivo da COMUM e passa a alcançar **ESPECIAL e SUPER**, sempre em qualidade inferior ao original — ver §15, seção nova. A SUPER também deixa de ser descrita como "forjada" em `cartas-technomagik.md` (ela é carta original; reflexo já aplicado lá, §2.4).
 >
+> **Atualização 2026-08-25 (líder, canon pessoal do Gus Dragon, L-16 de `GODS_LAWS.md`):** os quatro lanches favoritos reais dele viram os itens de cura do jogo (catálogo completo em `economia.md` §5.5). Dois deles, suco de limão e água com gás, também alimentam craft de **bateria de baixa qualidade**, via refino em suco puro de limão / água destilada: ver §5, nova subseção "Bateria de baixa qualidade (craftada)".
+>
 > **Status:** ✅ **CANON FECHADO (líder, 2026-07-28).** Os quatro pontos que este cabeçalho listava como abertos foram entregues: os **números** viraram `cartas-numeros-proposta.md` (com as últimas duas ambiguidades fechadas em 2026-07-28), a **spec de implementação** virou `cartas-spec-dados.md` (aprovada em 2026-07-28) e `cartas-spec-logica.md`, e os **efeitos do vírus** e o **mercado negro** estão fixados aqui e nos docs de números. Reflexo pendente em `cartas-technomagik.md` e na terminologia, que é passo de escrita, não decisão. _(Status original, por registro: BRAINSTORM EM ANDAMENTO, líder, 2026-07-18.)_ Decisões fechadas via AskUserQuestion capturadas fielmente. Ainda ABERTO: efeitos exatos do vírus, o mercado negro (lugar/vendedor), números (delegar ao `economy-designer`), spec de implementação (delegar a `gameplay_engineer`/`backend-engineer`). NÃO é canon fechado até o líder revisar o doc consolidado.
 >
 > **Origem:** derivou do "vírus do Dante" (guarda-chuva Faraday, ver `docs/design/mundo-topologia.md` / brainstorm-backlog). O líder escalou o evento pontual (Dante injeta vírus na carta Faraday à noite) para um SISTEMA geral de cartas modificadas / piratas / infectadas / com bateria.
@@ -112,6 +114,74 @@ O mesmo raciocínio vale, com um grau a mais de dificuldade, para a **SUPER**: e
 
 ### Bateria pirata / genérica
 Existe: mais barata, mas **mente sobre a carga**, morre cedo, pode **danificar a carta** ou ser vetor de vírus. A fraude do enquadramento no nível do hardware — caveat emptor também nas pilhas.
+
+### Bateria de baixa qualidade (craftada, canon do Gus Dragon, decisão do líder 2026-08-25)
+
+> **Canon pessoal (L-16 de `GODS_LAWS.md`), amarrado ao mesmo eixo do §12 (Bastiat: "o que se vê e
+> o que não se vê") e à Doutrina do Comedimento (`economia.md` §0).** O líder, verbatim, sobre o
+> suco de limão: *"Com o tempo, o personagem aprende a filtrar o suco de limão (craft) e obtem
+> 'suco puro de limão', item obrigatório para craft de baterias de baixa qualidade mas que são
+> melhor que nada pra quem tá sem bateria nenhuma no inventario. O suco puro de limao tambem pode
+> ser obtido em lojas e negociacoes com personagens. Trades: se gastar para bateria, fica sem item
+> para limpar debuff e vice-versa. Entra como mais uma lição do jogo: saber economizar e destinar
+> corretamente recursos escassos."* E sobre a água com gás, no mesmo dia: *"[restaura fôlego ou
+> energia de ação]. E pode ser usada em craft de bateria, após refinada para 'agua destilada'.
+> Mesma logica do suco de limao."*
+
+Os quatro lanches (`economia.md` §5.5) alimentam este sistema por DOIS insumos refinados:
+
+- **Suco de limão** → refinado em **suco puro de limão**.
+- **Água com gás** → refinada em **água destilada**.
+
+**O refino é craft narrativo-gated, não uma bancada aberta desde o início.** "Com o tempo"
+(verbatim do líder) é progressão: o MOMENTO exato em que o personagem aprende a filtrar (marco de
+história, requisito de nível, ou entrega de um mestre do roster) não foi decidido e fica como
+lacuna, ver "Em aberto" abaixo.
+
+**Onde o refino e o craft da bateria acontecem: a MESMA bancada já canônica.** É o terminal RSB de
+bancada fixa das oficinas do mercado negro/ferro-velho (§4, §14), a mesma que já cobre reparo
+(recarregar, trocar bateria, limpar vírus) e cópia pirata de carta (§15.5): **não é sistema
+paralelo**. Refinar suco/água e craftar a bateria de baixa qualidade a partir do insumo refinado
+entram como mais duas operações dessa bancada, no mesmo `.gw.table`.
+
+**A bateria de baixa qualidade é rede de segurança, não sucata. Regra dura, para ninguém
+"consertar" isto depois:** o próprio líder chamou de "melhor que nada pra quem tá sem bateria
+nenhuma no inventario". Ela é PIOR que a bateria de fábrica (reusa a física da EPROM da §3: upload
+lento, degrada mais rápido), mas SEMPRE funciona o suficiente para tirar o jogador do zero-bateria.
+Nenhum ajuste futuro pode reduzi-la a "sem efeito nenhum" ou "efetivamente inútil": isso contradiz a
+razão de ela existir.
+
+**Terceira rota, para o refino não virar gargalo de farm:** suco puro de limão TAMBÉM se compra em
+lojas e se negocia com personagens; o líder foi explícito nisso, especificamente sobre o limão.
+Pela "mesma lógica" que ele deu para a água com gás, o mesmo provavelmente vale para a água
+destilada, mas isto é EXTENSÃO POR SIMETRIA (mesmo padrão de inferência já usado em §15.2 para as
+ESPECIAIS), não uma frase dele sobre água destilada especificamente: sinalizado para confirmação,
+não decidido aqui.
+
+**O trade-off É a mecânica, não efeito colateral (verbatim do líder: "se gastar para bateria, fica
+sem item para limpar debuff e vice-versa").** Suco de limão e água com gás são, cada um, UM item que
+serve a DOIS fins mutuamente exclusivos: consumir agora (limpa debuff / restaura fôlego-AP, ver
+`economia.md` §5.5) OU guardar e refinar (insumo de bateria de baixa qualidade). Gastar um lado
+fecha o outro para aquela unidade do item. É a Doutrina do Comedimento (`economia.md` §0) em
+miniatura: quem administra o estoque dos dois lanches com cuidado tem, ao mesmo tempo, cura
+disponível E bateria de reserva; quem esbanja um lado fica sem o outro bem na hora que precisar.
+
+**Coerência física, registrada como observação de acerto, não como invenção nova:** suco de limão e
+água com sal/gás dissolvido são, no mundo real, a base de uma pilha caseira improvisada (eletrodos
+de metais diferentes numa solução ácida ou condutora geram corrente). A escolha do líder é
+fisicamente coerente com o Pillar 1 (a magia do mundo é sistema formal computável, a natureza é
+matemática), mas isto é leitura do que ele já decidiu, não uma extensão de química nova sobre o que
+ele disse.
+
+**Não decidido, e não inventado aqui:**
+- Se a bateria de baixa qualidade craftada compartilha os riscos já atribuídos à bateria pirata
+  comprada (subseção acima: mente sobre a carga, morre cedo, pode danificar a carta ou ser vetor de
+  vírus), ou se é categoria própria, só mecanicamente mais fraca, sem esses riscos.
+- Se o craft exige suco puro de limão E água destilada JUNTOS, ou se cada um sozinho já basta para
+  uma bateria de baixa qualidade (duas receitas paralelas).
+- Capacidade, número de usos, preço de compra do suco puro/água destilada, taxa de sucesso do
+  refino, e o momento narrativo em que o personagem "aprende a filtrar": tudo é número de
+  balanceamento (`economy-designer`), nada decidido pelo líder nesta rodada.
 
 ## 6. Costuras entre software e hardware
 - **Mod porco** → drena bateria mais rápido (custo do "compilado ruim").
@@ -287,3 +357,4 @@ O mecanismo exato de como a party recebe a carta SUPER original ao fim da missã
 - [x] ✅ **Spec de implementação** (ENTREGUE e APROVADA 2026-07-28: `cartas-spec-dados.md` + `cartas-spec-logica.md`) → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção).
 - [x] ✅ **Canonizado pelo líder em 2026-07-28.** Falta só refletir em `cartas-technomagik.md` e na terminologia (passo de escrita). Era: canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar.
 - [ ] **Camada pirata de ESPECIAL/SUPER (§15, decisão do líder 25/08/2026):** canon fechado, números em aberto → `economy-designer` (probabilidade de cada um dos 3 graus de falha, custo em crédito/material do craft, preço da cópia comprada pronta no mercado negro). Mecanismo de entrega da SUPER original ao fim da missão-capstone também em aberto (§15.6) → líder.
+- [ ] **Bateria de baixa qualidade craftada a partir de lanches refinados (§5, decisão do líder 25/08/2026):** canon fechado no mecanismo (refino gated, bancada compartilhada com reparo/pirataria, trade-off consumir×refinar, rede de segurança, terceira rota de compra) → `economy-designer` (capacidade/usos, preço de compra do suco puro/água destilada, taxa de sucesso do refino). Três lacunas de desenho, não numéricas, também em aberto → líder: se a bateria craftada herda os riscos da bateria pirata comprada; se o craft exige os dois insumos refinados juntos ou cada um sozinho já basta; e o momento narrativo em que o personagem "aprende a filtrar".
