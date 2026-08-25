@@ -954,10 +954,10 @@ Decrypt-All
 Barter
 
 ## CARD_EXEC_TESLA_NAME
-Tesla
+Coil-Arc
 
 ## CARD_EXEC_EINSTEIN_NAME
-Einstein
+Time-Dilate
 
 ## CARD_EXEC_PLANCK_NAME
 Quantum-Lock
