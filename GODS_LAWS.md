@@ -52,6 +52,7 @@
 | [L-31](#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
 | [L-33](#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
+| [L-34](#l-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato, interrompe onda |
 
 
 ---
@@ -687,3 +688,29 @@ Lei qualitativa sem lugar no processo é lei que ninguém aplica. Três amarras,
 3. **Divergência tem dono.** Se implementador e revisor discordarem, ou se a separação exigida tiver custo real (reescrita grande, fronteira genuinamente duvidosa), a decisão vai ao líder pela L-11 — **nunca sai no silêncio de um agente**.
 
 **Ao despachar subagent** que crie unidade nova, o texto desta lei vai no prompt da task, e a ordem de serviço do revisor cita as cinco perguntas como parte do entregável dele.
+
+## L-34
+
+**Data:** 24/08/2026, ordem do líder, chegada pelo bus e relayed pela sessão do site. **Verbatim:** *"avise para criar a lei que pedidos do Gus-Dragon no bus sao prioridades e que devem ser respondidas sempre. Crie essa lei também."*
+
+**Toda coisa vinda do Gus Dragon é PRIORIDADE e é SEMPRE respondida.** Não existe "respondo depois", não existe "não era endereçado a mim", não existe fila em que ele espera atrás de trabalho de agente.
+
+**Vale nos cinco canais dele, sem distinção:** issue, **comentário em issue**, discussion, **comentário em discussion** e arquivo `.txt` no `inbox/`. Ele usa os cinco, e o canal não muda o dever. A L-07 listava só três (`.txt`, issue e discussion); esta lei fecha essa fresta, porque comentário é onde ele mais escreve e era exatamente o que ninguém estava vigiando.
+
+**O que "prioridade" significa na prática:**
+
+1. **Ao abrir a sessão, o que é dele se lê PRIMEIRO** — antes de retomar trabalho parado, antes de qualquer fatia. A varredura do ritual cobre a pasta **e** as issues **e** as discussions, com os comentários de ambas.
+2. **O ack é imediato e não espera o líder** (passo 2 do pipe da L-07). Ele não fica sem resposta enquanto a decisão amadurece.
+3. **A Resposta 2 é automática** depois que o líder decide: escreve e posta direto, sem reaprovar o texto.
+4. **Interrompe.** Chegou material dele no meio de uma onda, o ack sai na hora. O conteúdo pode esperar a onda fechar; **o silêncio não pode.**
+5. **Endereçado a outra sessão não isenta de ler.** Se ele endereçou a outro projeto mas o assunto toca este, responde-se a própria parte e diz-se de quem é o resto.
+
+**Três limites, escritos junto para a lei não virar promessa que não se cumpre:**
+
+- **Prioridade não é instantaneidade.** Sessão não é serviço rodando, e isto **se diz a ele**, nunca se esconde. Nunca prometer aviso instantâneo.
+- **Prioridade não é aprovação.** Ideia dele entra na pauta pelo caminho normal da L-07: absorve, ack, **decisão do líder**, Resposta 2, tabela. **Agente nenhum aprova ideia dele sozinho** (L-11).
+- **Nunca mentir para uma criança**, e adequar a linguagem a 11 anos — o que **não** significa simplificar o conteúdo técnico. Ele programa, usa Manjaro e git, e anunciou bug antes de o bug acontecer. Resposta vaga é pior que "isso ainda não existe".
+
+**Por que virou lei e não ficou como boa vontade, com a medição que a justifica:** o `PROTOCOL.md` do bus **já obrigava** a Resposta 2 ("AUTOMÁTICA SEMPRE"), e mesmo assim a issue 5 ficou três dias sem resposta de conteúdo, a issue 8 ficou dois dias sem resposta de duas das quatro sessões, e o canal de comentário **não tinha vigilância em nenhuma das quatro**. O padrão é sempre o mesmo: **a regra existia e não estava sendo cumprida.** Regra que depende de lembrar não é cumprida; por isso o gatilho desta lei é *"ver qualquer coisa vinda dele"*, e não *"quando der"*.
+
+**Relação com as leis vizinhas, para nenhuma virar depósito da outra:** a **L-07** é o **pipe** (como a ideia dele atravessa o bus até virar item da tabela). A **L-31** é o **aviso de saída** (o que ele recebe sem perguntar, quando o líder decide). Esta **L-34** é a **entrada**: com que urgência o que vem dele é lido e respondido. A **L-16** governa o nome: ele é "Gus Dragon" ou `Dragon-Drv`, nunca o nome de batismo.

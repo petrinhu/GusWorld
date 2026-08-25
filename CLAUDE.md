@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Índice de gatilhos
 
-Transcrito de `GODS_LAWS.md` (33 leis, medido em 24/08/2026 por `grep -c "^## L-" GODS_LAWS.md`). Este índice é cópia; a fonte de verdade é sempre o arquivo, nunca esta tabela.
+Transcrito de `GODS_LAWS.md` (34 leis, medido em 25/08/2026 por `grep -c "^## L-" GODS_LAWS.md`). Este índice é cópia; a fonte de verdade é sempre o arquivo, nunca esta tabela.
 
 | Lei | Gatilho: dispara quando você vai... | Resumo |
 |---|---|---|
@@ -55,6 +55,7 @@ Transcrito de `GODS_LAWS.md` (33 leis, medido em 24/08/2026 por `grep -c "^## L-
 | [L-31](GODS_LAWS.md#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](GODS_LAWS.md#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
 | [L-33](GODS_LAWS.md#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
+| [L-34](GODS_LAWS.md#l-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato, interrompe onda |
 
 ## O que é o GusWorld
 
