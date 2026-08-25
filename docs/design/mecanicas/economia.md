@@ -252,44 +252,88 @@ A derrota (§3.3) NUNCA anula os ganhos de vitórias anteriores — o wipe é um
 
 ---
 
-## §5.5. Lanches (itens de cura, canon do Gus Dragon)
+## §5.5. Lanches e ingredientes de craft (canon do Gus Dragon)
 
-> **Canon pessoal (L-16 de `GODS_LAWS.md`).** Os quatro itens abaixo são os lanches favoritos reais
-> do Gus Dragon, filho do líder e colaborador humano do projeto, transformados em item de cura do
-> jogo com aceite dele. Decisão original em 2026-07-17 (chocolate, suco de uva; suco de limão e
-> água com gás ficaram com efeito aberto); completada pelo líder em 2026-08-25. **Não confundir com
-> o PERSONAGEM Gus** (Gustaf VII Tavus Vance), canon público e distinto. Fora do apelido "Gus
+> **Canon pessoal (L-16 de `GODS_LAWS.md`).** Os itens abaixo são as comidas e os ingredientes de
+> craft favoritos reais do Gus Dragon, filho do líder e colaborador humano do projeto,
+> transformados em item de cura e em insumo de craft do jogo com aceite dele. Decisão original em
+> 2026-07-17 (chocolate, suco de uva; suco de limão e água com gás ficaram com efeito aberto);
+> fechada pelo líder em 2026-08-25 (efeito de suco de limão e água com gás) e **expandida pelo
+> líder no mesmo dia, por ditado direto**, de quatro para **doze comidas** mais **oito ingredientes
+> de craft** (ditado preservado em `DITADO-COMIDAS.md`, scratchpad de trabalho). **Não confundir
+> com o PERSONAGEM Gus** (Gustaf VII Tavus Vance), canon público e distinto. Fora do apelido "Gus
 > Dragon" (ou `Dragon-Drv`), o nome de batismo dele não é citado, aqui nem em nenhum outro lugar do
 > projeto.
 
-Quatro consumíveis, cada um com efeito PRÓPRIO: nenhum duplica o de outro.
+### 5.5.1 Comidas (12)
 
-| Item | Efeito | Craft/refino | Decisão |
-|---|---|---|---|
-| **Chocolate** | cura de HP, a MAIOR dos quatro (é o favorito real do Gus Dragon) | nenhum; consumível simples | líder, 2026-07-17 |
-| **Suco de uva** | cura de HP, média | nenhum; consumível simples | líder, 2026-07-17 |
-| **Suco de limão** | limpa efeito negativo (debuff) da party | refina em **suco puro de limão** | líder, 2026-08-25 |
-| **Água com gás** | restaura **fôlego OU energia de ação** (as duas leituras possíveis não foram decididas entre si, ver nota abaixo) | refina em **água destilada** | líder, 2026-08-25 |
+Doze consumíveis. Seis têm efeito FECHADO pelo líder; seis foram citadas por nome no ditado de
+2026-08-25 mas ainda aguardam efeito — marcadas abaixo com ⚠️, sem nenhum efeito sugerido neste
+documento (L-11: quem decide é o líder, não o agente).
 
-**Nota sobre "fôlego ou energia de ação" (água com gás, entre colchetes na própria ordem do
-líder):** existem DOIS recursos canônicos distintos que a frase pode estar mirando, e o líder não
-escolheu entre eles: fica registrado aqui como LACUNA, não decidido por este documento.
+| # | Item | Efeito | Craft / refino | Decisão |
+|---|---|---|---|---|
+| 1 | **Chocolate** | cura de HP, a MAIOR do catálogo (é o favorito real do Gus Dragon) | nenhum; consumível simples | líder, 2026-07-17 |
+| 2 | **Suco de uva** | cura de HP, média | nenhum; consumível simples | líder, 2026-07-17 |
+| 3 | **Suco de limão** | limpa efeito negativo (debuff) da party | refina em **suco puro de limão** (insumo de bateria de baixa qualidade, `cartas-hardware-pirataria-energia.md` §5) | líder, 2026-08-25 |
+| 4 | **Água com gás** | restaura **fôlego do corpo** (`core::player::WindedTimer`, `stamina.md`) — **não** é energia de ação/AP; lacuna anterior FECHADA nesta rodada, ver §5.5.3 | refina em **água destilada** (mesmo papel de insumo de bateria) | líder, 2026-08-25 |
+| 5 | **Sanduíche de queijo, sem queijo derretido** | fôlego do corpo **e** HP juntos, pouco de cada (mesmo recurso "fôlego" da linha 4, agora fechado — ver §5.5.3) | nenhum decidido | líder, 2026-08-25 |
+| 6 | **Tirinhas de frango** | **buff temporário de ataque ou força** — a categoria "buff ofensivo temporário" está fechada; qual das duas estatísticas exatas (se forem distintas no jogo) não foi escolhida pelo líder | nenhum decidido | líder, 2026-08-25 |
+| 7 | Churrasco | ⚠️ EFEITO A DECIDIR PELO LÍDER | nenhuma ligação óbvia a ingrediente do §5.5.2 | líder cita o item, 2026-08-25 |
+| 8 | Pastilha de menta | ⚠️ EFEITO A DECIDIR PELO LÍDER | nenhuma ligação óbvia | líder cita o item, 2026-08-25 |
+| 9 | Macarrão ao alho e óleo | ⚠️ EFEITO A DECIDIR PELO LÍDER | nome cita **Alho** (§5.5.2) | líder cita o item, 2026-08-25 |
+| 10 | Pão de alho | ⚠️ EFEITO A DECIDIR PELO LÍDER | nome e composição óbvia citam **Alho** e **Manteiga** (§5.5.2) | líder cita o item, 2026-08-25 |
+| 11 | Pizza de atum | ⚠️ EFEITO A DECIDIR PELO LÍDER | nome e composição óbvia citam **Atum em lata** e **Orégano** (§5.5.2) | líder cita o item, 2026-08-25 |
+| 12 | Macarrão ao molho pesto | ⚠️ EFEITO A DECIDIR PELO LÍDER | nenhuma ligação óbvia (pesto tradicional leva parmesão, mas o NOME do item não cita o ingrediente — não presumido aqui) | líder cita o item, 2026-08-25 |
 
-1. **Fôlego do corpo** (`core::player::WindedTimer`, `stamina.md`), a inércia da respiração
-   ofegante do Gus no overworld, distinta da Carga do aparato.
-2. **Energia de ação (AP)** de combate, o recurso já usado pela Bio-Ampola (§4) e pelo custo de
-   troca de bateria em batalha (`cartas-hardware-pirataria-energia.md` §5, "In-battle (arena)").
+### 5.5.2 Ingredientes de craft (8)
 
-Números finais (magnitude de cura, quantidade de debuff limpo, valor de fôlego/AP restaurado,
-preço, fonte de drop/compra) são do `economy-designer`, na MESMA curva numérica canônica já usada
+Catálogo à parte, ditado no mesmo dia. São insumos de craft, não consumíveis de cura — não
+confundir com os 18 ingredientes já canônicos do sistema de Poções/Implantes (§7.8 acima), que são
+de outra família temática (hardware/Selve/cripto). O papel exato de cada um (que receita consomem,
+quantidade, se pertencem a uma bancada nova ou já existente) **não foi decidido**; só a composição
+nominal (qual comida cita qual ingrediente pelo próprio nome) está registrada aqui.
+
+| Ingrediente | Comida onde a ligação é óbvia pelo nome | Decisão |
+|---|---|---|
+| Queijo parmesão ralado | — (nenhuma ligação óbvia) | líder, 2026-08-25 |
+| Orégano | Pizza de atum | líder, 2026-08-25 |
+| Alho | Macarrão ao alho e óleo; Pão de alho | líder, 2026-08-25 |
+| Manteiga | Pão de alho | líder, 2026-08-25 |
+| Páprica | — (nenhuma ligação óbvia) | líder, 2026-08-25 |
+| Atum em lata | Pizza de atum | líder, 2026-08-25 |
+| Tempero composto seco (cebola, alho, salsa) | — (nenhuma das doze comidas cita o tempero composto pelo nome) | líder, 2026-08-25 |
+| Camarões sem casca | — (nenhuma das doze comidas cita camarão) | líder, 2026-08-25 |
+
+### 5.5.3 Fôlego do corpo × energia de ação (LACUNA FECHADA, 2026-08-25)
+
+A versão anterior deste documento registrava como lacuna aberta se "água com gás" mirava o
+**fôlego do corpo** (`core::player::WindedTimer`, `stamina.md`) ou a **energia de ação (AP)** de
+combate. O líder fechou isso nesta rodada, por ditado direto: água com gás restaura **fôlego do
+corpo**, não AP. A mesma leitura vale para a linha 5 (sanduíche de queijo sem queijo derretido),
+que soma fôlego a HP.
+
+Os dois recursos seguem distintos, como já eram:
+
+1. **Fôlego do corpo** (`core::player::WindedTimer`, `stamina.md`) — a inércia da respiração
+   ofegante do Gus no overworld, agora com fonte de recuperação por item (água com gás, sanduíche
+   de queijo).
+2. **Energia de ação (AP)** de combate — usada pela Bio-Ampola (§4) e pelo custo de troca de
+   bateria em batalha (`cartas-hardware-pirataria-energia.md` §5, "In-battle (arena)"). **Nenhuma**
+   das doze comidas restaura AP; se o líder quiser um item de cura que reponha AP, é decisão nova,
+   não coberta por este ditado.
+
+Números finais (magnitude de cura, quantidade de debuff limpo, valor de fôlego restaurado, preço,
+fonte de drop/compra) continuam do `economy-designer`, na MESMA curva numérica canônica já usada
 para Bio-Ampola (§4) e Life Ampola (§5): nenhum decidido aqui.
 
-**O refino e o destino do que sai dele são canon de carta, não de crédito, e vivem em
+**O refino e o destino do que sai das comidas 3 e 4 são canon de carta, não de crédito, e vivem em
 `cartas-hardware-pirataria-energia.md` §5** ("Bateria de baixa qualidade craftada"), porque o
 consumo final é energia de carta, o mesmo domínio que já governa bateria, pirataria e RSB. Este
-documento é o dono do CATÁLOGO dos quatro itens e da curva de crédito deles; o outro é o dono do que
-acontece quando suco de limão e água com gás viram insumo de hardware, inclusive o trade-off entre
-consumir agora e guardar para refinar.
+documento é o dono do CATÁLOGO das doze comidas, dos oito ingredientes de craft e da curva de
+crédito deles; o outro é o dono do que acontece quando suco de limão e água com gás viram insumo
+de hardware, inclusive o trade-off entre consumir agora e guardar para refinar, e agora também da
+herança de risco da bateria craftada (mesma subseção, ver relatório desta rodada).
 
 ---
 
@@ -436,10 +480,17 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 
 ---
 
-**Última revisão:** 2026-08-25 (adição §5.5, catálogo dos quatro lanches favoritos reais do Gus
-Dragon como itens de cura, canon pessoal sob L-16 de `GODS_LAWS.md`; suco de limão e água com gás
-ganham efeito e viram matéria-prima de craft de bateria de baixa qualidade, canonizado em
-`cartas-hardware-pirataria-energia.md` §5). Revisão anterior: 2026-08-01 (adição §0, doutrina do
+**Última revisão:** 2026-08-25, mesmo dia (expansão §5.5: o líder dita, direto, a ampliação de
+quatro para **doze comidas** mais **oito ingredientes de craft**; fecha a lacuna fôlego-do-corpo ×
+energia-de-ação para água com gás, extensiva ao sanduíche de queijo; liga ingrediente a comida só
+onde o nome já diz — pão de alho/Alho+Manteiga, pizza de atum/Atum em lata+Orégano, macarrão ao
+alho e óleo/Alho; seis comidas citadas sem efeito ficam marcadas ⚠️, nenhum efeito sugerido no
+canon; `cartas-hardware-pirataria-energia.md` §5 fecha em paralelo se a bateria craftada herda os
+riscos da pirata comprada). Revisão anterior, mesmo dia: 2026-08-25 (adição §5.5, catálogo dos
+quatro lanches favoritos reais do Gus Dragon como itens de cura, canon pessoal sob L-16 de
+`GODS_LAWS.md`; suco de limão e água com gás ganham efeito e viram matéria-prima de craft de
+bateria de baixa qualidade, canonizado em `cartas-hardware-pirataria-energia.md` §5). Revisão
+anterior: 2026-08-01 (adição §0, doutrina do
 comedimento: "quem é comedido sofre menos
 no final, o esbanjador sofre mais", canonizada pelo líder e escalonada por periculosidade do
 inimigo; régua de validação aplicável a toda mecânica de economia nova; auditoria de coerência e
