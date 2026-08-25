@@ -110,7 +110,7 @@ Só `playtest_plan_vs.md` ("Proposta para ratificação", não canônico).
 ### Documentos explicitamente PROPOSTA / rascunho / não-canônico (lista, com citação)
 
 - `docs/design/propostas/copy-stubs-combate.md:4` - "**PROPOSTA. NADA AQUI É CANON.**"
-- `docs/design/mecanicas/modos-morte.md:3` - "PROPOSTA - spec fechada [...], aguardando canonização."
+- `docs/design/mecanicas/modos-morte.md:3` - "PROPOSTA - spec fechada [...], aguardando canonização." **RESOLVIDO em 24/08/2026** (`TODO.md`, item `G3`): §1 a §5 do documento passaram a CANÔNICO; só o §6 (plano de implementação) segue morto, e agora como REVOGADO, não mais como proposta. Citação mantida porque descreve o estado real do documento no momento do levantamento (21/08/2026), e o levantamento inteiro é datado por natureza (linha 4 acima).
 - `docs/design/mecanicas/cartas-spec-dados.md:3` - "PROPOSTA - [...] NÃO implementada."
 - `docs/design/mecanicas/cartas-technomagik.md:3` - "PROPOSTA [...] aguarda revisão."
 - `docs/design/mecanicas/cartas-spec-logica.md:3` - "PROPOSTA [...] Documento de design de LÓGICA [...] Não é código."

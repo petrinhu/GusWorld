@@ -1,6 +1,12 @@
 # Modos de Morte (MODOS-MORTE) — sistema de fail-state escalonado por dificuldade
 
-**Status:** PROPOSTA — spec fechada pelo `lead-game-designer`, aguardando canonização do criador supremo (líder). Nada aqui está implementado; é o documento que orienta a implementação incremental (ver §7).
+**Status:** CANÔNICO em §1 a §5, por decisão do líder em 24/08/2026 (`TODO.md`, item `G3`): "do desenho antigo dos modos de morte sobrevive todo o design (§1 a §5 de `docs/design/mecanicas/modos-morte.md`: os quatro modos, dificuldade fixa por save, quebra-cabeça de última chance no Hardcore, três marcos do Difícil, enquadramento narrativo, e as sete sinalizações abertas do §5)". O §6 (plano de implementação) foi REVOGADO pela mesma decisão; o texto continua no documento, marcado como revogado, porque a ORDEM das fases ali descrita (Fácil primeiro, Hardcore por último) segue válida como raciocínio, mesmo com os nomes e as dependências mortos (ver aviso dentro do §6).
+
+**Nada aqui está implementado.** Canonizar o design não é o mesmo que construir: não existe uma linha de código de jogo neste projeto (confirmado em `CLAUDE.md`, seção "Estado atual do repositório"). O plano de implementação vivo, que vai substituir o §6 revogado, ainda não foi escrito: nasce como item novo da tabela, re-derivado sobre a espinha de cinco camadas (L-17), quando a onda do núcleo de regra chegar.
+
+**As sete sinalizações do §5 continuam abertas.** A canonização do design (`G3`) não decidiu nenhuma delas; são decisões do líder, ainda pendentes, e seguem descritas ao fim do documento.
+
+**Referências a código do projeto anterior, em §1 a §5, são intenção descrita, não arquivo consultável (L-01):** o texto cita, ao longo do corpo, infraestrutura do `gusworld_legacy` que não existe aqui ou que mudou de identidade neste projeto. Nada disso foi apagado nem corrigido linha a linha; a leitura correta é esta nota, não o corpo. `FsSaveStore`, o esquema de save V4 para V5 com o migrador dele, e caminhos como `gus/domain/save/save_data.hpp` são código do projeto anterior: pela L-01 não são arquivo consultável, são descrição de intenção. `ADR-006` existe hoje em `docs/tech/adr/` (importado do `gusworld_legacy`), mas descreve HMAC-SHA256 escrito em casa, revogado pela L-25 (a cripto vem do GlintFx, não se escreve em casa nem se vendoriza). `ADR-014` também existe em `docs/tech/adr/`, mas hoje é sobre outro assunto (runtime de diálogo POCO), não sobre segurança de save: o conteúdo que este documento chama de "ADR-014" (AEAD XChaCha20-Poly1305 via Monocypher vendorizado) está, de fato, em `docs/tech/adr/ADR-015-save-security-v2-offline.md`, cujo único ponto revogado é justamente a fonte da cifra, porque a L-25 manda vir do GlintFx, não vendorizar Monocypher. `pillars.md` já cita a `ADR-015` corretamente, na seção "Dificuldade, 4 modos"; este documento é que aponta para o número errado de ADR.
 
 **Escopo:** expande o Pillar 4 (`pillars.md`, seção "Game over") de 2 níveis (Normal/Hard) pra **4 níveis** (Fácil/Médio/Difícil/Hardcore), cada um com consequência mecânica própria pra morte de Gus. NÃO é escopo do M7-COSTURA (canon já registrado — o M7 mantém o placeholder simples "volta pra cidade"; ver §6).
 
@@ -197,22 +203,25 @@ int difficult_recovery_stage = 0;
 
 ---
 
-## §4. Proposta de atualização do Pillar 4 (`pillars.md`) — NÃO aplicada, aguarda o líder
+## §4. Atualização do Pillar 4 (`pillars.md`), APLICADA em 10/07/2026
 
-O `pillars.md` é canônico e imutável sem aprovação explícita (regra do projeto). Trecho atual (`docs/design/pillars.md`, seção "Game over"):
+A atualização abaixo já está aplicada em `docs/design/pillars.md`, seção "Game over, 4 modos escalonados por dificuldade" (linhas 134 a 141, conferido em 25/08/2026). **Ela foi aplicada em 10/07/2026, no projeto anterior**, pelo commit `1ebd2734` (*"docs(pillars): Pillar 4 'Game over' de 2 -> 4 modos de morte"*), no mesmo dia das decisões do líder que o §2 registra; chegou a este repositório **já aplicada**, dentro do commit fundador do corpus (`8d81293`, 22/08/2026). O item `G3`, de 24/08/2026, é ato separado e posterior: ele canonizou §1 a §5 deste documento, não aplicou a mudança no `pillars.md`. O trecho de 2 níveis (Normal/Hard) não existe mais no arquivo; `pillars.md` hoje descreve os 4 modos e aponta de volta para este documento, chamando-o de "detalhe canônico". A seção "Sistemas-âncora > Dificuldade, 4 modos" (linhas 253 a 256 de `pillars.md`) também já reflete os 4 níveis, e não repete mais o texto antigo de Normal/Hard.
+
+Registro do que mudou, mantido por ser evidência da decisão:
+
+Trecho antigo de `pillars.md`, substituído:
 
 > - **Normal default**: game over puro (HP=0 → reload save).
 > - **Hard mode (unlock pós-zerar)**: permadeath + **kernel panic puzzle** ao chegar HP=0 (sequência puzzle pra reboot; falhar = game over real).
 
-**Proposta de substituição** (a aplicar no `pillars.md` só quando o líder canonizar):
+Trecho hoje vigente em `pillars.md` (citado sem alteração):
 
-> - **4 níveis de dificuldade, fixos por save, escolhidos na criação** (ver `docs/design/mecanicas/modos-morte.md`):
->   - **Fácil**: reload do último save.
->   - **Médio** *(default)*: whiteout — acorda no Hospital, custo de créditos (`economia.md` §3).
->   - **Difícil**: respawn deslocado (Selve Sombria se morto por criatura, casa destruída se morto por humano), stats quase-zero, recuperação por marcos (voltar à cidade / dormir / curar).
->   - **Hardcore/Hell** *(unlock só pós-vitória no Difícil)*: HP=0 dispara o **kernel-panic puzzle** (última chance) — resolve = sobrevive; falha = **permadeath**, save isolado protegido por anti-rollback offline (âncora out-of-band + machine-binding) e apagado por wipe por trechos.
-
-E o bullet espelhado em "Sistemas-âncora > Dificuldade Normal / Hard" (linhas 249-252) vira um ponteiro pro doc novo em vez de repetir o texto.
+> A morte de Gus tem consequência mecânica distinta por nível (default = **Médio**; dificuldade **fixa por save**; detalhe canônico em `docs/design/mecanicas/modos-morte.md`, decisões do líder 2026-07-03/10):
+>
+> - **Fácil**: HP=0 → reload do último save (game over JRPG clássico).
+> - **Médio** *(default)*: HP=0 → whiteout no Hospital com perdas (economia Fibonacci, `economia.md` §3).
+> - **Difícil**: HP=0 → respawn deslocado + stats quase-zero (Selve Sombria se criatura matou / casa destruída se humano), recuperação por marcos. Enquadramento **técnico** (fail-safe corrompido, log glitchado, sem testemunha nem reconhecimento de "quase-morte") — protege a exclusividade do Dragon Victory.
+> - **Hardcore/Hell** *(unlock pós-zerar o Difícil, preso à máquina)*: HP=0 → **kernel panic puzzle** como ÚLTIMA CHANCE (resolve = sobrevive; falha = **permadeath** real). Save isolado, cifrado+selado (ADR-015), destruído de forma irrecuperável na morte (wipe seguro).
 
 **RESOLVIDO 2026-07-10 (contradição entre 2 canons):** o Pillar 4 original (2026-05-15) descrevia o Hard mode com um **kernel panic puzzle** como última chance antes do permadeath ("falhar = game over real" — morte condicional, não incondicional). O canon do Hardcore de 2026-07-03 (memória `project_morte_dificuldade_canon`) dizia que a morte era incondicionalmente final, sem mencionar o puzzle. Eu havia recomendado a opção **(a)** — manter o puzzle como última chance — e o **líder aprovou (a)**: o kernel-panic puzzle sobrevive no Hardcore (§2.3a), o wipe só dispara se o jogador falhar o puzzle. Preserva o gancho mecânico original e dá agência coerente com o Pillar 1 (lógica vence força) em vez de um dado puro de sorte-ou-fim.
 
