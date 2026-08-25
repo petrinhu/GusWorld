@@ -10,6 +10,10 @@ o código do GusWorld nasce do zero, sempre assentado sobre o GlintFx (LEI ZERO,
 
 - `convencao-formatos-gw.md` — a convenção `.gw.<tipo>` para todo formato próprio do projeto; decisão
   do líder de 24/08/2026, canônica e vigente.
+- `contrato-i18n.md` — contrato de i18n do projeto (item `D20`, sem pré-requisito): convenção de
+  chave, locale como dimensão aberta, cadeia de fallback, placeholder/plural/gênero (recomendação
+  de subconjunto ICU MessageFormat, decisão pendente do líder), termo de lore sem tradução honesta,
+  orçamento de expansão. `B9` e `D19` dependem dele.
 - `ai-assets-provenance.md` — proveniência e cadeia de titularidade dos assets gerados por IA;
   resgatado do `gusworld_legacy` em 25/08/2026, com correção de regime (o texto fala em CC-BY-SA,
   o regime vigente é todos-os-direitos-reservados por L-08; o motivo de fundo — titularidade do
