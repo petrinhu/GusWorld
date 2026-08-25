@@ -965,15 +965,15 @@ graph TD
 6. Avançar T2 (lugares canon cross-doc) F5-BK.AUDIT.FULL.
 
 **Caminhos absolutos relevantes:**
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/CHARS.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/INCOHERENCES.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/lore-bible.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/timeline.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/in-world-docs.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/deep/eras/era-2-boom-tecnico.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/deep/eras/era-1-pre-codigo.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/environments/07-zona-do-silencio.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/deep/factions/ordem-recursiva.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/narrative/deep/magic/natureza-matematica-rigida-deep.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/book/BIBLE-V2-CAPA.md`
-- `/home/petrus/IDrive/Documentos/projetos_claudebrain/Projects/gusworld/docs/book/BIBLE-V2-APENDICE-H.md`
+- `CHARS.md`
+- `docs/narrative/INCOHERENCES.md`
+- `docs/narrative/lore-bible.md`
+- `docs/narrative/timeline.md`
+- `docs/narrative/in-world-docs.md`
+- `docs/narrative/deep/eras/era-2-boom-tecnico.md`
+- `docs/narrative/deep/eras/era-1-pre-codigo.md`
+- `docs/narrative/environments/07-zona-do-silencio.md`
+- `docs/narrative/deep/factions/ordem-recursiva.md`
+- `docs/narrative/deep/magic/natureza-matematica-rigida-deep.md`
+- `docs/book/BIBLE-V2-CAPA.md`
+- `docs/book/BIBLE-V2-APENDICE-H.md`
