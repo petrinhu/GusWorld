@@ -245,7 +245,7 @@ Cronistas canonizados em §9 deep-lore (vestígios cros-era Era 1 → Era 2 → 
 
 ## 8d. Mestres do Codex (análogos históricos)
 
-Os 20 análogos históricos cujas descobertas viraram as cartas do Codex (deep-lore `docs/narrative/deep/characters/mestre-*.md`, canonizados 2026-07-12). Cluster OCU = Era 1 (arcano-cerimonial); demais clusters = Era 2 (Era do Compilador); ver Status por linha. **Todos morreram na própria era (biografia intacta), mas cada um deixou um Tavus-Eco (self compilado, variante cerimonial na Era 1) no artefato da carta: a party ENCONTRA o mestre na Era 3 ao resolver o puzzle da missão, e ele entrega a carta pela própria mão (ver `docs/design/techmagic.md` seção Tavus-Eco + AMB-24).** Tusk/Helion fica de fora (capstone à parte). Espectro político in-fiction e método em `docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md`.
+Os 20 análogos históricos cujas descobertas viraram as cartas do Codex (deep-lore `docs/narrative/deep/characters/mestre-*.md`, canonizados 2026-07-12). Cluster OCU = Era 1 (arcano-cerimonial); demais clusters = Era 2 (Era do Compilador); ver Status por linha. **Todos morreram na própria era (biografia intacta), mas cada um deixou um Tavus-Eco (self compilado, variante cerimonial na Era 1) no artefato da carta: a party ENCONTRA o mestre na Era 3 ao resolver o puzzle da missão, e ele entrega a carta pela própria mão (ver `docs/design/technomagik.md` seção Tavus-Eco + AMB-24).** Tusk/Helion fica de fora (capstone à parte). Espectro político in-fiction e método em `docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md`.
 
 | Nome | Apelido / codinome | Características | 1ª aparição | Status |
 |---|---|---|---|---|
