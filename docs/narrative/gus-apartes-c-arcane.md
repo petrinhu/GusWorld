@@ -80,7 +80,7 @@ Decisões do líder, 2026-07-17.
 ### A7
 > "Você sabia que o Óxido leva a biblioteca inteira dentro de cada feitiço, mesmo o feitiço que só diz 'oi'? Pra ele emagrecer, você tem que arrancar pedaço dele. O meu já nasce magro."
 
-**Reação:** Iara. **Fato:** a `libstd` do Rust é ligada estaticamente e otimizada para velocidade, não para tamanho; reduzir binário exige remover `core::__DEP_REMOVIDA__` e, no limite, ir de `#![no_std]`. **Fonte:** repositório `min-sized-rust` (johnthagen), seção sobre `libstd`, `core::__DEP_REMOVIDA__` e `no_std`.
+**Reação:** Iara. **Fato:** a `libstd` do Rust é ligada estaticamente e otimizada para velocidade, não para tamanho; reduzir binário exige remover `core::fmt` e, no limite, ir de `#![no_std]`. **Fonte:** repositório `min-sized-rust` (johnthagen), seção sobre `libstd`, `core::fmt` e `no_std`.
 
 ### A8
 > "O layout de uma struct em Óxido pode mudar a cada vez que ele compila. A cada vez, Iara. Quando o Óxido quer conversar com o resto do mundo sem se perder, ele tem que pedir licença e falar C-Arcane. Tem um modo especial só pra isso."
