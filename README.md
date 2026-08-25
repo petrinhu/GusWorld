@@ -6,6 +6,18 @@ Jogo 2D pixel-art, single-player e offline, escrito em C++23, assentado sobre o 
 
 O código está sendo escrito do zero. **O jogo ainda não roda**: não há build funcional, não há tela, não há demo. O que existe hoje é a fundação do repositório (licenças, configuração de versionamento) e o corpus de design, lore e ativos que alimentam o desenvolvimento.
 
+## Apoie o projeto
+
+GusWorld é **freeware**: de graça pra jogar, para sempre, sem intenção comercial alguma. Se você curte o projeto e quer ajudar a manter o desenvolvimento (inclusive os tokens de IA que ajudam a construir o jogo):
+
+[![Buy me a coffee and some AI tokens](resources/buymecoffe.png)](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL)
+
+**Buy me a coffee and some AI tokens.** Via [PayPal](https://www.paypal.com/donate/?business=9XNZQ4RND67KL&no_recurring=0&currency_code=BRL) *(totalmente opcional, nunca obrigatório)*.
+
+Ou aponte a câmera do celular no QR Code:
+
+![QR Code de doação PayPal](resources/QRCode.png)
+
 ## Licença
 
 - **Código-fonte**: [AGPL-3.0-or-later](LICENSE).
