@@ -65,12 +65,18 @@ compilador que a decisão do líder escolheu para esse alvo (não GCC/Clang via
 MinGW, que reintroduziria uma ABI POSIX-like sobre Windows e anularia o
 propósito de ter MSVC como o detector mais divergente do POSIX).
 
-## Contagem de entradas da matriz, e uma divergência aritmética a devolver ao líder
+## Contagem de entradas da matriz: NOVE, confirmado pelo líder em 25/08/2026
 
-A ordem de serviço registra que "a matriz cresce de cinco para sete
-entradas". Refiz a conta a partir da leitura mais direta das duas decisões
-de compilador — **GCC e Clang, os dois, em CADA uma das quatro plataformas
-Linux** — e ela não fecha em sete:
+A versão anterior deste ADR levantou uma divergência aritmética: a ordem de
+serviço original citava "sete entradas", mas a leitura literal das duas
+decisões de compilador — **GCC e Clang, os dois, em CADA uma das quatro
+plataformas Linux** — fecha em nove, não sete. Em vez de forçar o número
+para sete inventando qual subconjunto de plataformas ficaria com um único
+compilador (decisão de escopo de cobertura que não me cabia tomar, L-11), a
+divergência foi devolvida ao líder como pergunta aberta.
+
+**O líder respondeu: a matriz tem NOVE entradas**, a leitura literal e
+uniforme, sem exceção de plataforma:
 
 | Plataforma | Compilador(es) | Entradas |
 |---|---|---|
@@ -81,25 +87,26 @@ Linux** — e ela não fecha em sete:
 | Windows | MSVC | 1 |
 | **Total** | | **9** |
 
-Sob a leitura uniforme (as duas decisões aplicadas sem exceção às quatro
-plataformas Linux), a matriz tem **nove** entradas, não sete. Para chegar a
-sete a partir de cinco plataformas, seria preciso que **apenas duas** das
-quatro plataformas Linux dobrassem de compilador (por exemplo, só Fedora e
-Ubuntu, ficando Arch e CachyOS com um único compilador cada) — mas nenhuma
-decisão registrada nesta ordem de serviço nomeia qual subconjunto seria esse,
-e escolher um sozinho seria eu inventar escopo de cobertura de plataforma,
-exatamente o tipo de decisão que a L-11 reserva ao líder.
+**Razão dele, registrada porque é a que sustenta a decisão: cobertura
+desigual esconde bug.** Se só o Fedora rodasse Clang (ou qualquer outro
+subconjunto), um aviso que só o Clang do **Arch** desse — por exemplo, uma
+diferença de versão de libc/headers entre as distros — passaria despercebido
+até alguém compilar manualmente naquela combinação específica. Testar os
+dois compiladores em **todas** as quatro plataformas Linux é o que garante
+que a divergência apareça em qualquer distro onde ela exista, não só
+naquela que o CI escolheu arbitrariamente testar com os dois.
 
-**Não resolvi a divergência por conta própria.** Escrevo aqui as duas leituras
-possíveis e devolvo a pergunta: **(a)** GCC e Clang em cada uma das quatro
-plataformas Linux — nove entradas ao todo, cobertura de compilador uniforme;
-ou **(b)** GCC e Clang só num subconjunto das quatro (e, nesse caso, qual
-subconjunto, e com que critério) — sete entradas, mais barato de rodar a cada
-push, com cobertura de compilador concentrada em menos plataformas. Até essa
-resposta, este ADR registra a decisão **qualitativa** (GCC e Clang são ambos
-obrigatórios no Linux, MSVC no Windows, nenhuma entrada não bloqueante) e
-deixa a contagem exata da matriz como item pendente de confirmação — a tabela
-acima é a leitura-padrão (uniforme), não a definitiva.
+**As nove entradas são bloqueantes, sem exceção (L-20).** Nenhuma delas é
+informativa nem pode ficar de fora do gate de push (L-32).
+
+⚠️ **Correção de registro, porque o erro era do lado de quem redigiu a ordem
+de serviço, não meu, e isso fica dito com todas as letras:** o número "sete"
+citado originalmente era um erro aritmético do coordenador, propagado
+também para o item `G6` do `TODO.md`. A recusa de forçar o número ou de
+inventar um subconjunto de plataformas foi o comportamento correto — a
+pergunta devolvida (L-11) é o que permitiu a correção acontecer antes do
+número errado virar fundação. **Toda ocorrência de "sete entradas" neste
+documento, no ADR-023 e no `_INDEX.md` foi substituída por "nove".**
 
 ## Evidência de que a imagem oficial existe
 
@@ -203,11 +210,11 @@ feita pelo GlintFx, não uma nova).
   input) — irrelevante hoje porque `present/` ainda não existe (L-06,
   L-27), mas registrado para quando nascer: a prática já em uso no GlintFx
   é compositor Wayland aninhado dentro do container, nunca a sessão viva.
-- **A matriz cresce de cinco para nove entradas** sob a leitura uniforme
-  (ver seção de contagem acima) — ou sete, se o líder confirmar um
-  subconjunto de plataformas Linux com um único compilador. Custo de tempo
-  e minutos de CI por push aumenta proporcionalmente, e nenhuma das entradas
-  pode ser não bloqueante (L-20).
+- **A matriz cresce de cinco para nove entradas**, confirmado pelo líder
+  (ver seção de contagem acima). Custo de tempo e minutos de CI por push
+  aumenta proporcionalmente, e nenhuma das nove entradas pode ser não
+  bloqueante (L-20) — custo aceito conscientemente em troca de cobertura
+  uniforme (cobertura desigual esconde bug, razão do líder).
 
 ## Riscos / pontos de atenção
 
@@ -219,8 +226,9 @@ feita pelo GlintFx, não uma nova).
 - **Nunca misturar compiladores dentro da mesma célula da matriz** (GlintFx
   compilado por um, jogo pelo outro) — anularia a garantia de coerência de
   ABI que esta matriz existe para fornecer (ver ADR-023).
-- A contagem exata da matriz (sete ou nove entradas) fica pendente de
-  confirmação do líder, ver seção "Contagem de entradas da matriz" acima.
+- A contagem exata da matriz **é nove entradas**, confirmado pelo líder
+  (ver seção "Contagem de entradas da matriz" acima) — não fica mais
+  pendente.
 
 ## Reversibilidade
 

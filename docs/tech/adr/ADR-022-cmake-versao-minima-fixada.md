@@ -70,37 +70,42 @@ para testar se o MSVC aceita `if consteval` de C++23 — esse probe declara
 parte do link real do GlintFx nem do GusWorld, e por isso não é uma segunda
 exigência a reconciliar.
 
-## Gerador: Ninja (decisão do líder, 25/08/2026)
+## Gerador: Ninja nas CINCO plataformas, Windows incluído (decisão do líder, 25/08/2026)
 
-**O GusWorld usa Ninja como gerador do CMake, `-G Ninja`, em toda entrada da
-matriz onde isso é aplicável.** Antes desta decisão, "Ninja" já vinha
-implícito nas fatias (a fundação de build presumia Ninja como se fosse óbvio),
-sem nunca ter sido registrado como escolha do líder. Isto encerra essa
-suposição: passa a ser uma **decisão registrada**, não uma herança tácita.
+**O GusWorld usa Ninja como gerador do CMake, `-G Ninja`, nas cinco
+plataformas obrigatórias, sem exceção — Windows incluído.** Antes desta
+decisão, "Ninja" já vinha implícito nas fatias (a fundação de build
+presumia Ninja como se fosse óbvio), sem nunca ter sido registrado como
+escolha do líder, e a primeira leitura desta ADR tratava Windows como
+dúvida aberta. **O líder confirmou: Ninja em todas as cinco, sem exceção.**
+
+**Razão dele, registrada porque decide a forma do script de CI: um gerador
+só é um comportamento só.** O mesmo comando de configuração
+(`cmake -S . -B <dir> -G Ninja ...`) e o mesmo comando de build
+(`cmake --build <dir>`) funcionam em qualquer entrada da matriz, Linux ou
+Windows. O script local que espelha o CI (`TESTES.md`, o portão que roda
+antes do push) não precisa de dois caminhos — um `if` de plataforma a menos
+no script, e uma ferramenta de paralelismo só para entender.
 
 **Sem piso de versão fixado para o Ninja, por escolha explícita do líder.**
 Medição feita mesmo assim, por prudência, sem virar portão: nesta máquina
 (Fedora 44, alvo primário), `ninja --version` devolve **1.13.2**
-(`ninja-build-1.13.2-2.fc44.x86_64`). O próprio GlintFx instala Ninja pelo
-gerenciador de pacote nativo de cada distro Linux da sua matriz
-(`ninja-build` no `dnf`, `ninja` no `pacman`) e o invoca com `-G Ninja`
-explícito no job `linux` (`../GlintFx/.github/workflows/ci.yml:212`). Nenhum
-problema real de versão foi encontrado nesta medição; se uma fatia futura
-encontrar um, o achado é reportado ao líder, e não vira piso fixado por
-conta própria — foi assim que ele decidiu.
+(`ninja-build-1.13.2-2.fc44.x86_64`). Nenhum problema real de versão foi
+encontrado nesta medição; se uma fatia futura encontrar um, o achado é
+reportado ao líder, e não vira piso fixado por conta própria — foi assim
+que ele decidiu.
 
-**Onde diverge do precedente do GlintFx, registrado para não confundir quem
-comparar os dois CIs:** o job `windows` do GlintFx **não** passa `-G Ninja`
-— deixa o CMake escolher o gerador padrão do MSVC (Visual Studio), como o
-próprio comentário do workflow diz: "Sem action de terceiro: o próprio CMake
-localiza o MSVC." A decisão do líder para o GusWorld ("Ninja como gerador",
-sem exceção mencionada) é lida aqui como valendo também para Windows, o que
-é uma escolha **diferente** da que o GlintFx faz hoje no próprio job Windows
-dele. Isto não é um conflito a resolver — GusWorld e GlintFx podem usar
-geradores diferentes no mesmo CMake sem se afetarem, já que o gerador é
-propriedade da árvore de build de quem o invoca, não do que está sendo
-compilado — mas fica registrado como divergência consciente, não como
-suposição de que "é assim que o GlintFx faz".
+**Divergência declarada, não escondida, do próprio job Windows do GlintFx:**
+o job `windows` do GlintFx **não** passa `-G Ninja` — deixa o CMake escolher
+o gerador padrão do MSVC (Visual Studio), como o próprio comentário do
+workflow diz: "Sem action de terceiro: o próprio CMake localiza o MSVC." O
+GusWorld faz diferente, conscientemente: Ninja também no Windows. Quem for
+comparar os dois CIs vai notar a diferença — e ela é intencional, não um
+descuido de quem copiou o padrão do framework sem olhar. Isto não quebra
+nada entre os dois repositórios (o gerador é propriedade da árvore de build
+de quem o invoca, não do que está sendo compilado — GlintFx e GusWorld
+configuram cada um a própria árvore), mas fica registrado aqui exatamente
+para que a diferença não seja lida como erro de cópia incompleta.
 
 ## Alternativas consideradas
 
