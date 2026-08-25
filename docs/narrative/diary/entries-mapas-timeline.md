@@ -163,7 +163,7 @@ Cada mapa segue padrão fixo:
 
 | Pin | Landmark | Trigger | Cross-ref |
 |---|---|---|---|
-| "?" laranja | **Subterrâneo lacrado (Selagem Asmódica protocolo Atelaiá -78)** | Knowledge alta + Asmódico Bento decodifica selo | possível arco DLC pós-jogo · não acessível G1 |
+| "?" laranja | **Subterrâneo lacrado (Selagem Asmódica protocolo Atelaiá -78)** | Knowledge alta + Asmódico Bento decodifica selo | possível expansão gratuita pós-jogo (`C-14`: sem compromisso de produzir) · não acessível G1 |
 | "?" laranja | **Catedral perdida (localização revelada pelo diário de Aldebrando)** | Knowledge alta + diário Aldebrando ([[entries-docs-descobriveis|doc 9]]) decodificado + cripto-glifo Hugo Tirol cruzado | gate Ouro · localização parcial revelada (não totalmente); não confundir com a Catedral Menor de Atelaiá, onde Aldebrando morreu |
 
 **Rotas Gus:**
