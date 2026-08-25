@@ -58,7 +58,7 @@ Morfologia: ectomorfo, pele alva, ruivo de coloração laranja vibrante em corte
 2. **Matriz Ortodôntica Ressonante** (boca): aparelho dentário composto por liga de grafeno e tântalo biointegrada, com microfilamentos de fibra óptica soldados aos braquetes. Funciona como arranjo de antenas dipolo de ultra-alto ganho (UHF/VHF). Amplifica recepção e transmissão de frequências arcanas através da mandíbula e da base do crânio, estendendo o alcance dos óculos e acelerando o processamento de scripts locais. Engenharia caseira de Gus, derivada de necessidade médica banal.
 3. **Tavus-Drive** (pulso esquerdo): executor portátil. Lê cartões físicos do Codex e projeta o conjuro compilado.
 
-Domínios cognitivos: programação arcana em baixo nível, lógica estocástica (treinada em jogos de cartas matrizadas), cálculo vetorial de trajetórias (treinado no xadrez), ecologia algorítmica da Selve. Resolução por análise, não por força. Pillar 4 contém integralmente: prodígio analítico de onze anos, não power-fantasy adulta.
+Domínios cognitivos: programação arcana em baixo nível, lógica estocástica (treinada em jogos de cartas matrizadas), cálculo vetorial de trajetórias (treinado no xadrez), ecologia algorítmica da Selve. Resolução por análise, não por força. Pillar 4 contém integralmente: criança analítica de onze anos, não power-fantasy adulta.
 
 **Linguagem profana zero.** "Que horror" é o palavrão máximo do registro de Gus.
 

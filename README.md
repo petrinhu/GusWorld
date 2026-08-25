@@ -41,7 +41,7 @@ Cinco pilares mantêm o design coerente:
 1. **Lógica vence força.** Combate e exploração são resolvidos por análise, predição e combinação, nunca por reflexo, dano bruto ou grind.
 2. **Magia é sistema formal computável, natureza é matemática.** Magia funciona como sistema formal (linguagens diegéticas como C-Arcane e Óxido); a Selve Sombria segue padrões matemáticos observáveis, não caos.
 3. **O triângulo de hardware é a interface.** Toda habilidade do Gus passa por uma de três peças de equipamento: óculos táticos, aparelho ortodôntico ou o executor de pulso Tavus-Drive. Nada de poder "vindo do nada".
-4. **Prodígio de 11 anos, não herói adulto.** Gus resolve por inteligência, curiosidade e otimização, com tom analítico, não fantasia de poder adulta.
+4. **Criança analítica de 11 anos, não herói adulto.** Gus resolve por inteligência, curiosidade e otimização, com tom analítico, não fantasia de poder adulta.
 5. **Contraste multipolar com duas âncoras.** O mundo se organiza em torno do contraste entre a megacidade ciber-gótica e a Selve Sombria tecnorgânica.
 
 Detalhes completos em [`docs/design/pillars.md`](docs/design/pillars.md).
