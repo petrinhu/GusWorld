@@ -47,7 +47,7 @@
 | [L-26](#l-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, quatro direções cardeais, grade quadrada |
 | [L-27](#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
 | [L-28](#l-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
-| [L-29](#l-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é |
+| [L-29](#l-29) | propor recurso, sistema ou escopo novo | Os 13 cortes: a cerca do que o jogo NÃO é |
 | [L-30](#l-30) | escrever, reordenar ou acrescentar item na tabela | Todo item aponta para o documento que o especifica, se existir |
 | [L-31](#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
@@ -505,7 +505,8 @@ Ferramenta: `git-crypt`, **uma chave só**, a simétrica exportada para fora da 
 
 **Esta é a cerca do que o GusWorld NÃO é.** Proposta que atravesse a cerca é recusada por padrão; só o líder abre exceção, nominalmente.
 
-**Revogação de 25/08/2026, por decisão do líder após argumentação contra (lei das leis):** o **`C-03`** (sem crafting e sem economia complexa) e o **`C-13`** (cartas nunca craftadas) **foram revogados e apagados desta tabela**, pela L-24. **O GusWorld TEM crafting**, e ele alcança **também as cartas**. A decisão restaura canon do projeto anterior, onde `craft()` existia implementado e testado no sistema de deck (commits `aeaa65ed`, `db84275a`, `d200ae4f`, de julho e agosto de 2026): lá o corte e o crafting coexistiam, e para cá viemos só com o corte. **Os números `C-03` e `C-13` não são reaproveitados** e a cerca passa a ter **catorze** cortes, do `C-01` ao `C-16` com dois buracos — mesma convenção do `ADR-010` apagado. Renumerar quebraria toda citação existente a `C-08`, `C-15` e irmãos, e por isso é proibido.
+**Revogação de 25/08/2026, por decisão do líder após argumentação contra (lei das leis):** o **`C-03`** (sem crafting e sem economia complexa) e o **`C-13`** (cartas nunca craftadas) **foram revogados e apagados desta tabela**, pela L-24. **O GusWorld TEM crafting**, e ele alcança **também as cartas**. A decisão restaura canon do projeto anterior, onde `craft()` existia implementado e testado no sistema de deck (commits `aeaa65ed`, `db84275a`, `d200ae4f`, de julho e agosto de 2026): lá o corte e o crafting coexistiam, e para cá viemos só com o corte. **Os números `C-03`, `C-08` e `C-13` não são reaproveitados** e a cerca passa a ter **treze** cortes, do `C-01` ao `C-16` com dois buracos — mesma convenção do `ADR-010` apagado. Renumerar quebraria toda citação existente a `C-08`, `C-15` e irmãos, e por isso é proibido.
+**Segunda revogação de 25/08/2026, também após argumentação contra:** o **`C-08`** (sem conquistas e sem placar) foi **revogado e apagado**. **O jogo TEM conquistas.** O líder registrou que a decisão é dele e anterior ao arquivamento do projeto anterior; a auditoria dos cortes já havia achado o corpus contradizendo o corte em silêncio, com quatro menções a conquista destravando e banner aparecendo em `docs/narrative/comic-reliefs.md` e sete easter eggs indexados como conquistas. ⚠️ **O que ficou DE FORA, e o motivo, para ninguém reabrir achando que foi esquecimento:** **conquista da Steam não entra agora.** Ela exige o **SDK proprietário do Steamworks**, e a documentação oficial da Valve diz que licença GPL *"can be problematic when combining code with the Steamworks SDK"*. A **L-08** deste projeto é AGPL-3.0-or-later, e não por preferência: ela é **herdada do GlintFx**, porque o executável linkado a ele é obra combinada. Trocar a licença do jogo não resolveria; teria de se trocar a do framework. **Decisão do líder em 25/08/2026: conquista interna agora, integração com a Steam decidida quando a distribuição for real.** Publicar na Steam **sem** o SDK continua possível e não colide com nada.
 
 | # | O corte |
 |---|---|
@@ -515,7 +516,6 @@ Ferramenta: `git-crypt`, **uma chave só**, a simétrica exportada para fora da 
 | **C-05** | Sem captura de movimento. |
 | **C-06** | Sem dificuldade dinâmica adaptativa. A dificuldade é escolhida e fixa por save. |
 | **C-07** | Sem suporte a mod e sem editor dentro do jogo. |
-| **C-08** | Sem conquistas e sem placar. Talvez depois do lançamento. |
 | **C-09** | Conteúdo em pt-br; tradução real fica para depois do lançamento. A **estrutura** nasce pronta para internacionalização desde já. |
 | **C-10** | Sem certificação de console agora. Verificação para Steam Deck fica para depois. |
 | **C-11** | Sem romance, sem sistema de moralidade e sem múltiplos finais. Um final, com variantes mínimas. |
