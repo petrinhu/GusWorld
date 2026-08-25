@@ -54,7 +54,7 @@ Transcrito de `GODS_LAWS.md` (33 leis, medido em 24/08/2026 por `grep -c "^## L-
 | [L-30](GODS_LAWS.md#l-30) | escrever, reordenar ou acrescentar item na tabela | Todo item aponta para o documento que o especifica, se existir |
 | [L-31](GODS_LAWS.md#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](GODS_LAWS.md#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
-| [L-33](GODS_LAWS.md#l-33) | escrever documento, teste, commit, item da tabela ou asset | Atomizar fora do código também; monolito é acoplamento, não tamanho |
+| [L-33](GODS_LAWS.md#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
 
 ## O que é o GusWorld
 
