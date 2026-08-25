@@ -94,7 +94,7 @@ Quando, dentro do ciclo de combate, um `@effect` dispara: `OnCast` (no momento e
 
 ## 9. Tier e categoria (`tier`, `category`)
 
-`tier` distingue as três trilhas de raridade: `comum` (obtida por loja/craft/loot, sem exclusividade), `especial` (uma cópia no jogo inteiro, entregue por progresso narrativo — nunca comprada, craftada ou dropada), `super` (a carta-capstone, forjada a partir das 20 especiais). `category` só faz sentido quando `tier` não é `comum`, e distingue **quatro** formas de uso, todas descritas em `cartas-technomagik.md` §2.3 deste projeto (não repetido aqui, L-30):
+`tier` distingue as três trilhas de raridade: `comum` (obtida por loja/craft/loot, sem exclusividade), `especial` (uma cópia no jogo inteiro, entregue por progresso narrativo — nunca comprada, craftada ou dropada), `super` (a carta-capstone, carta original, nunca forjada; as 20 especiais são pré-requisito de ACESSO à missão-capstone que leva até ela, não matéria-prima de criação; correção 25/08/2026, decisão do líder, ver `cartas-technomagik.md` §2.1/§2.4). `category` só faz sentido quando `tier` não é `comum`, e distingue **quatro** formas de uso, todas descritas em `cartas-technomagik.md` §2.3 deste projeto (não repetido aqui, L-30):
 
 - **`ativa`** — jogada uma vez por batalha, com custo de mana.
 - **`passiva`** — sempre ligada enquanto equipada, sem custo de mana, sem consumir o uso único da batalha.
