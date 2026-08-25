@@ -50,7 +50,7 @@ Limite de mão = **base por personagem** (identidade; ex.: Gus prodígio segura 
 ## 6. Aquisição e descarte
 
 ### 6.1 Adquirir (decisão: multi-canal determinístico + achados híbridos)
-- **Especiais (Gus):** vêm **SÓ in-game, por progresso NARRATIVO** (encontra/aprende com cada mestre → compila a carta; Tavus-Eco / forja). **Nunca** compradas/craftadas/dropadas, e **classe PROTEGIDA** (não vão pro deck morto — ver §7). Confirmado pelo líder 2026-07-16.
+- **Especiais (Gus):** vêm **SÓ in-game, por progresso NARRATIVO** (encontra/aprende com cada mestre → compila a carta; Tavus-Eco). **Nunca** compradas/craftadas/dropadas, e **classe PROTEGIDA** (não vão pro deck morto — ver §7). Confirmado pelo líder 2026-07-16. **Esta linha descreve só as 20 ESPECIAIS.** A SUPER (Tusk) NÃO é forjada nem compilada por ninguém: é carta original, achada, não entregue (correção 25/08/2026, decisão do líder; ver `cartas-technomagik.md` §2.1/§2.4). Este documento ainda não descreve o mecanismo específico de aquisição da SUPER; o que fica fixo aqui é só que ela segue classe protegida junto das ESPECIAIS (§7 invariante 9).
 - **Comuns — espinha determinística (você sempre consegue o que precisa, sem grind):**
   - **Loja "app store" (crédito):** compra o que quer. Casa com "faz-se dinheiro com trabalho" + a metáfora de app. **Lojas compram E vendem** cartas.
   - **Loot de repositórios/missão/luta:** GARANTIDO (recompensa fixa de arco/beat) **E ALEATÓRIO** (drop de missão/combate — variância de COLEÇÃO, não de combate; ok com o pillar anti-sorte porque não decide batalha, só engorda a coleção). Decisão do líder 2026-07-16.
