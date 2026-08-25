@@ -10,7 +10,18 @@ Uma missão de **aventura/exploração** (fora do core de combate): o player tem
 
 ## Decisões fechadas
 
-- **O relógio corre SEMPRE** — inclusive durante batalhas no caminho. Encarar um inimigo custa tempo real. Consequência de design (intencional): incentiva **evitar/otimizar** os encontros, não farmá-los.
+- **O relógio corre durante a batalha só a partir do Difícil** (decisão do líder, 24/08/2026, item `G5` — resolve a tensão com o Pilar 1, *"Active turn-based sem timer no turno do jogador"*):
+
+| Dificuldade | Relógio na batalha | Por quê |
+|---|---|---|
+| **Fácil** | **congela** | nenhuma pressão de tempo sobre o turno |
+| **Médio** *(default)* | **congela** | o jogador default nunca sente cronômetro no combate; o Pilar 1 é respeitado onde alcança mais gente |
+| **Difícil** | corre, visível | a pressão passa a ser parte do desafio, e quem escolheu Difícil escolheu isso |
+| **Hardcore** | corre, visível, prazo mais apertado | como esta spec já previa |
+
+  Fora da batalha o relógio corre em **todos** os modos — a missão é cronometrada nos quatro. O que muda é só o que acontece quando o combate começa.
+
+  **Custo assumido, nomeado em vez de silenciado:** no Fácil e no Médio, "encarar um inimigo custa tempo real" deixa de valer, e com ele o incentivo de desviar das lutas. A intenção original do Gus Dragon sobrevive nos dois modos superiores. Foi troca consciente: o Pilar 1 protege o jogador default, e o desafio de rota continua existindo pela distância e pelos atalhos, que não dependem do relógio correr na batalha.
 - **Desafio central = planejar a ROTA** (não reflexo). Há atalhos e caminhos a descobrir; o mérito é **achar a rota eficiente** (e talvez usar itens/cartas de mobilidade), não ter só dedo rápido. **Alinha o Pillar 4** (o Gus vence pensando). O relógio-corre-sempre reforça isso: a rota ótima desvia das lutas.
 - **Consequência de falhar (tempo esgotado) por dificuldade:**
   - **Fácil:** igual ao Médio (só perde o bônus, completa).
