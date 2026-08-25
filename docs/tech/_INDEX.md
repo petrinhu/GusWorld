@@ -18,6 +18,11 @@ o código do GusWorld nasce do zero, sempre assentado sobre o GlintFx (LEI ZERO,
   morreu (mapa é hoje contrato do GlintFx, L-30 deles); sobrevivem as decisões de 23/06/2026 (mapa
   selado contra adulteração, fonte editável separada do artefato compilado, identificador fixo
   anti-troca) como insumo de pedido ao GlintFx pelo bus.
+- `algoritmos-combate-rpg-turnos.md` — pesquisa consolidada em 11/08/2026 sobre IA de combate por
+  turnos (relógio híbrido, atributos, fórmulas, Utility AI, targeting, coordenador de pressão,
+  dificuldade, IA de aliados, autobattle, e o bloco inteiro de anti-degeneração); trazida pelo
+  próprio líder do `gusworld_legacy` em 25/08/2026, verbatim, ainda sem reconferência contra as leis
+  vigentes. Cita arquivo de código do projeto anterior que não existe aqui (L-01).
 - `adr/` — 20 ADRs do `gusworld_legacy` (numerados 001 a 021, o 010 ausente por ordem do líder sob
   a L-24), trazidos verbatim em 25/08/2026. Índice próprio em `adr/_INDEX.md`.
 
