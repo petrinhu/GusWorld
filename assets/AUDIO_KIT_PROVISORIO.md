@@ -1,6 +1,6 @@
-# Kit de áudio provisório — M6 F2 (ADR-011)
+# Kit de áudio provisório — M6 F2
 
-**Este é um kit provisório da 1ª onda do M6 (Áudio), curado conforme `docs/tech/adr/ADR-011-m6-audio-onda1-plano.md` decisão 3.** Não é produção/composição nova — é curadoria de sons prontos CC0, filtrada pelo canon (Pillar "magia = software" para o hit; bíblia de leitmotivs `docs/narrative/deep/ontologia/leitmotivs-musicais-detalhados.md` R7 §"01. GusWorld City cyber-gótica" para a música). Serve para provar o cano técnico (`GusEngine/platform/audio/`) e dar sinal honesto de feel em playtest. **Será substituído/expandido pelo `audio-designer-composer` numa onda futura dedicada** (assinatura sonora do combate, leitmotiv de Gus, canal-4 Patch-Zero — zero disso está aqui).
+**Este é um kit provisório da 1ª onda do M6 (Áudio).** Não é produção/composição nova — é curadoria de sons prontos CC0, filtrada pelo canon (Pillar "magia = software" para o hit; bíblia de leitmotivs `docs/narrative/deep/ontologia/leitmotivs-musicais-detalhados.md` R7 §"01. GusWorld City cyber-gótica" para a música). Serve para provar o cano técnico (`GusEngine/platform/audio/`) e dar sinal honesto de feel em playtest. **Será substituído/expandido pelo `audio-designer-composer` numa onda futura dedicada** (assinatura sonora do combate, leitmotiv de Gus, canal-4 Patch-Zero — zero disso está aqui).
 
 Todas as fontes abaixo são **estritamente CC0 / domínio público** (nenhuma CC-BY foi usada, para evitar gestão de atribuição num kit descartável em repo público).
 

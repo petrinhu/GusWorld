@@ -78,7 +78,7 @@ Fecham as duas fraudes que o criador antecipou (duplicar carta; usar deck morto 
 4. **One-way por código:** existe API `ativo→morto`; **NÃO existe** API `morto→ativo`.
 5. **Venda/upload é ATÔMICO** (remove-do-container-DEPOIS-credita numa transação) e **idempotente**: carta sem container não vende de novo.
 6. **Mão só puxa do deck ATIVO.**
-7. Base de confiança: o save é **AEAD/HMAC assinado** (ADR-015) — adulterar o arquivo quebra a assinatura. Os invariantes acima protegem contra bug de LÓGICA (o vetor real dentro do jogo).
+7. Base de confiança: o save é **AEAD/HMAC assinado** — adulterar o arquivo quebra a assinatura. Os invariantes acima protegem contra bug de LÓGICA (o vetor real dentro do jogo).
 8. O **deck morto persistente** é mais superfície → o `qa-engineer` DEVE ter testes dedicados de dup/slot-extra/one-way/atomicidade/round-trip no save.
 9. **CLASSE PROTEGIDA — ESPECIAL/SUPER nunca vão pro deck morto** (Finding B do parecer de economia, 2026-07-16). São únicas (1 de 20 + a Super), só-narrativa, sem craft/drop/2ª chance: mandá-las pro morto (one-way) = **perda permanente de conteúdo único**. A lógica/UI do descarte **RECUSA** carta ESPECIAL/SUPER (guard por tier no service de descarte; custo ~1 `if`, risco altíssimo se faltar). Elas ocupam slot de deck normalmente, mas o único "descarte" possível delas é não-existente (ficam sempre). Teste dedicado do `qa-engineer`: tentar mandar especial pro morto → rejeitado.
 

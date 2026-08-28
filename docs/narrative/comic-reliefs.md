@@ -2093,7 +2093,7 @@ Isso eu sei fazer.
 
 **As cenas têm DUAS formas, e as duas são canônicas.**
 
-**1. No jogo: diálogo linear com narração.** Cada cena vira um arquivo `.dlg.txt` consumido pelo runtime de diálogo (ADR-014), no mesmo formato do `npc_intro_bertoldo.dlg.txt`. As falas entram como estão. **As direções cênicas viram linhas de um speaker de narração**, no registro terminal já aprovado para logs e telas de sistema.
+**1. No jogo: diálogo linear com narração.** Cada cena vira um arquivo `.dlg.txt` consumido pelo runtime de diálogo, no mesmo formato do `npc_intro_bertoldo.dlg.txt`. As falas entram como estão. **As direções cênicas viram linhas de um speaker de narração**, no registro terminal já aprovado para logs e telas de sistema.
 
 Isto é o que o motor faz **hoje**, sem feature nova: o formato tem `speaker`, `text` (chave i18n), escolhas e flags. O que ele **não** tem é movimento de sprite scriptado, e por isso o gesto interrompido no meio, o dedo seguindo o cabo e o tronco estalando são **narrados**, não encenados. Cutscene com sprites móveis seria feature de engine e não está na fila.
 
