@@ -1,0 +1,13 @@
+#!/bin/sh
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Portao da LEI ZERO. Bloqueia commit que ACRESCENTA nome de dependencia que
+# o GusWorld nao pode ligar. O GusWorld liga em GlintFx e no SO. Mais nada.
+#
+# Morde o DIFF, nao a arvore: divida antiga nao trava commit novo -- inclusive
+# nao trava os commits que estao LIMPANDO a divida.
+#
+# Instalacao: python3 tools/git-hooks/install.py
+# Escape consciente: LEI_ZERO_GUARD=off git commit ...
+exec python3 "$(git rev-parse --show-toplevel)/tools/security/lei_zero_guard.py" --staged
