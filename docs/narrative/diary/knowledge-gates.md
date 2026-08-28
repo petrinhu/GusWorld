@@ -373,7 +373,7 @@ Categoria Mecânico-meta tem cap baixo (~30) intencionalmente. Não pode "destra
 
 ## 10. Notas técnicas (delegadas Fase 2)
 
-> **NOTA DE STACK (pós-ADR-008).** A spec preliminar abaixo foi escrita sobre o stack antigo Godot 4 + GDScript, depois superado pela engine própria C++23 + __DEP_REMOVIDA__ (ver ADR-008). O que segue válido: o conteúdo do save versionado (§10.1), o tracking por IDs de trigger (set lookup), os pares de cross-reference data-driven e o recálculo on-demand. O que muda: a implementação é em C++23, event-driven via `core/events/` (barramento de eventos próprio), sem signals de framework. Termos de engine antiga abaixo permanecem só como referência conceitual; serão re-derivados pelo squad técnico na engine atual.
+> **NOTA DE STACK.** A spec preliminar abaixo foi escrita sobre um stack antigo, depois superado pela engine própria C++23 sobre GlintFx. O que segue válido: o conteúdo do save versionado (§10.1), o tracking por IDs de trigger (set lookup), os pares de cross-reference data-driven e o recálculo on-demand. O que muda: a implementação é em C++23, event-driven via `core/events/` (barramento de eventos próprio), sem signals de framework. Termos de engine antiga abaixo permanecem só como referência conceitual; serão re-derivados pelo squad técnico na engine atual.
 
 A spec de DESIGN dos gates (thresholds, triggers, categorias) é canônica e independe de engine. Spec técnica preliminar:
 

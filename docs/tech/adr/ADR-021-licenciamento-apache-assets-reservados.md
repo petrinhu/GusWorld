@@ -158,7 +158,7 @@ limpa**:
 - **Varredura de copyright alheio nos 531 arquivos** que carregavam SPDX
   `GPL-3.0-or-later`: zero achados de comentário de copyright de terceiro,
   cabeçalho de licença estranha, ou bloco de código com atribuição alheia.
-- **Caça a irmãos do caso `__DEP_REMOVIDA__`**: o vendor do loader OpenGL
+- **Caça a irmãos do caso do loader OpenGL vendorizado**: o vendor do loader OpenGL
   (achado em 2026-07-28 fora de
   `third_party/`, documentado em `THIRD-PARTY-LICENSES.md`) foi o único caso
   conhecido de código de terceiro vendorizado fora do diretório esperado.
@@ -231,7 +231,7 @@ feita e voltou limpa.
 - `LICENSE` (texto Apache License 2.0 verbatim, imutável).
 - `NOTICE` (copyright + carve-out de marca, propagado pela seção 4(d)).
 - `ASSETS-LICENSE.md` (regime de assets em duas zonas + livros + marca + fã).
-- `THIRD-PARTY-LICENSES.md` (atribuição de terceiros, inclusive o caso `__DEP_REMOVIDA__`).
+- `THIRD-PARTY-LICENSES.md` (atribuição de terceiros, inclusive o caso do loader OpenGL vendorizado).
 - Apache License 2.0: <https://www.apache.org/licenses/LICENSE-2.0> · Steamworks
   e licenças open source: <https://partner.steamgames.com/doc/sdk/uploading/distributing_opensource>
   · CC-BY-SA 4.0: <https://creativecommons.org/licenses/by-sa/4.0/>

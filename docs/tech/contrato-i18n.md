@@ -251,8 +251,8 @@ Ver também `docs/narrative/guia-dialogos.md` §11 (trocadilho e jargão) — re
 
 ### 6.1 O que existe hoje, e o problema que carrega
 
-Os dois catálogos usam interpolação posicional (`{0}`, `{1}`, ...), herdada do parser da era
-Godot/GDScript e mantida como convenção mecânica do formato `## CHAVE` (regra 6 do `README.md`).
+Os dois catálogos usam interpolação posicional (`{0}`, `{1}`, ...), herdada do parser da engine
+anterior e mantida como convenção mecânica do formato `## CHAVE` (regra 6 do `README.md`).
 Pluralização hoje é feita **por escrita manual**, caso a caso:
 
 - Evitando o problema por design: `SAVE_SCREEN_SUBTITLE_SAVE` diz *"{0} espaços (lista rola)"*

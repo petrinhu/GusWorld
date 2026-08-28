@@ -71,7 +71,7 @@ Todas as fontes abaixo são **estritamente CC0 / domínio público** (nenhuma CC
 
 ## Notas técnicas gerais
 
-- SFX candidatos vieram em Ogg Vorbis (formato original Kenney) e foram convertidos para WAV PCM 16-bit via `ffmpeg -c:a pcm_s16le` (conversão de container/codec, sem alteração de conteúdo) — atende à recomendação de evitar Ogg/Vorbis no __DEP_REMOVIDA__ sem decoder extra.
-- Música já veio em MP3 (decodificação nativa do __DEP_REMOVIDA__), só precisou de redução de bitrate por tamanho de repo.
+- SFX candidatos vieram em Ogg Vorbis (formato original Kenney) e foram convertidos para WAV PCM 16-bit via `ffmpeg -c:a pcm_s16le` (conversão de container/codec, sem alteração de conteúdo) — atende à recomendação de evitar Ogg/Vorbis no GlintFx sem decoder extra.
+- Música já veio em MP3 (decodificação nativa do GlintFx), só precisou de redução de bitrate por tamanho de repo.
 - Nenhum arquivo foi ouvido por humano ou por este agente (sem capacidade de audição) — toda curadoria foi por **descrição textual da fonte + metadata técnica** (duração via `ffprobe`, perfil de volume via `ffmpeg volumedetect`/`silencedetect`). **O criador (petrus) precisa validar o feel real ouvindo no jogo** antes de considerar este kit definitivo — é exatamente o propósito desta onda (dar sinal honesto pro playtest, não composição final).
 - Packs Kenney completos ficaram baixados em scratchpad de sessão (não commitados) — só os 3 arquivos WAV selecionados e convertidos foram copiados para `assets/sfx/`.

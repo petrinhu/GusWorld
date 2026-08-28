@@ -1,6 +1,6 @@
 # Tela de Batalha (BattleScreen): Design de Apresentacao
 
-**Status:** Decisoes macro ratificadas pelo criador supremo em 2026-06-23 (brainstorm colaborativo, 5 perguntas via AskUserQuestion). Spec de APRESENTACAO do combate; o motor e as regras vivem em [`combat.md`](combat.md) (canonico, fechado, nao reaberto aqui). Implementacao no M5 (BattleScreen) da engine C++23 + __DEP_REMOVIDA__. **Atualizacao 2026-06-25 (comando livre):** §3.5 modo-mira / target selection (D3) integrado ao menu de verbos; o painel do ator ativo e a faixa de fila refletem o comando livre da party (combat.md §4.1, modelo 1B).
+**Status:** Decisoes macro ratificadas pelo criador supremo em 2026-06-23 (brainstorm colaborativo, 5 perguntas via AskUserQuestion). Spec de APRESENTACAO do combate; o motor e as regras vivem em [`combat.md`](combat.md) (canonico, fechado, nao reaberto aqui). Implementacao no M5 (BattleScreen) da engine C++23 sobre GlintFx. **Atualizacao 2026-06-25 (comando livre):** §3.5 modo-mira / target selection (D3) integrado ao menu de verbos; o painel do ator ativo e a faixa de fila refletem o comando livre da party (combat.md §4.1, modelo 1B).
 
 **Convencao de escrita:** pt-br. Termos de game-dev no original. Sem em-dash; usa ponto, virgula, parenteses, dois-pontos.
 

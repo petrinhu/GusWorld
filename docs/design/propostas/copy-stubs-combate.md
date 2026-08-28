@@ -47,7 +47,7 @@ Conta: `228dp / (0.5 * 10dp) = 228 / 5 = 45,6`, ou seja **45 caracteres** antes 
 
 Se a caixa for content-box em vez de border-box (o arquivo não declara `box-sizing`, e o default do RCSS é content-box, o que daria 252dp úteis), o teto sobe para 50. **Fico com o número menor, 228dp, porque é o que o próprio arquivo declara**, e porque errar para menos só custa concisão.
 
-**Ressalva honesta:** eu **não executei a fonte** para conferir o avanço real. O `0.5` é a constante que o repositório declara e usa no próprio `text_width`; o caminho do glintfx desenha por __DEP_REMOVIDA__ com a métrica real da fonte, que numa face monoespaçada deve bater com `0.5em`, mas isso não foi medido aqui. Se o avanço real for `0.55em`, o teto cai para cerca de 41. **Por isso recomendo escrever com teto de 42:** o texto sobrevive às duas leituras.
+**Ressalva honesta:** eu **não executei a fonte** para conferir o avanço real. O `0.5` é a constante que o repositório declara e usa no próprio `text_width`; o caminho do glintfx desenha com a métrica real da fonte, que numa face monoespaçada deve bater com `0.5em`, mas isso não foi medido aqui. Se o avanço real for `0.55em`, o teto cai para cerca de 41. **Por isso recomendo escrever com teto de 42:** o texto sobrevive às duas leituras.
 
 **Consumidor B, o desenho à mão (fallback, só quando `hud_external_` é falso).**
 

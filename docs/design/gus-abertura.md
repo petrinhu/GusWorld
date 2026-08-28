@@ -271,7 +271,7 @@ Após aprovação deste esqueleto pelo criador (incluindo resolução dos pontos
 >
 > **O que esta seção resolve:** o §6 (Beat 5) e o §0 diziam que "o primeiro companion e a primeira área" ficavam adiados pro item `MUNDO-TOPOLOGIA`. Esta seção **decide** esses dois pontos PARA A ABERTURA: a primeira missão jogável após cruzar o limiar é uma **investigação solo** nos Distritos Inferiores que termina no primeiro companion (**Cauã "Volt"**) nos Dutos Infernais. `MUNDO-TOPOLOGIA` segue dono da topologia macro das 13 áreas; esta seção é só o primeiro fio.
 >
-> **Filtro de produção (regra dura do criador, `feedback_solo_baixa_infra_escopo`):** dev solo, recursos poucos. Toda peça abaixo foi escolhida por ser **BARATA** de implementar na stack C++23+__DEP_REMOVIDA__/2D — resolvida com **estado de sprite + SFX + diálogo + lógica**, sem animação quadro-a-quadro, partículas, shader custom ou física complexa. Onde uma opção mais cara for escolhida no futuro, ela vira **pedido pra glintfx** na TODO.md (não implementação inline).
+> **Filtro de produção (regra dura do criador, `feedback_solo_baixa_infra_escopo`):** dev solo, recursos poucos. Toda peça abaixo foi escolhida por ser **BARATA** de implementar na stack C++23 sobre GlintFx, em 2D — resolvida com **estado de sprite + SFX + diálogo + lógica**, sem animação quadro-a-quadro, partículas, shader custom ou física complexa. Onde uma opção mais cara for escolhida no futuro, ela vira **pedido pra glintfx** na TODO.md (não implementação inline).
 
 ### 13.1. Onde entra no fluxo
 

@@ -11,7 +11,7 @@ This document exists so anyone reading the GusWorld source, docs or lore knows e
 GusWorld is directed, decided and reviewed by a human. The AI (Claude Code) was used as an execution tool, under my direction and review at every step: no design, narrative or architecture decision was delegated to the AI without my approval. Breaking down each part:
 
 - **Creative direction, game design and narrative** (mechanics, world, characters, story, concept art): about 95% human. Every creative decision and every canonical direction was set and approved by me. The AI helped draft and organize text from decisions I had already made, always under my review; nothing becomes canon without my sign-off.
-- **Architecture and technical choices** (stack, engineering patterns, the ADRs): near 100% attributed to me and the human contributors credited in the acknowledgments (in particular my brother, El Iagows, who guided me on architecture, __DEP_REMOVIDA__ and spritesheets). The "how to build it" is a human decision; the AI contributed analysis and options, which I decided between.
+- **Architecture and technical choices** (stack, engineering patterns, the ADRs): near 100% attributed to me and the human contributors credited in the acknowledgments (in particular my brother, El Iagows, who guided me on architecture, rendering and spritesheets). The "how to build it" is a human decision; the AI contributed analysis and options, which I decided between.
 - **Code (implementation):** this is where the AI had the heaviest role. Claude Code acted as a pair-programming tool, writing and refactoring code from my specifications and decisions, with tests and review. Mine is the direction, the specification and the final call; the AI's is the assisted typing.
 
 In short: the author and director of this game is human. The AI is the tool.
@@ -30,7 +30,7 @@ All prompts used for image and sprite generation were derived from the game's lo
 Alongside the AI tools, several people shaped this project directly:
 
 - **Gus Dragon (my son):** inspiration for the protagonist's look and tastes, my partner in game decisions, and lead tester.
-- **El [Iagows](https://github.com/iagows) (my brother):** a computer engineer and a personal inspiration to me in IT, whose training shaped how I think about tech; he gave me plenty of architecture and stack advice, and guided me on using __DEP_REMOVIDA__ and spritesheets for movement.
+- **El [Iagows](https://github.com/iagows) (my brother):** a computer engineer and a personal inspiration to me in IT, whose training shaped how I think about tech; he gave me plenty of architecture and stack advice, and guided me on using the rendering pipeline and spritesheets for movement.
 - **Od Fuinha Minduim, Thiago MadDog and Thiago Arcanjo:** IT professionals who gave countless tips on testing, architecture, QA, security, CI and RAG.
 - **The #metaleiros-PE crew:** a longstanding friendship and a source of ongoing feedback and camaraderie.
 - **Bruno Vettore:** suggested creating a language for the game (Sylvarin was born from that conversation), inspired the character Brunus "Vetorial" Solveckt, and contributed the idea for the Black Mirror card.
@@ -70,7 +70,7 @@ The author and director of this game is human. The AI is a tool: a fast typist a
 O GusWorld é dirigido, decidido e revisado por um humano. A IA (Claude Code) foi usada como ferramenta de execução, sob minha direção e revisão em cada etapa: nenhuma decisão de design, narrativa ou arquitetura foi delegada à IA sem minha aprovação. Detalhando o papel de cada parte:
 
 - **Direção criativa, game design e narrativa** (mecânicas, mundo, personagens, história, arte conceitual): ~95% humana. Toda decisão criativa e todo rumo canônico foram definidos e aprovados por mim. A IA ajudou a rascunhar e organizar texto a partir das minhas decisões, sempre sob revisão minha; nada vira cânone sem meu aval.
-- **Arquitetura e escolhas técnicas** (stack, padrões de engenharia, os ADRs): quase 100% atribuídas a mim e aos contribuidores humanos creditados nos agradecimentos (em especial ao meu irmão El Iagows, que me orientou em arquitetura, __DEP_REMOVIDA__ e spritesheets). O "como construir" é decisão humana; a IA contribuiu com análise e opções, que eu decidi.
+- **Arquitetura e escolhas técnicas** (stack, padrões de engenharia, os ADRs): quase 100% atribuídas a mim e aos contribuidores humanos creditados nos agradecimentos (em especial ao meu irmão El Iagows, que me orientou em arquitetura, renderização e spritesheets). O "como construir" é decisão humana; a IA contribuiu com análise e opções, que eu decidi.
 - **Código (implementação):** é onde a IA teve o papel mais pesado. O Claude Code atuou como par de programação, escrevendo e refatorando código a partir das minhas especificações e decisões, com testes e revisão. O meu é a direção, a especificação e a decisão final; o da IA é a digitação assistida.
 
 Em resumo: o autor e diretor do jogo é humano; a IA é a ferramenta.
@@ -89,7 +89,7 @@ Todos os prompts usados na geração de imagem e sprite foram derivados da lore 
 Além das ferramentas de IA, várias pessoas moldaram este projeto diretamente:
 
 - **Gus Dragon (meu filho):** inspiração da aparência e dos gostos do protagonista, parceiro nas decisões sobre o jogo, e meu tester principal.
-- **El [Iagows](https://github.com/iagows) (meu irmão):** engenheiro de computação e uma inspiração pessoal minha em TI, cuja formação moldou meu jeito de pensar tecnologia; me deu várias dicas de arquitetura e stack, e me orientou no uso de __DEP_REMOVIDA__ e de spritesheets para o movimento.
+- **El [Iagows](https://github.com/iagows) (meu irmão):** engenheiro de computação e uma inspiração pessoal minha em TI, cuja formação moldou meu jeito de pensar tecnologia; me deu várias dicas de arquitetura e stack, e me orientou no uso do pipeline de renderização e de spritesheets para o movimento.
 - **Od Fuinha Minduim, Thiago MadDog e Thiago Arcanjo:** profissionais de TI que deram inúmeras dicas de testes, arquitetura, QA, segurança, CI e RAG.
 - **A galera do #metaleiros-PE:** uma amizade antiga e uma fonte constante de feedback e parceria.
 - **Bruno Vettore:** deu a sugestão de criar uma língua para o jogo (o Sylvarin nasceu dessa conversa), inspirou o personagem Brunus "Vetorial" Solveckt, e contribuiu com a ideia da carta do Espelho Negro.

@@ -163,7 +163,7 @@ Campo aditivo, `validate()` não precisa mudar (todo ordinal do enum é válido 
 
 **Onde:** tela nova, inserida no fluxo de **Novo Jogo** da tela de título (`title_menu.hpp`, já existe — SAVE-LOAD-UI etapa 4). Hoje: `Novo Jogo` → (se há save existente) mini-diálogo Sim/Não → `StartNewGame`. Proposta: entre a confirmação de "Novo Jogo" e o `StartNewGame` de fato, entra uma **tela de seleção de dificuldade** (3 opções: Fácil / Médio / Difícil — Hardcore não aparece aqui, §2.3), foco inicial em **Médio** (§2.1), navegação idêntica ao padrão já estabelecido (setas/WASD + Enter, clique = foco+confirma). Selecionar dispara o Aviso #2 (§2.2); `Confirmar` grava a escolha e só ENTÃO o jogo começa do zero.
 
-Novo POCO análogo a `TitleMenuState`: `DifficultyMenuState` (arquivo sugerido `gus/app/screens/difficulty_menu.hpp`, mesmo espírito de `title_menu.hpp`/`save_load_menu.hpp` — 100% testável sem __DEP_REMOVIDA__/disco), __DEP_REMOVIDA__/RCSS dedicado (`difficulty_menu_____.hpp/.cpp`) e o loop GL (`difficulty_menu_loop.hpp/.cpp`).
+Novo POCO análogo a `TitleMenuState`: `DifficultyMenuState` (arquivo sugerido `gus/app/screens/difficulty_menu.hpp`, mesmo espírito de `title_menu.hpp`/`save_load_menu.hpp` — 100% testável sem GlintFx/disco), documento de estilo dedicado (`difficulty_menu.hpp/.cpp`) e o loop GL (`difficulty_menu_loop.hpp/.cpp`).
 
 **Armazenamento (`SaveData`, `gus/domain/save/save_data.hpp`):** campo novo, aditivo, schema **V5** (mesmo padrão dos bumps V2→V3→V4 já documentados no header do arquivo):
 
@@ -252,7 +252,7 @@ Trecho hoje vigente em `pillars.md` (citado sem alteração):
 
 **Fase 0 — pode entrar já, zero dependência nova de conteúdo:**
 - `DifficultyLevel` enum + campo `SaveData.difficulty` (+ `difficult_recovery_stage`), schema V5 aditivo + migrator V4→V5 (default `Medio`).
-- Tela de seleção de dificuldade (`DifficultyMenuState` + __DEP_REMOVIDA__ + loop) encaixada no fluxo de Novo Jogo — Aviso #1 (legenda) + Aviso #2 (splash confirmar/cancelar).
+- Tela de seleção de dificuldade (`DifficultyMenuState` + GlintFx + loop) encaixada no fluxo de Novo Jogo — Aviso #1 (legenda) + Aviso #2 (splash confirmar/cancelar).
 - `EnemyKind` enum + campo `EnemyTemplate.kind` (aditivo, default `Creature`) — dado puro, sem consumidor ainda.
 - **Fácil** funcional ponta-a-ponta: reload do último save no `CombatOutcome::Defeat` — reusa 100% o save I/O já existente (M2 ✅). É literalmente a substituição mais barata do placeholder do M7 pra saves marcados Fácil.
 

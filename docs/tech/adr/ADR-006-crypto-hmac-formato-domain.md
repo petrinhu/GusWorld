@@ -6,7 +6,7 @@ Decisores: lider supremo (petrus), software-architect, backend-engineer
 
 ## Contexto
 
-A camada `domain/` do GusEngine (C++20 POCO, ZERO Qt, invariante auditada por grep no CI) porta de C# os subsistemas `templates` (TemplateSerializer) e `save` (o mais critico). Ambos usam HMAC-SHA256 anti-tamper + serializacao. O C# usa System.Security.Cryptography (HMACSHA256) + System.Text.Json. O projeto C++ nao tem OpenSSL, lib JSON nem crypto linkada (build via CMakePresets + FetchContent, sem vcpkg). QCryptographicHash esta FORA do domain pela invariante de camadas.
+A camada `domain/` do GusEngine (C++20 POCO, ZERO dependência externa, invariante auditada por grep no CI) porta de C# os subsistemas `templates` (TemplateSerializer) e `save` (o mais critico). Ambos usam HMAC-SHA256 anti-tamper + serializacao. O C# usa System.Security.Cryptography (HMACSHA256) + System.Text.Json. O projeto C++ nao tem lib JSON nem crypto externa linkada (build via CMakePresets + FetchContent, sem vcpkg).
 
 Fatos que delimitam a decisao:
 
@@ -18,7 +18,7 @@ Fatos que delimitam a decisao:
 
 1. **HMAC-SHA256 proprio em `core/`**: implementacao de dominio publico (SHA-256 + HMAC), ZERO dependencia externa, validada TEST-FIRST contra os vetores oficiais FIPS 180-4 (SHA-256) e RFC 4231 (HMAC-SHA256). Nenhum subsistema (templates, save) porta antes da crypto estar verde contra os vetores. Chave de integridade FIXA embutida no binario.
 
-2. **Formato de serializacao binario proprio** (envelope compacto: magic / length / payload / hmac), sem JSON nem dependencia externa. Rompe a compatibilidade byte-a-byte com os arquivos do C#/Godot (aceitavel: jogo em DEV, sem saves de jogador real; C# descontinuado no M8). Decidido AGORA porque romper o formato e barato em DEV e caro pos-lancamento.
+2. **Formato de serializacao binario proprio** (envelope compacto: magic / length / payload / hmac), sem JSON nem dependencia externa. Rompe a compatibilidade byte-a-byte com os arquivos da engine anterior (aceitavel: jogo em DEV, sem saves de jogador real; engine anterior descontinuada no M8). Decidido AGORA porque romper o formato e barato em DEV e caro pos-lancamento.
 
 3. **Oraculo de equivalencia semantica** no lugar do oraculo de formato byte-a-byte: congelar objetos de dominio canonicos e provar, em C# e em C++, o roundtrip identico (objeto -> bytes -> objeto identico) + a deteccao de tamper (byte-flip rejeitado). Prova nao-corrupcao com o mesmo rigor, sem acorrentar o C++ a formatacao do .NET depois do M8.
 
@@ -34,7 +34,7 @@ Eixo formato: (A) JSON compativel com o C# (nlohmann/json): preserva o oraculo b
 
 ## Consequencias
 
-Positivas: build reprodutivel Linux+Windows sem vcpkg/OpenSSL/JSON externos; invariante zero-Qt e zero-dep externa em core/domain preservada; soberania total do codigo critico (crypto + formato) sob Apache-2.0, sem atribuicao extra; o oraculo semantico prova nao-corrupcao sem acorrentar o C++ a quirks do .NET pos-M8.
+Positivas: build reprodutivel Linux+Windows sem vcpkg/JSON externos; invariante zero-dep externa em core/domain preservada; soberania total do codigo critico (crypto + formato) sob Apache-2.0, sem atribuicao extra; o oraculo semantico prova nao-corrupcao sem acorrentar o C++ a quirks do .NET pos-M8.
 
 Negativas (aceitas como custo): crypto propria exige suite de teste com vetores oficiais (FIPS 180-4 + RFC 4231) como gate; romper o formato C# significa abrir mao do oraculo byte-a-byte literal (os fixtures C# viram referencia semantica, nao binaria); saves/templates do C# antigo nao sao lidos pelo C++ (aceitavel: sem base instalada real).
 

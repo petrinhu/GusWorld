@@ -59,7 +59,7 @@ build/linux-release/app/gusworld_app \
 ```
 
 O I/O de arquivo (ler `.csv`, escrever `.gmap`) vive SO no `app/` (fronteira). A
-logica de transformacao e POCO puro do `domain/` (sem __DEP_REMOVIDA__, sem fstream).
+logica de transformacao e POCO puro do `domain/` (sem dependencia de plataforma, sem fstream).
 
 ## Formato CSV
 
