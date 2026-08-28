@@ -24,7 +24,12 @@ from pathlib import Path
 PROIBIDOS = {
     "Qt":          r"\bQt[0-9]?\b|\bQt(Gamepad|RHI|Quick|Widgets|Core)\b",
     "SDL":         r"\bSDL[0-9]?\b|\bSDL_[A-Za-z]+\b",
-    "RmlUi":       r"\bRmlUi\b|\bRCSS\b",
+    # ATENCAO: RCSS e RML sao do GLINTFX, nao do RmlUi -- sao a linguagem de
+    # estilo e a marcacao NATIVAS do framework que a LEI ZERO autoriza. Estavam
+    # neste padrao por engano meu, e o guard apontava a arma contra a unica
+    # dependencia legitima do projeto. Achado pelo agente da extirpacao em
+    # 28/08/2026 e confirmado no repositorio do proprio GlintFx.
+    "RmlUi":       r"\bRmlUi\b",
     "Godot":       r"\bGodot\b|\bGDScript\b",
     "Unity":       r"\bUnity\b",
     "Unreal":      r"\bUnreal\b",
