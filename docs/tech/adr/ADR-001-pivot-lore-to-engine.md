@@ -115,7 +115,7 @@ GusWorld está no fim da Fase 1 (Concepção). Estado factual em 2026-05-19:
 
 - **Momentum técnico imediato.** F2-S.1 desbloqueada. Próxima sessão pode iniciar o setup técnico da Fase 2.
 - **Validação empírica acelerada de pillars técnicos.** Câmera orbital 3/4 (Pillar 5 setting bipartido) testada em semanas, não meses. Triângulo de hardware (Pillar 3) sai do papel.
-- **Risco arquitetural reduzido.** Decisões one-way door (save schema, modular engine layout, signal bus) confrontadas com código real cedo. ADRs subsequentes (ADR-002+) nascem de evidência, não conjectura.
+- **Risco arquitetural reduzido.** Decisões one-way door (save schema, modular engine layout, signal bus) confrontadas com código real cedo. ADRs subsequentes nascem de evidência, não conjectura.
 - **Fadiga criativa respeitada.** User produz lore quando inspirado, código quando inspirado. Solo indie sustentável.
 - **Vertical slice volta à meta 4-6 meses.** Sem 3-6 meses de lore pré-código, janela original do CLAUDE.md restaurada.
 - **Lore-on-demand preserva qualidade.** Quando F2 puxar um detalhe canônico faltante (ex: comportamento exato de inimigo da Selve em combate), micro-sessão de 500-2000 pal cobre — não precisa do bloco completo de 35k.

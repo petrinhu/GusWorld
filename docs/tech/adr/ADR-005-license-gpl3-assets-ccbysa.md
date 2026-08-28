@@ -120,7 +120,6 @@ Ações fora do escopo desta ADR (responsabilidade do líder, separadas):
 ## Cross-refs
 
 - `docs/tech/pivot/engine-design.md` §7 (direção de licença do pivot, agora fechada).
-- `ADR-002-csharp-aot-over-gdscript.md` (stack C# da engine que será descartada; contexto do submodule).
 - `LICENSE` (texto GPLv3 verbatim, imutável).
 - `ASSETS-LICENSE.md` (fronteira código/assets + exceção livros).
 - `THIRD-PARTY-LICENSES.md` (atribuição de terceiros).

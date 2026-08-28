@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > selado — isso é trabalho do `B9` (`docs/tech/convencao-formatos-gw.md`, tipo `.gw.text`), que
 > **depende** deste contrato e tem de satisfazer cada regra abaixo. Este documento fixa **o que**
 > o formato precisa garantir; `B9` decide **como**, em texto fonte editável no repositório,
-> compilado e selado no build (L-18, L-25, ADR-012 §7-8).
+> compilado e selado no build (L-18, L-25).
 
 ---
 
@@ -180,7 +180,7 @@ unidade que ainda faz sentido isolada para quem traduz.**
   de palavras diferente) — a chave inteira é a frase, como `MENU_QUIT_CONFIRM` já faz.
 - **Diálogo**: uma chave por nó do grafo (`DIALOGUE_<id>_<node>`), nunca uma chave para o diálogo
   inteiro nem uma chave partida no meio de uma fala. O nó já é a unidade que o parser do motor
-  consome (`ADR-014-dialogue-runtime-poco.md`), e é também a unidade que faz sentido pro tradutor
+  consome, e é também a unidade que faz sentido pro tradutor
   ler isolada.
 - **Prosa longa** (Diário, docs in-world): uma chave por **parágrafo**, não por documento inteiro
   nem por sentença. A convenção já citada em `README.md`
@@ -214,7 +214,7 @@ quebra os dois ao mesmo tempo: o código que busca a chave antiga e o trabalho d
 em cada idioma vivo.
 
 **A ordem de exibição nunca depende do nome da chave.** No formato de diálogo, o `id` do nó é só
-identidade; a ordem real vem dos links `->` do grafo (`ADR-014`). Isso significa que inserir um
+identidade; a ordem real vem dos links `->` do grafo. Isso significa que inserir um
 nó novo no meio de uma cena publicada **não exige renumerar** os nós vizinhos — anexa-se o
 nó novo com um `id` que ainda não existe e emenda-se o grafo, sem tocar identificador nenhum já
 traduzido. A numeração de dois dígitos do piloto da Cena 15 (`n01`...`n27`) existe para
@@ -300,7 +300,7 @@ idiomas.
 por decisão já tomada (`ADR-006`, ratificada pela L-25 para a própria criptografia — "nenhuma
 biblioteca de terceiro"), e ICU4C é uma dependência pesada para o que o jogo precisa. A
 **sintaxe** ICU MessageFormat pode ser adotada sem a **biblioteca** ICU: um parser pequeno,
-escrito em `domain/i18n/` junto do carregador de catálogo (`ADR-012` §7 já reserva esse espaço),
+escrito em `domain/i18n/` junto do carregador de catálogo,
 que entende `{arg}`, `{count, plural, ...}` com as categorias CLDR e `{..., select, ...}`, com a
 tabela de qual categoria vale para qual locale sendo exatamente o "campo de plural CLDR" do
 registro de locale do §2.2 — dado, não código condicional por idioma.
@@ -418,7 +418,7 @@ O formato que `B9` desenhar só cumpre este contrato se, para os itens abaixo, a
 - [ ] O parser aceita `{arg}` nomeado e o subconjunto ICU de `plural`/`select` do §6.2 (ou a
       alternativa que o líder aprovar no lugar).
 - [ ] Nada do texto do jogador chega em texto puro na distribuição — a fonte fica no repositório,
-      o artefato entregue é o pacote compilado e selado (L-18, L-25, ADR-012 §8), sem exceção para
+      o artefato entregue é o pacote compilado e selado (L-18, L-25), sem exceção para
       locale nenhum, inclusive os que ainda não existem.
 
 ---

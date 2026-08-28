@@ -138,7 +138,7 @@ A morte de Gus tem consequência mecânica distinta por nível (default = **Méd
 - **Fácil**: HP=0 → reload do último save (game over JRPG clássico).
 - **Médio** *(default)*: HP=0 → whiteout no Hospital com perdas (economia Fibonacci, `economia.md` §3).
 - **Difícil**: HP=0 → respawn deslocado + stats quase-zero (Selve Sombria se criatura matou / casa destruída se humano), recuperação por marcos. Enquadramento **técnico** (fail-safe corrompido, log glitchado, sem testemunha nem reconhecimento de "quase-morte") — protege a exclusividade do Dragon Victory.
-- **Hardcore/Hell** *(unlock pós-zerar o Difícil, preso à máquina)*: HP=0 → **kernel panic puzzle** como ÚLTIMA CHANCE (resolve = sobrevive; falha = **permadeath** real). Save isolado, cifrado+selado (ADR-015), destruído de forma irrecuperável na morte (wipe seguro).
+- **Hardcore/Hell** *(unlock pós-zerar o Difícil, preso à máquina)*: HP=0 → **kernel panic puzzle** como ÚLTIMA CHANCE (resolve = sobrevive; falha = **permadeath** real). Save isolado, cifrado+selado, destruído de forma irrecuperável na morte (wipe seguro).
 
 ### Companions — imortais com incapacitação
 
@@ -253,7 +253,7 @@ Uma por personagem da party (Gus + 6 companions). Auto-mode + manual. XP individ
 ### Dificuldade — 4 modos (Fácil / Médio / Difícil / Hardcore)
 
 - **4 níveis**, cada um com consequência de morte própria (default = **Médio**; **fixa por save**). Detalhe canônico: `docs/design/mecanicas/modos-morte.md` + seção "Game over — 4 modos" acima.
-- **Hardcore/Hell** (unlock pós-zerar o Difícil, preso à máquina): kernel panic puzzle última chance → permadeath; save cifrado/selado (ADR-015) destruído irrecuperável na morte.
+- **Hardcore/Hell** (unlock pós-zerar o Difícil, preso à máquina): kernel panic puzzle última chance → permadeath; save cifrado/selado destruído irrecuperável na morte.
 
 ### Foreshadow Dante traidor
 

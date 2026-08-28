@@ -62,4 +62,4 @@ O `ADR-019` já canoniza "motor genérico + conteúdo como dado atômico" no ní
 
 ## Reversibilidade
 
-Two-way door quanto ao MECANISMO de decomposição (herança de agregados + fachada é um padrão aplicável a qualquer módulo futuro, sem custo de reverter se um assunto se mostrar mal cortado). One-way door quanto ao formato já persistido: a decomposição de `CardPhysicalState` já está em save V7 de produção — reverter exigiria novo migrator, mesmo custo que qualquer mudança de shape de save já documentada em `ADR-006`/`ADR-007`/`ADR-015`.
+Two-way door quanto ao MECANISMO de decomposição (herança de agregados + fachada é um padrão aplicável a qualquer módulo futuro, sem custo de reverter se um assunto se mostrar mal cortado). One-way door quanto ao formato já persistido: a decomposição de `CardPhysicalState` já está em save V7 de produção — reverter exigiria novo migrator, mesmo custo que qualquer mudança de shape de save já documentada em `ADR-006`/`ADR-007`.

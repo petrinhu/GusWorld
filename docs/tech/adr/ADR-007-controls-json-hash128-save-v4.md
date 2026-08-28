@@ -15,7 +15,7 @@ Decisores: lider supremo (petrus), software-architect, backend-engineer
 
 ## Contexto
 
-O subsistema `input_remap` ja vive em `GusEngine/domain/input/` como POCO puro (ADR-002 + F2-E.7): `ActionRegistry` (37 actions canonicas) + os records de binding (`KeyBinding`, `GamepadButtonBinding`, `MouseButtonBinding`, `GamepadAxisBinding`, `ActionBindings`, `InputRemapConfig`, com `config_version = 1`). O header `input_binding.hpp` registra explicitamente que NAO existe serializer portado: "quando a persistencia do remap virar necessaria, o serializer entra junto do backend (decisao de design para o lider)". Este ADR e essa decisao.
+O subsistema `input_remap` ja vive em `GusEngine/domain/input/` como POCO puro (F2-E.7): `ActionRegistry` (37 actions canonicas) + os records de binding (`KeyBinding`, `GamepadButtonBinding`, `MouseButtonBinding`, `GamepadAxisBinding`, `ActionBindings`, `InputRemapConfig`, com `config_version = 1`). O header `input_binding.hpp` registra explicitamente que NAO existe serializer portado: "quando a persistencia do remap virar necessaria, o serializer entra junto do backend (decisao de design para o lider)". Este ADR e essa decisao.
 
 O lider desenhou a feature em detalhe (verbatim no fim deste ADR). O conceito esta FECHADO; este ADR crava o COMO, sem reabrir o conceito. Em uma frase: o remap do jogador mora num arquivo `*_controls.json` legivel/editavel; ao abrir o jogo, o jogo deteta se o arquivo foi editado a mao (via hash de 128 bits) e, se foi, mostra o diff e oferece restaurar a partir de um backup binario embutido no save mais recente.
 
