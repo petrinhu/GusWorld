@@ -32,7 +32,7 @@ Transcrito de `GODS_LAWS.md` (34 leis, medido em 25/08/2026 por `grep -c "^## L-
 | [L-08](GODS_LAWS.md#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
 | [L-09](GODS_LAWS.md#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos; Fedora 44 primário; CachyOS é próprio, não Arch |
 | [L-10](GODS_LAWS.md#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level fable audita e cria; sonnet implementa |
-| [L-11](GODS_LAWS.md#l-11) | escolher entre duas abordagens, ou notar qualquer dúvida | Nada é decidido por agente; opções ao líder via `AskUserQuestion` |
+| [L-11](GODS_LAWS.md#l-11) | fazer **qualquer** pergunta ao líder, inclusive de esclarecimento | `AskUserQuestion` SEMPRE, com opções clicáveis; nunca pergunta em prosa |
 | [L-12](GODS_LAWS.md#l-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
 | [L-13](GODS_LAWS.md#l-13) | tocar em qualquer trabalho que dependa de canon | Canon desatualizado bloqueia: atualiza primeiro, trabalha depois |
 | [L-14](GODS_LAWS.md#l-14) | concluir que algo está morto, obsoleto ou descartável | Nada é declarado morto por agente; a decisão é do líder |
