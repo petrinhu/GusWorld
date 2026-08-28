@@ -28,7 +28,7 @@ Fatos que delimitam a decisao:
 
 ## Opcoes consideradas
 
-Eixo fonte do HMAC: (1) OpenSSL via vcpkg/find_package: crypto auditada, mas arrasta dep pesada + vcpkg so para 1 HMAC, over-engineering pro escopo. (2) SHA-256/HMAC header-only FOSS vendorado: zero infra de dep, mas +1 codigo de terceiro no repo. (3) ESCOLHIDA: SHA-256/HMAC proprio em core/: zero dep, soberania total, validavel por vetores oficiais; risco de bug mitigado pelos vetores FIPS/RFC (uso so integridade, sem timing/sigilo).
+Eixo fonte do HMAC: (1) biblioteca de criptografia de terceiro via gerenciador de pacote: crypto auditada, mas arrasta dep pesada + gerenciador de pacote so para 1 HMAC, over-engineering pro escopo. (2) SHA-256/HMAC header-only FOSS vendorado: zero infra de dep, mas +1 codigo de terceiro no repo. (3) ESCOLHIDA: SHA-256/HMAC proprio em core/: zero dep, soberania total, validavel por vetores oficiais; risco de bug mitigado pelos vetores FIPS/RFC (uso so integridade, sem timing/sigilo).
 
 Eixo formato: (A) JSON compativel com o C# (nlohmann/json): preserva o oraculo byte-a-byte, mas exige casar a formatacao exata do System.Text.Json (fragil, sobretudo no save indentado) + 1 dep. (B) ESCOLHIDA: binario proprio compacto: zero dep, controle total; rompe compat byte-a-byte, compensado pelo oraculo de equivalencia semantica.
 

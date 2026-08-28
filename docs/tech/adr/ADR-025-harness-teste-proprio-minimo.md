@@ -46,8 +46,8 @@ APIs do sistema operacional. Sem gerenciador de pacote de terceiros, sem
 lei a si mesmo, inclusive ao **próprio harness de teste**: `tests/CMakeLists.txt`
 do GlintFx monta uma biblioteca `glintfx_test_harness` a partir de três
 arquivos escritos em casa — `harness/test_registry.cpp`,
-`harness/check.cpp`, `harness/harness_main.cpp` — sem Catch2, GoogleTest nem
-qualquer outro framework externo. Este é o precedente real, medido, que
+`harness/check.cpp`, `harness/harness_main.cpp` — sem
+framework de teste de terceiro. Este é o precedente real, medido, que
 justifica a decisão de hoje: não é lei do GusWorld, é harmonia deliberada
 com o costume já provado do projeto do qual o GusWorld depende.
 
@@ -78,7 +78,7 @@ o mínimo que isso exige: rodar um teste, ver se ele falha, ver se ele passa.
 
 ## Alternativas consideradas
 
-### A. Adotar um framework de teste C++ maduro (Catch2, GoogleTest, doctest)
+### A. Adotar um framework de teste C++ maduro de terceiro
 
 **Prós:** descoberta automática, relatórios prontos, matchers expressivos,
 comunidade e manutenção de terceiros.

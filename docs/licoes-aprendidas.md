@@ -52,11 +52,11 @@ Um checklist de playtest entregue ao líder pedia que ele avaliasse ordem de tur
 
 **Fazer diferente:** ao montar um checklist para humano, separar antes o que é da categoria "sensação de jogo" (ritmo, dificuldade percebida, clareza de UI) do que é da categoria "correção interna" (ordenação, decisão de IA, resultado de sorteio). A segunda categoria vai sempre para teste automatizado, nunca para observação humana.
 
-## 9. Vírgula em nome de teste corta o filtro do Catch2 em pedaços que não casam nada
+## 9. Vírgula em nome de teste corta o filtro de teste em pedaços que não casam nada
 
-Um harness de caça a teste instável rodou 55 amostras e reportou 20 falhas (36%), todas espúrias: os nomes de teste tinham vírgula não escapada, o Catch2 trata vírgula como separador de filtro, e o nome fatiado não casava com nenhum teste real, produzindo "No tests ran" indistinguível de falha de verdade sem olhar a saída completa.
+Um harness de caça a teste instável rodou 55 amostras e reportou 20 falhas (36%), todas espúrias: os nomes de teste tinham vírgula não escapada, o framework de teste da época tratava vírgula como separador de filtro, e o nome fatiado não casava com nenhum teste real, produzindo "No tests ran" indistinguível de falha de verdade sem olhar a saída completa.
 
-**Fazer diferente:** não usar vírgula em nome de teste no Catch2, ou sempre filtrar por curinga. E, ao investigar uma suíte com falhas em massa e súbitas, conferir primeiro se o nome do teste tem caractere especial de filtro antes de assumir regressão real.
+**Fazer diferente:** não usar vírgula em nome de teste, e sempre filtrar por curinga quando o harness suportar filtro por nome. E, ao investigar uma suíte com falhas em massa e súbitas, conferir primeiro se o nome do teste tem caractere especial de filtro antes de assumir regressão real.
 
 ## 10. Loop modal que descarta "tecla solta" silenciosamente deixa o personagem andando sozinho depois
 

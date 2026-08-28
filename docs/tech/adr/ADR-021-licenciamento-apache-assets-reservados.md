@@ -166,10 +166,11 @@ limpa**:
 - **Cross-check do inventário de terceiros** em `THIRD-PARTY-LICENSES.md`
   contra o que está de fato vendorizado ou linkado no binário: nenhuma
   divergência nova.
-- **Revisão dos empréstimos de constantes do Godot**, remanescentes da era
-  Godot/C# (pré-M8): são valores de interface (enums, constantes numéricas de
-  configuração), não expressão criativa protegida por copyright; e o próprio
-  Godot é MIT, permissivo, sem exigência que impeça o uso desses valores.
+- **Revisão dos empréstimos de constantes de engine anterior**, remanescentes
+  de uma era pré-M8 já descontinuada: são valores de interface (enums,
+  constantes numéricas de configuração), não expressão criativa protegida por
+  copyright; e a engine de origem era MIT, permissiva, sem exigência que
+  impeça o uso desses valores.
 
 ⚠️ **Limite declarado do método, não bloqueio da decisão:** existe risco
 residual de regurgitação de material de treino, porque este código foi escrito

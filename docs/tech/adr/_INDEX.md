@@ -27,11 +27,6 @@ lição — e não a stack morta em que cada um foi escrito.
   jogador, backup embutido em todo save, hash sobre forma canônica) é o desenho mais detalhado do
   corpus e antecede a L-25 quase ponto a ponto. Ver achado em `../_INDEX.md` — sem marcador de
   superação no documento.
-- `ADR-015` — segurança de save v2 offline: AEAD, machine-binding só no Hardcore, âncora selada
-  anti-rollback, wipe por crypto-shred. É o ADR mais próximo da L-25 vigente — quase um rascunho
-  dela. Único ponto revogado: a fonte da cifra vendorizada; a lei manda vir do GlintFx. **Onda 1
-  do plano de execução (vendorizar a cifra) precisa de revisão do líder antes de qualquer
-  implementação — ver achado em `../_INDEX.md`.**
 - `ADR-016` — motor `techMagic` de efeito data-driven (lista de instruções, não VM/bytecode). Morto
   como código; o princípio (dado antes de máquina virtual) é o mesmo que a L-04/L-17 de hoje
   consagram. Já tem edição de terminologia aplicada por outra passada (troca pontual de

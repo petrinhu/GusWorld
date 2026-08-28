@@ -146,7 +146,7 @@ Análise de equilíbrio em jogos de múltiplos jogadores (party vs. múltiplos b
 Mecânicas de incomplete information intencionais (fog of war em stats ou “descoberta” de fraquezas)
 
 O resultado é combate com profundidade estratégica real, replayability alta e sensação de maestria — exatamente o que diferencia sistemas de dano memoráveis (Press Turn de Shin Megami Tensei, triangle weapons de Fire Emblem, complexidade de status em Persona) daqueles que se reduzem a “apertar Attack até morrer”.
-Se você estiver implementando isso em um protótipo (Godot, Unity, engine custom ou até script Python para simulação), posso ajudar a refinar a heurística de avaliação, a estrutura da árvore Expectiminimax ou a construção das matrizes de payoff para o seu sistema específico de dano. Basta fornecer mais detalhes sobre as mecânicas centrais (fórmula exata de dano, quantas ações por turno, presença de grid/posicionamento, etc.).19 sourcesImplementar Expectiminimax com MCTSPensou por 1m 28sImplementação completa de Expectiminimax com MCTS para sistema de dano em RPG de batalhas por turnos
+Se você estiver implementando isso em um protótipo (engine própria ou script Python para simulação), posso ajudar a refinar a heurística de avaliação, a estrutura da árvore Expectiminimax ou a construção das matrizes de payoff para o seu sistema específico de dano. Basta fornecer mais detalhes sobre as mecânicas centrais (fórmula exata de dano, quantas ações por turno, presença de grid/posicionamento, etc.).19 sourcesImplementar Expectiminimax com MCTSPensou por 1m 28sImplementação completa de Expectiminimax com MCTS para sistema de dano em RPG de batalhas por turnos
 A combinação de Expectiminimax com Monte Carlo Tree Search (MCTS) é uma das abordagens mais poderosas e práticas para IA em jogos com dano estocástico. Enquanto o Expectiminimax clássico lida bem com árvores pequenas e chance nodes explícitos (miss/crit com probabilidades conhecidas), o MCTS escala para espaços de ação maiores, típicos de RPGs com múltiplas skills, alvos e party.
 O código abaixo é uma implementação educacional, autossuficiente e funcional em Python puro. Ele modela exatamente o que discutimos: o sistema de dano estocástico é o motor que gera os payoffs, e o MCTS + rollouts amostrados aproxima os valores esperados do Expectiminimax sem precisar expandir explicitamente todos os outcomes de dano (que são contínuos).
 O arquivo completo está salvo em:
@@ -239,11 +239,9 @@ B. Chance nodes explícitos (mais preciso que puro sampling)
 Quando os outcomes são discretos e poucos (ex: Miss / Hit normal / Crítico), crie filhos de chance no expand com pesos = probabilidades. No backpropagation use média ponderada em vez de amostra única. Isso é Expectiminimax “puro” dentro do MCTS.
 C. Heurística mais forte
 Substitua _evaluate_state por uma rede neural leve treinada (ou mesmo uma função com mais features: ameaças de burst, cooldowns restantes, sinergia de status). MCTS + rede = AlphaZero-style para RPG.
-D. Integração com engines
+D. Integração com engine
 
-Godot (GDScript/Python): exponha a classe ExpectiMCTS via GDExtension ou chame Python externo.
-Unity (C#): portar a lógica é direto (dataclasses → classes, random → UnityEngine.Random).
-Qt6/C++: use o Python como protótipo/ferramenta de balanceamento e depois implemente versão otimizada com std::mt19937 e std::vector.
+Portar a lógica para C++ é direto (dataclasses → structs/classes, random → std::mt19937): use o Python como protótipo/ferramenta de balanceamento e depois implemente a versão otimizada com std::mt19937 e std::vector.
 
 E. Tuning de parâmetros
 
@@ -384,7 +382,7 @@ Rápido de clonar
 Completo (contém tudo que afeta payoff)
 Hashável ou comparável para transposition table (opcional mas poderoso)
 
-Estrutura recomendada (Python-like, fácil de portar para C++/GDScript):
+Estrutura recomendada (Python-like, fácil de portar para C++):
 PythonCopiar@dataclass
 class StatusEffect:
     type: str          # "Burn", "DefenseUp", "Taunt", "Stealth", ...
