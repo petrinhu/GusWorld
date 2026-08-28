@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Portao da LEI ZERO no CI. O gancho pre-commit morde na maquina de quem
+# commita; este morde no servidor, para quem commitou sem o gancho instalado.
+#
+# ATENCAO, para ninguem confundir: este NAO e o CI do projeto. A matriz das
+# cinco plataformas com nove entradas e o item C4, e continua por fazer. Este
+# workflow existe antes dela porque a LEI ZERO se verifica em TEXTO, sem
+# compilar nada -- e o unico portao que pode valer antes de existir build.
+name: LEI ZERO
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lei-zero:
+    name: O GusWorld liga em GlintFx e no SO. Mais nada.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Precisa do historico para comparar o que o push ACRESCENTA.
+          fetch-depth: 0
+
+      - name: Regressao — o que este push acrescenta
+        # Morde primeiro o DIFF: bloqueia nome proibido NOVO mesmo enquanto a
+        # divida antiga ainda esta sendo removida. Sem isto, o portao travaria
+        # ate os proprios commits que fazem a limpeza.
+        run: |
+          set -eu
+          base="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            echo "Sem base (branch novo ou primeiro push): teste de regressao pulado."
+            exit 0
+          fi
+          python3 tools/security/lei_zero_guard.py --range "$base HEAD"
+
+      - name: Divida — a arvore inteira
+        # Morde a arvore. Enquanto houver violacao antiga, este passo e
+        # VERMELHO de proposito: e a verdade sobre o corpus, e a L-32 nao
+        # deixa pushar com CI vermelho.
+        run: python3 tools/security/lei_zero_guard.py

@@ -88,15 +88,16 @@ def isento(caminho: str) -> bool:
     c = caminho.replace("\\", "/")
     return any(c.startswith(p) for p in ISENTOS)
 
-def linhas_adicionadas() -> list[tuple[str, int, str]]:
+def linhas_adicionadas(intervalo: str | None = None) -> list[tuple[str, int, str]]:
     """Modo GATE: so o que este commit ACRESCENTA.
 
     Checar a arvore inteira travaria todo commit ate a limpeza terminar --
     inclusive os commits QUE FAZEM a limpeza. O gate morde a regressao: se o
     diff nao introduz nome proibido, passa, mesmo com divida antiga na arvore.
     """
-    out = subprocess.run(["git", "diff", "--cached", "--unified=0", "--no-color"],
-                         capture_output=True, text=True, check=True)
+    cmd = ["git", "diff", "--unified=0", "--no-color"]
+    cmd += ["--cached"] if intervalo is None else intervalo.split()
+    out = subprocess.run(cmd, capture_output=True, text=True, check=True)
     achados, caminho, linha = [], None, 0
     for l in out.stdout.split("\n"):
         if l.startswith("+++ b/"):
@@ -112,12 +113,16 @@ def linhas_adicionadas() -> list[tuple[str, int, str]]:
 
 def main() -> int:
     quiet = "--quiet" in sys.argv
-    if "--staged" in sys.argv:
+    intervalo = None
+    for i, a in enumerate(sys.argv):
+        if a == "--range" and i + 1 < len(sys.argv):
+            intervalo = sys.argv[i + 1]
+    if intervalo is not None or "--staged" in sys.argv:
         import os
         if str(os.environ.get("LEI_ZERO_GUARD", "")).lower() == "off":
             print("lei-zero-guard: DESLIGADO por LEI_ZERO_GUARD=off.", file=sys.stderr)
             return 0
-        return gate()
+        return gate(intervalo)
     try:
         arquivos = rastreados()
     except Exception as e:                       # noqa: BLE001
@@ -171,12 +176,12 @@ def main() -> int:
 
 
 
-def gate() -> int:
+def gate(intervalo: str | None = None) -> int:
     """Portao de pre-commit: bloqueia commit que ACRESCENTA dependencia proibida."""
     try:
-        adicionadas = linhas_adicionadas()
+        adicionadas = linhas_adicionadas(intervalo)
     except Exception as e:                       # noqa: BLE001
-        print(f"lei-zero-guard: nao consegui ler o diff staged: {e}", file=sys.stderr)
+        print(f"lei-zero-guard: nao consegui ler o diff: {e}", file=sys.stderr)
         return 1
     violacoes = []
     for caminho, linha, texto in adicionadas:
