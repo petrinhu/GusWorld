@@ -1,9 +1,9 @@
 # ADR-009: motor de UI/HUD embutido para o jogo (sobre __DEP_REMOVIDA__, dentro das 4 camadas)
 
-**Status:** Superseded by [ADR-010](ADR-010-adopt-glintfx-embed-mode.md)
+**Status:** Superseded
 **Data:** 2026-06-25
 **Decisores:** criador supremo (petrus) + software-architect (proposta)
-**Cross-ref:** [ADR-008](ADR-008-repivot-qt-to-__DEP_REMOVIDA__.md) (repivot Qt->__DEP_REMOVIDA__, já previu esta camada na "fase 3"; este ADR-009 concretiza essa fase 3), [`docs/tech/pivot/engine-design.md`](../pivot/engine-design.md) (4 camadas, GATE), [`docs/design/mecanicas/battle-screen.md`](../../design/mecanicas/battle-screen.md) (Tático Cockpit, pacing 2-beats, font-free), [ADR-010](ADR-010-adopt-glintfx-embed-mode.md) (troca o COMO desta decisão, não o QUÊ).
+**Cross-ref:** [ADR-008](ADR-008-repivot-qt-to-__DEP_REMOVIDA__.md) (repivot Qt->__DEP_REMOVIDA__, já previu esta camada na "fase 3"; este ADR-009 concretiza essa fase 3), [`docs/tech/pivot/engine-design.md`](../pivot/engine-design.md) (4 camadas, GATE), [`docs/design/mecanicas/battle-screen.md`](../../design/mecanicas/battle-screen.md) (Tático Cockpit, pacing 2-beats, font-free) — a decisão sucessora trocou o COMO desta decisão, não o QUÊ (ver "Nota de superação" abaixo).
 
 ---
 
@@ -110,4 +110,4 @@ A grande maioria dos ~887 testes (save, i18n, combat, progression, knowledge, sp
 
 ## Nota de superação
 
-Esta decisão foi **substituída em substância pelo ADR-010**: o COMO passou a ser consumir o motor de UI indiretamente, através do glintfx (biblioteca de UI própria do ecossistema, em modo embutido), em vez de integrar um motor de terceiro diretamente em `platform/`. O QUÊ (motor de UI/HUD declarativo, camada separada da arena, view-models POCO como fonte de verdade) permanece vigente.
+Esta decisão foi **substituída em substância**: o COMO passou a ser consumir o motor de UI indiretamente, através do glintfx (biblioteca de UI própria do ecossistema, em modo embutido), em vez de integrar um motor de terceiro diretamente em `platform/`. O QUÊ (motor de UI/HUD declarativo, camada separada da arena, view-models POCO como fonte de verdade) permanece vigente.
