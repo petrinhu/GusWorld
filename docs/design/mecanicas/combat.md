@@ -761,7 +761,7 @@ O domínio puro (`domain/combat/`) não emite eventos diretamente: apenas acumul
 
 #### Contrato de evento de status (canonizado 2026-05-26)
 
-O POCO **não** emite signals diretamente (mantém-se sem dependência Godot). Em vez disso a FSM **acumula uma lista de `StatusEffectChange`** (mesmo padrão do `Log` de `CombatLogEntry`), drenada dos atores em cada transição de fase relevante (tick / resolução / expire). O `CombatManager` (ponte Node) lê essa lista pós-turno por índice e traduz em signals:
+O POCO **não** emite signals diretamente (mantém-se sem dependência de framework). Em vez disso a FSM **acumula uma lista de `StatusEffectChange`** (mesmo padrão do `Log` de `CombatLogEntry`), drenada dos atores em cada transição de fase relevante (tick / resolução / expire). O `CombatManager` (ponte Node) lê essa lista pós-turno por índice e traduz em signals:
 
 ```
 StatusEffectChange(ActorId, StatusId Id, StatusChangeKind Kind, int Magnitude, int Duration)
@@ -981,7 +981,7 @@ Efeito mecânico de cada ambiente (qualquer camada) age por até quatro canais:
 
 Princípios não negociáveis desta camada:
 
-- **Dados no engine POCO**: record `EnvironmentModifier` (NÃO Resource Godot; mantém o engine puro, §16). Aplicação estática por arena no slice; cartas/inimigos que invocam ambiente = fase posterior (os dados já são preparados para isso).
+- **Dados no engine POCO**: record `EnvironmentModifier` (mantém o engine puro, §16). Aplicação estática por arena no slice; cartas/inimigos que invocam ambiente = fase posterior (os dados já são preparados para isso).
 - **Telegraph obrigatório (Pillar 4)**: toda mudança de clima ou período é avisada N turnos antes na fila, com ícone persistente; Scan revela o número exato de turnos restantes. Nunca RNG punitivo.
 - **Cap anti-Scan (Pillar 3)**: degradações de custo de Scan **não empilham além de -2 AP total** num mesmo encontro. A curadoria (§18.6) impede 2 ambientes anti-Scan fortes simultâneos. Hardware nunca vira inútil.
 - **Teto cognitivo**: no máximo ~12 terrenos visíveis. O tier **Codex** (efeitos sutis) só **ativa/revela após Scan-ambiente** (novo verb: Scan aplicado ao campo, custo 1 AP).

@@ -6,8 +6,8 @@ Decisores: lider supremo (petrus), software-architect, backend-engineer
 
 > ACEITO 2026-06-22. O lider cravou todos os forks abaixo e adicionou 3 camadas
 > anti-tamper (T1.1 detect-and-respond, T1.2 slot-id selado, T2.2 KDF na origem da
-> chave). A parte HEADLESS (POCO puro, ZERO Qt/IO) foi implementada em TDD pelo
-> backend-engineer (ctest 658/658 verde; ASan/UBSan limpo; grep-invariante zero-Qt/
+> chave). A parte HEADLESS (POCO puro, ZERO dep externa/IO) foi implementada em TDD pelo
+> backend-engineer (ctest 658/658 verde; ASan/UBSan limpo; grep-invariante zero-dep/
 > zero-IO mantido). Ver "Decisao do lider (resolucao dos forks)" e "Camadas
 > anti-tamper" abaixo. O I/O real (escrever/ler o .json e o save em disco, o caminho
 > ~/.gusworld/saves, permissoes 0700/0600, "qual save e o mais recente", a janela de
@@ -24,7 +24,7 @@ Fatos que delimitam a decisao (estado atual, factual):
 - `core/crypto/` ja tem SHA-256 e HMAC-SHA256 proprios, dep-free, validados contra vetores FIPS 180-4 / RFC 4231 (ADR-006). `sha256()` devolve `std::array<uint8_t, 32>`.
 - `domain/save/` ja existe e foi auditado: envelope binario proprio `GDS2` (MAGIC `"GDS2"` || LENGTH u32 LE || PAYLOAD || HMAC-SHA256 de 32 bytes), migrators forward-only (chain V1 -> V2 -> V3), `SaveData` com `schema_version`, `timestamp_ms` (carimbo epoch ms injetado), 1 autosave (slot 0) + 5 manuais (slots 1..5). Ancora real `gus::domain::kSaveSchemaVersion = 3` em `domain/include/gus/domain/domain_info.hpp` (o comentario "V2" em `save_migrators.hpp` esta desatualizado; a fonte de verdade e o `domain_info.hpp`).
 - ADR-006 RECUSOU JSON e dependencia externa no `domain/`. O save ficou binario proprio. O lider quer `controls.json` em JSON legivel. Esta e a tensao central deste ADR.
-- A invariante de camadas (ZERO Qt, ZERO dep externa, ZERO I/O real em `core/`+`domain/`) e auditada por grep no CI. Vale para tudo que este ADR cravar como headless.
+- A invariante de camadas (ZERO dep externa, ZERO I/O real em `core/`+`domain/`) e auditada por grep no CI. Vale para tudo que este ADR cravar como headless.
 - O hash 128 NAO e seguranca. A chave/algoritmo sao publicos. E deteccao casual de edicao manual: dizer ao jogador "alguem mexeu nisso fora do jogo". O save ja tem seu proprio selo HMAC com chave embutida; o controls.json e deliberadamente reproduzivel por qualquer um (e pra ser editavel).
 
 ## Decisao
@@ -150,7 +150,7 @@ Regra "se nao restaurar, proximo save grava o esquema novo": e consequencia natu
 
 ### 6. Fronteira de camadas (o que e headless AGORA vs o que e app/platform depois)
 
-HEADLESS (implementado AGORA, em `core/`+`domain/`, ZERO Qt/IO):
+HEADLESS (implementado AGORA, em `core/`+`domain/`, ZERO dep externa/IO):
 - Serializer + parser JSON proprio do schema de controles (parse robusto, sem crash).
 - Hash 128 (SHA-256 truncado sobre o canonico).
 - `controls_were_modified` (compara hashes).
@@ -185,7 +185,7 @@ Eixo selo do hash 128: HMAC (chave secreta) vs SHA-256 cru. ESCOLHIDA SHA-256 cr
 
 ## Consequencias
 
-Positivas: invariante zero-dep / zero-Qt do ADR-006 preservada (parser JSON proprio, nao lib); arquivo de controles legivel e editavel pelo jogador (intento do lider); deteccao de edicao manual robusta a reformatacao cosmetica (hash do canonico); restauracao funciona offline a partir de qualquer save recente (backup viaja no envelope ja selado por HMAC); oraculo semantico do save estende-se aos campos novos sem novo mecanismo; toda a logica e headless e testavel sem UI nem disco.
+Positivas: invariante zero-dep do ADR-006 preservada (parser JSON proprio, nao lib); arquivo de controles legivel e editavel pelo jogador (intento do lider); deteccao de edicao manual robusta a reformatacao cosmetica (hash do canonico); restauracao funciona offline a partir de qualquer save recente (backup viaja no envelope ja selado por HMAC); oraculo semantico do save estende-se aos campos novos sem novo mecanismo; toda a logica e headless e testavel sem UI nem disco.
 
 Negativas (aceitas como custo): mais um formato no projeto (JSON de controles) alem do binario do save, com parser proprio a manter; cada save cresce pela copia integral do esquema de controles (trivial em bytes, acoplamento de design registrado); o hash sobre o canonico exige um parse+reserialize correto e estavel (se o serializer canonico mudar de forma entre versoes, o hash de um mesmo config muda; mitigar congelando a forma canonica ou versionando-a junto com `config_version`).
 

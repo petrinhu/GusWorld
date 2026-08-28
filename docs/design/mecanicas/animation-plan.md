@@ -38,7 +38,7 @@ Moldura tematica por faccao. Esquerda: nome completo + "apelido" + resumo da lor
 - Session limit ~70-80 geracoes/janela (reseta 4h America/Recife) -> rodar em ONDAS. Creditos: 2000/mes (folga).
 
 ## Ordem de execucao
-1. **GUS completo** (piloto) -> integrar na engine __DEP_REMOVIDA__ (preview/viewer) -> validar com o lider.
+1. **GUS completo** (piloto) -> integrar na engine sobre GlintFx (preview/viewer) -> validar com o lider.
 2. Resto da party (mesmo pacote completo + signature).
 3. Inimigos do slice (quando o encontro for definido).
 4. Lore (~90 secundarios): so giro (8 dir) + breathing-idle.

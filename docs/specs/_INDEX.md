@@ -34,7 +34,7 @@ Toda spec segue 4 seções:
 
 ## Pipeline canônico de aprovação
 
-> **Nota 2026-07.** O pipeline abaixo e a tabela Status são da era 3D/Godot, superada pelo pivot C++23+SDL3 com arte 2D pixel art (PixelLab). As SPECS continuam a fonte canônica de aparência (proporção, paleta, traços-assinatura) e alimentam os prompts de geração de sprite. Mantido como registro histórico.
+> **Nota 2026-07.** O pipeline abaixo e a tabela Status são da era 3D, superada pelo pivot para C++23 com arte 2D pixel art (PixelLab). As SPECS continuam a fonte canônica de aparência (proporção, paleta, traços-assinatura) e alimentam os prompts de geração de sprite. Mantido como registro histórico.
 
 1. Spec aprovada (este arquivo)
 2. Blender blockout 1:1:1
@@ -43,7 +43,7 @@ Toda spec segue 4 seções:
 5. Retopo low-poly (atinge budget de `Projects/gusworld/docs/art/style-guide.md`)
 6. UV unwrap + atlas painting (cel-shading)
 7. Rig (Rigify modificado pra SD)
-8. Test render in-Godot com câmera 3/4 rotacional
+8. Test render in-engine com câmera 3/4 rotacional
 9. **Aprovação criador supremo antes de animar**
 
 ## Status

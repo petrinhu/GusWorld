@@ -55,8 +55,8 @@ reporta, não decide o que está morto):
 - **ADR-015** (`save-security-v2-offline.md`) é o mais alinhado dos três com a L-25 vigente:
   machine-binding só no Hardcore, âncora selada anti-rollback, wipe por crypto-shred + N-passadas +
   unlink + zeragem de RAM, e a mesma doutrina de honestidade ("detecta, não promete impossível").
-  A única peça que a L-25 revoga é a fonte da cifra (o ADR vendoriza Monocypher; a lei manda vir do
-  GlintFx). É a leitura mais próxima de "isto já é o rascunho que virou lei".
+  A única peça que a L-25 revoga é a fonte da cifra (o ADR vendoriza uma biblioteca de terceiro; a
+  lei manda vir do GlintFx). É a leitura mais próxima de "isto já é o rascunho que virou lei".
 - **ADR-004** (`environment-modifier-contract.md`) tem o mesmo conteúdo de fórmula de combate
   (`multAmbiente`) que já vive, canônico e vigente, em `docs/design/mecanicas/combat.md`. Não há
   contradição de lei — é redundância de conteúdo entre um ADR de implementação (C#, morto) e a spec

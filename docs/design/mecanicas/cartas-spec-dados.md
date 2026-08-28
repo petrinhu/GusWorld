@@ -33,7 +33,7 @@
 
 ## 2. Fronteira de camada (onde isso vive)
 
-Tudo que este doc especifica é **POCO de `domain/`** — zero __DEP_REMOVIDA__/GL/glintfx/IO, mesma regra de `combat_records.hpp`/`deck_records.hpp`. Nenhum campo aqui conhece "como desenhar" nem "quando mostrar ao jogador".
+Tudo que este doc especifica é **POCO de `domain/`** — zero GL/glintfx/IO, mesma regra de `combat_records.hpp`/`deck_records.hpp`. Nenhum campo aqui conhece "como desenhar" nem "quando mostrar ao jogador".
 
 | Camada | O que faz com este modelo |
 |---|---|

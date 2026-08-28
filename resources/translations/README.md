@@ -4,9 +4,9 @@
 >
 > **Locales:** `pt_br` (dev primário, sempre completo), `en_intl` (alvo da própria 1.0, corte `C-09` alterado pelo líder em 25/08/2026, `GODS_LAWS.md` L-29; paridade estrutural completa com `pt_br` (361/361 chaves com o mesmo nome), mas tradução parcial: 117 chaves com valor preenchido e 244 ainda vazias, medido em 25/08/2026 por parsing do arquivo, faltante que o `D19a`/`D19b` do `TODO.md` fecha antes do lançamento), `es_la` (alvo v1.x+, ainda não existe).
 >
-> **Loader:** `engine/localization/md_translation_loader.gd` (custom MD parser).
+> **Loader:** ainda não implementado (nenhuma linha de código no projeto hoje).
 >
-> ⚠️ **Ponteiro morto (LEI ZERO, L-01):** o caminho acima é do motor Godot/GDScript do projeto anterior e **não existe** neste projeto (C++23 sobre GlintFx, sem Godot). Ele fica registrado como estava escrito: descreve a intenção de quem redigiu este documento, não um arquivo consultável hoje. O mesmo vale para as três entradas de `engine/localization/*.gd` na seção "Cross-refs" abaixo. O carregador vigente, ainda não implementado (não há uma linha de código no projeto), já está fixado em [`ADR-012`](../../docs/tech/adr/ADR-012-m7-paridade-jogavel-plano.md) §7: `domain/src/i18n/md_translation_loader.cpp` mais `GusEngine/app/src/i18n/translator.cpp`, consumido via `tr()`, não via `Localization.tr_md()`. As chamadas a `Localization.*` no corpo deste README (seções "Workflow editorial" e "Validação") são do mesmo API morta e não foram tocadas nesta revisão; ver relatório.
+> ⚠️ **Ponteiro morto (LEI ZERO, L-01):** o caminho de loader que este documento citava era da engine do projeto anterior e **não existe** neste projeto (C++23 sobre GlintFx). Ele fica registrado como estava escrito: descreve a intenção de quem redigiu este documento, não um arquivo consultável hoje. O mesmo vale para as três entradas equivalentes na seção "Cross-refs" abaixo. O carregador vigente, ainda não implementado, fica a definir pelo `software-architect` quando a camada `domain/` de i18n nascer (L-06). As chamadas a `Localization.*` no corpo deste README (seções "Workflow editorial" e "Validação") são do mesmo API morta e não foram tocadas nesta revisão; ver relatório.
 
 ---
 
@@ -104,7 +104,7 @@ Expandir seções conforme arcos: `§8 Items`, `§9 Quests`, `§10 In-world docs
 
 ## Anti-patterns proibidos
 
-- ❌ Strings hardcoded em código GDScript (sempre via `Localization.tr_md`).
+- ❌ Strings hardcoded em código (sempre via `Localization.tr_md`).
 - ❌ Adicionar key em pt_br sem placeholder em en_intl.
 - ❌ Chaves duplicadas (parser usa última, comportamento silencioso).
 - ❌ Chaves em camelCase / snake_case / kebab-case (sempre UPPER_SNAKE_CASE).

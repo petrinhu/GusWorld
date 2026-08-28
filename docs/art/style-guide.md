@@ -1,10 +1,10 @@
 # Style Guide — GusWorld
 
-**Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver ADR-008 e CLAUDE.md).
+**Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver CLAUDE.md).
 
-> **NOTA DE STACK (pós-pivô de arte 2D).** As diretrizes de ARTE deste doc que são **agnósticas de dimensão** (paleta, HSL, shape language, color script, semiótica de silhueta) continuam canônicas. As diretrizes que descreviam **como renderizar em 3D** (proporção de mesh, poly budget, shader strategy Godot-style, pipeline de texture atlas/UV) foram escritas para o stack Godot 4 + 3D cel-shaded, hoje superado pelo pivô C++23+__DEP_REMOVIDA__ com arte 2D pixel-art via PixelLab (ver ADR-008, CLAUDE.md "Decisões fechadas: Visual"). Essas seções foram removidas deste documento — não são a spec de execução vigente. Uma spec 2D detalhada equivalente (resolução de sprite, nº de frames/direções, paleta indexada, orçamento de créditos PixelLab) é **decisão pendente do criador supremo** — não foi inventada nesta atualização.
+> As diretrizes de ARTE deste doc que são **agnósticas de dimensão** (paleta, HSL, shape language, color script, semiótica de silhueta) continuam canônicas. Uma spec 2D detalhada equivalente (resolução de sprite, nº de frames/direções, paleta indexada, orçamento de créditos PixelLab) é **decisão pendente do criador supremo** — não foi inventada nesta atualização.
 
-Solo G1 indie, engine própria C++23 + __DEP_REMOVIDA__, **2D pixel-art estilizado via pipeline PixelLab** (não mais 3D). Documento vivo. Toda decisão visual valida contra `docs/design/pillars.md`.
+Solo G1 indie, engine própria C++23, **2D pixel-art estilizado via pipeline PixelLab** (não mais 3D). Documento vivo. Toda decisão visual valida contra `docs/design/pillars.md`.
 
 **Spec mestre de personagem:** `Resources/gusworld/character-spec-gus.md` (canônica — traços de identidade vigentes; a spec de mesh 3D antiga foi removida do arquivo). Sheet de produção: `docs/art/characters/gus.md`.
 
@@ -13,8 +13,6 @@ Solo G1 indie, engine própria C++23 + __DEP_REMOVIDA__, **2D pixel-art estiliza
 ## 1. Vision statement
 
 GusWorld é **pixel-art estilizado** (pipeline PixelLab): silhuetas legíveis em poucos pixels, paleta restrita deliberada, cor saturada como foco de leitura. Duas paletas opostas (cidade neon ciano/magenta × floresta biolúmen verde/violeta) que nunca se misturam por preguiça — essa regra continua valendo em pixel art tanto quanto valia em 3D. O protagonista é o único ponto quente em paisagens frias.
-
-> *Wording original (quando o jogo ainda era 3D com leitura pixel-art-like) preservado no bloco Histórico, ao fim.*
 
 ## 2. Referências canônicas
 
@@ -133,7 +131,7 @@ Vigente, agnóstico de dimensão.
 
 ## 10. Shader strategy
 
-**Movido para o Histórico.** A tabela original é shader 3D (Godot `render_mode`, inverted hull outline, RIM built-in).
+**Movido para o Histórico.** A tabela original é shader 3D (`render_mode` custom, inverted hull outline, RIM built-in).
 
 **Pendência de spec 2D:** quais efeitos da lista antiga ainda são necessários e como viram efeitos 2D (ex.: glitch/anomalia e holograma provavelmente seguem como shader screen-space no glintfx sobre o sprite; outline pode já vir do próprio PixelLab). Escopo a decidir pelo líder — nada assumido aqui.
 

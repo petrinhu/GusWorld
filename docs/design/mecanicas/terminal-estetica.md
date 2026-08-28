@@ -40,7 +40,7 @@ Criador aprovou o mock e quer **TODOS os 100 glifos no pool**: os **60 da Fase 1
 - **`fallback_face` é ruim pro nosso caso:** o glifo viria com o desenho de OUTRA fonte; pra box-drawing/blocos isso quebra (junções `─│┌┼` não casam com a grade pixel da PixelOperatorMono). Fallback serve pra texto linguístico (CJK/emoji), não pra arte-de-célula.
 - **CAMINHO ESCOLHIDO = estender nossa própria fonte** (item `FONT-EXTEND-GLITCH`): forkar a PixelOperatorMono (é **CC0**, manter atribuição) e desenhar os ~67 glifos na MESMA grade/em-square (1600) via FontForge/fontTools → pixel-perfeito, junções conectam, zero fallback, controle total. Trabalho one-time nosso; referência = o mock `11-terminal-glitch-glyphs.html` (os 100).
 - **Tofu de propósito = caractere REAL, não glifo-faltante:** o dev confirmou que glifo ausente hoje renderiza NADA (branco) nos dois motores (não caixinha) — a premissa antiga estava errada. Pra a caixinha-tofu, usar `□` (U+25A1) ou `█/▓` explícito e estilizar por RCSS. NÃO contar com o `.notdef`.
-- **Evitar o atalho do U+FFFD na fonte:** faria o __DEP_REMOVIDA__ auto-usar no faltante mas o motor próprio não → divergência entre motores. Caminho limpo e igual nos dois = caractere explícito.
+- **Evitar o atalho do U+FFFD na fonte:** faria o GlintFx auto-usar no faltante mas o motor próprio não → divergência entre motores. Caminho limpo e igual nos dois = caractere explícito.
 - **Sem pressa:** a Fase 1 (60 Latin-1) roda igual hoje nos dois motores; a fonte estendida é upgrade posterior (destrava a arte de célula real do dungeon-corrompido).
 
 ## 4. Hazard de dungeon: corrupção do terminal (feature nova)

@@ -80,7 +80,7 @@ Contrato canônico do `EnvironmentModifier` e da integração com a fórmula §1
 | Arquivo | Papel |
 |---|---|
 | `engine/foundation/turn_combat/EnvironmentEnums.cs` | `EnvironmentLayer` (Terreno/Clima/Periodo), `EnvironmentTier` (Visivel/Codex), `EnvironmentId` (catálogo completo + `None`). |
-| `engine/foundation/turn_combat/EnvironmentModifier.cs` | Record POCO: `FamilyMults`, `FacilitatedStatus` (reusa enum §9, nenhum status novo; "Root" = `Slow` extremo), `HardwareHook` (ScanApDelta/ScanFree/PreverTurnDelta/PartySpdDelta), `PeriodDuration`, `MultFor(family)`. Imutável; sem dependência Godot. |
+| `engine/foundation/turn_combat/EnvironmentModifier.cs` | Record POCO: `FamilyMults`, `FacilitatedStatus` (reusa enum §9, nenhum status novo; "Root" = `Slow` extremo), `HardwareHook` (ScanApDelta/ScanFree/PreverTurnDelta/PartySpdDelta), `PeriodDuration`, `MultFor(family)`. Imutável; sem dependência de framework. |
 | `engine/foundation/turn_combat/EnvironmentCatalog.cs` | Fonte única de instâncias canônicas (números transcritos das tabelas §18); `MultAmbiente(family, active)` = produto das camadas ativas com `Math.Clamp(produto, 0.44, 2.25)`. |
 | `engine/foundation/turn_combat/EnvironmentClock.cs` | Roda determinística de período Dia(5)→Crep(2)→Noite(5)→Aurora(2); `Advance()` por rodada de fila; `TurnsRemaining`/`TransitionTelegraphed` (telegraph 2); `Project()`; `IsChaoticVector` (T6 Perlin). |
 | `engine/foundation/turn_combat/EnvironmentTransitions.cs` | Tabela de mutabilidade curada e determinística (§18.6). |
@@ -92,7 +92,6 @@ Pontos confirmados na impl: ciclo 5/2/5/2 por **rodada**; telegraph **2 turnos**
 ## Cross-refs
 
 - `docs/design/mecanicas/combat.md` §18 (catálogo completo de ambientes) + §11 (fórmula de dano, `multAmbiente`, stacking, cap).
-- `ADR-002-csharp-aot-over-gdscript.md` (stack C# POCO + camadas Foundation/Back).
 - `TODO.md` F2-E.11-CONTRACT (ratificação do contrato), F2-E.11 (impl), F2-QA.3 (testes TDD), F2-PROD.4 (escopo do catálogo no VS).
 
 ---

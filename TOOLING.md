@@ -1,6 +1,6 @@
 # TOOLING.md - Ferramentas do GusWorld
 
-> Catálogo restrito ao stack real deste projeto: **C++23, CMake/CTest, sem banco de dados, sem rede, sem web, sem Qt, sem Godot** (LEI ZERO do `GODS_LAWS.md`). O agent usa a ferramenta canônica do domínio sempre que aplicável, nunca reinventa em shell cru. Se faltar (⬇), instala com o comando indicado antes de usar.
+> Catálogo restrito ao stack real deste projeto: **C++23, CMake/CTest, sem banco de dados, sem rede, sem web** (LEI ZERO do `GODS_LAWS.md`). O agent usa a ferramenta canônica do domínio sempre que aplicável, nunca reinventa em shell cru. Se faltar (⬇), instala com o comando indicado antes de usar.
 
 ## Legenda de status
 
