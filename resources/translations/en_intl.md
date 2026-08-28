@@ -1,6 +1,6 @@
 # en_intl.md, international English translations
 
-> Locale fallback international. **VALUES VAZIOS até pós-release v1.0.0** (canon: dev em pt-br, tradução en-intl pós-launch).
+> Locale fallback international. **VALUES sendo preenchidos para a própria 1.0** (canon: dev em pt-br, en-intl entra no lançamento; corte `C-09` alterado pelo líder em 25/08/2026, `GODS_LAWS.md` L-29; ver `docs/tech/contrato-i18n.md`).
 >
 > Paridade estrutural com pt_br.md obrigatória: toda key em pt_br.md MUST existir aqui (valor vazio aceito durante G1).
 >

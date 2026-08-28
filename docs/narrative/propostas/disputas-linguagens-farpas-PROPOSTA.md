@@ -10,7 +10,7 @@
 >
 > **O que este arquivo é:** primeiro um **inventário** do que já existe de disputa de linguagem no projeto (§2, o entregável mais útil daqui), depois um **delta enxuto** de 22 farpas novas que preenchem lacunas nomeadas (§4). Não é um banco escrito do zero: o projeto já tinha muito material, e escrever por cima duplicaria e contradiria.
 >
-> **Idioma:** pt-br apenas. A camada en-intl é pós-v1.0.0.
+> **Idioma:** pt-br nesta proposta. A camada en-intl agora entra na própria 1.0, não depois (corte `C-09` alterado pelo líder em 25/08/2026, `GODS_LAWS.md` L-29).
 >
 > **Formato:** só aspas, zero travessão, zero em-dash (convenção do projeto, `guia-dialogos.md` §8).
 

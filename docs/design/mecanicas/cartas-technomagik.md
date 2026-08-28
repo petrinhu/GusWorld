@@ -312,7 +312,7 @@ Cada carta ESPECIAL tem 3 nomes; a regra de qual serve pra quê:
 
 | Camada | Papel | i18n? | Exemplo |
 |---|---|---|---|
-| **Título** | Nome descritivo que o jogador lê na prosa dos mestres e na UI | **SIM — chave `tr()` desde o começo** (PT agora, traduzido pós-1.0, coerente com o i18n canônico) | "Dilatação Temporal" |
+| **Título** | Nome descritivo que o jogador lê na prosa dos mestres e na UI | **SIM, chave `tr()` desde o começo** (PT e EN já na 1.0, corte `C-09` alterado pelo líder em 25/08/2026, coerente com o i18n canônico) | "Dilatação Temporal" |
 | **Alcunha EN** | Codinome techno curto, mostrado como flavor de combate | **NÃO se traduz** — fica fixa em inglês em todo locale (tech é inglês universalmente; trata-se como nome próprio de produto/tech) | "Time-Dilate" |
 | **ID de código** | Identificador interno | **irrelevante à língua** (é só código) | `cardExec-einstein` |
 

@@ -150,7 +150,7 @@ docs/narrative/deep/
 | Era 1 tratamento | Completa pro autor, calibrada pro player (gate Ouro) |
 | Cronograma | Deep-lore prioritário (paralelo orgânico à Fase 2: vertical slice na engine própria C++23 + __DEP_REMOVIDA__, em andamento) |
 | Estrutura Vol 1 | Híbrida (voz autoral + trechos in-character) |
-| Idioma | pt-br (i18n estrutura ready desde dia 1; tradução en-intl pós-release v1.0.0) |
+| Idioma | pt-br (i18n estrutura ready desde dia 1; en-intl entra na própria 1.0 do jogo, corte `C-09` alterado pelo líder em 25/08/2026, `GODS_LAWS.md` L-29; a consolidação em livro segue cronograma próprio pós-release, ver `ADR-001-pivot-lore-to-engine.md`) |
 | Em-dash | Permitido nesta camada (exceção formal) |
 
 ---
