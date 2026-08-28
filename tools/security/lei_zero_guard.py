@@ -58,6 +58,28 @@ ISENTOS = (
     "tools/security/",         # este guard e a lista do outro portao
 )
 
+
+MSG_COMO_APAGAR = """
+NAO reescreva a mencao. NAO troque por sinonimo. NAO deixe nota, aviso,
+comentario, marcador nem bloco explicando que algo foi removido. O texto que
+ficar tem de ler-se como se aquilo nunca tivesse existido (L-24).
+
+Como apagar, conforme o caso:
+
+  1. O ARQUIVO e a dependencia morta -> apague o arquivo inteiro (git rm).
+
+  2. A PASSAGEM a descreve como stack -> apague a PASSAGEM inteira: a frase,
+     o item de lista, a secao. Se sobrar frase truncada ou lista com buraco,
+     voce cortou errado.
+
+  3. A frase diz que NAO usamos -> apague a CLAUSULA inteira, nunca a palavra
+     solta. De "sem rede, sem web, sem Qt, sem Godot" sobra "sem rede, sem
+     web". Apagar so a palavra ja corrompeu "firmly" neste repositorio,
+     comendo o "rml" do meio.
+
+Depois de apagar, confira:  python3 tools/security/lei_zero_guard.py
+"""
+
 def rastreados() -> list[str]:
     out = subprocess.run(["git", "ls-files", "-z"], capture_output=True, text=True, check=True)
     return [p for p in out.stdout.split("\0") if p]
@@ -66,8 +88,36 @@ def isento(caminho: str) -> bool:
     c = caminho.replace("\\", "/")
     return any(c.startswith(p) for p in ISENTOS)
 
+def linhas_adicionadas() -> list[tuple[str, int, str]]:
+    """Modo GATE: so o que este commit ACRESCENTA.
+
+    Checar a arvore inteira travaria todo commit ate a limpeza terminar --
+    inclusive os commits QUE FAZEM a limpeza. O gate morde a regressao: se o
+    diff nao introduz nome proibido, passa, mesmo com divida antiga na arvore.
+    """
+    out = subprocess.run(["git", "diff", "--cached", "--unified=0", "--no-color"],
+                         capture_output=True, text=True, check=True)
+    achados, caminho, linha = [], None, 0
+    for l in out.stdout.split("\n"):
+        if l.startswith("+++ b/"):
+            caminho = l[6:]
+        elif l.startswith("@@"):
+            m = re.search(r"\+(\d+)", l)
+            linha = int(m.group(1)) if m else 0
+        elif l.startswith("+") and not l.startswith("+++") and caminho:
+            achados.append((caminho, linha, l[1:]))
+            linha += 1
+    return achados
+
+
 def main() -> int:
     quiet = "--quiet" in sys.argv
+    if "--staged" in sys.argv:
+        import os
+        if str(os.environ.get("LEI_ZERO_GUARD", "")).lower() == "off":
+            print("lei-zero-guard: DESLIGADO por LEI_ZERO_GUARD=off.", file=sys.stderr)
+            return 0
+        return gate()
     try:
         arquivos = rastreados()
     except Exception as e:                       # noqa: BLE001
@@ -118,6 +168,49 @@ def main() -> int:
     print("\nA LEI ZERO diz: o GusWorld liga em GlintFx e no sistema operacional. "
           "Mais nada.", file=sys.stderr)
     return 2
+
+
+
+def gate() -> int:
+    """Portao de pre-commit: bloqueia commit que ACRESCENTA dependencia proibida."""
+    try:
+        adicionadas = linhas_adicionadas()
+    except Exception as e:                       # noqa: BLE001
+        print(f"lei-zero-guard: nao consegui ler o diff staged: {e}", file=sys.stderr)
+        return 1
+    violacoes = []
+    for caminho, linha, texto in adicionadas:
+        if isento(caminho):
+            continue
+        for nome, padrao in PROIBIDOS.items():
+            if re.search(padrao, texto):
+                violacoes.append((caminho, linha, nome, texto.strip()[:100]))
+    if not violacoes:
+        return 0
+    print("\n" + "=" * 68, file=sys.stderr)
+    print("LEI ZERO: commit BLOQUEADO.", file=sys.stderr)
+    print("=" * 68, file=sys.stderr)
+    print("\nO GusWorld liga em GlintFx e no sistema operacional. Mais nada.\n",
+          file=sys.stderr)
+    print(f"Este commit ACRESCENTA {len(violacoes)} referencia(s) a dependencia proibida:\n",
+          file=sys.stderr)
+    for caminho, linha, nome, texto in violacoes[:15]:
+        print(f"  {caminho}:{linha}  [{nome}]", file=sys.stderr)
+        print(f"      {texto}", file=sys.stderr)
+    if len(violacoes) > 15:
+        print(f"  ... e mais {len(violacoes) - 15}.", file=sys.stderr)
+    print("\n" + "-" * 68, file=sys.stderr)
+    print("O QUE FAZER: APAGUE.  Ordem do lider, verbatim:", file=sys.stderr)
+    print('  "e para APAGAR"   e   "Nao para colocar observacao"', file=sys.stderr)
+    print("-" * 68, file=sys.stderr)
+    print(MSG_COMO_APAGAR, file=sys.stderr)
+    print("\nSe for citacao legitima (lei, backlog, relatorio de processo), o caminho",
+          file=sys.stderr)
+    print("ja deveria estar isento -- veja ISENTOS neste arquivo.", file=sys.stderr)
+    print("Para uma excecao pontual e consciente:  LEI_ZERO_GUARD=off git commit ...\n",
+          file=sys.stderr)
+    return 2
+
 
 if __name__ == "__main__":
     sys.exit(main())
