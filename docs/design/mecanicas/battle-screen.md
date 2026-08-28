@@ -1,6 +1,6 @@
 # Tela de Batalha (BattleScreen): Design de Apresentacao
 
-**Status:** Decisoes macro ratificadas pelo criador supremo em 2026-06-23 (brainstorm colaborativo, 5 perguntas via AskUserQuestion). Spec de APRESENTACAO do combate; o motor e as regras vivem em [`combat.md`](combat.md) (canonico, fechado, nao reaberto aqui). Implementacao no M5 (BattleScreen) da engine C++23 sobre GlintFx. **Atualizacao 2026-06-25 (comando livre):** §3.5 modo-mira / target selection (D3) integrado ao menu de verbos; o painel do ator ativo e a faixa de fila refletem o comando livre da party (combat.md §4.1, modelo 1B).
+**Status:** Decisoes macro ratificadas pelo criador supremo em 2026-06-23 (brainstorm colaborativo, 5 perguntas via AskUserQuestion). Spec de APRESENTACAO do combate; o motor e as regras vivem em [`combat.md`](combat.md) (canonico, fechado, nao reaberto aqui). Implementacao no M5 (BattleScreen) da engine C++23 sobre GlintFx. **Atualizacao 2026-06-25 (comando livre):** §3.5 modo-mira / target selection (D3) integrado ao menu de verbos; o painel do ator ativo e a faixa do relógio de ação refletem o comando livre da party (combat.md §4.1).
 
 **Convencao de escrita:** pt-br. Termos de game-dev no original. Sem em-dash; usa ponto, virgula, parenteses, dois-pontos.
 
@@ -12,8 +12,8 @@
 
 | # | Decisao | Escolha | Por que | Implicacao |
 |---|---|---|---|---|
-| 1 | **Modelo de cena** | **Tela de batalha separada** (mundo some -> arena dedicada -> volta ao mapa). Feel Pokemon/Final Fantasy. | Mais barata e MUITO mais legivel: o sistema de cartas/pipeline/fila precisa de espaco de tela limpo, sem o mundo 3D competindo. | A arena e uma cena propria. Evolui depois pro **hibrido** (fundo da arena = pintura do bioma onde esbarrou) SEM refazer: so trocar o fundo plano por uma arte de bioma. |
-| 2 | **Angulo dos atores** | **Side-view de perfil** (Chrono Trigger / FF). Party a esquerda olhando pra direita; inimigos a direita olhando pra esquerda. | Ve todos de corpo inteiro: ideal pra COMANDAR 3 personagens com fila CTB. A referencia-mae (Chrono Trigger) e exatamente assim. | **Zero arte nova:** usa as poses leste (party) e oeste (inimigos) que ja existem. Sem flip (Pillar 3 respeitado). Nao depende das diagonais (ARTE-DIAGONAL-8DIR fica fora do caminho critico). |
+| 1 | **Modelo de cena** | **Tela de batalha separada** (mundo some -> arena dedicada -> volta ao mapa). Feel Pokemon/Final Fantasy. | Mais barata e MUITO mais legivel: o sistema de cartas/pipeline/relógio precisa de espaco de tela limpo, sem o mundo 3D competindo. | A arena e uma cena propria. Evolui depois pro **hibrido** (fundo da arena = pintura do bioma onde esbarrou) SEM refazer: so trocar o fundo plano por uma arte de bioma. |
+| 2 | **Angulo dos atores** | **Side-view de perfil** (Chrono Trigger / FF). Party a esquerda olhando pra direita; inimigos a direita olhando pra esquerda. | Ve todos de corpo inteiro: ideal pra COMANDAR 3 personagens no relógio de ação (`ADR-017`). A referencia-mae (Chrono Trigger) e exatamente assim. | **Zero arte nova:** usa as poses leste (party) e oeste (inimigos) que ja existem. Sem flip (Pillar 3 respeitado). Nao depende das diagonais (ARTE-DIAGONAL-8DIR fica fora do caminho critico). |
 | 3 | **Layout** | **Comando-first** (menu de verbos do ator ativo; cartas + pipeline abrem so ao COMPILAR). | Tela limpa e legivel; casa com Chrono Trigger/Sea of Stars/Pokemon (todos comando-first). Nao polui com 3-4 inimigos. As cartas tomam o palco na hora certa. | A mao de 15 cartas NAO fica sempre na tela; surge num leque + pipeline de 3 slots quando o jogador escolhe COMPILAR. |
 | 4 | **Feedback / juice** | **Numeros flutuantes sobre o alvo + caixa de log.** | O numero da impacto imediato; o log carrega as mensagens de sistema longas que o combat.md EXIGE (ERRO DE COMPILACAO, COMPILADO, ANALISE PREDITIVA). | Dois canais de feedback: popup de dano (curto, sobre o alvo) + log rolando (mensagens de sistema + historico). |
 | 5 | **Telegraph de intent** | **Icone de intencao flutuando sobre o inimigo** (estilo Slay the Spire). | Padrao-ouro de legibilidade; casa com Scan (revela) e Gambito-Prever (aprofunda alvo/area). Pillar 1: informacao habilita acao. | Cada inimigo mostra um simbolo do plano (atacar quem + dano previsto / defender / aplicar status). **Patch-Zero** (intent caotico, one-way door ja canon) mostra um icone "ruido" embaralhado. |
@@ -26,7 +26,7 @@ Apos 3 variantes mockadas (A compacto / B cinematografico / C tatico), o criador
 
 ```
 +--------+----------------------------------------------+
-| COCKPIT|  FILA CTB:  > Gus  [i]  Caua  [i]  Jaci  +2  |   topo (a dir do cockpit)
+| COCKPIT|  RELOGIO:  > Gus  [i]  Caua  [i]  Jaci  +2  |   topo (a dir do cockpit)
 | retrato|----------------------------------------------|
 |  GRANDE|             VEZ DE GUS                       |   banner em FAIXA PROPRIA
 |  GUS   |          SUA VEZ: escolha uma acao           |   (nao sobre os atores)
@@ -47,8 +47,8 @@ Apos 3 variantes mockadas (A compacto / B cinematografico / C tatico), o criador
 
 ### Zonas da tela (variante C)
 
-- **Cockpit lateral ESQUERDO (~174px, ~1/4 da largura):** o painel do ator ativo + o menu de verbos, empilhados verticalmente como um cockpit. De cima pra baixo: retrato GRANDE (64px) + nome + barra de HP (com numero) + pips de AP (latao) e Mana (cyan) + os 6 verbos EMPILHADOS (Scan/Gambito/Atacar/Defender/COMPILAR/Fugir). E onde o jogador comanda. So mostra dados FORA da abertura (na abertura o ativo e o 1o da fila por SPD = inimigo; o cockpit fica sem dados).
-- **Topo da arena, faixa horizontal:** fila de iniciativa CTB (5 proximos, retrato 48px + marca de "proximo"), a direita do cockpit.
+- **Cockpit lateral ESQUERDO (~174px, ~1/4 da largura):** o painel do ator ativo + o menu de verbos, empilhados verticalmente como um cockpit. De cima pra baixo: retrato GRANDE (64px) + nome + barra de HP (com numero) + pips de AP (latao) e Mana (cyan) + os 6 verbos EMPILHADOS (Scan/Gambito/Atacar/Defender/COMPILAR/Fugir). E onde o jogador comanda. So mostra dados FORA da abertura (na abertura ninguem agiu ainda, e um HOLD que espera [Encarar], D10/D13; o cockpit fica sem dados ate o primeiro ator agir).
+- **Topo da arena, faixa horizontal:** faixa do relógio de ação (5 atores mais próximos de ficar prontos, retrato 48px + marca de "proximo"; ver D4, `combat.md §4`), a direita do cockpit.
 - **Faixa PROPRIA do banner:** "VEZ DE <nome>" / "BATALHA!" numa faixa reservada ACIMA dos atores (nao invade ninguem).
 - **Arena central-direita:** party (ate 3) numa coluna a esquerda-da-arena, inimigos (1 a 4) numa coluna a direita, atores DISTRIBUIDOS com espaco proprio (space-around vertical, cada um na sua faixa, ~54px). Por ora os atores sao RETRATOS (placeholder; sprites de corpo animados num passo futuro - decisao do criador "testar com retratos, animacoes depois"). Gus na arena usa `retrato_gus_combate.png`. Intent flutuante sobre cada inimigo; floater de dano sobre o alvo; mini-barra de HP + statusrow sob cada ator.
 - **Terminal/log fino no rodape:** mensagens narradas (COMPILADO/ERRO/dano/cura) com cor por categoria. So aparece FORA da abertura.
@@ -172,7 +172,7 @@ Menu do membro selecionado: [Scan] [Gambito] [Atacar] [Defender] [COMPILAR] [Fle
 Ao abrir o modo-mira para uma acao ofensiva, a pre-selecao segue, nesta ordem:
 
 1. **Se o inimigo ja foi escaneado:** pre-seleciona o inimigo FRACO a familia da acao atual (multFraqueza 1.5). Premia o Scan (Pillar 1: informacao habilita acao); a mira ja "aponta para a jogada certa" para quem investiu em ler o inimigo.
-2. **Sem Scan (fallback):** pre-seleciona o inimigo mais A FRENTE na fila (o que vai agir antes), reduzindo o dano que a party vai tomar.
+2. **Sem Scan (fallback):** pre-seleciona o inimigo mais proximo de agir no relógio de ação (menor `next_action_at`, `combat.md §4`), reduzindo o dano que a party vai tomar.
 
 A pre-selecao e sempre apenas sugestao: a mira e 100% navegavel, o jogador escolhe qualquer inimigo vivo. Coerente com a filosofia do comando livre (combat.md §4.1): o sistema sugere a jogada otima por SPD/Scan, mas a decisao e do jogador.
 
@@ -187,7 +187,7 @@ A mira e navegavel por teclado e controller, nao so mouse (mesmo principio tap-t
 ### M5 entrega (a tela jogavel do combate)
 - A cena separada (transicao de entrada/saida, forma simples no M5; polimento depois).
 - Side-view com party (placeholders/poses leste-oeste) vs inimigos.
-- Faixa de fila CTB lendo o estado do motor.
+- Faixa do relógio de ação lendo o estado do motor (`ADR-017`, `combat.md §4`).
 - Painel do ator ativo (HP/AP/Mana/status) + menu de verbos.
 - Overlay de COMPILAR (leque da mao + pipeline de 3 slots).
 - Numero flutuante + caixa de log com as mensagens de sistema do combat.md.
@@ -199,7 +199,7 @@ A mira e navegavel por teclado e controller, nao so mouse (mesmo principio tap-t
 - Animacoes de ataque ricas por familia (VFX de Pulso/Raiz/Eco...): polimento de arte posterior.
 - Transicao "assinatura" elaborada (a do M5 e funcional).
 - COMBATE-AUTOKILL + Resolver sem encarar (instant-win no overworld + auto-resolve opt-in): **mecanica CANONIZADA em combat.md §19** (eixo de dominio auto-kill/auto-resolve/encarar). A BattleScreen ja incorpora o HOLD de abertura + verbo (§5.2 D13) e o terminal `-O0` (§3.1); o auto-kill silencioso no overworld (micro-animacao por arquetipo + falas-balao) e apresentacao de OVERWORLD, fora da BattleScreen, plugada DEPOIS.
-- CARTAS-CAST-TIME (cartas lenta/rapida; ver [`combat-flavor.md`](combat-flavor.md) + INBOX do TODO): a tela ja deve PREVER o marcador de cast na fila (ex: "Gus: interpretando...") e o spinner de fases; a mecanica de motor (cast-time real) entra como extensao DEPOIS da BattleScreen base, sem refazer.
+- CARTAS-CAST-TIME (cartas lenta/rapida; ver [`combat-flavor.md`](combat-flavor.md) + INBOX do TODO): a tela ja deve PREVER o marcador de cast na faixa do relógio (ex: "Gus: interpretando...", como ator-fantasma, D4) e o spinner de fases; a mecanica de motor (cast-time real) entra como extensao DEPOIS da BattleScreen base, sem refazer.
 
 ---
 
@@ -231,7 +231,7 @@ O playtest pegou que o combate sem RITMO atropela tudo (inimigos agem antes do j
 
 - **D8 Modelo de ritmo: HIBRIDO.** Cada turno mostra acao + numero flutuante + log, pausa ~0.8s, segue sozinho; o jogador pode APERTAR uma tecla pra acelerar/avancar pro proximo. Fluido por padrao + controle quando quer ler. A apresentacao processa UM evento de cada vez (fila de eventos drenada do motor com timing), NAO resolve tudo instantaneo.
 - **D9 Indicador de turno: banner + highlight + 'sua vez'.** Texto claro de quem joga ("TURNO DE GUS"); ator ativo com destaque forte (brilho/seta); na vez do jogador, "SUA VEZ: escolha uma acao"; na vez do inimigo, "vez do inimigo". Leitura imediata.
-- **D10 Abertura: comeca PARADA e ESPERA INPUT.** Ao abrir: arena monta, "BATALHA!" breve + a fila, NINGUEM agiu. **A abertura agora PARA e ESPERA o jogador iniciar** (decisao do criador 2026-06-25, casa com o verbo Resolver sem encarar, D13): a luta so comeca quando o jogador manda [Encarar] (Enter). Ao iniciar, os turnos animam um a um com o ritmo; se o inimigo for o 1o (maior SPD), o jogador VE ele atacar com numero+log no tempo certo. (Resolve "inimigos ja atacaram antes de eu ver": agora o 1o turno so dispara com input do jogador.)
+- **D10 Abertura: comeca PARADA e ESPERA INPUT.** Ao abrir: arena monta, "BATALHA!" breve + a faixa dos próximos a agir no relógio de ação (`combat.md §4`, reconciliado 25/08/2026; ver D4), NINGUEM agiu. **A abertura agora PARA e ESPERA o jogador iniciar** (decisao do criador 2026-06-25, casa com o verbo Resolver sem encarar, D13): a luta so comeca quando o jogador manda [Encarar] (Enter). Ao iniciar, os turnos animam um a um com o ritmo; o jogador VE o primeiro ator a ficar pronto no relógio agir, com numero+log no tempo certo. (Resolve "inimigos ja atacaram antes de eu ver": agora o 1o turno so dispara com input do jogador.)
 - **D11 Floater no ataque do INIMIGO:** com o pacing, cada ataque inimigo aparece no seu tempo com seu numero flutuante (antes batiam todos juntos e somiam).
 - **D12 Log narra a CONSEQUENCIA:** nao so "X atacou", mas "X atacou Y: Y recebeu N de dano" e o status ("Y ficou com Stun"). A apresentacao monta a linha completa a partir do dano + status que o motor ja entrega. E com o pacing, o log nao rola rapido demais (uma linha por evento no ritmo).
 - **D13 Estado de HOLD na abertura + verbo "Resolver sem encarar" (canon 2026-06-25, combat.md §19; SO TRASH).** O estado parado do D10 e um HOLD que espera o input. Opcoes apresentadas:
