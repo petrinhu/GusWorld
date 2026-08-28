@@ -44,12 +44,8 @@ lição — e não a stack morta em que cada um foi escrito.
   corte. Superada pela L-08 (AGPL-3.0-or-later + todos os direitos reservados, regime único). Ver
   achado em `../_INDEX.md` — sem marcador de superação no documento.
 
-**Não presentes** (deletados por ordem do líder sob a L-24, não recriar): `ADR-002`, `ADR-003`,
-`ADR-008`, `ADR-009`, `ADR-010`, `ADR-011`, `ADR-012`, `ADR-013`, `ADR-014` e `ADR-018` foram
-apagados — cada um descrevia, por inteiro ou quase, um modelo de arquitetura ou uma biblioteca de
-plataforma revogados pela LEI ZERO. Nenhum princípio de fundo desses nove sobrevivia à parte do
-código morto que descreviam; onde algum trecho tinha vida própria (ex.: anti-over-engineering do
-plano de áudio), já é prática corrente do projeto, sem precisar de resgate textual.
+**Não presentes** — números aposentados, não reutilizar: `ADR-002`, `ADR-003`, `ADR-008`, `ADR-009`,
+`ADR-010`, `ADR-011`, `ADR-012`, `ADR-013`, `ADR-014`, `ADR-015` e `ADR-018`.
 
 ## ADRs de fundação do GusWorld (código do zero, 25/08/2026)
 
