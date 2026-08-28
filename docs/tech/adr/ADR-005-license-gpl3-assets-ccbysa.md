@@ -17,7 +17,7 @@ O repo havia migrado para **AGPL-3.0** (commit `4b850dc`). O design do pivot (`e
 Pontos técnicos que pesaram:
 
 - A cláusula de rede da AGPL (§13) é **inócua sem servidor**. GusWorld é single-player puro (sem backend), então a AGPL é "mais copyleft do que o necessário"; GPLv3 entrega o mesmo efeito prático de copyleft forte com menos atrito conceitual e é a escolha convencional para jogo desktop.
-- O pivot vai usar **Qt** (LGPLv3 + alguns módulos GPL-only). GPLv3 é compatível com Qt sem licença comercial: pode-se inclusive **static-linkar** o Qt, pois o jogo inteiro é GPLv3.
+- O pivot vai usar um framework de UI de terceiro (LGPLv3 + alguns módulos GPL-only). GPLv3 é compatível com esse framework sem licença comercial: pode-se inclusive **static-linkar** ele, pois o jogo inteiro é GPLv3.
 - **Assets** (arte, música, lore in-game) costumam ir sob licença própria, distinta do código.
 - O criador é **titular único** do copyright (solo indie, sem contribuições externas aceitas em G1, ver README "não aceita PRs externos"). Isso preserva a liberdade de relicenciar no futuro.
 
@@ -28,7 +28,7 @@ Pontos técnicos que pesaram:
 3. **Livros-companheiros (Vol 1 bíblia + Vol 2 antologia) = direitos reservados.** Obra literária à parte, todos os direitos reservados ao autor. Vivem em `docs/book/`. A lore aparecer no jogo (CC-BY-SA) NÃO estende essa licença ao texto dos livros: suportes distintos, licenças distintas.
 4. **Fronteira `.tscn`/`.tres`:** arquivo com lógica (script, expressão, máquina de estado, comportamento) = **código GPLv3**; dado/arte puro (valores, referências, paleta, balanceamento sem lógica) = **asset CC-BY-SA 4.0**.
 5. **Modelo:** freeware + doação opcional via PayPal donate (merchant `9XNZQ4RND67KL`, BRL). O EULA proprietário / código fechado que o F2-LEG.1 previa fica **obsoleto** (não há mais intenção de fechar o código).
-6. **Static-link do Qt liberado.** Com o jogo todo em GPLv3, o link estático com Qt LGPL/GPL é permitido sem custo nem licença comercial. O link dinâmico LGPL deixa de ser obrigatório: vira escolha técnica de empacotamento, não de licença. Atribuição de terceiros (Qt, Godot, addons, fontes, OpenSSL) em `THIRD-PARTY-LICENSES.md`.
+6. **Static-link de dependências de terceiro liberado.** Com o jogo todo em GPLv3, o link estático com framework LGPL/GPL é permitido sem custo nem licença comercial. O link dinâmico LGPL deixa de ser obrigatório: vira escolha técnica de empacotamento, não de licença. Atribuição de terceiros (framework de UI, engine, addons, fontes, biblioteca de criptografia) em `THIRD-PARTY-LICENSES.md`.
 7. **SPDX `GPL-3.0-or-later`** aplicado **apenas aos fontes C++ NOVOS** do pivot. NÃO adicionar SPDX em massa nos `.cs` atuais (serão descartados no decommission da engine C#).
 8. **Titular único = relicenciamento livre no futuro.** Como não há copyright de terceiros no código próprio, o titular pode relicenciar versões futuras. **Releases já publicadas sob AGPL-3.0 permanecem AGPL-3.0** (a licença concedida a quem já recebeu o código é irrevogável); a mudança vale daqui para frente.
 
@@ -52,7 +52,7 @@ Ações fora do escopo desta ADR (responsabilidade do líder, separadas):
 
 **Pros:**
 - Já era a licença vigente (commit `4b850dc`); zero trabalho.
-- Compatível com Qt (AGPLv3 ↔ GPLv3 têm compatibilidade mútua; LGPLv3 usável em AGPL).
+- Compatível com o framework de UI escolhido (AGPLv3 ↔ GPLv3 têm compatibilidade mútua; LGPLv3 usável em AGPL).
 
 **Cons:**
 - Cláusula de rede §13 é inócua num jogo desktop single-player (sem servidor): copyleft acima do necessário.
@@ -67,7 +67,7 @@ Ações fora do escopo desta ADR (responsabilidade do líder, separadas):
 
 **Cons:**
 - Não é o desejo do criador (quer copyleft, código aberto que continua aberto).
-- Static-link de Qt GPL-only já puxaria GPL de qualquer forma em parte do build.
+- Static-link de um componente GPL-only já puxaria GPL de qualquer forma em parte do build.
 
 **Decidida:** REJEITADA. O criador quer copyleft forte.
 
@@ -97,7 +97,7 @@ Ações fora do escopo desta ADR (responsabilidade do líder, separadas):
 ### Positivas
 
 - **Tensão de licença resolvida.** Fecha as duas pendências do RF-9 (AGPL vs GPL; assets).
-- **Qt sem custo.** GPLv3 permite static-link de Qt LGPL/GPL; sem licença comercial.
+- **Framework de UI sem custo.** GPLv3 permite static-link de dependência LGPL/GPL; sem licença comercial.
 - **Fronteira clara** para quem quer reusar: código (GPLv3) vs arte/áudio (CC-BY-SA) vs livros (reservados).
 - **Liberdade futura preservada** (titular único pode relicenciar o que vier).
 
@@ -111,9 +111,9 @@ Ações fora do escopo desta ADR (responsabilidade do líder, separadas):
 
 1. ✅ `LICENSE` trocado para GPLv3 (texto verbatim) e README raiz atualizado (feito antes desta ADR).
 2. ✅ Criar `ASSETS-LICENSE.md` (fronteira código/assets/livros).
-3. ✅ Criar `THIRD-PARTY-LICENSES.md` (atribuição Qt/Godot/addons/fontes/OpenSSL; incluir no release).
+3. ✅ Criar `THIRD-PARTY-LICENSES.md` (atribuição de dependências de terceiro: framework de UI, engine, addons, fontes, biblioteca de criptografia; incluir no release).
 4. ✅ Criar `.codeberg/FUNDING.yml` (`custom: paypal.me/petrinhu`). _(Nota de superação, 2026-07-25: o projeto saiu do Codeberg e o GitHub virou host único; o arquivo vive hoje em `.github/FUNDING.yml`, com o mesmo conteúdo. A decisão desta ADR não muda: só o caminho do arquivo.)_
-5. ✅ Atualizar `docs/tech/pivot/engine-design.md` §7 (AGPL para GPLv3; assets CC-BY-SA; livros reservados; static-link Qt liberado).
+5. ✅ Atualizar `docs/tech/pivot/engine-design.md` §7 (AGPL para GPLv3; assets CC-BY-SA; livros reservados; static-link de framework de UI liberado).
 6. ✅ SPDX `GPL-3.0-or-later` **aplicado em massa nos 524 fontes C++ nossos em 2026-07-28**, e isto **SUPERA a redação original deste item** ("apenas nos NOVOS, conforme forem criados"). Motivo da mudança: "conforme forem criados" nunca aconteceu, a base foi de **zero a 528 arquivos**, e uma auditoria de 2026-07-28 mediu a cobertura real em **0%**. A ressalva sobre os `.cs` perdeu objeto: o C# saiu do projeto no decommission do M8 (2026-07-22). Formato e posição decididos pelo líder: só a linha de licença, como PRIMEIRA linha do arquivo (convenção REUSE). **Fora, por motivo declarado:** `GusEngine/third_party/` (código de terceiro, SPDX nosso ali seria declaração falsa de licença), o header de um loader OpenGL vendorizado FORA de `third_party/` (achado nessa mesma passada e agora listado no `THIRD-PARTY-LICENSES.md`), e 3 arquivos com edição não commitada do líder. Commit `9ed1dc75`, com `.git-blame-ignore-revs` para o blame não apontar o commit mecânico como autor da primeira linha de cada arquivo.
 7. ⏳ **Líder:** arquivar repo `gus_dragon-engine` no Codeberg (decommission, ação separada). _(Nota de superação, 2026-07-25: sem efeito. O repo foi **apagado** do Codeberg em vez de arquivado, no M8, e o projeto inteiro saiu do Codeberg nesta data; ver CHANGELOG do M8.)_
 
