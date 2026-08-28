@@ -1,0 +1,33 @@
+{
+  "_por_que": "Arma o TDD estrito da L-19 por maquina, e nao por disciplina. Criado em 28/08/2026 por ordem do lider, depois de a reordenacao de 25/08 apontar que o T1 nao tinha hook que o forcasse. O guard roda em PreToolUse (decide bloquear) e o runner em PostToolUse (executa e grava estado).",
+  "_hoje_e_inerte": "Nenhum arquivo do projeto casa production_globs: nao existe C++ ainda. O guard ativa sozinho no dia em que o C1 criar o primeiro .cpp/.hpp. Nao ha nada a ligar depois.",
+  "_semantica_do_guard": "estado ausente BLOQUEIA; teste vermelho PERMITE (fase red); tudo verde BLOQUEIA (escreva o teste que falha antes); comando quebrado faz fail-open com aviso. Escape legitimo: TDD_PHASE=refactor para refatorar, TDD_GUARD=off para desligar pontualmente.",
+
+  "preset": "cpp-ctest",
+  "enabled": true,
+  "timeout_sec": 180,
+  "test_command": "ctest --test-dir build --output-on-failure",
+
+  "_test_command_por_que": "ctest e o driver certo mesmo com harness proprio: o ADR-025 integra o harness ao CMake por tests/CMakeLists.txt, entao quem executa continua sendo o ctest. 'build/' e a convencao ja fixada no .gitignore. Timeout de 180s porque a matriz e de cinco plataformas e o build e C++23.",
+  "_sem_fast_command": "fast_command deliberadamente AUSENTE. Ele venceria o test_command no runner, e um comando com filtro de label que ainda nao existe falharia sempre -- e falha vira fail-open, que desliga o guard EM SILENCIO. So acrescentar quando houver label de verdade para excluir.",
+
+  "exclude_globs": [
+    "framework/**",
+    "build/**",
+    "cmake-build-*/**",
+    "docs/**",
+    "resources/**",
+    "assets/**",
+    "tools/**",
+    "LICENSES/**",
+    ".claude/**"
+  ],
+  "_exclude_por_que": "framework/** e o submodulo GlintFx: pela LEI ZERO nao escrevemos nele, e o C++ DELE jamais pode disparar o guard DESTE projeto. Os demais nao sao codigo de jogo. A ordem de classificacao do hook e exclude > test > production, entao estas exclusoes vencem os globs largos do preset.",
+
+  "test_globs": [
+    "tests/**",
+    "**/test_*.cpp",
+    "**/*_test.cpp",
+    "**/*_test.hpp"
+  ]
+}
