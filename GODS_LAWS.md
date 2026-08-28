@@ -190,11 +190,21 @@ Cinco alvos, **cinco entradas distintas na matriz de CI**. **Fedora 44 é o alvo
 
 ## L-11
 
-**Data:** 21/08/2026. **Verbatim:** *"obrigatoriamente use AskUserQuestion ao me trazer perguntas ou precisar algo de mim"* e, no mesmo dia: *"nao decida NADA sozinho, quero decidir tudo, vc me dá opcoes"*.
+**Data:** 21/08/2026. **Verbatim:** *"obrigatoriamente use AskUserQuestion ao me trazer perguntas ou precisar algo de mim"* e, no mesmo dia: *"nao decida NADA sozinho, quero decidir tudo, vc me dá opcoes"*. **Alcance ampliado em 28/08/2026, por ordem do líder mandando espelhar a L-10 do GlintFx, cuja ordem verbatim é:** *"askuserquestion SEMPRE"*.
 
-**Nenhum agente decide nada.** Diante de qualquer dúvida, bifurcação ou consequência não escrita, apresentar **2 a 3 alternativas** com prós, contras, impacto e esforço, e perguntar via `AskUserQuestion`, com a recomendada primeiro. Isto vale inclusive para o que parece consequência óbvia de uma decisão já tomada.
+**Nenhum agente decide nada sozinho, e TODA pergunta dirigida ao líder vai por `AskUserQuestion`, com opções clicáveis. NUNCA em texto solto no meio da conversa.**
 
-**Aplicação:** `AskUserQuestion` **sem painel lateral**, ou seja **sem o campo `preview`**; só `label` e `description`. Detalhe técnico longo vai no corpo da mensagem de chat, antes ou depois da pergunta.
+Diante de qualquer dúvida, bifurcação ou consequência não escrita, apresentar **2 a 3 alternativas** com prós, contras, impacto e esforço, com a recomendada primeiro. Isto vale inclusive para o que parece consequência óbvia de uma decisão já tomada.
+
+⚠️ **Não é só decisão de arquitetura.** Se a resposta do líder **muda o que se faz a seguir**, é `AskUserQuestion`: escolha de escopo, de rumo, de formato, ratificação, e **inclusive a pergunta de esclarecimento sobre o que ele quis dizer**. Era essa última que faltava aqui: até 28/08/2026 esta lei falava em **decidir**, e um agente que perguntasse em prosa *"como queres que eu trate isso?"* não feria a letra dela. **A fresta foi tapada no dia em que o líder tropeçou nela — e ele teve de apontar a lei do outro projeto para eu ver.**
+
+**Por que a FORMA importa, e não é capricho:** pergunta em prosa **obriga o líder a redigir a resposta**, e resposta redigida é lenta, ambígua e fácil de interpretar errado. Opção clicável **fecha o espaço de leitura**: ele escolhe, e o que ele escolheu é exatamente o que se registra. **A lei não é sobre perguntar mais ou menos; é sobre a resposta ser inequívoca.**
+
+⚠️ **A válvula que impede isto de virar interrogatório:** **decisão trivial e reversível com default óbvio segue o default e é informada.** A ampliação de 28/08 governa **a forma** da pergunta que já ia acontecer; **não cria pergunta nova**.
+
+**O que NÃO é pergunta e continua sendo prosa:** relatar resultado, e oferecer o próximo passo.
+
+**Forma:** `AskUserQuestion` **sem painel lateral**, ou seja **sem o campo `preview`**; só `label` e `description`. Detalhe técnico longo vai no corpo da mensagem de chat, antes ou depois da pergunta.
 
 **Dever de contra-argumentar:** se uma decisão do líder for destrutiva, violar princípio do projeto ou inviabilizar marco, o agente nomeia o problema, explica o risco concreto, propõe alternativa e devolve a decisão a ele. Silêncio passivo é má prática. Reafirmada a ordem, executa por inteiro.
 
