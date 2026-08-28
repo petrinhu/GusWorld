@@ -165,9 +165,9 @@ Se você quiser, a poda mínima preserva a sua redação aprovada e só tira o r
 
 ## 7. Nota sobre a coluna en-intl
 
-O catálogo `en_intl.md` está com **valores vazios de propósito** até pós-v1.0.0 (está escrito no cabeçalho do próprio arquivo: dev em pt-br, tradução en-intl pós-launch; a paridade exigida hoje é só de **chave**, não de valor).
+O catálogo `en_intl.md` estava com **valores vazios de propósito** até pós-v1.0.0 quando esta nota foi escrita. **Em 25/08/2026 o líder alterou o corte `C-09`** (`GODS_LAWS.md` L-29): o inglês passa a entrar **na própria 1.0**, e o cabeçalho de `en_intl.md` já reflete isso. A paridade de **chave** continua obrigatória; o que muda é o prazo do **valor**.
 
-Logo, aprovar a versão em inglês aqui significa **reservar a frase para a passada de tradução**, não escrevê-la agora. Quem executar a troca deve mexer **só** no `pt_br.md` e deixar a chave em inglês vazia, como está.
+Logo, aprovar a versão em inglês aqui **não é mais** reservar a frase para depois: quem executar a troca preenche `en_intl.md` junto com `pt_br.md` (escopo `D19a`/`D19b` do `TODO.md`), e não deixa mais a chave em inglês vazia.
 
 ---
 

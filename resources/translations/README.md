@@ -2,7 +2,7 @@
 
 > **Status:** Canônico. F2-S.11 setup.
 >
-> **Locales:** `pt_br` (dev primário, sempre completo), `en_intl` (alvo pós-v1.0.0; paridade estrutural completa com `pt_br` (361/361 chaves com o mesmo nome), mas tradução parcial: 117 chaves com valor preenchido e 244 ainda vazias, medido em 25/08/2026 por parsing do arquivo), `es_la` (alvo v1.x+, ainda não existe).
+> **Locales:** `pt_br` (dev primário, sempre completo), `en_intl` (alvo da própria 1.0, corte `C-09` alterado pelo líder em 25/08/2026, `GODS_LAWS.md` L-29; paridade estrutural completa com `pt_br` (361/361 chaves com o mesmo nome), mas tradução parcial: 117 chaves com valor preenchido e 244 ainda vazias, medido em 25/08/2026 por parsing do arquivo, faltante que o `D19a`/`D19b` do `TODO.md` fecha antes do lançamento), `es_la` (alvo v1.x+, ainda não existe).
 >
 > **Loader:** `engine/localization/md_translation_loader.gd` (custom MD parser).
 >
@@ -86,7 +86,7 @@ Expandir seções conforme arcos: `§8 Items`, `§9 Quests`, `§10 In-world docs
 3. Validar parsing: `Localization.reload()` em editor + verificar `Localization.has_key("NOVA_CHAVE")`.
 4. Usar via `Localization.tr_md("NOVA_CHAVE")` no código.
 
-### Tradução en_intl pós-v1.0.0
+### Tradução en_intl, antes do lançamento (corte `C-09` alterado em 25/08/2026)
 
 1. Sweep completo de `en_intl.md`, preencher valores.
 2. Validar paridade: toda chave em pt_br MUST existir em en_intl com valor não-vazio.
@@ -136,4 +136,4 @@ Expandir seções conforme arcos: `§8 Items`, `§9 Quests`, `§10 In-world docs
 - `engine/localization/localization.gd` (AutoLoad wrapper) ⚠️ ponteiro morto do projeto anterior, ver nota de estatuto no topo deste arquivo
 - `CONTRACT.md` §4 (DoD: strings user-facing via tr_md)
 - `CONTRACT.md` §6 (acessibilidade D1, subtitles + closed captions)
-- Memo: `project_i18n_canonico` (decisão dev pt-br + en-intl pós-v1.0.0)
+- Memo: `project_i18n_canonico` (decisão dev pt-br + en-intl na própria 1.0, corte `C-09` alterado pelo líder em 25/08/2026)

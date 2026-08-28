@@ -326,7 +326,7 @@ Para a tela de resultado (log de build ao vivo; ver [`battle-screen.md`](battle-
 - O **codigo de erro** (ex: `Segmentation fault (core dumped)`) e string LITERAL nao-traduzivel: faz parte do gag tecnico e da autenticidade. O dev ri do erro real em qualquer locale.
 - O **subtitulo do leigo** (ex: "a magia falhou") vai pro CSV `tr()` com chave propria (ex: `combat.spell_fail.subtitle`), traduzido normalmente.
 
-Coerente com o i18n canonico do GusWorld (dev em pt-br, estrutura i18n-ready desde dia 1; tradicao en-intl pos-1.0).
+Coerente com o i18n canonico do GusWorld (dev em pt-br, estrutura i18n-ready desde dia 1; en-intl entra na propria 1.0, corte C-09 alterado pelo lider em 25/08/2026, GODS_LAWS.md L-29).
 
 ---
 
