@@ -27,8 +27,7 @@ o código do GusWorld nasce do zero, sempre assentado sobre o GlintFx (LEI ZERO,
   dificuldade, IA de aliados, autobattle, e o bloco inteiro de anti-degeneração); trazida pelo
   próprio líder do `gusworld_legacy` em 25/08/2026, verbatim, ainda sem reconferência contra as leis
   vigentes. Cita arquivo de código do projeto anterior que não existe aqui (L-01).
-- `adr/` — 20 ADRs do `gusworld_legacy` (numerados 001 a 021, o 010 ausente por ordem do líder sob
-  a L-24), trazidos verbatim em 25/08/2026. Índice próprio em `adr/_INDEX.md`.
+- `adr/` — **14 ADRs vivos**, numerados `001` a `025` com **onze números aposentados** que não se reaproveitam; a lista dos aposentados está em `adr/_INDEX.md`.
 
 ## Achados desta varredura (25/08/2026) que ainda não têm correção aplicada
 
