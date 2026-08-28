@@ -17,16 +17,15 @@ lição — e não a stack morta em que cada um foi escrito.
   `multAmbiente`). A implementação antiga morreu; o conteúdo de fórmula já vive, atualizado, em
   `docs/design/mecanicas/combat.md` — redundante, não contraditório. Ver achado em `../_INDEX.md`.
 - `ADR-005` — GPLv3 + CC-BY-SA + livros reservados. Morto por inteiro; o próprio documento já se
-  marca **SUPERADO** (por ADR-021, que por sua vez está superado pela L-08 — ver achado).
-- `ADR-006` — HMAC-SHA256 próprio + envelope binário `GDS2` do save. A fonte da primitiva (escrita
-  em casa) está revogada pela L-25 (crypto vem do GlintFx); o desenho do envelope
-  (magic/length/payload/hmac) é o ancestral direto do envelope que a L-25 exige hoje. Ver achado em
-  `../_INDEX.md` — sem marcador de superação no documento.
-- `ADR-007` — `controls.json` legível com hash-128 de detecção e restauração via backup no save.
-  O formato texto está revogado pela L-18; o mecanismo de segurança (detectar sem prevenir, diff ao
-  jogador, backup embutido em todo save, hash sobre forma canônica) é o desenho mais detalhado do
-  corpus e antecede a L-25 quase ponto a ponto. Ver achado em `../_INDEX.md` — sem marcador de
-  superação no documento.
+  marca **SUPERADO** (pela rotação de licença de código que, por sua vez, foi superada pela L-08).
+- `ADR-006` — editado em `G21` (28/08/2026): saiu a primitiva HMAC-SHA256 escrita em casa (a
+  cripto vem do GlintFx, LEI ZERO/L-25); ficaram o formato de serialização binário do `domain/`, o
+  carimbo de data/hora por save e a semente de RNG por data/hora/milissegundo, mais a nota de que
+  migrators forward-only operam sobre structs versionadas.
+- `ADR-007` — editado em `G21` (28/08/2026): saiu o desenho inteiro em torno do arquivo de
+  controles em JSON legível (formato texto proibido pela L-18); ficaram as três camadas
+  anti-tamper do save que não dependiam do JSON (detectar sem crashar, slot-id selado dentro do
+  payload, chave do selo derivada por KDF em vez de embutida crua).
 - `ADR-016` — motor `techMagic` de efeito data-driven (lista de instruções, não VM/bytecode). Morto
   como código; o princípio (dado antes de máquina virtual) é o mesmo que a L-04/L-17 de hoje
   consagram. Já tem edição de terminologia aplicada por outra passada (troca pontual de
@@ -40,12 +39,9 @@ lição — e não a stack morta em que cada um foi escrito.
   Sem contradição; decisão viva, já refletida em lei.
 - `ADR-020` — peças de dado componíveis em módulos estreitos + regra do mundo data-driven.
   Precursor direto da L-04/L-17. Sem contradição; decisão viva, já refletida em lei.
-- `ADR-021` — rotação de licença de código para Apache 2.0 + assets em duas zonas por data de
-  corte. Superada pela L-08 (AGPL-3.0-or-later + todos os direitos reservados, regime único). Ver
-  achado em `../_INDEX.md` — sem marcador de superação no documento.
 
 **Não presentes** — números aposentados, não reutilizar: `ADR-002`, `ADR-003`, `ADR-008`, `ADR-009`,
-`ADR-010`, `ADR-011`, `ADR-012`, `ADR-013`, `ADR-014`, `ADR-015` e `ADR-018`.
+`ADR-010`, `ADR-011`, `ADR-012`, `ADR-013`, `ADR-014`, `ADR-015`, `ADR-018` e `ADR-021`.
 
 ## ADRs de fundação do GusWorld (código do zero, 25/08/2026)
 
