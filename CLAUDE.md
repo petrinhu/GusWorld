@@ -62,7 +62,7 @@ Transcrito de `GODS_LAWS.md` (34 leis, medido em 25/08/2026 por `grep -c "^## L-
 Jogo **2D pixel-art**, single-player e offline, em **C++23**, assentado sobre o framework [GlintFx](../GlintFx) (LEI ZERO): o GusWorld não cria janela, não possui contexto gráfico e não roda laço próprio de quadro — isso é do GlintFx, e o GusWorld escreve só a lógica do jogo.
 
 - **Perspectiva:** 3/4 top-down fixa, quatro direções cardeais desenhadas à mão (sem espelhamento), grade quadrada (L-26).
-- **Estrutura de mundo:** hub central mais incursões radiais; sem mundo aberto, sem mundo persistente (corte C-02).
+- **Estrutura de mundo:** **sem mundo aberto e sem mundo persistente** (corte `C-02`). ⚠️ A **forma da conectividade** é do `docs/design/mundo-topologia.md` — 13 áreas em grafo, com dobradiças ligando regiões —, e **não** do corte: em 28/08/2026 o líder tirou da lei a frase que ditava "hub central mais incursões radiais". O radial sobrevive como **ritmo de missão** no `pillars.md`, não como geografia.
 - **Progressão de cartas:** por progresso narrativo **e por crafting**. O corte `C-13`, que proibia carta craftada, foi **revogado pelo líder em 25/08/2026** junto com o `C-03`, restaurando canon do projeto anterior (L-29).
 - **Escopo da campanha:** **fechado e definido por conteúdo; sem número de horas fixado** (corte `C-15`, reescrito em 28/08/2026). O número anterior — 4 a 8 horas — foi derrubado pelo líder, que registrou não tê-lo escolhido; a duração se mede quando houver cena jogável.
 - **Distribuição:** FOSS, código sob AGPL-3.0-or-later; assets e lore com todos os direitos reservados (L-08).
@@ -105,7 +105,7 @@ Estas foram tomadas explicitamente via `AskUserQuestion` (salvo onde indicado) e
 | Natureza | Jogo 2D pixel-art, single-player, offline — executável final, não biblioteca |
 | Linguagem e build | C++23; única dependência de framework é o GlintFx (LEI ZERO) |
 | Perspectiva e câmera | 3/4 top-down fixa, quatro direções cardeais desenhadas à mão, sem espelhamento, grade quadrada (L-26) |
-| Estrutura de mundo | Hub central mais incursões radiais; sem mundo aberto nem persistente (C-02) |
+| Estrutura de mundo | Sem mundo aberto nem persistente (`C-02`); a **geografia** é o grafo de 13 áreas com dobradiças do `mundo-topologia.md`, não o corte |
 | Plataformas | Fedora 44 (primário, pinado), Ubuntu, Arch, CachyOS (próprio, não é Arch renomeado), Windows — cinco entradas distintas de CI desde o primeiro commit (L-09, L-20) |
 | Arquitetura | Espinha de cinco camadas (`core/ → content/ → domain/ → app/ → present/`), dependência só para baixo, com gate de CI; regra como transição determinística por comando e evento (L-17) |
 | Persistência de dado | Nenhum formato de texto: save, configuração, mapa e catálogo de conteúdo em envelope binário único selado (L-18, L-25) |
