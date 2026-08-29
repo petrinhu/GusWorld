@@ -413,25 +413,14 @@ Lista completa de plants/payoffs em [[foreshadow-links]] (130 plants canônicos 
 - **Animação de abertura:** sequência de 4-6 sprites do papelão dobrando. ~120 KB total.
 - **Custo total estimado de Diário aberto:** ~5-10 draw calls + 1-2 MB VRAM. Negligível frente ao gameplay.
 
-### 9.2 Save (JSON versionado `save_version: 1`)
+### 9.2 Save (envelope binário selado, versionado `save_version: 1`)
 
-Salva **apenas state mínimo**:
+Salva **apenas state mínimo**, dentro do mesmo envelope binário selado e versionado do projeto (`GODS_LAWS.md` L-18/L-25), nunca em formato de texto:
 
-```json
-{
-  "diary": {
-    "entries_unlocked": ["m_beat_ki", "m_beat_sho", "d_01", "d_02", "f_caua_lv2", "b_drone_sterling_lv4", ...],
-    "entries_read": ["m_beat_ki", "d_01", ...],
-    "stickynotes_active": {
-      "m_dante_drive_4": ["d_08"],
-      "m_fonte_recorrente": ["b_bento_lv2"]
-    },
-    "current_tab": 1,
-    "last_entry_open": "d_05",
-    "knowledge_score": {"bestiary": 32, "lore": 58, "companions": 71, "mundo": 41, "total": 47}
-  }
-}
-```
+- **IDs de entries destravadas** (`entries_unlocked`) e **lidas** (`entries_read`), como conjuntos.
+- **Sticky notes ativas** (`stickynotes_active`): cada entry-gatilho aponta para a lista de conexões acesas por ela (ex.: `m_dante_drive_4` → `d_08`; `m_fonte_recorrente` → `b_bento_lv2`).
+- **Aba atual** (`current_tab`) e **última entry aberta** (`last_entry_open`), para retomar o Diário no mesmo lugar.
+- **Score de conhecimento por categoria** (`knowledge_score`): bestiary, lore, companions, mundo, total.
 
 - **IDs canônicos** para cada entry (esquema `<tipo>_<slug>[_<lvl>]`): `m_*` manuscrito, `d_*` doc descobrível, `f_*` ficha, `b_*` bestiary, `mp_*` mapa, `t_*` timeline. Definidos individualmente nos `entries-*.md`.
 - **Migrators desde D1** (alinhado com decisão Fase 1, CLAUDE.md raiz). Se schema muda, migrator converte.

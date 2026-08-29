@@ -395,7 +395,7 @@ Cada trigger tem ID único (string canônico). Save registra apenas IDs consumid
 
 ### 10.3 Cross-reference pairs
 
-Pares canônicos registrados em arquivo de configuração separado (data-driven). Não-hardcoded. Permite expansão sem patch de código. Arquivo: `game/data/cross_ref_pairs.json` (a criar Fase 2).
+Pares canônicos registrados em catálogo de dados separado (data-driven), binário, compilado no pipeline de build (`GODS_LAWS.md` L-18/L-25, nunca formato de texto). Não-hardcoded. Permite expansão sem patch de código. Catálogo: pares de cross-reference, a criar Fase 2.
 
 ### 10.4 Performance
 

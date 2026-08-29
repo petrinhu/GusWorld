@@ -4,7 +4,7 @@
 **Data:** 2026-07-19
 **Decisores:** líder supremo (petrus) — pergunta disparadora ("nossa arquitetura de cartas/itens/dungeons/mapas é atômica?"); Caetano/CTO + software-architect (levantamento da evidência e redação)
 
-Cross-ref: [ADR-016](ADR-016-techmagic-effect-engine-data-driven.md) (motor `techMagic` data-driven, já rejeitou VM/scripting genérico — este ADR generaliza o mesmo racional pra toda a arquitetura de conteúdo), [ADR-006](ADR-006-crypto-hmac-formato-domain.md)/[ADR-007](ADR-007-controls-json-hash128-save-v4.md) (save JSON versionado + migrators), `docs/tech/pivot/engine-design.md` (as 4 camadas core/domain/platform/app), `docs/design/mecanicas/cartas-technomagik.md`, item `AC-E11` do `TODO.md` (decomposição de `battle_preview.cpp`/`battle_scene.cpp` — a onda que aplica este princípio à camada de apresentação), memórias `reference_techmagic_engine_impl`, `feedback_todo_efeito_loga_terminal`, `feedback_auditoria_domino`.
+Cross-ref: [ADR-016](ADR-016-techmagic-effect-engine-data-driven.md) (motor `techMagic` data-driven, já rejeitou VM/scripting genérico — este ADR generaliza o mesmo racional pra toda a arquitetura de conteúdo), [ADR-006](ADR-006-crypto-hmac-formato-domain.md)/[ADR-007](ADR-007-controls-json-hash128-save-v4.md) (save binário selado versionado + migrators), `docs/tech/pivot/engine-design.md` (as 4 camadas core/domain/platform/app), `docs/design/mecanicas/cartas-technomagik.md`, item `AC-E11` do `TODO.md` (decomposição de `battle_preview.cpp`/`battle_scene.cpp` — a onda que aplica este princípio à camada de apresentação), memórias `reference_techmagic_engine_impl`, `feedback_todo_efeito_loga_terminal`, `feedback_auditoria_domino`.
 
 ## Contexto
 

@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 # Mapas do GusWorld (formato e pipeline)
 
 Decisao do lider (2026-06-23): o mapa do overworld e uma **matriz de tiles**
-guardada num **binario proprio `.gmap` SELADO com HMAC-SHA256** (anti-tamper: o
+guardada num **binario proprio `.gmap` SELADO** (anti-tamper: o
 jogador nao edita o mapa pra atravessar parede), **editavel no dev via uma fonte
 CSV + um compilador**.
 
@@ -42,8 +42,8 @@ abaixo. (Se o build versionar so a fonte, gere o `.gmap` no passo de build/empac
    `to_tile_grid()` gera o `core::spatial::TileGrid` (livre/bloqueado) que a colisao
    do overworld JA consome (so `Parede` bloqueia).
 2. **`.gmap`** (`domain/map/map_serializer.hpp`): envelope
-   `MAGIC "GMAP" | LENGTH | PAYLOAD | HMAC-SHA256(32)`. `load_map` valida o HMAC ANTES da versao, rejeita futuro (forward-only)
-   e adulteracao, sinalizando por valor (`MapLoadResult` Ok/HmacInvalid/Corrupt/
+   `MAGIC "GMAP" | LENGTH | PAYLOAD | SELO(32)`. `load_map` valida o selo ANTES da versao, rejeita futuro (forward-only)
+   e adulteracao, sinalizando por valor (`MapLoadResult` Ok/SeloInvalid/Corrupt/
    VersionTooNew/Invalid). Migrators forward-only desde a v1.
 3. **Compilador CSV** (`domain/map/map_csv.hpp`): `parse_csv_to_tilemap` (POCO) +
    o modo de ferramenta do app que faz o I/O de arquivo na fronteira.
