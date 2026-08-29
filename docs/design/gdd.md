@@ -135,18 +135,19 @@ Secundárias (não bloqueantes): "would play again" ≥70%, taxa de conclusão d
 
 - Multiplayer / co-op / PvP.
 - Open-world / mundo persistente.
-- Crafting profundo / sistema econômico de cidade.
+- **Crafting profundo, o corte foi REVOGADO pelo líder** (`C-03` da L-29, `GODS_LAWS.md`, 25/08/2026; a regra antiga bania crafting, inclusive profundo, e foi apagada sob a L-24). Detalhe em "Crafting de cartas", algumas linhas abaixo.
+- Sistema econômico de cidade. Status incerto após a revogação do `C-03`: a economia canônica hoje é a do Hospital (`docs/design/mecanicas/economia.md`, crédito, dívida, curva Fibonacci), sem menção a cidade. Se o corte de "economia complexa" do `C-03` cobria isto, ou se é um corte distinto que sobrevive, é dúvida relatada ao líder, não decidida por este agente (L-14).
 - Romance / morality system / múltiplos finais (1 final + variantes mínimas).
 - Voice acting (apenas texto).
 - Mocap / cutscenes pré-renderizadas (usar in-engine).
 - Dynamic difficulty adjustment (oferecer 2 modos fixos: Padrão + Analítico-hard).
-- Sistema de companions com afinidade / dating-sim mechanics.
+- **Companions com afinidade, o corte teve o alcance corrigido pelo líder** (`C-12` da L-29, `GODS_LAWS.md`, 25/08/2026; a regra antiga bania companions com afinidade em bloco, e foi apagada sob a L-24). **Continuam banidos: simulador de namoro e medidor de afeto romântico.** Afinidade de NPC como estado de reação social está FORA da cerca: decisão do líder de 04/08/2026, em `docs/narrative/characters/gus.md`, manda o NPC que insiste em assunto induzido perder afinidade e mudar de estado de diálogo.
 - Mais de 2 macro-biomas.
 - **Crafting de cartas — o corte foi REVOGADO pelo líder** (`C-03` e `C-13` da L-29, `GODS_LAWS.md`, 25/08/2026; a regra antiga dizia que carta se obtém e não se crafta, e foi apagada sob a L-24). **O jogo TEM crafting, e ele alcança as cartas.** Desde 2026-07-16: as COMUNS podem ser craftadas/compradas/lootadas (economia de coleção bounded); as ESPECIAIS/SUPER seguem "obtidas, não craftadas" (só progresso narrativo) **para a ORIGINAL**. Ver pillars.md + cartas-technomagik §2.2 + deck-mao-sistema.md. **REVISTO DE NOVO EM 25/08/2026 (líder, revogação de C-03/C-13 na L-29 de `GODS_LAWS.md`):** ESPECIAIS e SUPER passam a ter **cópia pirata craftável**, sempre inferior à original — qualidade pior, efeito trocado, ou só o nome sem função. A ORIGINAL de ESPECIAL/SUPER continua fechada a crafting, compra e loot; só a imitação é craftável. Ver `cartas-technomagik.md` §2.3-2.4 e `cartas-hardware-pirataria-energia.md` §15.
 - DLC / season pass / live-service.
 - Console port no MVP (Linux v1; Windows export template preparado mas ship pós-v1).
 - **Tradução — o corte foi ALTERADO pelo líder** (a regra antiga dizia que o inglês era pós-release da 1.0.0, e foi apagada sob a L-24). **REVISTO em 25/08/2026 (líder, alteração do `C-09` na L-29 de `GODS_LAWS.md`, lei das leis):** o inglês entra **NO LANÇAMENTO**. Conteúdo em pt-br e inglês na 1.0; a estrutura de internacionalização, que já estava de pé desde F2-S.11, deixa de ser só estrutura. Ver `B9`/`D19` no `TODO.md`.
 - Mod support / in-game editor.
-- Achievements / leaderboards (post-launch talvez).
+- **Achievements, o corte foi REVOGADO pelo líder** (`C-08` da L-29, `GODS_LAWS.md`, 25/08/2026; a regra antiga bania conquistas e placar, e foi apagada sob a L-24). **O jogo TEM conquistas** (afirmado pelo líder ao revogar o corte). Sobre placar/leaderboard, a revogação derrubou o corte mas o líder só afirmou "conquistas" com todas as letras; se placar é recurso vigente ou segue em aberto não foi decidido por este agente (L-14). **O que continua de fora, por ora:** integração com a Steam, por depender do SDK proprietário do Steamworks, incompatível com a AGPL-3.0 herdada do GlintFx; decidida quando a distribuição for real.
 - Tutorial wall-of-text / cinemática de abertura > 90s.
 - Mais de 8h de campanha (escopo G1 mata).

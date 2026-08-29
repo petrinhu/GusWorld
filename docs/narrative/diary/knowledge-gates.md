@@ -366,7 +366,7 @@ Categoria Mecânico-meta tem cap baixo (~30) intencionalmente. Não pode "destra
 
 - **Hint mode (opcional):** player pode ativar dicas extras no Diário (entries mostram "explore [setting] para destravar". Knowledge não é afetado, apenas legibilidade da exploração). Compensação para players cognitivos que querem o conteúdo sem decifrar pista.
 - **Auto-cross-reference (opcional):** modo onde o jogo sugere ativamente cruzamentos canônicos quando player abre uma das 2 entries. Knowledge Mecânico-meta + 1 (não +2; preserva agência mecânica).
-- **Text-to-speech:** voz canônica de Gus narra entries quando ativado. Voice consistente em todas as 4 categorias do Diário.
+- **Text-to-speech:** ideia registrada, **fora da 1.0** (`C-04`, `GODS_LAWS.md` L-29: o corte é amplo, o jogo não tem voz nenhuma, e a distinção "UI assistiva, não personagem" não abre exceção). Se voltar, é como **add-on pós-lançamento**: leitura em voz neutra, não dramatizada, das entries, nunca voz de personagem.
 - **Detalhe pleno em [[ui-spec]] §8.**
 
 ---
