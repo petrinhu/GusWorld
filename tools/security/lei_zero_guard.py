@@ -113,16 +113,36 @@ def isento(caminho: str) -> bool:
     c = caminho.replace("\\", "/")
     return any(c.startswith(p) for p in ISENTOS)
 
+
+class GitDiffError(RuntimeError):
+    """O comando git que monta o diff falhou. Fail-secure: isto NUNCA vira
+    lista vazia em silencio -- lista vazia por falha de git e lista vazia por
+    ausencia legitima de mudanca de texto sao coisas diferentes, e so a
+    segunda pode passar."""
+
+
 def linhas_adicionadas(intervalo: str | None = None) -> list[tuple[str, int, str]]:
     """Modo GATE: so o que este commit ACRESCENTA.
 
     Checar a arvore inteira travaria todo commit ate a limpeza terminar --
     inclusive os commits QUE FAZEM a limpeza. O gate morde a regressao: se o
     diff nao introduz nome proibido, passa, mesmo com divida antiga na arvore.
+
+    Levanta GitDiffError se o `git diff` falhar (SHA invalido no --range,
+    repo raso, erro de leitura) -- nunca devolve lista vazia como se o diff
+    legitimamente nao tivesse nada.
     """
     cmd = ["git", "diff", "--unified=0", "--no-color"]
     cmd += ["--cached"] if intervalo is None else intervalo.split()
-    out = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    try:
+        out = subprocess.run(cmd, capture_output=True, text=True)
+    except OSError as e:                              # git ausente do PATH
+        raise GitDiffError(f"nao consegui executar `{' '.join(cmd)}`: {e}") from e
+    if out.returncode != 0:
+        raise GitDiffError(
+            f"`{' '.join(cmd)}` saiu com codigo {out.returncode}: "
+            f"{out.stderr.strip() or '(git nao explicou o erro no stderr)'}"
+        )
     achados, caminho, linha = [], None, 0
     for l in out.stdout.split("\n"):
         if l.startswith("+++ b/"):
@@ -147,7 +167,7 @@ def main() -> int:
         if str(os.environ.get("LEI_ZERO_GUARD", "")).lower() == "off":
             print("lei-zero-guard: DESLIGADO por LEI_ZERO_GUARD=off.", file=sys.stderr)
             return 0
-        return gate(intervalo)
+        return gate(intervalo, quiet)
     try:
         arquivos = rastreados()
     except Exception as e:                       # noqa: BLE001
@@ -201,13 +221,34 @@ def main() -> int:
 
 
 
-def gate(intervalo: str | None = None) -> int:
-    """Portao de pre-commit: bloqueia commit que ACRESCENTA dependencia proibida."""
+def gate(intervalo: str | None = None, quiet: bool = False) -> int:
+    """Portao de pre-commit/CI: bloqueia commit que ACRESCENTA dependencia proibida.
+
+    Audivel (achado desta ordem de servico): um portao que passa em silencio
+    e indistinguivel de um portao que quebrou e nao olhou nada. Toda saida
+    limpa imprime quantos arquivos do diff foram varridos.
+
+    Fail-secure (achado desta ordem de servico): se o `git diff` falhar --
+    SHA invalido em --range, repo raso, erro de leitura --, o gate REPROVA
+    (exit 2) em vez de tratar a falha como "diff vazio, nada a varrer,
+    tudo limpo". Lista vazia por erro e lista vazia por ausencia legitima
+    de mudanca de texto sao coisas diferentes.
+    """
     try:
         adicionadas = linhas_adicionadas(intervalo)
-    except Exception as e:                       # noqa: BLE001
-        print(f"lei-zero-guard: nao consegui ler o diff: {e}", file=sys.stderr)
-        return 1
+    except GitDiffError as e:
+        print("\n" + "=" * 68, file=sys.stderr)
+        print("LEI ZERO: commit BLOQUEADO -- nao consegui medir o diff.", file=sys.stderr)
+        print("=" * 68, file=sys.stderr)
+        print(f"\n{e}\n", file=sys.stderr)
+        print("Isto NAO e um passe silencioso: git falhou, entao o gate reprova\n"
+              "por seguranca (fail-secure). Nao houve varredura nenhuma.\n",
+              file=sys.stderr)
+        return 2
+
+    arquivos_no_diff = sorted({caminho for caminho, _, _ in adicionadas})
+    arquivos_varridos = [c for c in arquivos_no_diff if not isento(c)]
+
     violacoes = []
     for caminho, linha, texto in adicionadas:
         if isento(caminho):
@@ -215,6 +256,11 @@ def gate(intervalo: str | None = None) -> int:
         for nome, padrao in PROIBIDOS.items():
             if re.search(padrao, texto):
                 violacoes.append((caminho, linha, nome, texto.strip()[:100]))
+
+    if not quiet:
+        print(f"lei-zero-guard: {len(arquivos_varridos)} arquivo(s) do diff "
+              f"varrido(s), {len(violacoes)} violacao(oes).")
+
     if not violacoes:
         return 0
     print("\n" + "=" * 68, file=sys.stderr)
