@@ -1,4 +1,4 @@
-# Especificação Técnica de Asset 3D: Jaci "Proxy" Vanderbist (Companheira — Healer Biológica)
+# Especificação de Personagem: Jaci "Proxy" Vanderbist (Companheira — Healer Biológica)
 
 **Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver CLAUDE.md).
 
@@ -20,6 +20,6 @@
 ## Pendências — spec 2D detalhada (decisão do líder)
 
 - Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
-- Prompt PixelLab: não definido — prompt SD/MJ abaixo é da era 3D, não reaproveitável 1:1.
+- Prompt PixelLab: não definido.
 - Como a heterocromia ocular emissiva permanece legível em baixa resolução de sprite: pendente.
 

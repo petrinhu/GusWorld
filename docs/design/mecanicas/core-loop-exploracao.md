@@ -24,7 +24,7 @@ A área não é level design (isso é F2-G.1 do level-designer); é a **gramáti
 | **Lore** | fragmento decifrável (in-world-doc, terminal, glifo) | brilho sutil + ping de Scan ao alcance | Óculos + Matriz: decodifica texto/glifo |
 | **Terminal** | hack ambiental (porta, ponte, energia) | painel inerte que Scan revela como interativo | Tavus-Drive: joga carta ambiental (GDD §6.2) |
 
-Navegação entre nós: caminho curto e legível (hub + ramos, alinhado a Pillar 5 "hub + radiais"). O VS tem ~1 nó de cada tipo (MVV plano_vs §4).
+Navegação entre nós: caminho curto e legível (hub + ramos, alinhado a Pillar 5 "hub + radiais"). O VS tem ~1 nó de cada tipo.
 
 ## 3. Scan no overworld (GDD §6.1)
 

@@ -1,4 +1,4 @@
-# Especificação Técnica de Asset 3D: Dante "Grid" Alencar (Companheiro / Traidor — Suporte Mecânico)
+# Especificação de Personagem: Dante "Grid" Alencar (Companheiro / Traidor — Suporte Mecânico)
 
 **Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver CLAUDE.md).
 
@@ -20,6 +20,6 @@
 ## Pendências — spec 2D detalhada (decisão do líder)
 
 - Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
-- Prompt PixelLab: não definido — prompt SD/MJ abaixo é da era 3D, não reaproveitável 1:1.
+- Prompt PixelLab: não definido.
 - **Importante:** como representar o foreshadow visual progressivo (variantes de sprite ao longo do arco) em pixel-art — pendente, mas não pode ser perdido no pivô.
 

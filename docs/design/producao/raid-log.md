@@ -1,11 +1,11 @@
 # RAID Log — Vertical Slice (GusWorld)
 
 **Status:** Vivo e canônico. Criado F2-PROD.3 em 2026-06-03; formato standalone (Opção A) ratificado pelo criador 2026-06-03.
-**Cross-ref:** `plano_vs.md` (Top-3 §3 é o resumo; este doc é a versão viva e expandida). IDs R-01/R-02/R-03 são os mesmos do plano. Critical path e MVV: ver `plano_vs.md` §2/§4 (não re-derivado aqui).
+**Cross-ref:** este doc é a versão viva e expandida do RAID (Top-3 é o resumo). ⚠️ Critical path e MVV eram derivados de `plano_vs.md`, apagado em 28/08/2026 na extirpação de dependências de terceiro; não há hoje documento vivo que os re-derive — pendente de decisão do líder.
 **Cadência de revisão:** a cada fechamento de onda (W3 → W4 → W5 → W6) e em F2-M.1. Solo dev: ler em 30s, saber o que está pegando fogo.
 **Owner de tudo:** Criador (solo). "Mitigação" aponta o item de TODO que a executa quando existe.
 
-> Formato: doc standalone (Opção A), ratificado pelo criador 2026-06-03. RAID vivo com revisão recorrente não cabe numa linha de backlog; ficar dentro do `plano_vs.md` misturaria estado-vivo com plano quase-estável.
+> Formato: doc standalone (Opção A), ratificado pelo criador 2026-06-03. RAID vivo com revisão recorrente não cabe numa linha de backlog; ficar dentro do plano do Vertical Slice misturaria estado-vivo com plano quase-estável.
 
 ---
 
@@ -26,20 +26,22 @@
 | A-01 | O pipeline AI (nano banana → TripoSR só-shape) produz topologia retopo-ável dentro do budget de tris (3k-4.5k) sem PBR | R-01 sobe para Alta×Alto; arte final só por hand-model | F2-ART.SPIKE em W3 com 1 char (Gus): se reprovar, fallback hand-model já assumido |
 | A-02 | Placeholder-first segura o fun-loop: graybox + material flat bastam p/ medir time-to-fun ≤ 5min no M.3 sem arte final | R-04 sobe; M.3 passa a depender de arte | Playtest N=3 em graybox no M.3; se testadores travarem por falta de leitura visual, reavaliar |
 
-## D — Dependencies (caminho crítico — cross-ref, não re-derivado)
+## D — Dependencies (caminho crítico)
+
+⚠️ **A coluna "Onde está mapeada" apontava para `plano_vs.md`, apagado em 28/08/2026** (extirpação de dependências de terceiro) e para uma numeração de notas do `TODO.md` (`§264`) que não existe no schema atual da tabela. Nenhuma das duas fontes está viva hoje; os IDs `F2-*` abaixo também não correspondem a nenhum item do `TODO.md` atual — pendente de decisão do líder sobre revalidar ou revogar este RAID inteiro.
 
 | # | Dependência | Tipo | Onde está mapeada |
 |---|---|---|---|
-| D-01 | F2-G.1 → F2-E.10 → F2-E.10b → F2-G.5/G.9 (combate jogável com dados reais) | Interna / critical path | `plano_vs.md` §2 + F2-PROD.5 (aresta E.10b confirmada) |
-| D-02 | F2-E.11 depende de F2-E.5b (status inertes precisam EXISTIR antes de ambientes modificá-los) | Interna | `plano_vs.md` §2; TODO notas §264 |
-| D-03 | F2-M.4 (build distribuível) depende de export templates + presets + wrappers (não de CI Forgejo completo) | Externa / tooling | `plano_vs.md` §2 M.4; ligada a R-05 |
+| D-01 | F2-G.1 → F2-E.10 → F2-E.10b → F2-G.5/G.9 (combate jogável com dados reais) | Interna / critical path | não mapeada (fonte apagada) |
+| D-02 | F2-E.11 depende de F2-E.5b (status inertes precisam EXISTIR antes de ambientes modificá-los) | Interna | não mapeada (fonte apagada) |
+| D-03 | F2-M.4 (build distribuível) depende de export templates + presets + wrappers (não de CI completo) | Externa / tooling | não mapeada (fonte apagada); ligada a R-05 |
 
 ---
 
 ## Política de revisão (mínima)
 
 - Tocar este doc a cada fechamento de onda: mudou Prob.×Impacto? Gatilho disparou? Mitigação ainda válida?
-- Risco materializado ou gatilho disparado → AskUserQuestion ao criador com trade-off explícito (cortar MVV / estender prazo / aceitar débito), conforme buffer policy `plano_vs.md` §5. Nunca slip silencioso.
+- Risco materializado ou gatilho disparado → AskUserQuestion ao criador com trade-off explícito (cortar MVV / estender prazo / aceitar débito). Nunca slip silencioso.
 - Risco morto → mover p/ "Encerrados" com 1 linha de fechamento (não apagar, preserva histórico p/ post-mortem).
 
 ### Encerrados

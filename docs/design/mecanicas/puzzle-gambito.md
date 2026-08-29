@@ -35,7 +35,7 @@ Materializa GDD §6.3 ("mesmo tabuleiro decifra movimento de patrulhas... e prev
 | Projétil ambiental | Selve | trajetória balística periódica (esporo/pólen-vírus) | fase posterior |
 | Hazard físico | cidade | feixe/porta/prensa em cadência fixa | fase posterior (camada de tempero) |
 
-O VS entrega **só patrulha** (área-cidade canônica, plano_vs §1/§4). Os outros tipos reusam o mesmo motor de "entidade com trajetória determinística previsível"; dados já preparados, não implementados.
+O VS entrega **só patrulha** (área-cidade canônica). Os outros tipos reusam o mesmo motor de "entidade com trajetória determinística previsível"; dados já preparados, não implementados.
 
 ## 5. Dificuldade e escalabilidade
 

@@ -1,4 +1,4 @@
-# Especificação Técnica de Asset 3D: Linda "Siren" Neumann (Companheira — Crowd Control)
+# Especificação de Personagem: Linda "Siren" Neumann (Companheira — Crowd Control)
 
 **Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver CLAUDE.md).
 
@@ -19,6 +19,6 @@
 ## Pendências — spec 2D detalhada (decisão do líder)
 
 - Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
-- Prompt PixelLab: não definido — prompt SD/MJ abaixo é da era 3D, não reaproveitável 1:1.
+- Prompt PixelLab: não definido.
 - Como o efeito diegético "alto-falantes pulsando com o áudio" (antes mesh deformer 3D) vira animação de sprite 2D: pendente.
 
