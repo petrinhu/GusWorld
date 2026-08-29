@@ -26,7 +26,7 @@ Transcrito de `GODS_LAWS.md` (34 leis, medido em 25/08/2026 por `grep -c "^## L-
 | [L-02](GODS_LAWS.md#l-02) | tocar arte, câmera, sprite, modelo ou pipeline visual | Jogo é 2D pixel-art; o pipeline 3D é do líder e agente não toca |
 | [L-03](GODS_LAWS.md#l-03) | criar build, escolher padrão de linguagem | C++23 |
 | [L-04](GODS_LAWS.md#l-04) | escrever função, arquivo, classe, módulo, item ou carta | Proibido monolito; cada elemento do jogo é átomo com POCO próprio |
-| [L-05](GODS_LAWS.md#l-05) | precisar de algo que o GlintFx ainda não tem | Proibido dublê de plataforma: ou liga no GlintFx, ou não existe |
+| [L-05](GODS_LAWS.md#l-05) | precisar de algo que o GlintFx ainda não tem, ou de ferramenta de apoio | Proibido dublê: ou liga no GlintFx, ou não existe. ⚠️ **Ferramenta que só constrói e nunca embarca NÃO é dependência** (LEI ZERO, reforma de 28/08/2026) |
 | [L-06](GODS_LAWS.md#l-06) | decidir o que construir primeiro | Núcleo puro agora; a camada que desenha só nasce com o GlintFx |
 | [L-07](GODS_LAWS.md#l-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
 | [L-08](GODS_LAWS.md#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |

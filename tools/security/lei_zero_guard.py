@@ -7,8 +7,28 @@ Existe porque a LEI ZERO estava escrita e NADA a fazia cumprir: toda violacao
 dependia de o lider notar e repetir a ordem. Este script tira essa carga dele.
 
 Nao substitui julgamento -- ele acha NOME de dependencia proibida em arquivo
-rastreado. Ferramenta de build (CMake, Ninja, ctest, clang-tidy) NAO e link e
-nao entra aqui; asset licenciado (a fonte Pixel Operator Mono) tambem nao.
+rastreado.
+
+A REGUA (reforma da LEI ZERO, decisao do lider em 28/08/2026):
+
+    Se o arquivo sumisse da maquina do JOGADOR, o jogo deixaria de rodar?
+      SIM -> e DEPENDENCIA, e esta proibida.
+      NAO -> e FERRAMENTA, e e permitida.
+
+A pergunta e sobre a maquina DELE, nao sobre a nossa. Por isso CMake, Ninja,
+ctest, clang-tidy, cppcheck, gitleaks, git, reuse, Python e script de shell
+NAO entram nesta lista: constroem e verificam, nunca embarcam. Asset
+licenciado (a fonte Pixel Operator Mono) tambem nao entra -- e asset, nao
+link.
+
+⚠️ O GERADOR e ferramenta (nao linka), MAS o que ele produz EMBARCA, e o
+output obedece as leis do produto (L-18: nada em texto; L-25: envelope
+selado). "Nao linka" nunca foi o mesmo que "nao afeta o que o jogador
+recebe".
+
+⚠️ Ferramenta de build e zona PERMITIDA, nao zona NEUTRA: pacote
+comprometido no caminho de build injeta no artefato sem nunca aparecer como
+dependencia do binario. Quanto menos ferramenta, menor a superficie.
 
 Uso:  python3 tools/security/lei_zero_guard.py [--quiet]
 Saida: 0 = limpo | 2 = violacao encontrada | 1 = erro de execucao
