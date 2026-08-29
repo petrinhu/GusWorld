@@ -1,7 +1,6 @@
 # Plano de Build e Portão de Release — GusWorld
 
 **Status:** Canônico. Escrito para o stack atual do projeto (C++23 + GlintFx).
-**Cross-ref:** `docs/design/producao/plano_vs.md` (marco de build distribuível do Vertical Slice).
 
 Documento leve de delivery solo (anti-over-engineering).
 

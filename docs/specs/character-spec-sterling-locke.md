@@ -1,4 +1,4 @@
-# Especificação Técnica de Asset 3D: Sterling Locke (Antagonista Principal)
+# Especificação de Personagem: Sterling Locke (Antagonista Principal)
 
 **Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver CLAUDE.md).
 
@@ -23,6 +23,6 @@
 ## Pendências — spec 2D detalhada (decisão do líder)
 
 - Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
-- Prompt PixelLab: não definido — prompt SD/MJ abaixo é da era 3D, não reaproveitável 1:1.
+- Prompt PixelLab: não definido.
 - Como manter a "quebra deliberada do cômico SD" (que dependia de silhueta 3D angular) legível em pixel-art de baixa resolução: pendente — provavelmente o ponto mais sensível de tradução 3D→2D deste elenco, por ser central à ameaça do antagonista.
 

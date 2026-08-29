@@ -1,4 +1,4 @@
-# Especificação Técnica de Asset 3D: Bento "Requiem" Chevalier (Companheiro — Tanque)
+# Especificação de Personagem: Bento "Requiem" Chevalier (Companheiro — Tanque)
 
 **Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver CLAUDE.md).
 
@@ -19,6 +19,6 @@
 ## Pendências — spec 2D detalhada (decisão do líder)
 
 - Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
-- Prompt PixelLab: não definido — prompt SD/MJ abaixo é da era 3D, não reaproveitável 1:1.
+- Prompt PixelLab: não definido.
 - Como as engrenagens animadas do escudo (antes via keyframes 3D) viram frames de spritesheet 2D: pendente.
 

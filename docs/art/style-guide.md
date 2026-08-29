@@ -4,7 +4,7 @@
 
 > As diretrizes de ARTE deste doc que são **agnósticas de dimensão** (paleta, HSL, shape language, color script, semiótica de silhueta) continuam canônicas. Uma spec 2D detalhada equivalente (resolução de sprite, nº de frames/direções, paleta indexada, orçamento de créditos PixelLab) é **decisão pendente do criador supremo** — não foi inventada nesta atualização.
 
-Solo G1 indie, engine própria C++23, **2D pixel-art estilizado via pipeline PixelLab** (não mais 3D). Documento vivo. Toda decisão visual valida contra `docs/design/pillars.md`.
+Solo G1 indie, engine própria C++23 sobre GlintFx, **2D pixel-art estilizado via pipeline PixelLab** (não mais 3D). Documento vivo. Toda decisão visual valida contra `docs/design/pillars.md`.
 
 **Spec mestre de personagem:** `Resources/gusworld/character-spec-gus.md` (canônica — traços de identidade vigentes; a spec de mesh 3D antiga foi removida do arquivo). Sheet de produção: `docs/art/characters/gus.md`.
 

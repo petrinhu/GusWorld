@@ -1,4 +1,4 @@
-# Especificação Técnica de Asset 3D: Gus "Dragon" Vector Tavus Vance (Sprite de Jogo)
+# Especificação de Personagem: Gus "Dragon" Vector Tavus Vance (Sprite de Jogo)
 
 **Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver CLAUDE.md).
 
@@ -22,6 +22,6 @@
 ## Pendências — spec 2D detalhada (decisão do líder)
 
 - Resolução/tamanho do sprite, nº de frames, nº de direções, paleta indexada: não definidos, aguardam spec 2D (ver `docs/art/style-guide.md`, seção "Pendências consolidadas").
-- Prompt PixelLab para o Gus: não definido — o prompt Stable Diffusion/Midjourney abaixo é da era 3D e não é reaproveitável 1:1 pro PixelLab.
+- Prompt PixelLab para o Gus: não definido.
 - Como o aparelho dental (detalhe minúsculo) permanece legível em baixa resolução de sprite: pendente.
 
