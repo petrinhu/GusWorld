@@ -78,7 +78,7 @@ Tudo o que está aqui amarra direto a Pillar 1 (Lógica vence força, Knowledge 
 - **Diário é safe space narrativo.** Mesmo quando o jogo escurece (arco Dante, Polis-Vermelha, ato 3), abrir o Diário **não disponibiliza nem jumpscare nem horror direto**. Patch-Zero **invade** o Diário em momentos específicos (4-canais, ver [[lore-bible]] §8.3 canal 1). Quando invade, é evento, não ambient.
 - **Pillar 4 obrigatório:** zero linguagem profana, zero "droga"/"merda". Quando Gus quer expressar frustração: tecnicismo ("isso aqui é um vazamento de memória emocional") ou metáfora científica.
 - **Acessibilidade:** layer 2 (texto limpo) tem fonte ajustável + opção de substituir cursiva da layer 1 por bloco-letra. WCAG AA mínimo. Detalhes em `ui-spec.md` §8.
-- **Performance:** caderno é sprite atlas único; entries renderizam texto on-demand. Save serializa apenas IDs de entries destravadas + estado de leitura. JSON versionado `save_version: 1` (alinhado com decisão Fase 1).
+- **Performance:** caderno é sprite atlas único; entries renderizam texto on-demand. Save serializa apenas IDs de entries destravadas + estado de leitura. Envelope binário selado e versionado `save_version: 1` (alinhado com decisão Fase 1).
 
 ---
 
