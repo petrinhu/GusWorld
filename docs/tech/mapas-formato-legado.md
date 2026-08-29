@@ -42,8 +42,7 @@ abaixo. (Se o build versionar so a fonte, gere o `.gmap` no passo de build/empac
    `to_tile_grid()` gera o `core::spatial::TileGrid` (livre/bloqueado) que a colisao
    do overworld JA consome (so `Parede` bloqueia).
 2. **`.gmap`** (`domain/map/map_serializer.hpp`): envelope
-   `MAGIC "GMAP" | LENGTH | PAYLOAD | HMAC-SHA256(32)`, mesma disciplina do save
-   (ADR-006). `load_map` valida o HMAC ANTES da versao, rejeita futuro (forward-only)
+   `MAGIC "GMAP" | LENGTH | PAYLOAD | HMAC-SHA256(32)`. `load_map` valida o HMAC ANTES da versao, rejeita futuro (forward-only)
    e adulteracao, sinalizando por valor (`MapLoadResult` Ok/HmacInvalid/Corrupt/
    VersionTooNew/Invalid). Migrators forward-only desde a v1.
 3. **Compilador CSV** (`domain/map/map_csv.hpp`): `parse_csv_to_tilemap` (POCO) +

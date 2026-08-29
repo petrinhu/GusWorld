@@ -32,7 +32,7 @@ O anti-padrão rejeitado é o interpretador/VM genérico de propósito amplo —
 
 - **Cartas (`techMagic`, ADR-016):** `Card { tier, category, target_shape, std::vector<EffectSpec> }` + executor `techMagic::execute(card, contexto)` despachado por `TriggerHook`/`EffectKind`. Catálogo `MasterCards::build_registry()` — hoje 11/12 `EffectKind`s do manifesto `CARD-ENGINE-MANIFESTO` entregues, cada carta nova = uma entrada em `master_cards.cpp`, zero handler novo quando o `EffectKind` já existe (Maxwell reusou `TargetShape::Grupo` sem nenhum código novo).
 - **Mapas `.gmap`:** formato binário selado (HMAC + UUID, anti-tamper) compilado a partir de CSV fonte (`reference_formato_mapa_gmap`) — o loop de exploração (M4) lê o mesmo parser pra qualquer mapa; mapa novo = arquivo novo, zero código novo.
-- **Save JSON versionado + migrators (ADR-006/ADR-007):** o formato de save é dado versionado; cada shape nova de save vira um migrator, o motor de carregamento é único e fixo desde D1.
+- **Save versionado + migrators:** o formato de save é dado versionado; cada shape nova de save vira um migrator, o motor de carregamento é único e fixo desde D1.
 - **Roster/itens POCO:** entidades de domínio como structs de dados puros, sem lógica de instância embutida.
 - **Diálogo runtime POCO:** grafo `DialogueGraph` em formato-texto próprio (nós, opções, `FlagCondition`/`FlagEffect`) interpretado por um parser+runtime fixo; NPC novo = arquivo de diálogo novo.
 - **Catálogo de animação (`anim_catalog`):** poses/timing como dado consumido por um player de animação único.
