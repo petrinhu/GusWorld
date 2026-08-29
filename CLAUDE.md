@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Índice de gatilhos
 
-Transcrito de `GODS_LAWS.md` (34 leis, medido em 25/08/2026 por `grep -c "^## L-" GODS_LAWS.md`). Este índice é cópia; a fonte de verdade é sempre o arquivo, nunca esta tabela.
+Transcrito de `GODS_LAWS.md` (35 leis, medido em 29/08/2026 por `grep -c "^## L-" GODS_LAWS.md`). Este índice é cópia; a fonte de verdade é sempre o arquivo, nunca esta tabela.
 
 | Lei | Gatilho: dispara quando você vai... | Resumo |
 |---|---|---|
@@ -56,6 +56,7 @@ Transcrito de `GODS_LAWS.md` (34 leis, medido em 25/08/2026 por `grep -c "^## L-
 | [L-32](GODS_LAWS.md#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
 | [L-33](GODS_LAWS.md#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
 | [L-34](GODS_LAWS.md#l-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato, interrompe onda |
+| [L-35](GODS_LAWS.md#l-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, o resultado é "não executado" |
 
 ## O que é o GusWorld
 
@@ -153,7 +154,7 @@ O que roda hoje é o portão 5 da L-19, local:
 
 - **Build pesado vai para `/var/tmp`, com `export TMPDIR=/var/tmp`.** `/tmp` aqui é tmpfs (sai da RAM); build C++ grande enche o tmpfs e o link falha com "no space on device".
 - **Espaço em disco se mede com `btrfs filesystem usage /`** (sem `sudo`), lendo `Device unallocated` e o `min` de `Free (estimated)`. O `df` mente em btrfs.
-- **Teste que toca janela, teclado, mouse ou tela:** ainda não existe nenhum teste desse tipo no GusWorld — não há `present/` (L-06, L-27), e a L-19 de `GODS_LAWS.md` deste projeto não registra regra própria de isolamento. Quando `present/` nascer e ligar direto no GlintFx, a prática desta máquina (compositor Wayland aninhado dentro de container, nunca a sessão viva) é a mesma já em uso no GlintFx — mas isto é prática observada, não lei formal deste projeto; confirmar com o líder antes de tratá-la como obrigatória aqui.
+- **Nenhum teste dinâmico roda na sessão do líder — é a L-35, lei desde 29/08/2026, e não mais "prática observada".** Vale para todo teste que EXECUTA código (suíte, integração, fuzzing, sanitizer, mutation testing, benchmark, sonda de janela/teclado/mouse/tela), não só para os que tocam a tela: **sempre em container**. Sem container disponível, o resultado honesto é **"não executado, falta o container"** — nunca rodar fora e reportar sucesso. ⚠️ **Subir o container não basta:** `wl_display_connect(NULL)` cai no nome embutido `wayland-0` dentro do `XDG_RUNTIME_DIR`, e desligar a variável **não protege** — a proteção real é trocar o `XDG_RUNTIME_DIR` por diretório próprio `chmod 700` só no processo sob teste, e provar antes de interagir. O compositor aninhado (`kwin_wayland`, `Xvfb`) continua valendo como **piso dentro** do container, nunca como alternativa a ele. O GusWorld ainda não tem código nem suíte, e a camada `present/` nasce bloqueada pelo GlintFx (L-06, L-27) — a lei está escrita **antes** do primeiro teste existir, de propósito.
 - **Verificação de entregável visual é do `qa-engineer`**, independente de quem implementou, com o orquestrador reconferindo o relatório do QA — ainda não se aplica, porque não há interface nem tela.
 
 ## Pendências
