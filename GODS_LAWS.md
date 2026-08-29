@@ -728,3 +728,19 @@ Lei qualitativa sem lugar no processo é lei que ninguém aplica. Três amarras,
 **Por que virou lei e não ficou como boa vontade, com a medição que a justifica:** o `PROTOCOL.md` do bus **já obrigava** a Resposta 2 ("AUTOMÁTICA SEMPRE"), e mesmo assim a issue 5 ficou três dias sem resposta de conteúdo, a issue 8 ficou dois dias sem resposta de duas das quatro sessões, e o canal de comentário **não tinha vigilância em nenhuma das quatro**. O padrão é sempre o mesmo: **a regra existia e não estava sendo cumprida.** Regra que depende de lembrar não é cumprida; por isso o gatilho desta lei é *"ver qualquer coisa vinda dele"*, e não *"quando der"*.
 
 **Relação com as leis vizinhas, para nenhuma virar depósito da outra:** a **L-07** é o **pipe** (como a ideia dele atravessa o bus até virar item da tabela). A **L-31** é o **aviso de saída** (o que ele recebe sem perguntar, quando o líder decide). Esta **L-34** é a **entrada**: com que urgência o que vem dele é lido e respondido. A **L-16** governa o nome: ele é "Gus Dragon" ou `Dragon-Drv`, nunca o nome de batismo.
+
+## L-35
+
+**Data:** 29/08/2026, ordem do líder, verbatim: *"Lei: nenhum teste dinamico toca minha sessao, sempre fazer em docker"*.
+
+**Nenhum teste dinâmico roda na sessão viva do líder. Sempre em container.** Teste dinâmico é todo teste que **executa código de verdade**: suíte unitária, teste de integração, fuzzing, sanitizer, mutation testing, benchmark, sonda de janela, teclado, mouse ou tela, e qualquer script que suba processo do produto. Leitura estática — `grep`, análise de arquivo, revisão de documento, lint que não executa — não é teste dinâmico e não cai aqui.
+
+**A fronteira é a sessão dele, e ela não se atravessa por conveniência.** Não existe "só desta vez", não existe "é um teste pequeno", não existe "só roda um segundo". Se o container não estiver disponível, o resultado honesto é **não executado, falta o container** — nunca rodar fora dele e reportar sucesso.
+
+**Por que virou lei, com o dano medido:** em 22/07/2026 uma sonda de janela abriu na sessão viva do líder por dois a três minutos, e em outra ocasião um teste de entrada travou o touchpad dele **até precisar de reinício da máquina**. E em 29/08/2026, no primeiro ciclo do `watchcode` neste projeto, os sensores acharam coredump de teste de **outros projetos** executando direto na máquina dele — `petrush/build/test_parser`, `petrush/build/test_expand` e a sandbox de mutação do `glintfx`. Ou seja: a prática de rodar teste na sessão viva **não era hipótese, estava acontecendo**, e é isso que esta lei encerra.
+
+⚠️ **Não basta subir o container: `wl_display_connect(NULL)` cai no nome embutido `wayland-0` e resolve dentro do `XDG_RUNTIME_DIR`.** Desligar a variável de ambiente **não protege** — foi assim que a sonda de 22/07 escapou para a sessão viva mesmo com o compositor aninhado já rodando e provado. A proteção real é **trocar o `XDG_RUNTIME_DIR` por diretório próprio `chmod 700`, só no processo sob teste**, e **provar antes de interagir** que ele não está falando com a sessão do líder.
+
+**Isto sobrepõe a prática anterior desta máquina** (compositor Wayland aninhado, `kwin_wayland` ou `Xvfb`), que valia como observação e agora vale como **piso dentro do container**, nunca como alternativa a ele.
+
+**Alcance:** vale desde já, embora o GusWorld ainda não tenha código nem suíte — a camada `present/` nasce bloqueada pelo GlintFx (L-06, L-27), e quando nascer já encontra esta lei escrita, em vez de a lei chegar depois do primeiro estrago.
