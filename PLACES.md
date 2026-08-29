@@ -123,7 +123,7 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
-| **Biblioteca Cintilante** | Sub-local (Catedral-Mãe anexo subterrâneo) | 1 (auge cooperativo) | Anexo adjacente à Catedral-Mãe, subterrâneo 3 níveis verticais escalonados | 🟡 lendário (inacessível desde selagem -750) | `deep/eras/era-1-pre-codigo.md` §6.5 |
+| **Biblioteca Cintilante** | Sub-local (Catedral-Mãe anexo subterrâneo) | 1 (auge cooperativo) | Anexo adjacente à Catedral-Mãe, subterrâneo 3 níveis verticais escalonados | ✅ canônico (reaberta antes da missão do Espelho e **em uso pela população**; selada de -750 até a reabertura) | `deep/eras/era-1-pre-codigo.md` §6.5 |
 | **Ala oeste Catedral-Mãe** | Sub-local (Catedral-Mãe) | 1 | Parede piezo-litúrgica de calibração onde Helíaco Vyr cegou de luz reativa | 🟡 lendário (Catedral-Mãe inacessível) | `deep/eras/era-1-pre-codigo.md` §6.3 |
 | **Scriptorium subterrâneo Catedral-Mãe** | Sub-local (Catedral-Mãe) | 1 | Sob a nave principal, sessões prolongadas Salomão Tessar Vyrcátrix | 🟡 lendário (selado -750) | `deep/eras/era-1-pre-codigo.md` §6.4 |
 | **Câmara comemorativa Lúcio Ostraconis** | Sub-local (São Camilo) | 3 (memorial Era 1) | acervo no anexo-retaguarda da Ordem no Núcleo, exibe pingente cerâmico reduzido | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo.md` §6.5 |

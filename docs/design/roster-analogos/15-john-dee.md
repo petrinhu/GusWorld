@@ -34,13 +34,15 @@
 
 ## 3. A CARTA "Espelho Negro"
 
-Carta-tema **cifra arcana / scrying** (revelar o oculto, decifrar, ou buff arcano), ligada diretamente ao instrumento real de Dee. **3 opções pro criador escolher:**
+Carta-tema **cifra arcana / scrying** (revelar o oculto, decifrar, ou buff arcano), ligada diretamente ao instrumento real de Dee.
 
-- **Opção A (fiel ao scrying passivo): PASSIVA pura.** "Espelho Negro": enquanto no Codex, revela automaticamente, na varredura dos óculos táticos, portas, objetos e passagens ocultas dentro do raio de exploração (extensão do sistema de scan já existente) e sinaliza pontos de interesse escondidos no mapa. Simples, muda a exploração, não o combate. Fiel ao fato real de que o espelho é um instrumento passivo de revelação (Dee não "ataca" com ele, ele consulta).
-- **Opção B (recomendada): PASSIVA + ATIVA.** Passiva "Espelho Negro" (revelação de ocultos, como A) **+** ativa "Scrying" (custo de AP): por N turnos, revela a PRÓXIMA AÇÃO pretendida de todos os inimigos em campo (intenção, tipo de ataque, alvo provável), permitindo jogar de forma cirúrgica (defender, contra-atacar, proteger o alvo certo). Simula literalmente o ato de consultar o espelho pra "ver antes de acontecer", ecoando o método real de Dee e Kelley (perguntar ao espelho pra orientar a decisão), e é uma mecânica clássica de RPG por turnos (foresight) que ainda não existe no roster.
-- **Opção C: PASSIVA + CIFRA-BUFF.** Passiva=A + ativa "Cifra Arcana": decifra temporariamente um Conjuro/carta ainda selada (bloqueada por nível/gate) do próprio Codex, liberando seu uso uma única vez fora de sequência, a troco de custo alto de AP. Simula literalmente "decifrar um segredo pra obter poder além do que deveria estar disponível ainda", mas bypassa a progressão normal do jogador, então pede mais cautela de balance do que as outras opções.
+✅ **EFEITO DECIDIDO PELO LÍDER em 29/08/2026:** a carta é **passiva + Cifra Arcana**. A passiva revela, na varredura dos óculos táticos, portas, objetos e passagens ocultas dentro do raio de exploração (extensão do sistema de scan já existente). A ativa **Cifra Arcana** é a que segue abaixo.
 
-> Recomendo **B**: preenche um nicho de informação/foresight que nenhuma carta publicada até aqui ocupa, mantém fidelidade alta ao ato real de scrying (consultar pra ver o que ainda não aconteceu) e evita o risco de progressão da opção C.
+⚠️ **O líder escolheu contra a recomendação deste dossiê, e sabendo do custo:** a recomendação era o desenho de *scrying* (revelar a próxima ação do inimigo), e o alerta de que a Cifra Arcana **mexe na progressão e no gating**, tendo por isso o maior risco de efeito colateral no balanceamento, foi apresentado junto da escolha. A decisão é dele e está tomada; o que fica é a **obrigação de exercitar esse risco no balanceamento**, não de reabrir o desenho.
+
+⚠️ **Consequência que quem for balancear precisa enfrentar:** liberar uma carta selada fora de sequência é a única forma, hoje, de o jogador **furar o gate de progressão**. O custo alto de AP é o freio previsto; se ele não bastar, o conserto é no custo e no número de usos, nunca em desfazer a decisão.
+
+**Efeito, decidido:** passiva de revelação de ocultos **+** ativa "Cifra Arcana": decifra temporariamente um Conjuro/carta ainda selada (bloqueada por nível/gate) do próprio Codex, liberando seu uso uma única vez fora de sequência, a troco de custo alto de AP. Simula literalmente "decifrar um segredo pra obter poder além do que deveria estar disponível ainda", mas bypassa a progressão normal do jogador, então pede mais cautela de balance do que as outras opções.
 
 ## 4. Descoberta (missão/puzzle)
 

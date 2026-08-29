@@ -159,7 +159,7 @@ O que roda hoje é o portão 5 da L-19, local:
 
 ## Pendências
 
-A tabela de pendências do projeto está em `TODO.md` na raiz: **108 itens** (`grep -cE '^\| [0-9]' TODO.md`, medido em 25/08/2026), em schema de **10 colunas** (`WSJF`, `ID`, `Onda`, `Grupo`, `Descrição Técnica`, `Prioridade`, `Pré-requisito`, `Dificuldade`, `Status`, `Estado Auditado`, com `WSJF` como primeira coluna, L-30). A coluna `Onda` tem **22 valores distintos** (`0` a `19`, mais `—` para item que não entra em fila de execução: bloqueado sem data, ou prática contínua que por desenho nunca fecha, como o `A11b`).
+A tabela de pendências do projeto está em `TODO.md` na raiz: **126 itens** (`grep -cE '^\| [0-9]' TODO.md`, medido em 29/08/2026), em schema de **10 colunas** (`WSJF`, `ID`, `Onda`, `Grupo`, `Descrição Técnica`, `Prioridade`, `Pré-requisito`, `Dificuldade`, `Status`, `Estado Auditado`, com `WSJF` como primeira coluna, L-30). A coluna `Onda` tem **22 valores distintos** (`0` a `19`, mais `—` para item que não entra em fila de execução: bloqueado sem data, ou prática contínua que por desenho nunca fecha, como o `A11b`).
 
 Status medidos linha a linha em 25/08/2026 (excluindo a legenda do cabeçalho, que cita cada status uma vez): **84 `⏳ Pendente`**, **14 `🔍 Pendente verificação`**, **9 `✅ Concluído`**, **1 `🔄 Em andamento`** (o `A11b`). Soma = 108. Não há mais nenhum `🟡 Parcial`: o único era o `A11`, que em 25/08/2026 foi **fatiado em `A11a` e `A11b`** por decisão do líder sob a L-33 — ele misturava o gabarito SPDX, que fecha uma vez, com a prática de aplicá-lo, que nunca fecha, e nessa forma travava o grafo do primeiro commit.
 
