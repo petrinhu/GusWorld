@@ -182,7 +182,7 @@ líder respondeu **"2+3"**: as duas opções combinadas, não uma escolha entre 
 inimigo comum (trash mob) repetido**. O corpus já fecha essa porta pros 18 ingredientes irmãos,
 verbatim: *"não dá pra farmar trash mob pra conseguir componente-boss"* (`economia.md` §7.8, nota
 anti-grind). A mesma frase vale aqui palavra por palavra, porque a mesma porta furaria o mesmo
-corte, **C-15** (campanha de 4 a 8 horas: farm de trash mob é tempo de jogo que a campanha não
+corte, **C-15** (campanha de escopo fechado: farm de trash mob é tempo de jogo que a campanha não
 tem), e o **Pilar 1** ("resolve por análise, nunca por grind"). Farm de inimigo comum não é fonte do
 craft de cozinha; isto não é omissão a ler como brecha, é vetado pelo mesmo racional que já veta
 pro resto do jogo.

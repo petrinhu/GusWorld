@@ -64,7 +64,7 @@ Jogo **2D pixel-art**, single-player e offline, em **C++23**, assentado sobre o 
 - **Perspectiva:** 3/4 top-down fixa, quatro direções cardeais desenhadas à mão (sem espelhamento), grade quadrada (L-26).
 - **Estrutura de mundo:** hub central mais incursões radiais; sem mundo aberto, sem mundo persistente (corte C-02).
 - **Progressão de cartas:** por progresso narrativo **e por crafting**. O corte `C-13`, que proibia carta craftada, foi **revogado pelo líder em 25/08/2026** junto com o `C-03`, restaurando canon do projeto anterior (L-29).
-- **Escopo da campanha:** 4 a 8 horas de campanha principal, mais cerca de 2 horas de puzzle opcional (corte C-15).
+- **Escopo da campanha:** **fechado e definido por conteúdo; sem número de horas fixado** (corte `C-15`, reescrito em 28/08/2026). O número anterior — 4 a 8 horas — foi derrubado pelo líder, que registrou não tê-lo escolhido; a duração se mede quando houver cena jogável.
 - **Distribuição:** FOSS, código sob AGPL-3.0-or-later; assets e lore com todos os direitos reservados (L-08).
 
 A cerca completa do que o jogo **não** é (**13 cortes**, numerados `C-01` a `C-16` com os buracos do `C-03`, do `C-08` e do `C-13`, revogados em 25/08/2026) está na L-29. Os números revogados **não se reaproveitam**.
