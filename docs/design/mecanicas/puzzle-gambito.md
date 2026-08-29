@@ -85,7 +85,7 @@ Rota elegante: aguardar P1 afastar (passo onde P1 está em col 4), cruzar row2�
 
 ## 10. Restrições honradas
 
-Determinístico, sem RNG punitivo (Pillar 2). Sem twitch (Pillar 1: pressão é lógica). Hardware-triad presente (Pillar 3). Complexidade de 11 anos (K baixo, janelas legíveis, Pillar 4). Stealth aqui é **modo de puzzle pontual, não sistema obrigatório** (respeita corte GDD §9). No VS, caminho único (D4 canon 2026-06-03): todos N=3 testadores validam o Gambito-puzzle. Rota alternativa de combate no jogo final. Sem open-world, sem crafting profundo.
+Determinístico, sem RNG punitivo (Pillar 2). Sem twitch (Pillar 1: pressão é lógica). Hardware-triad presente (Pillar 3). Complexidade de 11 anos (K baixo, janelas legíveis, Pillar 4). Stealth aqui é **modo de puzzle pontual, não sistema obrigatório** (respeita corte GDD §9). No VS, caminho único (D4 canon 2026-06-03): todos N=3 testadores validam o Gambito-puzzle. Rota alternativa de combate no jogo final. Sem open-world. **"Sem crafting profundo" aqui descreve só este módulo de puzzle** (ele não usa crafting), **não é mais corte de escopo do jogo**: `C-03` da L-29 (`GODS_LAWS.md`) foi REVOGADO em 25/08/2026, e o jogo TEM crafting, inclusive de cartas (ver `docs/design/gdd.md`, "Crafting de cartas").
 
 ---
 
