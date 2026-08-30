@@ -24,13 +24,27 @@
 Carta de combate ATIVA (tema: descarga elétrica em cadeia, fiel à corrente alternada + ressonância + energia sem fio). **3 opções pro criador escolher:**
 
 - **Opção A (fiel ao seed): ATIVA pura.** "Descarga em Cadeia": ataque elétrico que salta de um inimigo ao próximo (até 3 alvos), perdendo intensidade a cada salto (a amplitude cai com a distância, igual à ressonância real). Custo de AP médio, sem componente passiva. Simples, carta de combate limpa e imediatamente jogável.
-- **Opção B: ATIVA + PASSIVA leve.** Descarga em Cadeia (como A) + passiva "Sintonia Compartilhada": enquanto no Codex, sempre que dois ou mais conjuros da família Elétrico são usados no mesmo turno, o dano de ambos aumenta (os arcos "casam a frequência" um do outro). Sinergiza direto com Cauã. Mais jogável em party coordenado.
-- **Opção C: ATIVA + TRANSMISSÃO SEM FIO.** Descarga em Cadeia (como A, 2 alvos em vez de 3) + ao acertar, transfere parte do AP gasto pra um aliado escolhido (o sonho de Wardenclyffe: energia que chega sem fio a quem precisa). Mais estratégica, incentiva pensar em economia de recurso de party.
-> Recomendo **A** pra manter a carta como peça de combate limpa e imediata; B como upgrade natural quando Cauã já estiver no time (sinergia elemental); C fica como variante mais avançada, se o criador quiser uma carta de suporte de recurso em vez de dano puro.
 
 ## 4. Descoberta (missão/puzzle)
 
 Nas ruínas de uma torre inacabada na periferia da rede técnica (o paralelo do Wardenclyffe de Tesla), o Gus encontra um núcleo de bobinas mortas. **Puzzle de ressonância:** três anéis concêntricos, cada um girando numa frequência diferente (indicada por um zumbido que os óculos táticos traduzem em onda visual), precisam ser alinhados na MESMA frequência pra "acender" o núcleo por indução, sem tocar em nada, só ajustando a rotação de cada anel até a onda casar. Alinhar errado gera uma descarga fraca que precisa recarregar (sem dano ao jogador, só tempo). Ensina o princípio da ressonância ao resolver: a energia não passa por fio nenhum, passa porque as frequências combinam. Gate cedo/meio-jogo (carta de combate).
+
+⚠️ **CANON NOVO, ordem do líder de 30/08/2026, verbatim:** *"quero que o formato do corredor de entrada inicial seja o de uma válvula de tesla (no sentido do fluxo dificultado) com 6 alças"*.
+
+A **válvula de Tesla** é invenção real dele — o *valvular conduit* da patente US 1.329.559: um duto **sem peça móvel nenhuma** que deixa o fluido passar com facilidade num sentido e o obstrui fortemente no outro, usando só a própria geometria, uma série de alças que desviam parte do fluxo contra ele mesmo. Aqui são **6 alças**.
+
+✅ **SENTIDO E ARQUITETURA DECIDIDOS pelo líder em 30/08/2026, e ele inverteu a válvula em vez de escolher um lado.**
+
+**Entrar é difícil.** O corredor de entrada é a válvula de 6 alças no sentido que resiste a quem chega.
+
+**E a saída não é por onde se entrou.** Resolvido o puzzle de ressonância, a porta da sala **se fecha e some — vira parede** —, e uma **parede vira porta**: abre-se uma passagem secreta com um **corredor de saída, uma segunda válvula de Tesla**, agora orientada de modo que **sair é o sentido difícil**.
+
+⚠️ **O que isso quer dizer, e é a razão de ser bom:** as duas válvulas apontam contra o viajante. Luta-se para entrar e luta-se para sair, por passagens diferentes. A sala **se reconfigura**, então a entrada deixa de existir como rota — o lugar não é atravessado, é **vencido duas vezes**. ⚠️ **Consequência de level design a respeitar:** entrada e saída são pontos distintos do mapa, e quem desenhar a área não pode assumir que se volta por onde se veio.
+
+### O efeito da carta, decidido: **Opção A**
+
+**Descarga em Cadeia**, ataque elétrico que salta de um inimigo ao próximo, **até 3 alvos**, perdendo intensidade a cada salto — a amplitude caindo, como na ressonância real. Peça de combate limpa e imediata. As opções B e C foram **apagadas**, não guardadas como histórico (L-24).
+
 
 ## 5. Dica-pro-Tusk (gravada no diário do Gus ao descobrir Tesla)
 
