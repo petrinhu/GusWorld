@@ -1,6 +1,6 @@
 # PROPOSTA — critério e distribuição de intensidade do campo PEM nas 13 dungeons
 
-> **Status: PROPOSTA, não canon.** Pendente de aprovação do líder (L-11, L-14). Este documento não decide nada por si — apresenta um critério e a distribuição que ele produz, para o líder aceitar, ajustar ou rejeitar.
+> **Status: PROPOSTA apreciada e superada.** O líder julgou esta proposta em 30/08/2026, por `AskUserQuestion`, e decidiu diretamente: **12 dungeons em intensidade total e 1 em intensidade fraca** — a de abertura, "Dutos — aparato (abertura)". Isto **substitui** a distribuição de 5 fraca / 8 total que este documento propunha (Seção 5); o canon vigente é `docs/design/mecanicas/save-por-local.md` §1.2, não a tabela abaixo. O critério de quatro regras (Seções 1-4) não foi adotado como o critério de decisão — só a Regra 1 (abertura → fraca) sobrevive na prática, e por coincidência de resultado, não porque o líder tenha ratificado a hierarquia inteira. Este documento **não foi apagado**: registra o raciocínio apresentado à decisão, mas nenhuma linha da Seção 5 abaixo é canon.
 >
 > **Item da tabela:** `G8`.
 >
