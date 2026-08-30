@@ -19,7 +19,9 @@
 
 ## Pendências — spec 2D detalhada (decisão do líder)
 
-- Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
+- Resolução de sprite: DECIDIDO em 30/08/2026 — canônico **180×180** (ver `docs/art/style-guide.md` §8), já é o tamanho do arquivo em disco.
+- Profundidade de paleta: DECIDIDO em 30/08/2026 — paleta enxuta, medido **25 cores únicas**, `PaletteAlpha` (só o Gus tem paleta rica, ver `docs/art/style-guide.md` §9).
+- Nº de frames/direções de sprite: não definidos, ver `docs/art/style-guide.md`.
 - Prompt PixelLab: não definido.
 - **Importante:** como representar o foreshadow visual progressivo (variantes de sprite ao longo do arco) em pixel-art — pendente, mas não pode ser perdido no pivô.
 

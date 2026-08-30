@@ -18,7 +18,9 @@
 
 ## Pendências — spec 2D detalhada (decisão do líder)
 
-- Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
+- Resolução de sprite: DECIDIDO em 30/08/2026 — canônico **180×180** (ver `docs/art/style-guide.md` §8); o arquivo em disco está em **256×256** e **não é regerado**, o ajuste é em tempo de execução pelo motor gráfico do GlintFx (ver `docs/art/sprites-inventory.md`).
+- Profundidade de paleta: DECIDIDO em 30/08/2026 — paleta enxuta, medido **58 cores únicas**, `PaletteAlpha` (só o Gus tem paleta rica, ver `docs/art/style-guide.md` §9).
+- Nº de frames/direções de sprite: não definidos, ver `docs/art/style-guide.md`.
 - Prompt PixelLab: não definido.
 - Como as engrenagens animadas do escudo (antes via keyframes 3D) viram frames de spritesheet 2D: pendente.
 

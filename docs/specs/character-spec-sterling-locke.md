@@ -22,7 +22,9 @@
 
 ## Pendências — spec 2D detalhada (decisão do líder)
 
-- Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
+- Resolução de sprite: DECIDIDO em 30/08/2026 — canônico **180×180** (ver `docs/art/style-guide.md` §8).
+- Profundidade de paleta: DECIDIDO em 30/08/2026 — paleta enxuta, junto do resto do elenco (só o Gus tem paleta rica); número exato não medido nesta decisão, ver `docs/art/style-guide.md` §9.
+- Nº de frames/direções de sprite: não definidos, ver `docs/art/style-guide.md`.
 - Prompt PixelLab: não definido.
 - Como manter a "quebra deliberada do cômico SD" (que dependia de silhueta 3D angular) legível em pixel-art de baixa resolução: pendente — provavelmente o ponto mais sensível de tradução 3D→2D deste elenco, por ser central à ameaça do antagonista.
 

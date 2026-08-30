@@ -6,6 +6,22 @@ gerar o que falta. **Fonte da verdade sobre a árvore `resources/sprites/`.**
 > Atualizado 2026-08-06 (ASSETS-VERSIONAR-SPRITES). Contagem via `identify` + `find`
 > sobre o disco.
 
+## Tamanho canônico vs. tamanho no disco (decisão do líder, 30/08/2026)
+
+**O tamanho CANÔNICO e lógico do sprite de personagem é 180×180 para TODO o elenco**, decisão do
+líder por `AskUserQuestion` em 30/08/2026 (conteúdo completo em `docs/art/style-guide.md` §8).
+Isto **não é** o mesmo que o tamanho do arquivo no disco hoje: a maior parte do elenco já nasceu
+em 180×180, mas dois personagens estão em **256×256** — o **Gus** (protagonista, ver bloco ⭐
+abaixo) e o **`bento_requiem`** (confirmado por `identify` em 30/08/2026). **Esses arquivos NÃO
+são regerados** para bater com o canônico; o ajuste de 256 para 180 é feito **em tempo de
+execução, pelo motor gráfico do GlintFx**, na camada de apresentação — que ainda não existe
+(L-06, L-27). Isto abre uma exigência nova ao framework, registrada no `TODO.md` como item `P4`;
+o pedido só vai ao bus quando `present/` esbarrar de fato na falta (L-07).
+
+**Ao ler a coluna `dim` da tabela abaixo:** ela descreve o **arquivo real no disco**, não o
+canônico. Onde os dois coincidem (180×180), nenhuma nota é necessária. Onde divergem (o
+`bento_requiem`), a tabela sinaliza.
+
 ## Onde ficam
 
 Todos em **`resources/sprites/<slug>/`**, um diretório por personagem. Os PNGs são
@@ -62,7 +78,10 @@ homenageados-mestres (Faraday, Turing, Gödel, von Neumann...) vive em
 **ATENÇÃO: o Gus NÃO fica em `sprites/gus/`.** A pasta canônica é
 `sprites/personagens_inspirados/gus/`, apontada pela constante `kGusSpritesDir =
 "sprites/personagens_inspirados/gus"` (header `asset_paths.hpp`). (O `gustaf_i_tavus_vance/` é o **ancestral
-Gustaf I**, não o protagonista — não confundir.) Tudo 256×256.
+Gustaf I**, não o protagonista — não confundir.) Tudo 256×256 **no arquivo em disco**.
+⚠️ **O tamanho canônico e lógico é 180×180** (decisão do líder, 30/08/2026, ver seção
+"Tamanho canônico vs. tamanho no disco" acima) — este arquivo **não é regerado** para bater com
+ele; o ajuste é feito em tempo de execução pelo motor gráfico do GlintFx.
 
 ```
 personagens_inspirados/gus/
@@ -94,12 +113,12 @@ mas é crítico no Gus.
 
 Estes 7 têm ciclo de caminhada pronto (o alvo de completude):
 
-| slug | dim | walk frames | nota |
+| slug | dim (arquivo no disco) | walk frames | nota |
 |---|---|---|---|
 | `caua_volt` | 68×68 | 16 | **APOSENTADA** — leia a nota abaixo antes de mexer |
 | `caua_volt_cyan_v2` | 180×180 | 24 | **ATIVA — o Cauã do jogo** (ciano canônico reforçado) |
 | `iara_lumen` | 180×180 | 24 | Infiltradora |
-| `bento_requiem` | 180×180 | 24 | Tanque |
+| `bento_requiem` | **256×256** | 24 | Tanque. ⚠️ **Divergente do canônico (180×180)** — confirmado por `identify` em 30/08/2026. Não regerar: o ajuste é do motor gráfico do GlintFx em tempo de execução (ver seção "Tamanho canônico vs. tamanho no disco" acima). |
 | `linda_siren` | 180×180 | 24 | Crowd Control |
 | `dante_grid` | 180×180 | 24 | TRAIDOR |
 | `jaci_proxy` | 180×180 | 24 | Healer |

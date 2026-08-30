@@ -21,7 +21,9 @@
 
 ## Pendências — spec 2D detalhada (decisão do líder)
 
-- Resolução/tamanho do sprite, nº de frames, nº de direções, paleta indexada: não definidos, aguardam spec 2D (ver `docs/art/style-guide.md`, seção "Pendências consolidadas").
+- Resolução/tamanho do sprite: DECIDIDO em 30/08/2026 — canônico **180×180** (ver `docs/art/style-guide.md` §8); o arquivo em disco continua em 256×256 e **não é regerado**, o ajuste é em tempo de execução pelo motor gráfico do GlintFx.
+- Profundidade de paleta: DECIDIDO em 30/08/2026 — o Gus é a **EXCEÇÃO de paleta rica** do elenco (cor plena, medido **12.987 cores únicas**, `TrueColorAlpha`), justamente por ser o protagonista sempre em tela (ver `docs/art/style-guide.md` §9).
+- Nº de frames, nº de direções de sprite: não definidos, aguardam spec 2D (ver `docs/art/style-guide.md`, seção "Pendências consolidadas").
 - Prompt PixelLab para o Gus: não definido.
 - Como o aparelho dental (detalhe minúsculo) permanece legível em baixa resolução de sprite: pendente.
 
