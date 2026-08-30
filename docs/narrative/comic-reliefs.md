@@ -920,6 +920,22 @@ Gus pode pular em cima de um rato pequeno tipo cogumelo-com-pernas. Rato vira pa
 Item raro dropável em zonas de bioma misto (final ato 2): cogumelo verde brilhante. Usar = +1 vida extra ao Gus (revive automático se HP=0 na próxima batalha). Descrição no Diário:
 > *"O Cogumelo-Recuperador. Lendário. Item raro. Existe um meme antigo que diz: 'A vida é sua. Mas o cogumelo te dá outra.'"*
 
+**Canon mecânico, decidido pelo líder em 30/08/2026 (`G12` do `TODO.md`, Eixo 1 de `docs/_secret/proposta-balanceamento-easter-eggs.md`):**
+
+- **Forma física do item, verbatim do líder:** "O cogumelo é um chocolate 80% de cacau, no FORMATO de cogumelo, embalado com papel aluminio colorido, no padrao de um cogumelo natural." O papel alumínio que embala o chocolate **se torna ingrediente para craft** (fonte de material, não só embalagem descartável).
+- **Fonte do drop:** cai de um inimigo-mestre nomeado do bioma misto (mesma convenção de drop knowledge-gated já usada em `docs/design/mecanicas/economia.md`, linha 382: "Esporo-Mestre"). **O inimigo-mestre não respawna** depois de derrotado: voltando ao local, ele não está mais lá. ⚠️ **Nome específico do inimigo-mestre do bioma misto ainda não está definido no corpus** (busca não encontrou nenhum inimigo-mestre nomeado fora da Selve): fica para quem desenhar o encontro do Ato 2.
+- **Taxa de drop, escalada por dificuldade:**
+
+| Dificuldade | Taxa de drop |
+|---|---|
+| Fácil | 89% |
+| Médio | 55% |
+| Difícil | 34% |
+| Hardcore | 0% |
+
+- **Hardcore fica em 0%**, preservando a exclusividade do kernel-panic puzzle como única segunda chance daquele modo (`docs/design/mecanicas/modos-morte.md` §2.3a: "a chance é ÚNICA por run").
+- **Pendente, fora de escopo desta atualização:** a dica de Diário acima ainda descreve o cogumelo pela versão antiga (não menciona chocolate nem papel alumínio); reescrevê-la é trabalho de `narrative-writer`, item `D33` do `TODO.md`.
+
 ---
 
 ### Zelda (2)
