@@ -10,7 +10,7 @@
 
 ## 1. Princípio de acesso (canon, gdd §7.1)
 
-Mundo **aberto por design**: todas as áreas principais são alcançáveis desde o começo. Gating **nunca** por barreira dura — só por **dificuldade** (mais longe da origem = ecossistema + inimigos mais duros) e por **áreas especiais contornáveis** (destravam com item/carta/habilidade e viram atalhos, nunca o único caminho). A origem é os **Distritos Inferiores** (casa do Gus).
+Mundo **aberto por design**: todas as áreas principais são alcançáveis desde o começo. Gating **nunca** por barreira dura — só por **dificuldade** (mais longe da origem = ecossistema + inimigos mais duros) e por **áreas especiais contornáveis** (destravam com item/carta/habilidade e viram atalhos, nunca o único caminho). A origem do grafo é os **Distritos Inferiores**: a primeira área de exploração livre, não a casa do Gus (ver nota em §2).
 
 ## 2. As 13 áreas (híbrido ancorado no canon) + gradiente de dificuldade
 
@@ -24,6 +24,8 @@ Mundo **aberto por design**: todas as áreas principais são alcançáveis desde
 | 4 — difícil (Selve) | **Selve Sombria** · **Catedrais Neo-Sylvania** · **Montadora Confluência** |
 | 5 — clímax | **Selve Profunda** |
 | especial | **Área "faraday" secreta** (contornável, vira atalho; ela mesma é dungeon-segredo) |
+
+> **Nota de canon (rótulo de partida × casa do Gus, decisão do líder 30/08/2026):** o rótulo **"start"** dos Distritos Inferiores designa a primeira área de **exploração livre** do grafo de 13 áreas, não o lugar onde a campanha abre, e não a casa do Gus. A campanha abre dentro de casa, no **Edifício Vance** (Núcleo Metropolitano, `PLACES.md`); o Gus desce aos Distritos Inferiores como primeira incursão, ver `gus-abertura.md` §13. A casa do Gus nunca fica nos Distritos Inferiores.
 
 > **Nota de canon (Periferia × Ferrovelhos, reconciliado 2026-07-12):** os dois são **duas zonas jogáveis do MESMO setting canônico "Periferia"** — **Periferia** (residencial oeste; Praça do Compilador, refugiados Tesla/Einstein) + **Ferrovelhos = "Periferia Industrial", distrito 2** (lore-bible §5.1: ferro-velho, oficinas, **lar do Dante**, atuação da FIR, economistas austríacos). Contíguos no mundo, divididos em dois mapas por gameplay.
 
