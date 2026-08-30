@@ -306,7 +306,7 @@ Cada camada depende só das de baixo, nunca o contrário. **Um gate de CI reprov
 
 **Tensão registrada, que o desenho tem de encarar de frente:** o jogo é FOSS sob AGPL-3.0, então o adversário tem o código-fonte e o algoritmo. Prevenção absoluta de adulteração numa máquina que o jogador controla é impossível, e prometer isso é mentira. Detecção confiável de adulteração é alcançável. O desenho diz com todas as letras o que garante e o que não garante.
 
-**Estado:** as opções de mecanismo estão sendo levantadas pelo Narciso (CISO), com pesquisa na web exigida pelo líder. A decisão é dele.
+**Estado:** o mecanismo foi decidido pelo líder em 21/08/2026; o corpo da decisão vive na L-25.
 
 
 ## L-19
