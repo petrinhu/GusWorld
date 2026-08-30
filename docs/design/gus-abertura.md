@@ -275,13 +275,14 @@ Após aprovação deste esqueleto pelo criador (incluindo resolução dos pontos
 
 ### 13.1. Onde entra no fluxo
 
-Encaixa **imediatamente após o Beat 5** (§6): o Gus sai da botica/apartamento pra rua, no **mesmo distrito** onde mora. Não há salto de cena nem gating hard — o mundo abre e a primeira coisa "errada" que o Gus encontra é o mistério dos aparatos dos vizinhos.
+Encaixa **imediatamente após o Beat 5** (§6): o Gus sai do apartamento Vance, no Núcleo Metropolitano, e desce até os Distritos Inferiores, a vizinhança contígua onde mora o mistério dos aparatos. Não há salto de cena nem gating hard: o mundo abre e a primeira coisa "errada" que o Gus encontra é o mistério dos aparatos dos vizinhos.
 
 ### 13.2. Âncora de cenário (canon)
 
 | Elemento | Local canônico | Fonte | Reaproveitamento |
 |---|---|---|---|
-| Casa do Gus + bairro do mistério | **Distritos Inferiores** (área-âncora do Vertical Slice; engloba a Praça da Compilação e a descida sul) | `PLACES.md` L79; `blockout-distritos-inferiores.md`; `environments/01-cidade-cyber-gotica.md` | 100% dos assets já em produção |
+| Casa do Gus | **Edifício Vance**, apartamento Vance, 6º andar lado leste, Núcleo Metropolitano | `PLACES.md` §5 (linha "Edifício Vance"); `sinopse.md` §4 | 100% dos assets já em produção |
+| Bairro do mistério (vizinhança da Doralice) | **Distritos Inferiores** (área-âncora do Vertical Slice; engloba a Praça da Compilação e a descida sul) | `PLACES.md` §5 (linha "Distritos Inferiores"); `blockout-distritos-inferiores.md`; `environments/01-cidade-cyber-gotica.md` | 100% dos assets já em produção |
 | A descida | Descida sul dos Distritos Inferiores → **Dutos Infernais** (subterrâneo industrial-arcano) | `PLACES.md` L26; `environments/04-dutos-infernais.md` | topologia cidade-em-cima → subterrâneo já canônica |
 | A fonte (aparato Era 1) | Sub-local **"Pilar Era 1 (canal esculpido)"** nos Dutos (vestígio Era 1 já canônico) | `PLACES.md` L96 | cenário-vestígio já previsto |
 | Peso temático do Cauã | **Subestação 7** (destruída pelo Sterling, morte de Davi Berenger, Cauã tinha 8) fica nos Dutos | `PLACES.md` L86; `characters/caua-volt.md` | encontrar o Cauã no lar-ferido dele carrega sentido de graça |
@@ -290,7 +291,7 @@ Encaixa **imediatamente após o Beat 5** (§6): o Gus sai da botica/apartamento 
 
 | # | Passo | Pillar / função | Custo de produção |
 |---|---|---|---|
-| 1 | Gus sai de casa pra rua dos Distritos Inferiores (sozinho, pós-sumiço do Brunus) | Cruza o limiar; continuidade com Beat 5 | BARATO (reuso) |
+| 1 | Gus sai de casa (Edifício Vance, Núcleo Metropolitano) e desce à rua dos Distritos Inferiores (sozinho, pós-sumiço do Brunus) | Cruza o limiar; continuidade com Beat 5 | BARATO (reuso) |
 | 2 | Os **aparatos pessoais dos vizinhos** começam a se comportar "possuídos" (ferramenta que liga sozinha, implante que fala); os adultos acham defeito solto | Pillar 2 (anomalia = bug/vírus); Pillar 4 (o Gus vê o padrão que os adultos não veem) | **BARATO**: cada "possessão" = troca de estado de sprite + SFX + linha de diálogo. Zero VFX |
 | 3 | Gus faz **scan + triangulação** com os óculos táticos: cada aparato lido dá um dado (hora, direção do "sinal", tipo de corrupção); ele cruza pra deduzir o foco | Pillar 3 (hardware do Gus) + Pillar 4 (lógica); reusa o verbo scan do Beat 1 | **BARATO**: interação com objeto + caderno de pistas no HUD + 1 dedução (escolher a resposta) |
 | 4 | A trilha leva a um **fragmento antigo** que um **catador dos Ferrovelhos** desenterrou e espalhou pelo bairro (vendendo sucata) | Raiz do mistério; teia com Ferrovelhos/FIR canon | BARATO (ver §13.4) |
