@@ -18,7 +18,9 @@
 
 ## Pendências — spec 2D detalhada (decisão do líder)
 
-- Resolução/frames/direções de sprite, paleta indexada: não definidos, ver `docs/art/style-guide.md`.
+- Resolução de sprite: DECIDIDO em 30/08/2026 — canônico **180×180** (ver `docs/art/style-guide.md` §8), já é o tamanho do arquivo em disco.
+- Profundidade de paleta: DECIDIDO em 30/08/2026 — paleta enxuta, medido **41 cores únicas**, `PaletteAlpha` (só o Gus tem paleta rica, ver `docs/art/style-guide.md` §9).
+- Nº de frames/direções de sprite: não definidos, ver `docs/art/style-guide.md`.
 - Prompt PixelLab: não definido.
 - Como o efeito diegético "alto-falantes pulsando com o áudio" (antes mesh deformer 3D) vira animação de sprite 2D: pendente.
 

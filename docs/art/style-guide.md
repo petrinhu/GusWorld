@@ -2,7 +2,7 @@
 
 **Visual vigente: 2D pixel-art via PixelLab** (pivô 3D→2D, ver CLAUDE.md).
 
-> As diretrizes de ARTE deste doc que são **agnósticas de dimensão** (paleta, HSL, shape language, color script, semiótica de silhueta) continuam canônicas. Uma spec 2D detalhada equivalente (resolução de sprite, nº de frames/direções, paleta indexada, orçamento de créditos PixelLab) é **decisão pendente do criador supremo** — não foi inventada nesta atualização.
+> As diretrizes de ARTE deste doc que são **agnósticas de dimensão** (paleta, HSL, shape language, color script, semiótica de silhueta) continuam canônicas. Duas peças da spec 2D detalhada já foram decididas pelo líder em 30/08/2026 — o **tamanho canônico do sprite** (§8) e a **profundidade de paleta por personagem** (§9). O restante da spec 2D (nº de frames/direções, orçamento de créditos PixelLab) segue **decisão pendente do criador supremo** — não foi inventada nesta atualização.
 
 Solo G1 indie, engine própria C++23 sobre GlintFx, **2D pixel-art estilizado via pipeline PixelLab** (não mais 3D). Documento vivo. Toda decisão visual valida contra `docs/design/pillars.md`.
 
@@ -121,13 +121,17 @@ Vigente, agnóstico de dimensão.
 
 **Movido para o Histórico.** Poly budget (tris/texture/material slots) é conceito 3D puro — não existe em pixel-art.
 
-**Pendência de spec 2D:** orçamento equivalente pra pixel-art (resolução do sprite por tier — hero/NPC/inimigo/boss/prop, nº de frames por animação, tamanho de atlas/spritesheet, orçamento de créditos PixelLab por asset). Decisão do líder, não assumida aqui.
+**Resolução do sprite: DECIDIDO em 30/08/2026, pelo líder, por `AskUserQuestion`.** Tamanho canônico **180×180 para todo o elenco**, sem diferenciação por tier (hero/NPC/inimigo/boss/prop compartilham a mesma resolução lógica). Verbatim dele: *"todos 180, mas deixa para mudar o tamanho no glintfx, com o motor grafico, nao precisa regenerar"*. Os assets que hoje estão em 256×256 no disco (o Gus e parte do elenco, ver `docs/art/sprites-inventory.md`) **não são regerados**: o ajuste de tamanho é responsabilidade da camada de apresentação, em tempo de execução, pelo motor gráfico do GlintFx — não do pipeline de geração PixelLab. Isto abre uma exigência nova ao GlintFx, registrada no `TODO.md` (item `P4`); o pedido só vai ao bus quando `present/` esbarrar de fato na falta (L-07).
+
+**Pendência de spec 2D, ainda em aberto:** nº de frames por animação e tamanho de atlas/spritesheet; orçamento de créditos PixelLab por asset. Decisão do líder, não assumida aqui.
 
 ## 9. Texture strategy
 
 **Movido para o Histórico.** Gradient atlas + vertex color + UV unwrap é pipeline 3D — não se aplica a pixel-art gerado via PixelLab.
 
-**Pendência de spec 2D:** o pipeline de arte em si já mudou de raiz (geração via prompt PixelLab em vez de pintura de atlas em Krita/Aseprite + UV), mas os PARÂMETROS ficam pendentes: profundidade de paleta indexada por personagem, estilo de dithering, se haverá normal/emission map em pixel art (PixelLab suporta alguns desses recursos) ou se isso é abandonado de vez. Decisão do líder.
+**Profundidade de paleta por personagem: DECIDIDO em 30/08/2026, pelo líder, por `AskUserQuestion`.** Dois regimes, por decisão e não por acidente: o **protagonista (Gus) usa cor plena / paleta rica**; o **restante do elenco usa paleta enxuta**. É hierarquia visual intencional — o protagonista está sempre em tela, e carrega o peso de leitura que os companheiros não precisam carregar. Estado atual medido (via `identify`, 30/08/2026): Gus **12.987 cores únicas**, classificado `TrueColorAlpha`; Bento **58**, Iara **23**, Jaci **29**, Linda **41**, Dante **25**, todos classificados `PaletteAlpha`. A distância de ordem de grandeza entre o Gus e o resto do elenco é o dado que passa a sustentar a decisão, não um acidente de geração a ser corrigido depois.
+
+**Pendência de spec 2D, ainda em aberto:** estilo de dithering; se haverá normal/emission map em pixel art (PixelLab suporta alguns desses recursos) ou se isso é abandonado de vez. Decisão do líder.
 
 ## 10. Shader strategy
 
@@ -200,12 +204,12 @@ A linguagem de cor/forma/movimento por família é **agnóstica de dimensão** e
 
 Nenhum destes pontos foi decidido nesta atualização; listados aqui pra virarem item de brainstorm de arte:
 
-1. Formulação em pixel-grid da proporção "chibi/SD" (altura de sprite, razão cabeça/corpo em pixels).
+1. Formulação em pixel-grid da proporção "chibi/SD": a altura do canvas do sprite está fixada em 180px (DECIDIDO em 30/08/2026, ver §8); a razão cabeça/corpo dentro desse canvas segue pendente.
 2. Shading/outline: o que o PixelLab já resolve automaticamente vs. o que precisa de regra própria (nº de tons, estilo de dithering, contorno).
 3. Nº de direções/ângulos de sprite por personagem (cruzar com decisão já registrada em memória de locomoção: 4 direções, sem flip).
 4. Abordagem de "lighting"/mood por cena em 2D (paleta por hora-do-dia? overlay de cor no glintfx? variantes de sprite pré-pintadas?).
-5. Orçamento de sprite por tier de asset (resolução, nº de frames, tamanho de spritesheet, créditos PixelLab).
-6. Profundidade de paleta indexada por personagem + se normal/emission map em pixel art (suportado pelo PixelLab) é usado ou abandonado.
+5. Orçamento de sprite: a **resolução** está DECIDIDA (180×180, canônico para todo o elenco, sem diferenciação por tier — ver §8, 30/08/2026); seguem pendentes nº de frames por animação, tamanho de spritesheet e orçamento de créditos PixelLab por asset.
+6. Profundidade de paleta indexada por personagem: DECIDIDA (dois regimes — Gus paleta rica, resto do elenco paleta enxuta — ver §9, 30/08/2026); segue pendente se normal/emission map em pixel art (suportado pelo PixelLab) é usado ou abandonado.
 7. Escopo de shaders 2D remanescentes (glitch/anomalia, holograma) — quais migram pro glintfx como screen-space/sprite shader.
 8. Implementação de VFX (spritesheet de frames vs. sistema de partículas 2D).
 9. Revisão do don't "sombra pintada = reprovado" (provavelmente precisa inverter pra pixel art).
