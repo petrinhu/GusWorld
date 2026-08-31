@@ -37,7 +37,7 @@ diretório → re-ignore o conteúdo → un-ignore só o(s) arquivo(s)/subpasta(
 código/teste (por diretório, nunca por nome exato solto — nome exato deixa de casar em
 silêncio se o arquivo for renomeado). Hoje são 3 exceções:
 - `resources/sprites/vanda_do_cafe/south.png` — NPC fixo do overworld (`city_actors.hpp`).
-- `resources/sprites/caua_volt_cyan_v2/walk/` (24 arquivos) — o walk do Cauã ativo.
+- `resources/sprites/caua_volt/walk/` (24 arquivos) — o walk do Cauã ativo.
 - `resources/sprites/caua_volt/south.png` — fixture da família GENÉRICA da cascata de
   assets (`platform/tests/asset_source_test.cpp`); ver seção do Cauã abaixo.
 
@@ -115,39 +115,44 @@ Estes 7 têm ciclo de caminhada pronto (o alvo de completude):
 
 | slug | dim (arquivo no disco) | walk frames | nota |
 |---|---|---|---|
-| `caua_volt` | 68×68 | 16 | **APOSENTADA** — leia a nota abaixo antes de mexer |
-| `caua_volt_cyan_v2` | 180×180 | 24 | **ATIVA — o Cauã do jogo** (ciano canônico reforçado) |
+| `caua_volt` | 180×180 | 24 | **ATIVA — o Cauã do jogo**, desde a reversão do líder em 08/08/2026 — leia a nota abaixo |
 | `iara_lumen` | 180×180 | 24 | Infiltradora |
 | `bento_requiem` | **256×256** | 24 | Tanque. ⚠️ **Divergente do canônico (180×180)** — confirmado por `identify` em 30/08/2026. Não regerar: o ajuste é do motor gráfico do GlintFx em tempo de execução (ver seção "Tamanho canônico vs. tamanho no disco" acima). |
 | `linda_siren` | 180×180 | 24 | Crowd Control |
 | `dante_grid` | 180×180 | 24 | TRAIDOR |
 | `jaci_proxy` | 180×180 | 24 | Healer |
 
-### Cauã Volt — migração 2026-08-06 (ASSETS-VERSIONAR-SPRITES)
+### Cauã Volt — reversão de 08/08/2026 (decisão do líder)
 
-Um agente moveu por engano arquivos de personagens **diferentes com o MESMO nome**
-(`east.png`/`north.png`/`west.png`) para um destino plano, e a movida sobrescreveu em
-silêncio os 3 arquivos de idle congelado (68×68) da pasta antiga `caua_volt/`. Nunca
-estiveram no git (a política era "sprite = disco local", ver seção "Onde ficam" acima),
-então não havia como recuperá-los — decisão do líder: **não tentar reconstruir; apontar
-o Cauã para a arte boa que já existia**, em vez de regenerar a antiga.
+Em 2026-08-06, um agente moveu por engano arquivos de personagens **diferentes com o
+MESMO nome** (`east.png`/`north.png`/`west.png`) para um destino plano, e a movida
+sobrescreveu em silêncio os 3 arquivos de idle congelado (68×68) da pasta antiga
+`caua_volt/`. Nunca estiveram no git (a política era "sprite = disco local", ver seção
+"Onde ficam" acima), então não havia como recuperá-los ali. Como contorno temporário, o
+projeto anterior passou a apontar `kCauaSpritesDir` para uma pasta nova,
+`caua_volt_cyan_v2/` (180×180).
 
-- **`kCauaSpritesDir`** (`core/asset_paths.hpp`) passou de `sprites/caua_volt` pra
-  `sprites/caua_volt_cyan_v2` — o Cauã do jogo usa **essa** pasta agora.
-- **`caua_layout()`** (`player_sprites_loader.cpp`) ganhou o mesmo comportamento
-  gracioso do Gus: sem `anims/breathing_idle/` no disco, o idle cai no **walk f0**
-  congelado de cada direção (em vez de exigir `south.png`/`north.png`/`east.png`/
-  `west.png` soltos na raiz — o ramo que causou a perda). Isso tornou os 3 arquivos
-  perdidos **desnecessários**: o personagem não depende mais deles pra existir.
-  `walk/` do `caua_volt_cyan_v2/` é **plano** (`walk_<dir>_<f>.png`, sem subpasta por
-  direção — export direto do gerador), suportado pelo campo de dado novo
+**Em 2026-08-08 o líder recuperou os 3 arquivos perdidos e o `walk/` completo (24
+quadros) de uma cópia própria, e decidiu reverter `kCauaSpritesDir` + `caua_layout()` de
+volta para `caua_volt/`** (commit `840479e` do projeto anterior, `gusworld_legacy`,
+verbatim: *"O Caua Volt volta a usar a arte recuperada em caua_volt/ [...] Os 24 quadros
+de walk/ de caua_volt_cyan_v2/ saem do git por decisao dele"*). A pasta
+`caua_volt_cyan_v2/` foi descartada por essa decisão e **não existe neste projeto** —
+nunca esteve no disco nem no histórico deste repositório.
+
+- **`kCauaSpritesDir`** (`core/asset_paths.hpp`) aponta para `sprites/caua_volt` — **essa**
+  é a pasta que o Cauã do jogo usa.
+- **`caua_layout()`** (`player_sprites_loader.cpp`) tem o mesmo comportamento gracioso do
+  Gus: sem `anims/breathing_idle/` no disco, o idle cai no **walk f0** congelado de cada
+  direção. `walk/` de `caua_volt/` é **plano** (`walk_<dir>_<f>.png`, sem subpasta por
+  direção — export direto do gerador), suportado pelo campo de dado
   `SpriteLayout::walk_dir_subfolder` (não um `if` por personagem — lei do átomo,
   ADR-020).
-- **`caua_volt/`** (a pasta antiga) fica **APOSENTADA**: nenhum código de produção a lê
-  mais. Só `south.png` (a única sobrevivente) segue versionada, como fixture de um
-  teste de infraestrutura genérica (família GENÉRICA da cascata de assets,
-  `platform/tests/asset_source_test.cpp`) que só precisa de ALGUM arquivo real — não é
-  mais "a arte do Cauã". Não editar nem regenerar essa pasta esperando que afete o jogo.
+- **`caua_volt/` é a pasta ATIVA**: os 28 arquivos no disco (4 direções soltas + 24
+  quadros de `walk/`) são os recuperados pelo líder em 08/08/2026, medidos por
+  `identify` em 180×180, `PaletteAlpha`, 34 a 53 cores conforme o quadro — já satisfazem
+  o tamanho canônico de 180×180 (decisão do líder, 30/08/2026) **sem nenhuma
+  regeração**.
 
 **GERAÇÃO 2026-07-23 (party completa + Gus breathing):** os 6 companions ganharam o
 conjunto de anims do Gus via API HTTP direta (`animate-with-text-v3`, `no_background`,
