@@ -25,7 +25,7 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 *Primeira impressão:* bancada onde um velho conserta Tavus-Drive enquanto, três metros adiante, criança troca peça por feijão-computacional.
 *Gancho exploratório:* upgrade barato de Tavus-Drive disponível aqui; sub-quest "consertar terminal antigo da Inácia Berenger" ([[in-world-docs]] doc 2) inicia por NPC daqui.
 
-**Edifício Vance (Núcleo Metropolitano, lado leste).** Prédio residencial modesto de 9 andares, fachada de tijolo cinza Era 2, calçada de pedra Era 1 visível em três pontos onde o asfalto rachou. Apartamento Vance no 6º andar. Bancada de eletrônica de Gargi visível pela janela. Onde [[gus]] mora.
+**Edifício Vance (Núcleo Metropolitano, lado leste).** Prédio residencial modesto de 9 andares, fachada de tijolo cinza Era 2, calçada de pedra Era 1 visível em três pontos onde o asfalto rachou. Apartamento Vance no 6º andar. Bancada de eletrônica de Gargi visível pela janela. Onde [[gus]] mora. **Subsolo do prédio** (área comum, não parte da unidade Vance): guarda a bancada de trabalho que Pyotor Vance deixou ao sair de casa, hoje usada pelo Gus, que a herdou. O piso inteiro é coberto por carpete; sob o carpete há um alçapão que o Gus nunca viu.
 *Primeira impressão:* prédio normal entre dois prédios normais, com uma janela de 6º andar onde sempre se vê alguém soldando placa-mãe sob luz de bancada.
 *Gancho exploratório:* save base canônica; mãe oferece feijão-computacional; cartas raras do pai Pyotor (médico-cyber itinerante) chegam aqui (3-4 no jogo todo).
 
@@ -47,6 +47,8 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 | Caixa de chumbinho-de-recibo Sterling jogada na sarjeta | Núcleo Metropolitano, rua qualquer | Recibos físicos descartados; rastro de consumo Janelarum. Conta sem palavra que a cidade vive pagando. |
 | Bandeirinha de papel da Festa da Compilação rasgada amarrada em poste | Núcleo Metropolitano | Festa passou recentemente. Cor verde-e-branca (bolo-de-bit). |
 | Antena de rádio caseira improvisada no telhado do Edifício Vance | Edifício Vance, vista de fora | Pyotor (pai Gus, médico-cyber itinerante) operou daqui antes de ir pra rotação na fronteira. Gus herdou know-how. |
+| Bancada de trabalho no subsolo, deixada pelo pai e hoje usada pelo Gus | Subsolo do Edifício Vance | Espaço de Pyotor herdado pelo Gus. Distinta da bancada ativa de Gargi, visível da rua no 6º andar. |
+| Piso do subsolo inteiramente coberto por carpete, alçapão escondido sob ele | Subsolo do Edifício Vance | Explica por que o Gus, que usa o espaço, nunca viu o alçapão. O que fica embaixo dele não é canônico. |
 | Janelarum infantil esquecido em banco de praça | Praça da Compilação | Distribuição gratuita da Festa Sterling. Tela travada em mesma imagem. Criança que ganhou perdeu interesse em 20 minutos. |
 | Cabo de fibra ótica saindo de buraco no asfalto, sem cobertura | Núcleo Metropolitano | Manutenção pendente FIR. Ninguém cobre. Acidente esperando. |
 | Folha biolúmen Selve grudada no para-choque de caminhão FIR | Periferia (chegando ao Mercado) | Caminhão veio do Anel Verde. Selve se infiltra carregada inadvertidamente. |
