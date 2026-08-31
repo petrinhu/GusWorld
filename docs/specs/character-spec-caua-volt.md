@@ -17,7 +17,7 @@
 
 ## Pendências — spec 2D detalhada (decisão do líder)
 
-- Resolução de sprite: DECIDIDO em 30/08/2026 — canônico **180×180** (ver `docs/art/style-guide.md` §8), já é o tamanho do arquivo em disco (`caua_volt_cyan_v2`, a pasta ativa — ver `docs/art/sprites-inventory.md`).
+- Resolução de sprite: DECIDIDO em 30/08/2026 — canônico **180×180** (ver `docs/art/style-guide.md` §8), já é o tamanho do arquivo em disco (`caua_volt`, a pasta ativa — ver `docs/art/sprites-inventory.md`).
 - Profundidade de paleta: DECIDIDO em 30/08/2026 — paleta enxuta, junto do resto do elenco (só o Gus tem paleta rica); número exato não medido nesta decisão, ver `docs/art/style-guide.md` §9.
 - Nº de frames/direções de sprite: não definidos, ver `docs/art/style-guide.md`.
 - Prompt PixelLab: não definido.
