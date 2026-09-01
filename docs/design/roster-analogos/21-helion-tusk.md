@@ -192,7 +192,7 @@ O arco **começa cedo** (Vitório Cardoso aparece na missão principal, não fic
 
 ### Profundidade mítica (fragmento velado, Nível 2)
 
-Um único fragmento velado liga o sítio (a Montadora Confluência, e por extensão o consórcio inteiro do Tusk) à fratura antiga do Transbordamento: **o Tusk é estruturalmente "o Vyr do presente"**: construiu sobre (ou perto d)o epicentro sem saber, pelo mesmo instinto de engenheiro já registrado no item 2 deste documento. Isso **nunca é confirmado nem nomeado** dentro da missão; fica no mesmo registro de mito/verdade ambíguo do resto do canon do Transbordamento (`cosmologia-origem-deep.md` §5).
+Um único fragmento velado liga o sítio (a Montadora Confluência, e por extensão o consórcio inteiro do Tusk) à ramificação antiga do Transbordamento: **o Tusk é estruturalmente "o Vyr do presente"**: construiu sobre (ou perto d)o epicentro sem saber, pelo mesmo instinto de engenheiro já registrado no item 2 deste documento. Isso **nunca é confirmado nem nomeado** dentro da missão; fica no mesmo registro de mito/verdade ambíguo do resto do canon do Transbordamento (`cosmologia-origem-deep.md` §5).
 
 ### Rewards (economy-designer, já aprovado; referência, detalhe completo vai pra `economia.md` §7.9 em etapa à parte)
 
