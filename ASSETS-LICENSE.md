@@ -75,6 +75,8 @@ Reprodução, distribuição ou obra derivada exigem autorização escrita do ti
 
 Identidade de marca (nome do jogo, logotipo, trade dress, nomes de personagem) fica **fora de qualquer concessão**, seja de código, seja de asset. Nenhuma licença acima concede o direito de usar o nome "GusWorld", o logotipo do jogo, os nomes dos personagens, ou apresentar um fork ou derivado como se fosse o produto oficial.
 
+**Logo/ícone oficial:** `resources/images/vance_dragon_glyph-alfa.png` é o logo/ícone oficial de GusWorld, por decisão do líder de 01/09/2026 ("esse arquivo será o logo/icone de gusworld"). Cai neste carve-out de marca, não no regime geral de asset com direitos reservados descrito acima.
+
 Ver também [NOTICE](NOTICE), que registra este carve-out para o código.
 
 ---
