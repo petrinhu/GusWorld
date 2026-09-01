@@ -49,7 +49,7 @@
 - Item 24 (reformatar o documento, leis em GODS_LAWS): feito; `GODS_LAWS.md` é a casa das leis. Resolvido e encerrado.
 - Item 25 (proteção de saves e mapas): virou L-18 e L-25; execução no grupo E.
 - Item 26 (configs com as mesmas proteções): virou L-18 e L-25; execução em E1 e E5.
-- Item 27 (PixelLab): PARCIAL. O pipeline de arte é do líder (L-02) e não gera item de execução; o estudo exaustivo da API pedido no texto não foi executado e aguarda pedido explícito dele. Ponta aberta a confirmar com o líder antes de apagar o `inicial.md`.
+- Item 27 (PixelLab): o pipeline de arte é do líder (L-02) e não gera item de execução; o estudo exaustivo da API pedido no texto **foi executado**, em `docs/_processo/dossie-pixellab.md` (295 linhas, ponto a ponto em [FATO]/[INFERÊNCIA]/[NÃO DOCUMENTADO], token não exibido nem vazado), listado em `docs/_processo/_INDEX.md`. Ponta do item 27 fechada. O encerramento do `inicial.md` (L-21) segue aberto: falta a reconferência dos outros 27 itens do rastreio contra a fonte primária, trabalho e decisão à parte.
 - Item 28 (uso web autorizado): registrado como preferência operacional permanente. Resolvido e encerrado.
 
 ## Itens bloqueados pelo GlintFx (sem data; o GlintFx hoje tem um header e nenhuma data prometida)
