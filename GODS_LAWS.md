@@ -23,13 +23,13 @@
 | [L-02](#l-02) | tocar arte, câmera, sprite, modelo ou pipeline visual | Jogo é 2D pixel-art; o pipeline 3D é do líder e agente não toca |
 | [L-03](#l-03) | criar build, escolher padrão de linguagem | C++23 |
 | [L-04](#l-04) | escrever função, arquivo, classe, módulo, item ou carta | Proibido monolito; cada elemento do jogo é átomo com POCO próprio |
-| [L-05](#l-05) | precisar de algo que o GlintFx ainda não tem | Proibido dublê de plataforma: ou liga no GlintFx, ou não existe |
+| [L-05](#l-05) | precisar de algo que o GlintFx ainda não tem, ou de ferramenta de apoio | Proibido dublê: ou liga no GlintFx, ou não existe. ⚠️ **Ferramenta que só constrói e nunca embarca NÃO é dependência** (LEI ZERO, reforma de 28/08/2026) |
 | [L-06](#l-06) | decidir o que construir primeiro | Núcleo puro agora; a camada que desenha só nasce com o GlintFx |
 | [L-07](#l-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
 | [L-08](#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
 | [L-09](#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos; Fedora 44 primário; CachyOS é próprio, não Arch |
 | [L-10](#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level fable audita e cria; sonnet implementa |
-| [L-11](#l-11) | escolher entre duas abordagens, ou notar qualquer dúvida | Nada é decidido por agente; opções ao líder via `AskUserQuestion` |
+| [L-11](#l-11) | fazer **qualquer** pergunta ao líder, inclusive de esclarecimento | `AskUserQuestion` SEMPRE, com opções clicáveis; nunca pergunta em prosa |
 | [L-12](#l-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
 | [L-13](#l-13) | tocar em qualquer trabalho que dependa de canon | Canon desatualizado bloqueia: atualiza primeiro, trabalha depois |
 | [L-14](#l-14) | concluir que algo está morto, obsoleto ou descartável | Nada é declarado morto por agente; a decisão é do líder |
@@ -53,7 +53,7 @@
 | [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
 | [L-33](#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
 | [L-34](#l-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato, interrompe onda |
-| [L-35](#l-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, resultado é "não executado" |
+| [L-35](#l-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, o resultado é "não executado" |
 | [L-36](#l-36) | decidir se lore ainda não escrita atrasa uma fatia de engenharia, ou sentir a tentação de esperar completar canon antes de codar | Lore que falta não bloqueia código, puxa-se sob demanda em micro-sessão pontual; distinta da L-13, que trava por canon que contradiz, não por canon que ainda falta |
 
 
