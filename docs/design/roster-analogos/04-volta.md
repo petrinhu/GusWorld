@@ -18,7 +18,7 @@ Volta relatou os resultados à Royal Society de Londres (carta publicada em 1800
 - **Era/lugar:** Era 2 (Era do Compilador), a era técnica, cronologicamente **anterior** ao período de Faraday dentro da própria história da rede técnica (mesma era, geração mais antiga). Cientista-artesão de um assentamento técnico primitivo, ainda mais rústico que o de Faraday; trabalha sozinho numa oficina de discos metálicos e panos salinizados.
 - **Papel:** o pioneiro do **armazenamento** de carga. Na região onde Volta atua corre um mito popular (eco velado do real Galvani) de que só corpos vivos produzem faísca, que a "centelha" é força vital e não se guarda, só se sente. Volta refuta isso empilhando discos de metais diferentes separados por pano encharcado e provando que a carga se acumula e se libera sob controle, sem tecido vivo nenhum: um experimento, não uma crença. É esse princípio de empilhamento (camada sobre camada, carga retida e liberável) que gerações depois os técnicos da rede (Faraday entre eles) herdam e refinam em blindagem e em toda célula de energia portátil usada hoje.
 - **Tece na timeline:** Era 2, sem tocar datas/eventos canônicos; o legado dele (o princípio da pilha) é o alicerce técnico que o presente herda, do mesmo jeito que a Gaiola de Faraday herda o campo.
-- **Verdade enterrada (endgame):** como os demais análogos, Volta é um eco convergente do arquétipo "domador de carga estática" que recorre pela fratura (ver `cosmologia-origem-deep.md`).
+- **Verdade enterrada (endgame):** como os demais análogos, Volta é um eco convergente do arquétipo "domador de carga estática" que recorre pela multiplicação do Transbordamento (ver `cosmologia-origem-deep.md`).
 
 ## 3. A CARTA "Pilha Voltaica"
 
