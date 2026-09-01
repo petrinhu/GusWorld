@@ -35,7 +35,7 @@ Decisões do líder, 2026-07-17.
 
 - **Gatilho social:** fora de combate o aparte só dispara **entre amigos** (só a party na cena; com estranhos o Gus fica quieto). **Exceção:** em combate ele solta mesmo com inimigo presente (é o "Dragon", a face de líder).
 - **Frequência no mapa:** RARO, ~1 a cada **8-10 minutos** andando, chance baixa + trava de tempo mínimo. **Sorteio sem repetição (shuffle bag):** uma frase só volta a ser elegível quando TODAS já saíram.
-- **Frequência em batalha:** até 1x a cada X minutos (**X ainda a definir com o líder**).
+- **Frequência em batalha (decisão do líder, 01/09/2026):** dispara por **evento**: o jogador joga uma daquelas cartas específicas, e o Gus comenta logo depois, sobre aquela carta. Depois disso ele fica **3 rodadas de batalha** em silêncio, para não falar sem parar se o jogador jogar várias cartas seguidas. A trava é em **rodada**, não em minuto (diferente da regra fora de combate, que segue por tempo).
 - **Reação do alvo:** **~80% = só a carinha 😑** (silêncio é a piada); **~20% = REVIDE** (o alvo responde). Os 13 revides são CANON (ver seção "Revides" abaixo, aprovada um a um pelo líder em 2026-07-17).
 - Frases de tom "mais aula" (as que soam explicativas) o Gus pode soltar no vazio, sem exigir reação elaborada do alvo.
 
@@ -243,7 +243,7 @@ Três passos.
 |---|---|---|---|
 | AMB-01 | Nome real ("C", "C++") na frase rara vs convenção diegética do doc | (a) manter verbatim do líder, (b) variante diegética genérica, (c) usar `C-Arcane Major`, nome diegético do C++ | **RESOLVIDA: (c).** O líder criou `C-Arcane Major` como nome diegético canônico do C++. Frase rara entra na forma diegética. |
 | AMB-04 | O lote 2 usa "manual de vocês" e "documentação" na boca do Gus (A22, A23). Isso pressupõe que existe documentação escrita das linguagens no mundo diegético | (a) ok, é coerente com magia = software, (b) trocar por "os próprios magos do Óxido admitem" | **Mantida como (a):** coerente com Pillar 1 (magia = software). Linha registrada aqui como **confirmar com o líder** se ele quiser revisitar. |
-| AMB-02 | Frequência de disparo dos apartes no mapa | (a) cooldown por tempo, (b) por transição de mapa, (c) pool aleatório sem repetição | **RESOLVIDA.** Ver "Regras de disparo": shuffle bag sem repetição + cooldown ~8-10 min no mapa. Frequência em batalha ainda com X a definir. |
+| AMB-02 | Frequência de disparo dos apartes no mapa | (a) cooldown por tempo, (b) por transição de mapa, (c) pool aleatório sem repetição | **RESOLVIDA.** Ver "Regras de disparo": shuffle bag sem repetição + cooldown ~8-10 min no mapa. Em batalha, decisão do líder de 01/09/2026: dispara por evento (a carta específica jogada) + 3 rodadas de silêncio depois. |
 | AMB-03 | A21 é reserva ou entra fixo (fecha em 21, número Fibonacci) | (a) reserva, (b) fixa | **RESOLVIDA: (b) fixa.** Pool fecha em 21 + lote 2 (A22-A29) = 29 frases totais. |
 
 ## Pendência de implementação (UI)
