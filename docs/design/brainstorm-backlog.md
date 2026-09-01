@@ -71,7 +71,9 @@ Brainstorm intenso sobre as **origens do reino** na lore, **incluindo a seed 1**
 Definir a **quantidade de áreas abertas pelo mundo** seguindo **a sequência numérica recorrente** (eco velado pervasivo). E **(re)discutir os tipos de ecossistema** das áreas.
 
 ## 6. Quantidade de dungeons por área (sequência numérica recorrente) + tipos de dungeon
-Quantidade de **dungeons por área** também na **sequência numérica recorrente** (brainstorm). **Tipos de dungeon:** ensinando a jogar (tutorial), puzzle puro, só batalhas, labirintos, mistas. Definir também a **quantidade de áreas secretas não obrigatórias por dungeon**.
+Quantidade de **dungeons por área** também na **sequência numérica recorrente** (brainstorm). **Tipos de dungeon:** ensinando a jogar (tutorial), puzzle puro, só batalhas, labirintos, mistas.
+
+> **Quantidade de áreas secretas não obrigatórias por dungeon: decidido em 31/08/2026** (líder, por `AskUserQuestion`), escalada pelo tipo de dungeon. Detalhe em `docs/design/mundo-topologia.md` §4.1.
 
 ## 7. Topologia de acesso: tudo acessível desde o começo, dificuldade por distância
 As **áreas principais são TODAS acessíveis desde o começo** do jogo, PORÉM quanto **mais distantes da origem**, mais difíceis (ecossistema + inimigos mais duros). Há **áreas especiais contornáveis** só acessíveis com **algo diferenciado** (item/carta/habilidade), que **virarão atalhos** entre dois pontos no futuro; elas **NUNCA restringem alcançar outras áreas** (open desde o início), mas podem **dificultar bastante** o caminho.

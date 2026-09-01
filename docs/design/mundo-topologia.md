@@ -95,6 +95,38 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
 12. **Selve Profunda (final) — mista (clímax):** culminante longa; gimmick = tudo junto (puzzle + labirinto + batalha), paletas fundidas (recompensa ato 3), rumo ao confronto final. O ápice.
 13. **Área faraday — puzzle EM (contornável/atalho):** câmara blindada; gimmick = dentro da gaiola o scan/HUD "cega" (sinal morto) — o Gus resolve às escuras, por dedução pura; guarda carta/item-chave.
 
+## 4.1 Áreas secretas dentro das dungeons — por tipo (decisão do líder, 31/08/2026)
+
+Camada de lugares secretos **DENTRO de cada dungeon**, distinta da camada por distância do §5 logo abaixo (ver comparação ao final desta seção). Escalada pelo **tipo** da dungeon — os tipos já fixados na tabela de §4:
+
+| Tipo | Áreas secretas por dungeon |
+|---|---|
+| labirinto | **5** |
+| puzzle puro | **3** |
+| mista | **2** |
+| só batalhas | **1** |
+| tutorial | **1** |
+
+**Aritmética** (contagem de tipos vinda da tabela de §4: tutorial 1 · puzzle puro 4 · só batalhas 3 · labirinto 2 · mista 3):
+
+- labirinto: 2 dungeons × 5 = 10
+- puzzle puro: 4 × 3 = 12
+- mista: 3 × 2 = 6
+- só batalhas: 3 × 1 = 3
+- tutorial: 1 × 1 = 1
+- **Total: 32 áreas secretas dentro das dungeons.**
+
+Somadas às **21** lugares secretos do §5, o jogo passa a ter **53 lugares secretos ao todo**.
+
+**As duas camadas são DISTINTAS, não a mesma coisa contada duas vezes:**
+
+- **§5 (barata):** entre áreas do mundo aberto, 1-2 salas, tiles reusados.
+- **§4.1 (esta, cara):** dentro de uma dungeon específica, sala feita à mão.
+
+**⚠️ Superação deliberada e informada do filtro de produção (linha 5 deste documento).** O filtro diz *"o caro (dungeons feitas à mão) fica capado; o barato (lugares secretos pequenos, interiores) escala"* — e continua valendo para tudo o mais neste documento; **esta seção é a exceção registrada**, não uma correção dele. O orquestrador apresentou ao líder a alternativa enxuta (11 áreas secretas, mantendo o filtro estrito) e apontou que 32 é o tipo de número que costuma ser cortado depois sob pressão de prazo. **O líder escolheu 32 mesmo assim, ciente do trade-off, em 31/08/2026, por `AskUserQuestion`.** Registrado aqui para que ninguém "corrija" o número para baixo depois achando que ele escapou da regra, e para que um corte futuro, se vier, seja feito sabendo exatamente o que está sendo cortado.
+
+**O que NÃO está decidido:** o que há dentro de cada área secreta, onde cada uma fica dentro da dungeon, e que recompensa dá. Fica para produção, junto do layout fino de cada dungeon (§10, item 1).
+
 ## 5. Lugares secretos — gradiente numérico por distância (barato)
 
 Camada por cima das dungeons: **lugares secretos pequenos** (1-2 salas, 1 puzzle/recompensa, tiles reusados, **opcionais**), mais numerosos quanto **mais longe da origem** (gradiente velado 0→1→2→3→5). São o BARATO que enche os ermos de recompensa de exploração sem custar como dungeon. Distribuição também **irregular** por área (não um número limpo por tier — o padrão numérico fica no agregado, não exposto).
