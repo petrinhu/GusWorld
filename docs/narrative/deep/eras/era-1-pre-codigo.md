@@ -2676,8 +2676,10 @@ O presente sub-bloco articula, conforme protocolo metodológico de §9.0, o per�
 > Em registro contido, articulei reflexão sobre a herança institucional em descendência direta de Atelaiá Chevalier em -115. O peso do ofício articulou-se em sucessão geracional canônica de pelo menos cinco gerações:
 >
 > - **Minha ancestral Atelaiá Chevalier** (-115). Codificação canônica do Asmódico moderno conforme protocolo dos primeiros cronistas Era 2.
-> - **Minha avó.** Transmissão do ofício cronístico em sucessão direta.
-> - **Minha mãe.** Transmissão do glossário cruzado em sucessão direta.
+> - **Antoneta Argéndia-Chevalier** (-110). Fundação do diário cronístico institucional da Ordem Recursiva, em sucessão direta.
+> - **Verônica Atelaiá** (-78, ativa -45). Transmissão do ofício cronístico em sucessão direta.
+> - **Tarsila Atelaiá-Verônica** (ativa -25). Expansão do arquivo cross-cidades, em sucessão direta.
+> - **Felícia Tarsila** (ativa -8). Auditoria cross-cidades e cross-Famílias, em sucessão direta.
 > - **Eu** (horizonte de cinquenta anos posteriores ao início da Era 3). Continuidade em descendência ininterrupta canônica.
 >
 > Em registro contido, articulei reflexão sobre o peso do ofício. O ofício articula matéria específica da preservação do conhecimento técnico Era 1 em sucessão geracional canônica, fora dos olhos da configuração consolidada vigente na Era 3, conforme princípio canônico da tradição comparativa do arquivo restrito de São Camilo.
