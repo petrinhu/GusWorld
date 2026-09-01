@@ -48,43 +48,43 @@ Atravesso seis quadras até o Mercado da Sucata Honesta. O nome é piada também
 
 A barraca da Inácia fica no lado oeste do mercado, perto do bebedouro público. Ela está sentada num banquinho baixo, classificando arruelas por bitola usando uma lupa de joalheiro. Levanta o olhar quando eu chego. Não sorri. Inácia não sorri muito. Ela usa o rosto pra coisa mais útil: medir.
 
-– Achou? ela pergunta.
+"Achou?" ela pergunta.
 
-– Achei.
+"Achei."
 
 Tiro o conector do bolso, coloco em cima da mesa de chapa entre nós. Ela olha. Pega. Vira na mão. Põe na lupa. Lê o S.B.
 
 Por um segundo ela para. Não é pausa dramática, é pausa de quem reconhece e decide o que vai fazer com o reconhecimento. Eu conheço essa pausa, é genética.
 
-– Boa peça, ela diz.
+"Boa peça", ela diz.
 
-– É do pai.
+"É do pai."
 
-– É.
+"É."
 
-– Ele trabalhou na 11?
+"Ele trabalhou na 11?"
 
-– Trabalhou.
+"Trabalhou."
 
-– Quando?
+"Quando?"
 
 Ela olha pra mim. Tira a lupa do olho. Põe o conector na caixa de peças aprovadas. Limpa a mão no avental de couro velho (que avental gasto, esse, eu reparo agora; ela tem ele desde antes de eu nascer, deve ter pelo menos uns treze anos de uso, o couro endurecido nas bordas).
 
-– Quando o Davi tinha uns três anos. Antes de eu te gestar. Ele fez seis meses lá, contrato extra. Não foi feliz.
+"Quando o Davi tinha uns três anos. Antes de eu te gestar. Ele fez seis meses lá, contrato extra. Não foi feliz."
 
-– Por quê?
+"Por quê?"
 
-– Não chegou a me contar inteiro. Veio o acidente antes.
+"Não chegou a me contar inteiro. Veio o acidente antes."
 
 Inácia volta pra arruela. A conversa acabou. Eu reconheço o fim da conversa do mesmo jeito que reconheço o fim de um ciclo elétrico. Não insisto. Catalogo. Sigo. A Inácia não fala do acidente de tráfego se não for puxada com cuidado, e hoje, num banquinho baixo de mercado, não é o lugar.
 
 Antes de sair, ela diz, sem levantar o olhar:
 
-– Cauã.
+"Cauã."
 
-– Oi.
+"Oi."
 
-– Bom trabalho.
+"Bom trabalho."
 
 Eu sorrio uns dois milímetros de canto de boca, o suficiente pra ela perceber sem ter que olhar. Saio.
 
@@ -92,31 +92,31 @@ Eu sorrio uns dois milímetros de canto de boca, o suficiente pra ela perceber s
 
 Na saída do mercado, na esquina do bebedouro, tem alguém me esperando. Reconheço de longe pelo jeito de ficar em pé: peso distribuído noventa por cento na perna esquerda, dez na direita, postura de quem nunca relaxa totalmente. Vespa Calderón. Veterana do Underground dos Dutos, idade que ninguém sabe, talvez quarenta, talvez sessenta. Tem um cordão de noventa e nove nós no pulso esquerdo, herança do Calixto Rivaz que morreu há uns oito anos. Quer dizer, oitenta e nove nós. Eu sempre erro, quase digo noventa e nove, mas são oitenta e nove. É importante. Cordão de oitenta e nove nós tem peso simbólico que cordão de noventa e nove não tem.
 
-– Volt, ela diz. Ela é uma das únicas pessoas que me chama pelo codinome em público.
+"Volt", ela diz. Ela é uma das únicas pessoas que me chama pelo codinome em público.
 
-– Vespa.
+"Vespa."
 
-– Tenho um favor pra te dar.
+"Tenho um favor pra te dar."
 
-– Você não me deve favor.
+"Você não me deve favor."
 
-– Devo um. Hoje quito.
+"Devo um. Hoje quito."
 
 Ela estende a mão direita. Entre os dedos, um nó solto, de fio idêntico ao do cordão dela. Um único nó, daqueles complicados, dos que precisam de quatro voltas e duas passagens internas. Não é nó de marinheiro. É nó da subcultura, um daqueles que o Calixto ensinava em sessão fechada nos anos antes da queda da Subestação 7.
 
 Eu olho pro nó. Olho pra ela.
 
-– Por quê?
+"Por quê?"
 
-– Seu irmão me defendeu uma vez. Eu nunca tive como pagar. Hoje pago no irmão dele.
+"Seu irmão me defendeu uma vez. Eu nunca tive como pagar. Hoje pago no irmão dele."
 
 Davi Berenger. Meu irmão mais velho, morto faz exatamente cinco anos. Subestação 7. Sterling. A Subestação 7 era alvo de um teste de carga ilegal que o Sterling Locke estava conduzindo (na época ele ainda era subdiretor de alguma coisa, antes de virar o que virou); a subestação foi sobrecarregada de propósito, "acidente industrial" virou o nome oficial, e o Davi estava lá dentro porque o Davi sempre estava onde precisavam dele. Davi tinha dezesseis anos. Eu tinha oito. Caçamba de pouca idade pra perder um irmão que já era a metade do que eu sabia do mundo.
 
 Pego o nó. Pesa quase nada. Pesa tudo.
 
-– Obrigado, Vespa.
+"Obrigado, Vespa."
 
-– De nada, Volt. Anda. Tua mãe te quer pra almoço.
+"De nada, Volt. Anda. Tua mãe te quer pra almoço."
 
 Ela some na multidão antes que eu pense em responder. Vespa some bem. É treino.
 
@@ -168,7 +168,7 @@ Eu olho a cidade. Vento alto bate em compasso que eu não consigo identificar de
 
 Eu digo em voz baixa, pra ninguém ouvir, pra mim mesmo:
 
-– Poxa, Davi, esse aqui ia ser teu lugar.
+"Poxa, Davi, esse aqui ia ser teu lugar."
 
 Não é frase grande. Não é frase pequena. É a frase do dia. Cataloguei, soltei, segui.
 
