@@ -104,6 +104,23 @@ resultados**. As 3 direções extras já estão na pasta final
 Arquivo solto fora do padrão de 4 subpastas:
 `personagens_inspirados/gus/walk/_south_strip.png`.
 
+**Técnica de geração por direção, medida em 31/08/2026** por `identify -format
+'%wx%h %[type] %k colors\n'` no quadro `f0` de cada uma das 4 subpastas: as
+quatro estão em **256×256**, mas **não** na mesma técnica —
+
+| direção | tipo | cores | data |
+|---|---|---|---|
+| `south` | TrueColorAlpha | 12.056 | 23/06/2026 |
+| `north` | PaletteAlpha | 52 | 23/07/2026 |
+| `east` | PaletteAlpha | 62 | 23/07/2026 |
+| `west` | PaletteAlpha | 57 | 23/07/2026 |
+
+`south` é cor plena; `north`/`east`/`west` caem na faixa de paleta enxuta do
+resto do elenco (67 personagens estáticos de 4 direções ficam em 34 a 58 cores,
+ver seção "Cauã Volt" na PARTE DE JULGAMENTO para um exemplo medido). As três
+foram geradas numa técnica diferente da do `south`, apesar de estarem, desde
+23/07/2026, na mesma pasta final que ele (ver julgamento do líder logo abaixo).
+
 ### `bento_requiem/` — pasta mista de tamanho
 
 - Direções (`south/north/east/west.png`, 4 arquivos no topo da pasta): `identify`
@@ -265,12 +282,26 @@ personagens_inspirados/gus/
 │   │        ← a "RESPIRAÇÃO"/cansado. Sul gerado 23/06/2026; Norte/Leste/Oeste
 │   │          gerados 23/07/2026 via API HTTP direta (/animate-with-text-v3,
 │   │          first_frame = a rotação real de cada dir, animação
-│   │          "winded/ofegante", antena preservada por construção). ⚠️ Já estão
-│   │          na pasta FINAL (não há mais staging — ver parte medida), o que
-│   │          pode significar que o item de backlog `ARTE-RESP-4DIR` (montar
-│   │          breathing direcional + desligar idle_animated_only_one_facing)
-│   │          já está fechado. **Isto é achado, não decisão** — precisa de
-│   │          revisão do líder antes de fechar o item.
+│   │          "winded/ofegante", antena preservada por construção). Já estão
+│   │          na pasta FINAL (não há mais staging — ver parte medida), mas
+│   │          `north`/`east`/`west` foram geradas em técnica de paleta enxuta
+│   │          (52 a 62 cores), diferente da cor plena do `south` (12.056
+│   │          cores) — ver tabela da PARTE MEDIDA acima. ⚠️ **DECISÃO DO
+│   │          LÍDER, 31/08/2026, por `AskUserQuestion`:** as três direções
+│   │          novas devem ser REGERADAS em cor plena, na mesma técnica do
+│   │          `south`. Razão que ele acolheu: a hierarquia de dois regimes
+│   │          visuais (protagonista em cor plena × elenco em paleta enxuta,
+│   │          decisão do líder de 30/08/2026) vale ENTRE o protagonista e o
+│   │          elenco, não DENTRO do protagonista — o Gus não pode trocar de
+│   │          técnica conforme a direção pra qual olha, porque isso aparece
+│   │          quando ele gira. **A regeração é trabalho do líder (L-02) — o
+│   │          pipeline de arte não é tocado por agente.** Rastreado no
+│   │          `TODO.md` como `ART-2`, que nenhum agente deve executar.
+│   │          ⚠️ **O identificador `ARTE-RESP-4DIR`, citado em versões
+│   │          anteriores deste documento como se fosse item de backlog, NUNCA
+│   │          existiu no `TODO.md` nem em nenhum outro lugar do repositório**
+│   │          — só existia dentro deste próprio arquivo. Não procurar por ele
+│   │          de novo; o item real é `ART-2`.
 │   ├── battle_idle/ (7)  cast/ (7)  attack_melee/ (7)  attack_melee_east/ (9)
 │   ├── defend/ (5)  hurt_magic/ (5)  hurt_physical/ (5)  ko/ (7)  revive/ (7)
 │   ├── run/ (7)  run_east/ (9)  run_west/ (9)  victory/ (7)  dragon_victory/ (9)
