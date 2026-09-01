@@ -2445,7 +2445,7 @@ A cadeia de transmissão técnica multi-camada está documentada em sucessão ge
 
 Cada camada articula matéria específica de duas operações pareadas: introdução de precisão verificável e introdução de erro institucionalmente compensado.
 
-O presente sub-bloco articula, conforme protocolo metodológico de §9.0, o período obscuro em cento e quarenta e quatro anos cumulativos posteriores à fundação Era 2. A categoria septenária de vestígio fecha aqui. O sub-bloco subsequente, §9.8, articula em decomposição literária cronístico-contemporânea o trecho in-character da cronista Era 3 **Verônica Atelaiá**, descendente direta de Atelaiá Chevalier (-115).
+O presente sub-bloco articula, conforme protocolo metodológico de §9.0, o período obscuro em cento e quarenta e quatro anos cumulativos posteriores à fundação Era 2. A categoria septenária de vestígio fecha aqui. O sub-bloco subsequente, §9.8, articula em decomposição literária cronístico-contemporânea o trecho in-character da cronista contemporânea Era 3, de identidade reservada, descendente direta de Atelaiá Chevalier (-115).
 
 ### 9.8 Trecho in-character: cronista contemporânea Era 3 (identidade reservada)
 
@@ -4512,7 +4512,7 @@ Estas quatro coisas (Sterling Corp, fluoróforo, fungo, placa) convergem no hori
 
 Penso, em registro contido, no que sobrevive.
 
-Sobrevive a linhagem cronística feminina. De Atelaiá Chevalier em -115 até Cassandra Chevalier, minha sucessora direta: oito gerações sucessivas em descendência ininterrupta. Entre Atelaiá e mim, a cadeia: Esmeralda Argéndia-Chevalier (filha direta de Atelaiá, segunda geração); Luísa Argéndia-Chevalier (terceira); Anastácia Vyrcátrix-Acaceiro a Paciente (quarta); Hipátia Atelaiá-Vargas (quinta); Olímpia Cardoso-Acaceiro (sexta); Cassandra Yvanova-Calígrafa (sétima); eu mesma, Verônica Atelaiá (transicional, da sétima à oitava); Cassandra "Bento" Chevalier (oitava canônica); Beatriz Argéndia-Vargas (nona, em formação). A linhagem dá continuidade ao ofício e transmite a paleografia de quatro camadas, fiel ao protocolo originário de -115.
+Sobrevive a linhagem cronística feminina. De Atelaiá Chevalier em -115 até Cassandra Chevalier, minha sucessora direta: oito gerações sucessivas em descendência ininterrupta. Entre Atelaiá e mim, a cadeia: Esmeralda Argéndia-Chevalier (filha direta de Atelaiá, segunda geração); Luísa Argéndia-Chevalier (terceira); Anastácia Vyrcátrix-Acaceiro a Paciente (quarta); Hipátia Atelaiá-Vargas (quinta); Olímpia Cardoso-Acaceiro (sexta); Cassandra Yvanova-Calígrafa (sétima); eu mesma (transicional, da sétima à oitava); Cassandra "Bento" Chevalier (oitava canônica); Beatriz Argéndia-Vargas (nona, em formação). A linhagem dá continuidade ao ofício e transmite a paleografia de quatro camadas, fiel ao protocolo originário de -115.
 
 Paralelo contido à configuração Bene Gesserit (Frank Herbert) preservada em arquivo restrito. Mesma função (continuidade ancestral); mecanismos distintos. Bene Gesserit: psi-genética e ritual químico. Linhagem da Ordem Recursiva: transmissão documentada mestre-aprendiz; cordão de oitenta e nove nós herdado; avental cerimonial herdado; paleografia de quatro camadas herdada; Três Princípios Originários Helíaco Vyr herdados.
 
