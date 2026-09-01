@@ -189,7 +189,7 @@ A linguagem de cor/forma/movimento por família é **agnóstica de dimensão** e
 - Normal map fora das exceções listadas → **movido pro Histórico** (idem).
 - Char SEM proporção SD 1:1:1 (exceto NPCs adultos em 1:1:1.2) → **pendência de spec 2D** (ver §3.2).
 - Char com cabeça redonda inflada + bracinhos curtos gordos (chibi tradicional) → reprovado. SD ectomorfo é a regra. Vigente (semiótica de forma, agnóstica).
-- **Atenção — item potencialmente invertido em pixel art:** o texto original tinha "Texture com lighting baked (sombra desenhada) → reprovado", pensado pro fluxo 3D (sombra deveria vir do shader em tempo real, não pintada). **Em pixel-art isso é o OPOSTO da prática padrão** — sombra/luz pintada à mão (ou gerada) diretamente no sprite é como pixel-art normalmente funciona. Sinalizado como **pendência**: essa regra provavelmente precisa ser revertida ou reescrita pelo líder, não decidido aqui.
+- Texture com lighting baked (sombra desenhada) → reprovado. Vigente. **Decisão do líder, 01/09/2026: a proibição se mantém.** Sombra e luz sobre os sprites vêm do motor, em tempo de execução, nunca do desenho. Essa capacidade ainda não existe no GlintFx — pedida pelo bus em 01/09/2026 (`inbox/glintfx/20260901-1650-gusworld-sombra-de-sprite.md`, repositório `petrinhu/gusworld_ia_autocomm`); enquanto ela não existir, o trabalho de arte que depende de sombra espera.
 - Mistura cidade+Selve fora do ato 3 → reprovado. Vigente.
 - Outline em todos os assets (deve ser só chars + props hero) → **pendência**: o princípio ("outline seletivo, não universal") é agnóstico, mas se o PixelLab já aplica outline por padrão em todo asset, a regra pode precisar de reformulação técnica — pendente.
 - Polycount acima do budget sem aprovação explícita → **movido pro Histórico** (substituído por orçamento de sprite/frame, pendência de spec 2D, ver §8).
@@ -212,8 +212,7 @@ Nenhum destes pontos foi decidido nesta atualização; listados aqui pra virarem
 6. Profundidade de paleta indexada por personagem: DECIDIDA (dois regimes — Gus paleta rica, resto do elenco paleta enxuta — ver §9, 30/08/2026); segue pendente se normal/emission map em pixel art (suportado pelo PixelLab) é usado ou abandonado.
 7. Escopo de shaders 2D remanescentes (glitch/anomalia, holograma) — quais migram pro glintfx como screen-space/sprite shader.
 8. Implementação de VFX (spritesheet de frames vs. sistema de partículas 2D).
-9. Revisão do don't "sombra pintada = reprovado" (provavelmente precisa inverter pra pixel art).
-10. Reavaliação do anti-ref "Octopath/HD-2D" e do anti-objetivo correspondente, agora que a razão original (câmera 3D) não se aplica mais.
+9. Reavaliação do anti-ref "Octopath/HD-2D" e do anti-objetivo correspondente, agora que a razão original (câmera 3D) não se aplica mais.
 
 **Revisão prevista:** após primeiro vertical slice (cidade + uma zona Selve + combate funcional). Atualizar paletas/budgets com dados reais de perf.
 
