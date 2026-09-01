@@ -122,15 +122,12 @@ wall-of-text"; corte `C-16`). Fala que ensina a equivalência ainda não foi esc
 `ux-writer`/`narrative-writer`, fora do escopo desta fatia; fica registrada aqui como necessidade
 pendente, não como texto pronto.
 
-**Relação com o que já está especificado, sem alterar nada disso:** `cartas-spec-logica.md` §3 (linha
-110) já liga os dois numericamente 1:1 — `BateriaCarta.charge -= ManaCost_da_ação`, o mesmo valor que
-sai da mana do ator, "sem eixo novo". A decisão de hoje confirma que esse acoplamento não é
-coincidência de número: é identidade de substância. **Ambiguidade sinalizada, não decidida aqui:** o
-combate mantém dois medidores distintos com essa mesma régua — o pool de mana do ator (`combat.md`
-§5, `manaMax = 2 + turnos`, reseta por regra própria) e a bateria física da carta (persiste entre
-batalhas, degrada, exige recarga real). A decisão do líder não diz se ela também funde esses dois
-medidores numa métrica única, ou se cada um continua com seu rastreamento próprio enquanto nome e
-fala tratam as duas palavras como sinônimos. Isto não foi perguntado nem decidido nesta fatia.
+**Relação com o que já está especificado, sem alterar nada disso:** `cartas-spec-logica.md` §3 já liga
+os dois numericamente — a decisão de hoje confirma que esse acoplamento não é coincidência de número:
+é identidade de substância. **A ambiguidade que esta seção levantava originalmente — se a rampa do
+ator em `combat.md` §5 (`manaMax = 2 + turnos`) e a bateria física da carta eram dois medidores
+separados ou o mesmo — foi respondida pelo líder no mesmo dia.** A resposta está na seção "Estoque e
+vazão", logo abaixo.
 
 ### Múltiplas baterias e a barra da tela (acréscimo do líder, 31/08/2026)
 
@@ -164,27 +161,56 @@ consumir a ativa inteira, o custo fixo de "mana 6" que algumas cartas registram 
 escrito em lugar nenhum. A mesma dúvida já está marcada, de forma independente, em
 `docs/design/mecanicas/cartas/volta.md` ("Pontas soltas"): não decidida ali, não decidida aqui.
 
-**Duas contradições candidatas achadas na varredura de hoje, sinalizadas e NÃO resolvidas ou
-editadas:**
+**Duas contradições candidatas achadas na varredura de 31/08/2026, uma delas RESPONDIDA pelo líder no
+mesmo dia (ver "Estoque e vazão", logo abaixo), a outra ainda sinalizada e NÃO resolvida ou editada:**
 
-1. `docs/design/mecanicas/combat.md` §5 (linhas 36, 61, 210, 232, 775) especifica um **pool de mana
-   do ATOR**, não da carta: `manaMax = 2 + contagemPropriaDeTurnos` (cap 8), que cresce a cada turno e
-   reseta ao máximo sem carry-over, com `spend_mana`/`RestoreMana` operando sobre esse pool único por
-   ator. Isso não bate, sem mais explicação, com "várias baterias com carga própria, uma ativa,
-   escolhida pelo jogador": bateria (`cartas-spec-dados.md` linhas 82-84, 155-173) tem capacidade
-   **fixa por origem/dificuldade**, persiste **entre batalhas** e degrada por uso — não cresce com o
-   contador de turnos nem reseta ao entrar em combate. Se a barra da tela mostra carga de bateria,
-   falta dizer se o pool `manaMax` do ator continua existindo por baixo (e a barra é só uma janela
-   para ele) ou se a bateria SUBSTITUI esse pool de fato.
+1. ✅ **Respondida.** `docs/design/mecanicas/combat.md` §5 especificava um pool de mana do ATOR,
+   separado da bateria física da carta. O líder respondeu: não são dois medidores, são duas
+   propriedades da MESMA bateria (estoque e vazão) — ver "Estoque e vazão" abaixo, e a correção já
+   aplicada em `combat.md` §5 e `cartas-spec-logica.md` §3.1.
 2. `docs/design/mecanicas/battle-screen.md` (linhas 50, 58, 222) é spec de tela já detalhada e
    embarcada como constantes (`kCyan` etc. em `battle_scene.cpp`, conforme a própria nota do
    documento): Mana aparece como **pips** (cyan), dentro do painel lateral ("cockpit"), ao lado do
    retrato — não como **barra** "abaixo do quadro do personagem", e o documento não descreve seleção
    de bateria pelo jogador. Pode ser só troca de palavra (pip é uma forma de barra), pode ser
-   atualização de layout que este acréscimo do líder pede — não decidido aqui.
+   atualização de layout que este acréscimo do líder pede — **não decidido aqui.** Não editado: é
+   spec de tela já canônica, e a L-27 deste projeto proíbe desenhar interface nesta fatia de qualquer
+   forma.
 
-Nenhuma das duas foi editada: são spec de combate e de tela já canônicas, e a L-27 deste projeto
-proíbe desenhar interface nesta fatia de qualquer forma.
+### Estoque e vazão: a bateria tem duas propriedades físicas (decisão do líder, 31/08/2026)
+
+**O líder respondeu a ambiguidade combat.md × bateria levantada acima: não são dois medidores, é UM
+sistema, com duas propriedades físicas da mesma bateria.**
+
+1. **Capacidade (estoque):** a carga da bateria ativa. Persiste entre batalhas, degrada, exige
+   recarga real. É o que a barra na tela mostra.
+2. **Vazão (taxa máxima de descarga por turno):** por turno, o ator pode sacar até `2 +
+   contagemPropriaDeTurnos`, com teto de 8 — a mesma rampa que `combat.md` §5 já definia, **mas
+   relida como taxa, não como orçamento próprio.**
+3. **O limite real de cada turno é o MENOR dos dois:** a vazão do turno, ou o que ainda resta na
+   bateria ativa. Nunca se saca mais do que a bateria tem.
+4. **Deixa de existir subtração dupla.** `cartas-spec-logica.md` §3.1 dizia que o `ManaCost` sai da
+   bateria e "o mesmo valor que já sai da mana do ator" — isso descrevia dois medidores em paralelo.
+   Agora é **uma subtração só**, da bateria, limitada pela vazão do turno. Redação corrigida no
+   próprio `cartas-spec-logica.md` §3.1 (L-24 deste projeto: o que virou passado se apaga, não se
+   guarda como histórico).
+
+**Leitura que explica o conjunto:** a rampa deixa de ser um orçamento que aparece do nada a cada
+turno e vira o quanto a bateria consegue entregar por vez. Bateria real tem capacidade e tem corrente
+máxima; o modelo agora tem as duas.
+
+**Duas consequências registradas, NÃO resolvidas aqui:**
+
+- **(a) Ficar sem bateria no meio da batalha passa a ser possível.** Antes não era: a rampa recarregava
+  ao máximo todo turno. Agora o estoque pode acabar. **O que acontece nesse momento não está
+  decidido** — se o jogador troca de bateria em combate, se isso custa a ação do turno, se há estado
+  de "sem carga". Nota factual, não confirmação: a carta do Volta depende de trocar de bateria para
+  ser reusada (`docs/design/mecanicas/cartas/volta.md`), o que sugere que a troca em combate existe,
+  mas isso não decide o mecanismo geral.
+- **(b) A degradação da bateria agora tem efeito mecânico direto.** Se a bateria é o estoque e ela
+  degrada, degradar significa ter menos carga disponível por batalha. Antes, com a rampa recarregando
+  sozinha, a degradação era mais abstrata. A curva de degradação em si **não é inventada aqui** —
+  segue no `economy-designer`.
 
 ### Troca e recarga
 - **Cidade:** grátis — abrir inventário, pôr carregada no lugar da usada.

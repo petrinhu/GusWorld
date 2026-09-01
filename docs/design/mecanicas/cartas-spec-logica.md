@@ -105,9 +105,20 @@ A lógica abaixo assume que cada **instância** de carta (lembrando: "carta = in
 
 ## 3. Energia: bateria CR2032
 
-### 3.1 Consumo por cast (drain = ManaCost, já fechado)
+### 3.1 Consumo por cast (drain = ManaCost, já fechado; subtração única desde 31/08/2026)
 
-Sem eixo novo: `BateriaCarta.charge -= ManaCost_da_ação`, mesmo valor que já sai da mana do ator (`cartas-numeros` §1a, AMB-02 já resolvida: "recurso Y" = `ManaCost`, não um multiplicador extra). Regra de Híbridas (Faraday/Maxwell/Newton/von Neumann/John Dee, `cartas-technomagik.md` §2.3): a face **passiva** (`ManaCost=0`, sempre ligada) nunca drena; só a face **ativa**, quando de fato disparada (`OnCast` do lado castável), drena as ~6 unidades.
+**Uma subtração só, da bateria, limitada pela vazão do turno** — decisão do líder, 31/08/2026,
+registrada em `cartas-hardware-pirataria-energia.md` §5 ("Mana e bateria são o mesmo recurso"):
+`BateriaCarta.charge -= ManaCost_da_ação`, e é essa mesma subtração, não duas em paralelo, que
+também conta contra a vazão do turno do ator (`combat.md` §5, `manaMax = 2 +
+contagemPropriaDeTurnos`, cap 8, relido como taxa máxima de saque, não como pool próprio).
+⚠️ **Redação anterior apagada (L-24 do projeto): dizia "mesmo valor que já sai da mana do ator"**,
+descrevendo bateria e "mana do ator" como dois medidores debitados em paralelo — isso é passado, não
+histórico a guardar, porque mana e carga de bateria são o mesmo recurso e só existe UM lugar de onde
+a carga sai. (`cartas-numeros` §1a, AMB-02 já resolvida: "recurso Y" = `ManaCost`, não um
+multiplicador extra.) Regra de Híbridas (Faraday/Maxwell/Newton/von Neumann/John Dee,
+`cartas-technomagik.md` §2.3): a face **passiva** (`ManaCost=0`, sempre ligada) nunca drena; só a
+face **ativa**, quando de fato disparada (`OnCast` do lado castável), drena as ~6 unidades.
 
 ```
 on_card_selected_for_play(card_instance, ap_cost, mana_cost):
@@ -115,8 +126,16 @@ on_card_selected_for_play(card_instance, ap_cost, mana_cost):
         # gate de pré-condição — a carta NUNCA aparece selecionável
         ui.mark_inert(card_instance)          # mesma UX do botão Null-sem-Scan
         return REJECTED                        # não consome AP nem entra no log de combate
-    # ... segue pros demais gates existentes (AP, mana do ator, alvo)
+    # ... segue pros demais gates existentes (AP, vazão do turno do ator, alvo) --
+    # vazão do turno e carga da bateria NÃO são dois débitos: é o mesmo estoque
+    # (combat.md §5), e o gate de vazão só limita QUANTO pode ser sacado neste turno.
 ```
+
+⚠️ **Sinalizado, não resolvido aqui:** se `card_instance.battery` acima é a bateria PRÓPRIA daquela
+carta (o modelo já descrito em §2 deste doc, "bateria como item separado", instalada por carta) ou a
+bateria ATIVA que o jogador seleciona dentre várias que carrega
+(`cartas-hardware-pirataria-energia.md` §5, "Múltiplas baterias e a barra da tela") — os dois modelos
+convivem no corpus hoje e este documento não escolhe entre eles.
 
 `REJECTED` aqui **não é** um "ERRO DE COMPILAÇÃO" em runtime (não é uma tentativa que falhou) — é a carta simplesmente não aparecer disponível, igual uma carta cujo `ManaCost` do ator já não cobre. Mantém a UX consistente com `combat.md` §10 (a UI nunca deixa o jogador tentar uma ação impossível de ver na tela; só as pré-condições *dinâmicas* como mana do ator entram no fluxo de erro visível).
 
