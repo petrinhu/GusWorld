@@ -10,9 +10,8 @@ Os ADRs do `gusworld_legacy`, trazidos verbatim. O código que eles descrevem n�
 lição — e não a stack morta em que cada um foi escrito.
 
 - `ADR-001` — pausa do deep-lore como gating de engenharia. Morto: a instalação da engine antiga
-  que o ADR desbloqueava. Não trazido como princípio à parte: "lore não bloqueia código, puxe
-  sob demanda" é cadência de projeto, não decisão técnica; fica registrado aqui, decisão de trazer
-  para outro lugar é do líder.
+  que o ADR desbloqueava. O princípio "lore não bloqueia código, puxe sob demanda" foi trazido
+  para outro lugar em 01/09/2026, por decisão do líder: é a `L-36` de `../../../GODS_LAWS.md`.
 - `ADR-004` — contrato do `EnvironmentModifier` (ambientes de combate: terreno×clima×período,
   `multAmbiente`). A implementação antiga morreu; o conteúdo de fórmula já vive, atualizado, em
   `docs/design/mecanicas/combat.md` — redundante, não contraditório. Ver achado em `../_INDEX.md`.

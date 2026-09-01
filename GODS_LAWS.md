@@ -53,6 +53,8 @@
 | [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
 | [L-33](#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
 | [L-34](#l-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato, interrompe onda |
+| [L-35](#l-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, resultado é "não executado" |
+| [L-36](#l-36) | decidir se lore ainda não escrita atrasa uma fatia de engenharia, ou sentir a tentação de esperar completar canon antes de codar | Lore que falta não bloqueia código, puxa-se sob demanda em micro-sessão pontual; distinta da L-13, que trava por canon que contradiz, não por canon que ainda falta |
 
 
 ---
@@ -744,3 +746,18 @@ Lei qualitativa sem lugar no processo é lei que ninguém aplica. Três amarras,
 **Isto sobrepõe a prática anterior desta máquina** (compositor Wayland aninhado, `kwin_wayland` ou `Xvfb`), que valia como observação e agora vale como **piso dentro do container**, nunca como alternativa a ele.
 
 **Alcance:** vale desde já, embora o GusWorld ainda não tenha código nem suíte — a camada `present/` nasce bloqueada pelo GlintFx (L-06, L-27), e quando nascer já encontra esta lei escrita, em vez de a lei chegar depois do primeiro estrago.
+
+## L-36
+
+**Data:** 01/09/2026, decisão do líder por `AskUserQuestion`. **Formulação de origem, `docs/tech/adr/_INDEX.md`, sobre o `ADR-001`:** *"pausa do deep-lore como gating de engenharia. [...] Não trazido como princípio à parte: 'lore não bloqueia código, puxe sob demanda' é cadência de projeto, não decisão técnica; fica registrado aqui, decisão de trazer para outro lugar é do líder."* Ele decidiu trazer, elevando a cadência a lei.
+
+**Lore que ainda não foi escrita não bloqueia código.** Deep-lore, texto de sabor, prosa narrativa e qualquer detalhe canônico ainda pendente de escrita não são pré-requisito para começar ou continuar um sistema de engenharia. A cadência de lore é livre e orgânica, sem meta de palavras por fatia ou por onda: escreve-se quando há energia criativa para isso, e o código anda independente disso.
+
+**Quando o código esbarra de verdade num detalhe que falta:** a resposta é uma micro-sessão de lore pontual (o tamanho de uma ficha, um nome, um comportamento específico), nunca um ciclo completo de deep-lore. O princípio é lore sob demanda para desbloquear código, nunca código em espera para completar lore.
+
+**A fronteira com a L-13, escrita para nenhum agente travar sem saber qual das duas obedecer:**
+
+- A **L-13** trava quando o corpus **afirma algo que contradiz** uma decisão vigente. Ela existe para não se implementar sobre canon que se sabe errado. O bloqueio dela é sobre **contradição**.
+- A **L-36** libera quando o corpus **ainda não escreveu** um detalhe. Não há contradição nenhuma ali, só ausência. Lore que falta não é canon errado, é canon **não escrito ainda**.
+
+**As duas nunca competem pelo mesmo caso:** canon que existe e contradiz o que se vai implementar bloqueia, pela L-13; canon que simplesmente ainda não existe não bloqueia, puxa-se sob demanda, pela L-36. Diante de dúvida sobre qual das duas se aplica, a pergunta é sempre a mesma: **o corpus diz algo errado, ou o corpus ainda não diz nada?** Errado é L-13. Nada ainda é L-36.
