@@ -150,9 +150,26 @@ anteriores deste documento.
 ### `prospero_vance/`
 
 `find resources/sprites/prospero_vance -type f | wc -l` → **0**. A pasta **existe e
-está vazia** (`ls -la` mostra só `.` e `..`). Ausente de `CHARS.md`
-(`/usr/bin/grep -i prospero_vance CHARS.md` → zero linhas). Está sob investigação
-separada — origem não apurada aqui.
+está vazia** (`ls -la` mostra só `.` e `..`). O personagem é **canônico**:
+`CHARS.md` linha 179 o registra como "Comerciante-Itinerante Próspero Vance"
+("Próspero"), **ancestral direto da família Vance** (Belinor → ... → Pyotor →
+Gargi → Gus), histórico da Era 1 (💀) — morto há muito tempo, não é NPC que anda
+pelo mundo, o que por si só explica a ausência de sprite de caminhada. O nome
+aparece em **14 arquivos** do corpus rastreado, com **43 menções** só em
+`docs/narrative/deep/eras/era-1-pre-codigo.md` §7.7
+(`git ls-files -z | xargs -0 /usr/bin/grep -c "Pr[óo]spero"`), e `CHARS.md` linha
+226 descreve ainda a linhagem institucional inteira derivada dele (11 títulos da
+Casa Comercial Vance, transmitidos ao longo de ~720 anos, cada portador com
+numeral romano e cognome).
+
+O prompt de imagem dele já existe
+(`resources/prompts_images/feitos/PROSPERO_VANCE_IMAGEPROMPT.md`), e ele é um dos
+**87 prompts de `resources/prompts_images/feitos/` (168 arquivos
+`*IMAGEPROMPT.md` no total) sem sprite de personagem gerado** — não é caso
+isolado. Medido agora, slug a slug, comparando cada prompt à árvore
+`resources/sprites/`: 86 desses 87 não têm pasta nenhuma em `resources/sprites/`;
+`prospero_vance` é o único com pasta já criada, e vazia. Essa é a peculiaridade
+real, registrada aqui como fato — sem conclusão sobre a causa.
 
 ### `seu_bertoldo_caim/`
 
@@ -357,8 +374,10 @@ MEDIDA, "Estrutura de topo"): 7 aguardando geração (só `_concept_front.png`),
   `gus/gus_conceito.png` 1844×2304 — HD, NÃO é sprite de jogo).
 - `world/` — cenário dos Distritos Inferiores.
 - `models_frente/` — 9 arquivos, papel ainda não documentado (ver acima).
-- `prospero_vance/` — pasta vazia, órfã, ausente de `CHARS.md`. **Sob investigação
-  separada**; existência registrada aqui, origem não decidida.
+- `prospero_vance/` — pasta vazia. Personagem canônico (`CHARS.md` linha 179,
+  ancestral direto da família Vance, histórico da Era 1 — ver `### prospero_vance/`
+  acima). Único, entre os 87 prompts de `resources/prompts_images/feitos/` ainda
+  sem sprite gerado, com pasta já criada.
 
 ## Como gerar o que falta (PixelLab, pipeline canônica)
 
