@@ -131,11 +131,13 @@ on_card_selected_for_play(card_instance, ap_cost, mana_cost):
     # (combat.md §5), e o gate de vazão só limita QUANTO pode ser sacado neste turno.
 ```
 
-⚠️ **Sinalizado, não resolvido aqui:** se `card_instance.battery` acima é a bateria PRÓPRIA daquela
-carta (o modelo já descrito em §2 deste doc, "bateria como item separado", instalada por carta) ou a
-bateria ATIVA que o jogador seleciona dentre várias que carrega
-(`cartas-hardware-pirataria-energia.md` §5, "Múltiplas baterias e a barra da tela") — os dois modelos
-convivem no corpus hoje e este documento não escolhe entre eles.
+✅ **Respondido pelo líder, 31/08/2026 (`cartas-hardware-pirataria-energia.md` §5, "Estoque e
+vazão"):** `card_instance.battery` acima é, de fato, a bateria PRÓPRIA daquela carta — o modelo que
+este §2 já descrevia ("bateria como item separado", instalada por carta) estava certo. A bateria
+ATIVA que a barra da tela mostra é a bateria da carta ativa (a que o ator está prestes a usar), não
+um cinto comum de onde qualquer carta puxa; "selecionar outra bateria" significa escolher outra carta
+como ativa, ou encaixar uma bateria avulsa do inventário numa carta descarregada — nunca compartilhar
+uma bateria entre cartas.
 
 `REJECTED` aqui **não é** um "ERRO DE COMPILAÇÃO" em runtime (não é uma tentativa que falhou) — é a carta simplesmente não aparecer disponível, igual uma carta cujo `ManaCost` do ator já não cobre. Mantém a UX consistente com `combat.md` §10 (a UI nunca deixa o jogador tentar uma ação impossível de ver na tela; só as pré-condições *dinâmicas* como mana do ator entram no fluxo de erro visível).
 

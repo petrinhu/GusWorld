@@ -230,6 +230,36 @@ máxima; o modelo agora tem as duas.
   sozinha, a degradação era mais abstrata. A curva de degradação em si **não é inventada aqui** —
   segue no `economy-designer`.
 
+### Cada carta gasta a própria bateria: o fecho do sistema (decisão do líder, 31/08/2026)
+
+**O líder respondeu a última ambiguidade do sistema — a que ficava marcada em `combat.md` §5 e
+`cartas-spec-logica.md` §3.1: cada carta gasta a PRÓPRIA bateria; as avulsas do inventário são
+reserva de troca.**
+
+1. **A carta consome a bateria dela.** O modelo por-exemplar que `cartas-spec-dados.md` já descreve
+   (carga, degradação e integridade por exemplar, não por catálogo) **continua valendo, sem mudança
+   nenhuma.** Duas cópias da mesma carta seguem podendo ter cargas diferentes.
+2. **Bateria avulsa é peça de troca.** O item de inventário que `cartas-spec-dados.md` linha 29 já
+   registra (bateria comprável, "a pirata mente sobre a carga") é o que o jogador **encaixa numa
+   carta descarregada** para voltar a usá-la. Não é um pool do qual as cartas puxam.
+3. **A barra mostra a bateria da carta ATIVA**, e a mais cheia é o padrão quando o jogador não
+   escolheu outra. "Selecionar outra bateria", na frase do líder que abriu esta seção ("Múltiplas
+   baterias e a barra da tela"), é **escolher outra carta como ativa** — não escolher de um cinto
+   comum.
+4. **O Volta funciona sem regra nova:** ele esvazia a própria bateria por inteiro; o jogador encaixa
+   uma reserva e usa de novo. Era exatamente o que a frase dele ("se tiver outra bateria, pode usar
+   novamente") descrevia (`docs/design/mecanicas/cartas/volta.md`).
+
+**A alternativa do cinto comum foi considerada e DESCARTADA pelo líder** — registrado aqui para a
+hipótese não voltar: um pool de baterias compartilhado por todas as cartas do ator apagaria a
+diferença entre duas cópias da mesma carta (uma pode estar com bateria pirata degradada, outra com
+original cheia) e enfraqueceria o sistema de pirataria inteiro (§1-§3, §15), que depende da bateria
+ser propriedade física de UMA carta específica.
+
+**Isto fecha, sem ambiguidade restante, a pergunta `card_instance.battery`** que `G26`/`G27`
+(`TODO.md`) vinham marcando: é a bateria própria da carta. Refletido em `combat.md` §5 e
+`cartas-spec-logica.md` §3.1.
+
 ### Troca e recarga
 - **Cidade:** grátis — abrir inventário, pôr carregada no lugar da usada.
 - **Estação de recarga:** te dá uma bateria **NOVA carregada** e cobra pela tua velha; o preço (**1,2x–2x** o de uma recarga) varia com a **degradação** da que você entrega.
