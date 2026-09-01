@@ -3,7 +3,7 @@
 > **APROVADO pelo líder, uma a uma, 2026-07-17. CANON.**
 > Qualquer mudança futura exige nova autorização explícita dele (regra: tudo que define o Gus original passa por ele). Não misturar com o conteúdo já aprovado de `comic-reliefs.md`.
 
-**Momento:** party andando pelo mapa, fora de combate, sem inimigo à vista. O Gus, entediado, solta "do nada". Só acontece **entre amigos** (com estranhos ele fica quieto, [[project_gus_voz_personalidade]]); **exceção: em combate ele solta mesmo com inimigo presente** (é o "Dragon", a face de líder). Detalhe completo em "Regras de disparo" abaixo.
+**Momento:** party andando pelo mapa, fora de combate, sem inimigo à vista. O Gus, entediado, solta "do nada". Só acontece **entre amigos** (com estranhos ele fica quieto, `vozes-party.md` §GUS); **exceção: em combate ele solta mesmo com inimigo presente** (é o "Dragon", a face de líder). Detalhe completo em "Regras de disparo" abaixo.
 
 **Molde:** "Você sabia que [característica real do C-Arcane], por isso obviamente é melhor que [outra linguagem]?" A forma varia, o espírito não.
 

@@ -18,7 +18,7 @@
 
 ## 1. A LEI que decide quem ganha cada piada
 
-**Compilado = rápido = MELHOR. Interpretado = lento = RUIM. O eixo nunca inverte**, nem por equilíbrio, nem por simpatia. É definição do Gus original ([[project_gus_eixo_compilado_interpretado]]), mais pétrea que os pillars.
+**Compilado = rápido = MELHOR. Interpretado = lento = RUIM. O eixo nunca inverte**, nem por equilíbrio, nem por simpatia. É definição do Gus original (`farpas-linguagens.md`), mais pétrea que os pillars.
 
 Consequência: **Pythia (Cauã, Jaci) perde no eixo da execução, sempre.** C-Arcane, Óxido e Asmódico são todos do lado compilado, e entre eles não há conflito de eixo. A única saída rápida honesta da Pythia é **compilar de verdade** (`@jit` do Numba/PyPy, ou builtin do CPython escrito em C): aí ela é rápida **porque compilou**, o que prova a lei em vez de furá-la. Hook proibido: REPL one-liner, que continua interpretado e seria mentira técnica.
 
