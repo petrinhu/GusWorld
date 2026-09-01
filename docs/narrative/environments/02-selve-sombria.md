@@ -113,6 +113,17 @@ A câmera entra por uma trilha normal. Há vento. Há canto de coruja distante. 
 - [[jaci-proxy]]: Jaci atravessa daqui pra setting 08 (Selve Profunda) regularmente; Selve acessível é parte de sua identidade narrativa.
 - [[bento-requiem]]: Trilha dos Pioneiros é caminho canônico do arco Bento pra Catedral Menor de Atelaiá e expedição catedral perdida.
 
+## 11. Pântano da Atelaiá (sub-local canonizado, decisão do líder 31/08/2026)
+
+- **Forma:** sub-local aberto, região atravessável com encontros, dentro deste setting. **NÃO é dungeon.** Distinto da dungeon nº9 (tipo mista, flora matemática e fauna-bug, casa da Jaci) já existente na Selve Sombria, que segue intacta e é outra coisa. Também distinto do **Pântano de Markov** (landmark 3, §2 acima): regiões diferentes, temas diferentes (Markov: cadeias estocásticas e bosses-vírus probabilísticos; este sub-local: zumbis).
+- **Localização:** em volta da **Atelaiá**, a catedral menor cuja subroutine era irrigação (`PLACES.md`).
+- **Cadeia causal (fato canônico):** Sterling saqueou a Atelaiá em **-3** (`PLACES.md`). O saque quebrou a subroutine de irrigação. A água nunca mais parou. O terreno afogou. O ciclo de decomposição que alimenta o crescimento da Selve travou no mesmo loop. O pântano é a cicatriz do crime de Sterling, com causa, data e culpado já canônicos.
+- **Catedral-Mãe descartada como local:** a Catedral-Mãe (Selve profunda, lacrada por dentro desde -750, status lendário) foi considerada como localização deste pântano e descartada: é outra região, sem relação com este sub-local.
+- **Enquadramento dos zumbis (Pillar 2, já canônico, não revisado por esta entrada):** não são morto-vivo sobrenatural, são a manifestação de um processo corrompido (rotina de decomposição-reanimação presa em loop infecto, um coletor de lixo que falhou e reanima o que devia liberar). Ver `docs/design/pillars.md` Pillar 2 e `docs/design/brainstorm-backlog.md` §11.
+- **Combate (decisão do líder 31/08/2026):** dano normal derruba os zumbis, mas eles levantam de novo, o loop reinicia. Só ficam caídos ao receber um efeito que quebra o loop. A carta do Gödel ("Sentença Indecidível", 1×/batalha, ignora a próxima imunidade/resistência/bloqueio) é o trunfo pontual para um caso difícil, não a regra geral. **O efeito de interrupção que encerra o loop ainda não existe:** ver `TODO.md` item `G28`.
+- **Loot:** cada zumbi carrega algo que a rotina travada deveria ter devolvido ao mundo e ficou preso nele, a metáfora do coletor que vaza memória funcionando. **A lista concreta ainda não foi decidida:** ver `TODO.md` item `G29`.
+- **Nome próprio:** pendente de decisão do líder, ver `TODO.md` item `G30`.
+
 ---
 
-**Última revisão:** 2026-05-15. Canônico (Bloco F). Atualizações exigem aprovação do criador supremo.
+**Última revisão:** 2026-05-15. Canônico (Bloco F). Atualizações exigem aprovação do criador supremo. **Exceção pontual:** §11 acrescentado em 31/08/2026 por autorização expressa do líder para este sub-local específico.
