@@ -139,7 +139,7 @@ um cinto comum de onde qualquer carta puxa; "selecionar outra bateria" significa
 como ativa, ou encaixar uma bateria avulsa do inventário numa carta descarregada — nunca compartilhar
 uma bateria entre cartas.
 
-`REJECTED` aqui **não é** um "ERRO DE COMPILAÇÃO" em runtime (não é uma tentativa que falhou) — é a carta simplesmente não aparecer disponível, igual uma carta cujo `ManaCost` do ator já não cobre. Mantém a UX consistente com `combat.md` §10 (a UI nunca deixa o jogador tentar uma ação impossível de ver na tela; só as pré-condições *dinâmicas* como mana do ator entram no fluxo de erro visível).
+`REJECTED` aqui **não é** um "ERRO DE COMPILAÇÃO" em runtime (não é uma tentativa que falhou) — é a carta simplesmente não aparecer disponível, igual uma carta cuja bateria não tem carga suficiente, ou cujo custo excede a vazão do turno (decisão do líder, 31/08/2026, `cartas-hardware-pirataria-energia.md` §5: mana é a carga da bateria, não um recurso à parte do ator). Mantém a UX consistente com `combat.md` §10 (a UI nunca deixa o jogador tentar uma ação impossível de ver na tela; só as pré-condições *dinâmicas* como carga da bateria e vazão do turno entram no fluxo de erro visível).
 
 ### 3.2 Estados da bateria (state machine)
 

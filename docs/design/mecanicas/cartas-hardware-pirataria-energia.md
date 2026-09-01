@@ -228,7 +228,15 @@ coisa como aberta:
   `SwapBattery`, custando **2 AP fixo, sem escalar por dificuldade** (`cartas-spec-logica.md` §3.3-3.4,
   `cartas-numeros-proposta.md` §1c). A bateria velha `DEPLETED` retirada vai para o inventário como
   item — não desaparece (ver "Descarte", abaixo). A carta do Volta já dependia exatamente disso
-  (`docs/design/mecanicas/cartas/volta.md`).
+  (`docs/design/mecanicas/cartas/volta.md`). **Precedente do líder no mesmo padrão** (`TODO.md` item
+  `F1`, decisão de 24/08/2026): a carta `glitch` não recebe exceção — "bateria em batalha: consome,
+  sem exceção", porque "TODAS as cartas passam por originalidade E degradação da bateria; exceção
+  nunca por omissão" (decisão do líder, 08/08/2026). Fora de combate, a mesma carta já fixa o que
+  acontece quando a carga acaba no meio de um uso (dentro da parede: o personagem é cuspido de volta
+  pelo lado por onde entrou, com preço em dano) — precedente de forma, não de conteúdo, para o caso
+  de combate. **O que continua genuinamente aberto, e só isto:** se ficar sem carga da bateria ativa
+  no meio do combate tem alguma consequência ALÉM de não poder jogar a carta até trocar — o canon não
+  cobre isso.
 - **(b) A degradação da bateria ganha efeito mecânico direto, e a curva JÁ TEM NÚMERO.** Cada recarga
   tira **13 pontos percentuais de SoH** (começa em 100%); abaixo de **21% SoH** a bateria é
   considerada morta, só serve pra vender/reciclar no ferro-velho — dando **~6 recargas de vida útil**
