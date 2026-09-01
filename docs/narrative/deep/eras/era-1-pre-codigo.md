@@ -2812,7 +2812,7 @@ Lembro o dia em cada detalhe. O Mestre-Hierofante leu a carta em voz baixa de ba
 
 Hipocrates havia articulado em ata da Vigília anual o pedido formal de me aceitar como aprendiz direta. O pedido cobriu aproximadamente duas horas em três fases: apresentação da candidata; apresentação da linhagem feminina em sete gerações; apresentação do compromisso de exercício cumulativo em mais de vinte e um anos.
 
-A linhagem feminina de minha mãe articulava-se em sete gerações: Atelaiá Chevalier (geração inaugural, -115); Castália Argéndia-Chevalier-Boroshova (-90); Decília Boroshova-Calígrafa (-50); Penélope Argéndia-Acaceiro o Sapiente (-25); Mariana Boroshova-Argéndia o Paciente (-10); Sibila Atelaiá-Boroshova (em horizonte de meu nascimento); Verônica Atelaiá (em minha trigésima estação).
+A linhagem feminina de minha mãe articulava-se em sete gerações: Atelaiá Chevalier (geração inaugural, -115); Castália Argéndia-Chevalier-Boroshova (-90); Decília Boroshova-Calígrafa (-50); Penélope Argéndia-Acaceiro o Sapiente (-25); Mariana Boroshova-Argéndia o Paciente (-10); Sibila Atelaiá-Boroshova (em horizonte de meu nascimento); eu (em minha trigésima estação).
 
 > **Nota de canon (01/09/2026):** esta é a descendência de sangue da narradora, objeto distinto da linhagem matrilinear canônica de seis gerações registrada em `CHARS.md` (bloco "Linhagem matrilinear cronistas Atelaiá") e distinto também da cadeia institucional do ofício registrada acima, neste mesmo capítulo. As três não precisam bater nome a nome, porque descrevem coisas diferentes.
 
@@ -3090,7 +3090,7 @@ A convergência matrimonial em -120 cristalizou-se cinco anos depois na fundaç�
 
 Cada linhagem trouxe seu eixo. A Argéndia, ofício prático-operacional: **infraestrutura material descentralizada**. A Chevalier, ofício teórico-paleográfico: **decomposição radicalógica institucional**. A convergência articulou a continuidade cumulativa em par cooperativo.
 
-A linhagem feminina seguinte cobriu sete gerações em descendência ininterrupta: Atelaiá Chevalier (-115); Castália Argéndia-Chevalier-Boroshova (-90); Decília Boroshova-Calígrafa (-50, documentada em §8.1); Penélope Argéndia-Acaceiro o Sapiente (-25); Mariana Boroshova-Argéndia o Paciente (-10); Sibila Atelaiá-Boroshova (em horizonte de minha aprendizagem); Verônica Atelaiá (em minha trigésima estação canônica).
+A linhagem feminina seguinte cobriu sete gerações em descendência ininterrupta: Atelaiá Chevalier (-115); Castália Argéndia-Chevalier-Boroshova (-90); Decília Boroshova-Calígrafa (-50, documentada em §8.1); Penélope Argéndia-Acaceiro o Sapiente (-25); Mariana Boroshova-Argéndia o Paciente (-10); Sibila Atelaiá-Boroshova (em horizonte de minha aprendizagem); eu (em minha trigésima estação canônica).
 
 Sete gerações; sete cronistas; uma continuidade. **Continuidade institucional cumulativa preservada em descendência feminina cronística.**
 
