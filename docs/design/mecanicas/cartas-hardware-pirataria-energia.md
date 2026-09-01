@@ -96,6 +96,42 @@ O mesmo raciocínio vale, com um grau a mais de dificuldade, para a **SUPER**: e
 - **Degradação:** a bateria degrada com uso e ciclos de carga.
 - **Especiais:** bateria **selada / de maior capacidade** — mais confiável (condiz com "especiais protegidas"), mas ainda exige cuidado no endgame (amarra com o clímax sem-save/PEM).
 
+### Mana e bateria são o mesmo recurso (decisão do líder, 31/08/2026)
+
+> **Decisão do líder, por `AskUserQuestion`, verbatim:** *"como magia é tecnologia, então mana e carga
+> de bateria se confundem e são a mesma coisa. Pode ser citado mana ou bateria... O jogador no início
+> vai se confundir, mas é proposital e depois vai passar a entender quando alguém disser por exemplo
+> que a bateria está com pouco mana."*
+
+**Mana e carga de bateria são o MESMO recurso, com dois nomes — não dois custos, não dois medidores,
+não duas economias.** A origem não é conveniência de sistema, é consequência direta do **Pillar 2**
+(`pillars.md`): *"magia é sistema formal computável"* — se magia é tecnologia, o combustível dela É a
+carga elétrica, e "mana" é só o nome que a tradição mágica dá ao que o hardware chama de "carga de
+bateria". As duas palavras descrevem a mesma substância, nunca dois recursos separados.
+
+**Os dois termos são intercambiáveis no texto do jogo.** Uma carta pode dizer "mana", um personagem
+pode dizer "bateria", e as duas falas descrevem a mesma coisa. Nenhuma delas é a forma "certa" e a
+outra a forma "de brincadeira" — são sinônimos canônicos.
+
+**A confusão inicial do jogador é DELIBERADA, não descuido de tutorial.** Ela nasce sem explicação e
+se desfaz por **fala de personagem** — o exemplo do próprio líder é alguém dizer *"a bateria está com
+pouco mana"* — nunca por tela de tutorial, pop-up ou texto explicativo. **Registrado aqui como
+intenção de desenho para que ninguém "conserte" essa ambiguidade depois achando que foi erro:** ela é
+o efeito pretendido, ecoando o onboarding orgânico já canônico (Pillar 1, anti-mecânica "tutorial
+wall-of-text"; corte `C-16`). Fala que ensina a equivalência ainda não foi escrita — é trabalho de
+`ux-writer`/`narrative-writer`, fora do escopo desta fatia; fica registrada aqui como necessidade
+pendente, não como texto pronto.
+
+**Relação com o que já está especificado, sem alterar nada disso:** `cartas-spec-logica.md` §3 (linha
+110) já liga os dois numericamente 1:1 — `BateriaCarta.charge -= ManaCost_da_ação`, o mesmo valor que
+sai da mana do ator, "sem eixo novo". A decisão de hoje confirma que esse acoplamento não é
+coincidência de número: é identidade de substância. **Ambiguidade sinalizada, não decidida aqui:** o
+combate mantém dois medidores distintos com essa mesma régua — o pool de mana do ator (`combat.md`
+§5, `manaMax = 2 + turnos`, reseta por regra própria) e a bateria física da carta (persiste entre
+batalhas, degrada, exige recarga real). A decisão do líder não diz se ela também funde esses dois
+medidores numa métrica única, ou se cada um continua com seu rastreamento próprio enquanto nome e
+fala tratam as duas palavras como sinônimos. Isto não foi perguntado nem decidido nesta fatia.
+
 ### Troca e recarga
 - **Cidade:** grátis — abrir inventário, pôr carregada no lugar da usada.
 - **Estação de recarga:** te dá uma bateria **NOVA carregada** e cobra pela tua velha; o preço (**1,2x–2x** o de uma recarga) varia com a **degradação** da que você entrega.
