@@ -2,9 +2,9 @@
 
 > **Status:** PROPOSTA (brainstorm interativo do criador, 2026-07-13/14). Design; implementação é feat seguinte (consome o `.gmap`/tile_map do domínio de mapa). **O criador pediu VÁRIOS brainstorms de detalhe** para os pontos abaixo; este doc CAPTURA as decisões e marca o que falta.
 >
-> **Filtro de produção (dev solo, [[feedback_solo_baixa_infra_escopo]]):** faseável se o escopo apertar.
+> **Filtro de produção (dev solo, ver `gus-abertura.md` §filtro de produção):** faseável se o escopo apertar.
 >
-> **Âncora canônica:** o mapa real é o `.gmap` selado (`reference_formato_mapa_gmap`); o mini-mapa é uma REPRODUÇÃO em escala menor do mesmo tilemap. Cross-ref topologia (`mundo-topologia.md`), gdd §7.1 (sem gate-hard), sistema de dificuldade ([[project_morte_dificuldade_canon]]), Pillar 2 (magia = software, anomalia = bug), Pillar 3 (loop de hardware: óculos/matriz/Tavus-Drive), save por PEM/Faraday ([[project_save_dungeon_pem_faraday]]).
+> **Âncora canônica:** o mapa real é o `.gmap` selado (`reference_formato_mapa_gmap`); o mini-mapa é uma REPRODUÇÃO em escala menor do mesmo tilemap. Cross-ref topologia (`mundo-topologia.md`), gdd §7.1 (sem gate-hard), sistema de dificuldade (`modos-morte.md`), Pillar 2 (magia = software, anomalia = bug), Pillar 3 (loop de hardware: óculos/matriz/Tavus-Drive), save por PEM/Faraday (`save-por-local.md`).
 
 ## 0. Princípio central: o mini-mapa é DIEGÉTICO e CONQUISTADO (decisão do criador 2026-07-14)
 
@@ -35,7 +35,7 @@
 
 ### 0.1. "Não existem tesouros; existem REPOSITÓRIOS PERDIDOS" (insight canônico, expandido 2026-07-14)
 
-Baús/tesouros clássicos não existem. Detalhamento canônico ([[project_repositorios_perdidos_canon]]):
+Baús/tesouros clássicos não existem. Detalhamento canônico (nesta seção, §0.1):
 - **TODAS as dungeons SÃO repositórios perdidos / corrompidos** (as 13 de `mundo-topologia.md`).
 - **O loot nunca é dinheiro/joia.** É **peça de hardware**, **código compilável** (mais barato) ou **algoritmo** (mais caro), **gravado no SSD da party** até ser **vendido** (vira Crédito) ou **usado**.
 - **Dois pools distintos de drop (decisão do criador 2026-07-14, achado PS-R3):** não confundir os dois sistemas canônicos:
@@ -93,7 +93,7 @@ Depois de compilar o repositório (missão 2), aparecem no mapa:
 
 ## 6. PEM / Faraday (decisão do criador)
 
-O **efeito PEM das dungeons** (que já bloqueia save, [[project_save_dungeon_pem_faraday]]) **TAMBÉM desativa o mini-mapa / VRAM / skill de marcadores** (a GPU do implante apanha do pulso). A **carta Faraday (EM-Shield)** evita esse efeito ruim — reforça o valor da carta (não protege só o save, protege o mini-mapa também). Cross-ref `_EFEITOS-ESCOLHIDOS.md` (Faraday).
+O **efeito PEM das dungeons** (que já bloqueia save, `save-por-local.md`) **TAMBÉM desativa o mini-mapa / VRAM / skill de marcadores** (a GPU do implante apanha do pulso). A **carta Faraday (EM-Shield)** evita esse efeito ruim — reforça o valor da carta (não protege só o save, protege o mini-mapa também). Cross-ref `_EFEITOS-ESCOLHIDOS.md` (Faraday).
 
 ## 7. Economia (handoff economy-designer)
 
@@ -110,7 +110,7 @@ O **efeito PEM das dungeons** (que já bloqueia save, [[project_save_dungeon_pem
 - **Config:** mini-mapa on/off, o que os marcadores mostram, nível de zoom preferido.
 - **Estado:** modo de dificuldade; assinatura Hard dos marcadores (ligada/desligada + saldo gasto).
 
-**Fundação robusta que já existe (herdada, não reinventar):** envelope **AEAD** (cifra+autentica, primitiva vinda do GlintFx — L-25; [[reference_save_crypto_v2]]); `save_version` versionado com **migrators** desde o D1 (campo novo = bump + migrator); **recuperação por backup** + aviso de save danificado/versão-incompatível (commit `db9a185`); **fail-secure** (save duvidoso nunca carrega silenciosamente). Feat do `backend-engineer`: estender o schema do save-domain com estes campos (bump de `save_version` + migrator + teste de roundtrip/tamper).
+**Fundação robusta que já existe (herdada, não reinventar):** envelope **AEAD** (cifra+autentica, primitiva vinda do GlintFx — `GODS_LAWS.md` L-25); `save_version` versionado com **migrators** desde o D1 (campo novo = bump + migrator); **recuperação por backup** + aviso de save danificado/versão-incompatível (commit `db9a185`); **fail-secure** (save duvidoso nunca carrega silenciosamente). Feat do `backend-engineer`: estender o schema do save-domain com estes campos (bump de `save_version` + migrator + teste de roundtrip/tamper).
 
 ## 8. Fios abertos — VÁRIOS brainstorms pedidos pelo criador
 

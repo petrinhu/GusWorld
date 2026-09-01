@@ -231,5 +231,5 @@ Resolvidos em 2026-07-12: mapeamento dos 20 interiores (§6, temático por campo
 Restam:
 
 1. **Layout FINO de cada dungeon** (level design sala-a-sala) — fase de PRODUÇÃO, com o `level-designer` + a engine de mapa. NÃO fazer antes da engine (retrabalho).
-2. **`ENGINE-MAPA-ONDA`** — onda de implementação do loader/compilador `.gmap` ([[reference_formato_mapa_gmap]]), pré-req de tudo isto virar jogável.
+2. **`ENGINE-MAPA-ONDA`** — onda de implementação do loader/compilador de mapa (`convencao-formatos-gw.md`), pré-req de tudo isto virar jogável.
 3. Detalhe: qual carta/item-chave cada lugar secreto e a área faraday guardam (liga a `cartas-technomagik.md` + FARADAY-DUNGEON-ITENS). **O princípio e os tipos de chave já estão fechados em §9 (seed #7); resta só o CONTEÚDO específico por lugar, fase de produção.**

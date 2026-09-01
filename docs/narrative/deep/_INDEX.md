@@ -198,7 +198,9 @@ user fecha decisões macro da rodada
 - [[../characters/_INDEX]] (se houver) ou docs/narrative/characters/: 13 docs canon no disco
 - [[../environments/_INDEX]]: Bloco F 9 docs
 - [[../diary/_INDEX]]: Bloco H 8 docs
-- Memórias: [[../../../../memory/project_pillars_canonicos]] [[../../../../memory/project_personagens]] [[../../../../memory/feedback_nomes_personagens_canonicos]] [[../../../../memory/project_terminologia]] [[../../../../memory/project_i18n_canonico]]
+- [[../CHARS]]: inventário de personagens + cabeçalho de imutabilidade dos nomes
+- [[../BIBLE-V1-GLOSSARIO]]: terminologia (arquivo cifrado por git-crypt em `docs/book/`, caminho apontado, conteúdo não citado)
+- [[../contrato-i18n]]: i18n canônico
 
 ---
 

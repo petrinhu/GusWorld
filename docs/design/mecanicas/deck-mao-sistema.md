@@ -2,7 +2,7 @@
 
 **Status:** ARQUITETURA FECHADA no brainstorm colaborativo com o criador (2026-07-16). Números exatos (tamanhos, taxas, preços) = `//PLAYTEST`. Catálogo das comuns + tela de montagem = frentes próprias (ver §9). Substitui a versão de definições-base de 2026-07-15.
 
-Cross-ref: [[project_sistema_cartas_technomagik]], [[project_repositorios_perdidos_canon]] (loot), [[project_economia_canon]] (crédito), [[reference_techmagic_engine_impl]] (motor de efeitos), [[reference_save_crypto_v2]] (save assinado = base anti-tamper), `docs/design/mecanicas/cartas-technomagik.md`, `docs/design/mecanicas/capacitor-item.md`.
+Cross-ref: `docs/design/mecanicas/mini-mapa.md` §0.1 (loot), `docs/design/mecanicas/economia.md` (crédito), `docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md` (motor de efeitos), `GODS_LAWS.md` L-25 (save assinado = base anti-tamper), `docs/design/mecanicas/cartas-technomagik.md`, `docs/design/mecanicas/capacitor-item.md`.
 
 O efeito de cada carta é ortogonal a este sistema: o motor techMagic (ADR-016) já executa os efeitos; este doc é o **meta-layer** de QUAIS cartas você traz e usa.
 
@@ -11,7 +11,7 @@ O efeito de cada carta é ortogonal a este sistema: o motor techMagic (ADR-016) 
 ## 1. Duas classes de carta (decisão do criador)
 
 - **Cartas COMUNS — para TODOS os personagens.** São **já compiladas** (equivalem a *apps prontos que qualquer um usa*). Cada personagem (Gus + os 6 companions) tem seu próprio conjunto.
-- **Cartas ESPECIAIS — SÓ do Gus.** As **históricas (20 mestres do Codex)** + a de **Helon Tusk**. São cartas **"para compilar"**, e **compilar só o Gus faz** (canon: Gus = compilador universal, [[project_nome_gus_canon]]). O motor é agnóstico por-ator; a exclusividade é trava de CONTEÚDO (só entram no deck do Gus).
+- **Cartas ESPECIAIS — SÓ do Gus.** As **históricas (20 mestres do Codex)** + a de **Helon Tusk**. São cartas **"para compilar"**, e **compilar só o Gus faz** (canon: Gus = compilador universal, `CHARS.md` + `docs/narrative/characters/gus.md`). O motor é agnóstico por-ator; a exclusividade é trava de CONTEÚDO (só entram no deck do Gus).
 
 ---
 
@@ -156,4 +156,4 @@ Todos afináveis no playtest N=3. O parecer completo (faucets×sinks, riscos-mes
 
 ## 10. Como conduzir
 
-Frente de design colaborativa (não código imediato). Brainstorm DIRETO com o criador ([[feedback_brainstorm_direto_sem_agentes]]); cada decisão via AskUserQuestion. Implementação (pós-decisão) via agentes: `backend-engineer` (POCO de deck/mão/containers + invariantes + save), `gameplay_engineer` (loadout em combate, swap de emergência), `ux-ui-designer`/mockup (tela da bancada). Casa com CARTAS-BALANCEAMENTO e o motor de efeitos já entregue.
+Frente de design colaborativa (não código imediato). Brainstorm DIRETO com o criador (`GODS_LAWS.md` global, L-16); cada decisão via AskUserQuestion. Implementação (pós-decisão) via agentes: `backend-engineer` (POCO de deck/mão/containers + invariantes + save), `gameplay_engineer` (loadout em combate, swap de emergência), `ux-ui-designer`/mockup (tela da bancada). Casa com CARTAS-BALANCEAMENTO e o motor de efeitos já entregue.
