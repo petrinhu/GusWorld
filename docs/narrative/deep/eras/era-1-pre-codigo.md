@@ -2746,6 +2746,8 @@ A validação anual segue a Vigília Neo-Sylvania. Três fases: leitura pública
 
 A cadeia institucional segue em sequência canônica: Atelaiá Chevalier (-115); Esmeralda Argéndia-Chevalier; Luísa Argéndia-Chevalier; Anastácia Vyrcátrix-Acaceiro a Paciente; Hipátia Atelaiá-Vargas; Olímpia Cardoso-Acaceiro; Cassandra Yvanova-Calígrafa; Verônica Atelaiá (transicional); Cassandra "Bento" Chevalier (contemporânea); Beatriz Argéndia-Vargas (em formação inicial). Dez nomes, oito séculos.
 
+> **Nota de canon (01/09/2026):** esta é a cadeia institucional do ofício, objeto distinto da linhagem matrilinear canônica de seis gerações registrada em `CHARS.md` (bloco "Linhagem matrilinear cronistas Atelaiá"). As duas não precisam bater nome a nome, porque descrevem coisas diferentes; ver o registro completo junto daquele bloco.
+
 Velhusto fixou em três eixos a distinção entre a Ordem Recursiva e configurações comparativas: paleografia de quatro camadas; cordão de oitenta e nove nós atado sob o avental; couro fino curtido em tanino-de-acaceiro. Os três eixos descendem do protocolo originário de Atelaiá em -115.
 
 A linhagem feminina cronística articula paralelo contido à Bene Gesserit de Frank Herbert, em obra preservada em arquivo restrito. Mesma função (continuidade ancestral feminina cumulativa), mecanismos distintos: psi-genética e ritual químico em Herbert; transmissão documentada mestre-aprendiz em paleografia de quatro camadas na Ordem. Velhusto registrou a comparação em ata sem fechar interpretação. Não há continuidade genética; há continuidade institucional. Não há ritual químico; há protocolo paleográfico. Não há acesso psi-genético a memórias ancestrais; há arquivo cumulativo em câmara fria. Mesma função; mecanismos distintos.
@@ -2809,6 +2811,8 @@ Lembro o dia em cada detalhe. O Mestre-Hierofante leu a carta em voz baixa de ba
 Hipocrates havia articulado em ata da Vigília anual o pedido formal de me aceitar como aprendiz direta. O pedido cobriu aproximadamente duas horas em três fases: apresentação da candidata; apresentação da linhagem feminina em sete gerações; apresentação do compromisso de exercício cumulativo em mais de vinte e um anos.
 
 A linhagem feminina de minha mãe articulava-se em sete gerações: Atelaiá Chevalier (geração inaugural, -115); Castália Argéndia-Chevalier-Boroshova (-90); Decília Boroshova-Calígrafa (-50); Penélope Argéndia-Acaceiro o Sapiente (-25); Mariana Boroshova-Argéndia o Paciente (-10); Sibila Atelaiá-Boroshova (em horizonte de meu nascimento); Verônica Atelaiá (em minha trigésima estação).
+
+> **Nota de canon (01/09/2026):** esta é a descendência de sangue da narradora, objeto distinto da linhagem matrilinear canônica de seis gerações registrada em `CHARS.md` (bloco "Linhagem matrilinear cronistas Atelaiá") e distinto também da cadeia institucional do ofício registrada acima, neste mesmo capítulo. As três não precisam bater nome a nome, porque descrevem coisas diferentes.
 
 Cada geração cumprira aprendizagem paleográfica plena e exercício cumulativo. Era continuidade do ofício em descendência ininterrupta há mais de cento e quarenta anos.
 
