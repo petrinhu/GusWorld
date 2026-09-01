@@ -40,7 +40,7 @@ docs/narrative/deep/
 │   ├── era-2-boom-tecnico.md            # Era do Compilador
 │   ├── era-3-sterling.md                # Era Sterling presente
 │   ├── transicoes-entre-eras.md         # Quedas, hiatos, restos
-│   └── cosmologia-origem-deep.md        # origem/verdade enterrada: Estilhaçamento + ecos convergentes; companheiro de ontologia/cosmologia-formal-deep.md
+│   └── cosmologia-origem-deep.md        # origem/verdade enterrada: Transbordamento + ecos convergentes; companheiro de ontologia/cosmologia-formal-deep.md
 ├── factions/                            # 6 facções principais + menores
 │   ├── sterling-corp.md
 │   ├── fir.md                           # Federação Industrial de Reciclagem

@@ -141,7 +141,7 @@ O recado insinua que:
 
 ### Disciplina de velado (regra dura, não negociável neste documento)
 
-- **NÃO nomear nem confirmar** o Dragon Victory, a linhagem Pyotor I Draco Vance, Vyrdragon, ou qualquer fratura de origem (Estilhaçamento / `LORE-ORIGEM-MULTIVERSO`) nesta cena.
+- **NÃO nomear nem confirmar** o Dragon Victory, a linhagem Pyotor I Draco Vance, Vyrdragon, ou qualquer fratura de origem (Transbordamento / `LORE-ORIGEM-MULTIVERSO`) nesta cena.
 - O recado pode usar linguagem ambígua compatível com o que o Brunus já é, canonicamente, capaz de dizer sem quebrar o próprio personagem: ele "esqueceu o técnico e os fatos antigos" (cf. `brunus-vetorial.md` § "O esquecimento") mas "retém vínculo, amizade, culpa". Ou seja: o recado pode soar como aviso pessoal e afetivo ("cuide-se", "não procure isso sozinho", "há coisas que voltam") sem virar aula de lore.
 - Tom: sombrio, ameaçador, mas nunca didático. O jogador deve sentir que uma peça maior existe, sem receber o nome da peça.
 
