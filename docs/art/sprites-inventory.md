@@ -160,7 +160,7 @@ disco. `git log --all --diff-filter=A --name-only | grep -i aleatorio` só acha
 ### `icons-m5/`
 
 `find resources/sprites/icons-m5 -type f | wc -l` (recursivo, com subpastas
-`app_icon/familias/intent/modificador/retratos/status/`) → **55 arquivos**: **54
+`familias/intent/modificador/retratos/status/`) → **50 arquivos**: **49
 PNGs** (`-iname '*.png'`) + **1 `REVISAO.html`** — não mencionado em versões
 anteriores deste documento.
 
