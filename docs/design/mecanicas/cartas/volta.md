@@ -11,13 +11,13 @@ Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/v
 
 ## Ficha rápida
 
-Família **Elétrico** · categoria **Ativa** · especial · mana 6 · alvo único · consome **1 bateria inteira por uso** — repetível na mesma batalha enquanto houver bateria disponível (não é limite de 1×/batalha; corrigido em 31/08/2026, ver "Por que é assim").
+Família **Elétrico** · categoria **Ativa** · especial · mana 6 ⚠️(posto em dúvida em 31/08/2026, ver "Por que é assim") · alvo único · consome **toda a carga disponível por uso** — repetível na mesma batalha enquanto houver carga disponível (não é limite de 1×/batalha; corrigido em 31/08/2026, ver "Por que é assim").
 
 ## Como funciona
 
-Ao ser usada, drena **21% da energia do ALVO** por uso (porcentagem do alvo, não valor absoluto). **55% do drenado converte e chega à party**; os outros **45% se perdem como calor** (2ª lei da termodinâmica). No momento do uso, **o jogador escolhe** se o retorno vira mana ou vida — a escolha é **cronometrada por dificuldade**: Fácil 13s, Médio 8s, Difícil 5s, Hardcore 3s. Esgotado o tempo sem escolha, a energia dissipa e o jogador **não recebe nada** (nem mana, nem vida).
+Ao ser usada, drena **21% da energia do ALVO** por uso (porcentagem do alvo, não valor absoluto — este número não muda com nada abaixo). **55% do drenado converte e chega à party**; os outros **45% se perdem como calor** (2ª lei da termodinâmica). No momento do uso, **o jogador escolhe** se o retorno vira mana ou vida — a escolha é **cronometrada por dificuldade**: Fácil 13s, Médio 8s, Difícil 5s, Hardcore 3s. Esgotado o tempo sem escolha, a energia dissipa e o jogador **não recebe nada** (nem mana, nem vida).
 
-Usar a carta consome **uma bateria inteira** (não uma fração dela). Com outra bateria disponível no inventário, a carta pode ser usada de novo na mesma batalha — não há teto de usos por combate; o teto é a quantidade de baterias que o jogador tem.
+Isso é o dreno sobre o ALVO. Separado disso, usar a carta tem um custo para o PRÓPRIO conjurador: consome **toda a carga disponível** (não uma fração dela) — ver "Por que é assim" sobre o que essa carga é, e a dúvida que isso abre sobre o número de mana registrado acima. Com carga disponível de novo (outra bateria), a carta pode ser usada de novo na mesma batalha — não há teto de usos por combate; o teto é a carga que o jogador tem.
 
 ## Por que é assim
 
@@ -33,12 +33,15 @@ Vale notar a garantia que já valia antes e continua valendo: este leech **não 
 
 **Decisão consciente, não descuido — registrado para ninguém "corrigir" depois achando que foi engano:** o canon geral de energia (`docs/design/mecanicas/cartas-hardware-pirataria-energia.md` §5, "Energia: baterias CR2032") descreve o DEFAULT como degradação gradual da bateria com o uso, não consumo total de uma vez. O Volta desvia desse default por ordem explícita do líder — consome a bateria inteira por uso. Não é pedido de confirmação: ele foi explícito. (Precedente mecânico já existente no corpus para "consumir a bateria de uma vez": o payload de vírus Zip-bomb, mesmo documento §8 — lá é malware que estoura a bateria; aqui é desenho legítimo da carta, mesma primitiva, uso oposto.)
 
-**Mana e bateria coexistem por padrão — canon já fechado, não é pergunta nova:** `cartas-hardware-pirataria-energia.md` §3 fixa o princípio (líder, 08/08/2026, ampliado no mesmo dia): *"TODAS as cartas devem passar pelo mecanismo de originalidade da carta (§3) E degradação da bateria (§5) — as duas variáveis JUNTAS, não uma ou outra. Isso é o DEFAULT; exceções existem, mas cada uma se discute e se aprova caso a caso com o líder, nunca por omissão."* Logo mana 6 (Ficha Rápida) e o custo de bateria coexistem nesta carta por padrão; não há exceção registrada para o Volta quanto a isso. Ponteiro (L-30): `cartas-hardware-pirataria-energia.md` §3.
+**Mana e carga de bateria são o MESMO recurso, com dois nomes (decisão do líder, 31/08/2026 — canon de PROJETO INTEIRO, não desta carta só).** Verbatim: *"como magia é tecnologia, então mana e carga de bateria se confundem e são a mesma coisa. Pode ser citado mana ou bateria... O jogador no início vai se confundir, mas é proposital e depois vai passar a entender quando alguém disser por exemplo que a bateria está com pouco mana."* A confusão inicial do jogador é deliberada, e se desfaz por fala de personagem, não por tutorial. **O registro deste princípio como canon do projeto inteiro é feito por outro agente, em outro documento** — não redigido aqui, para não abrir uma segunda fonte da mesma verdade. Candidato natural a abrigá-lo, não confirmado: `cartas-hardware-pirataria-energia.md` §4-§5 (terminologia e energia).
+
+⚠️ **DÚVIDA MARCADA PARA O LÍDER, NASCIDA DESTA DECISÃO DE HOJE, NÃO RESOLVIDA AQUI:** se mana e carga de bateria são o mesmo recurso, o custo fixo de **mana 6** que a Ficha Rápida registra para esta carta pode estar superado — se a carta consome TODA a carga disponível no uso (ver "Segunda correção" acima), não haveria um número fixo de 6 a cobrar, e sim "o que houver". Não apaguei o 6 nem o mantive como se estivesse confirmado; fica marcado até ele decidir.
 
 Duas consequências da especificação numérica, registradas e **não resolvidas aqui**: o combate por turnos ganha um elemento em tempo real, e a escolha cronometrada é barreira de acessibilidade conhecida. Detalhe completo em `_EFEITOS-ESCOLHIDOS.md` linha 14.
 
 ## Pontas soltas
 
+- ⚠️ **MARCADO PARA O LÍDER, NASCIDO DA DECISÃO MANA=BATERIA DE 31/08/2026, NÃO RESOLVIDO AQUI:** o custo fixo de **mana 6** (Ficha Rápida) pode estar superado, já que a carta consome toda a carga disponível no uso, não uma quantia fixa. Não decidido, não ajustado.
 - ⚠️ **MARCADO PARA O LÍDER, NÃO RESOLVIDO AQUI:** o princípio canônico de `cartas-hardware-pirataria-energia.md` §3 exige responder, ao planejar cada carta, **"o que muda se ela for original × pirata × homebrew?"** — essa resposta **não existe em lugar nenhum** para o Volta. Não inventada aqui.
 - ⚠️ **ACHADO ADICIONAL, MESMA CATEGORIA, TAMBÉM NÃO RESOLVIDO:** o mesmo §3 exige responder, para toda carta, uma segunda pergunta — **"o que muda se a bateria estiver nova × degradada?"** — e essa resposta também não foi encontrada em lugar nenhum para o Volta. Marcado junto, sem inventar resposta.
 - `resources/cards/volta.gw.card` segue com o número e o gatilho revogados (ver aviso no topo deste documento) — atualização do dado é tarefa separada, não feita aqui.
