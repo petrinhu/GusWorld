@@ -4412,7 +4412,7 @@ Ofereço, no espaço restante, três reflexões. A primeira, sobre a linhagem fe
 
 **Primeira reflexão. Linhagem feminina cronística canônica.**
 
-A linhagem cobre cerca de oito séculos consecutivos. Atelaiá Chevalier, a ancestral canonizada em -115. Sete gerações intermediárias em descendência ininterrupta, na paleografia de quatro camadas. Eu, na minha septuagésima quinta estação. Cassandra "Bento" Chevalier, minha herdeira imediata. Beatriz Argéndia-Vargas, cronista-aprendiz secundária. Oito gerações sucessivas, todas fiéis ao protocolo originário de -115.
+A linhagem cobre cerca de oito séculos consecutivos. Atelaiá Chevalier, a ancestral canonizada em -115. Sete gerações intermediárias em descendência ininterrupta, na paleografia de quatro camadas. Eu na minha septuagésima quinta estação. Cassandra "Bento" Chevalier, minha herdeira imediata. Beatriz Argéndia-Vargas, cronista-aprendiz secundária. Oito gerações sucessivas, todas fiéis ao protocolo originário de -115.
 
 Corre em paralelo contido à figura **"Bene Gesserit"** preservada em arquivo restrito (Frank Herbert): a ordem feminina de ancestralidade mística mantida em sucessão geracional. As Reverend Mothers acessam a memória ancestral por transmissão psi-genética em ritual químico (designação preservada: **Spice Agony**).
 
