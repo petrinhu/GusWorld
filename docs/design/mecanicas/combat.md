@@ -225,8 +225,9 @@ batalhas, degrada, exige recarga real) e **vazão** (a taxa máxima de descarga 
   e recarga"). "Sem carry-over" segue valendo, mas agora só para a VAZÃO não usada no turno (não dá
   para acumular capacidade de saque de um turno para o outro); o estoque, ao contrário, PERSISTE
   entre turnos e entre batalhas, porque é a bateria — ficar sem estoque no meio de uma batalha passa
-  a ser possível (não decidido aqui o que acontece nesse momento; ver
-  `cartas-hardware-pirataria-energia.md` §5).
+  a ser possível, e o mecanismo já está especificado: a carta vira `DEPLETED` (inerte) e o jogador
+  troca por outra bateria do inventário via `SwapBattery`, ação de emergência de **2 AP fixo**
+  (`cartas-hardware-pirataria-energia.md` §5, "Estoque e vazão"; `cartas-spec-logica.md` §3.2-3.4).
 - Ramp linear garante que combos premium só ficam viáveis no mid-late do combate, preservando curva
   de tensão — **contanto que a bateria ativa tenha estoque suficiente**; se não tiver, o teto real é
   o estoque, não a vazão.
