@@ -217,18 +217,23 @@ sistema, com duas propriedades físicas da mesma bateria.**
 turno e vira o quanto a bateria consegue entregar por vez. Bateria real tem capacidade e tem corrente
 máxima; o modelo agora tem as duas.
 
-**Duas consequências registradas, NÃO resolvidas aqui:**
+**Duas consequências da resposta — JÁ RESPONDIDAS no canon vizinho, não são pendência nova.**
+Corrigido em 31/08/2026, depois de o orquestrador conferir o corpus inteiro antes de marcar qualquer
+coisa como aberta:
 
-- **(a) Ficar sem bateria no meio da batalha passa a ser possível.** Antes não era: a rampa recarregava
-  ao máximo todo turno. Agora o estoque pode acabar. **O que acontece nesse momento não está
-  decidido** — se o jogador troca de bateria em combate, se isso custa a ação do turno, se há estado
-  de "sem carga". Nota factual, não confirmação: a carta do Volta depende de trocar de bateria para
-  ser reusada (`docs/design/mecanicas/cartas/volta.md`), o que sugere que a troca em combate existe,
-  mas isso não decide o mecanismo geral.
-- **(b) A degradação da bateria agora tem efeito mecânico direto.** Se a bateria é o estoque e ela
-  degrada, degradar significa ter menos carga disponível por batalha. Antes, com a rampa recarregando
-  sozinha, a degradação era mais abstrata. A curva de degradação em si **não é inventada aqui** —
-  segue no `economy-designer`.
+- **(a) Ficar sem bateria no meio da batalha passa a ser possível, e o mecanismo JÁ ESTÁ ESPECIFICADO.**
+  Antes não era possível: a rampa recarregava ao máximo todo turno. Agora o estoque pode acabar, e a
+  carta vira `DEPLETED` (inerte, gate sempre `REJECTED` até troca — `cartas-spec-logica.md` §3.2). O
+  jogador troca por uma bateria carregada do inventário em combate via ação de emergência dedicada,
+  `SwapBattery`, custando **2 AP fixo, sem escalar por dificuldade** (`cartas-spec-logica.md` §3.3-3.4,
+  `cartas-numeros-proposta.md` §1c). A bateria velha `DEPLETED` retirada vai para o inventário como
+  item — não desaparece (ver "Descarte", abaixo). A carta do Volta já dependia exatamente disso
+  (`docs/design/mecanicas/cartas/volta.md`).
+- **(b) A degradação da bateria ganha efeito mecânico direto, e a curva JÁ TEM NÚMERO.** Cada recarga
+  tira **13 pontos percentuais de SoH** (começa em 100%); abaixo de **21% SoH** a bateria é
+  considerada morta, só serve pra vender/reciclar no ferro-velho — dando **~6 recargas de vida útil**
+  por bateria física (`cartas-numeros-proposta.md` §1b). O preço de recarga na estação também escala
+  com o SoH entregue (base 3 cr, multiplicador 1,2×-2,0×, mesma fonte).
 
 ### Cada carta gasta a própria bateria: o fecho do sistema (decisão do líder, 31/08/2026)
 
@@ -267,7 +272,8 @@ ser propriedade física de UMA carta específica.
 - **In-battle (arena):** trocar (se tiver carregada) custa **1 turno + AP** (número → `economy-designer`).
 
 ### Descarte
-- Bateria descarregada **ocupa espaço** no inventário e **não pode ser jogada fora** — **crime ambiental**, tratado com **sátira leve do excesso regulatório** (registro LucasArts; a megacidade te obriga a carregar teu próprio lixo tóxico). Só vender ou trocar.
+- Bateria descarregada **ocupa espaço** no inventário e **não pode ser jogada fora** — **crime ambiental**, tratado com **sátira leve do excesso regulatório** (registro LucasArts; a megacidade te obriga a carregar teu próprio lixo tóxico). Só vender ou trocar. **Regra dura, não branda:** a interface não oferece a opção de descartar — não é uma escolha errada com punição, o jogo simplesmente não deixa (`cartas-spec-logica.md` §3.2: a bateria "não pode ser jogada fora", sem ramo de exceção).
+- **Slot dedicado a baterias usadas** (acréscimo do líder, 31/08/2026, verbatim: *"Bateria usada vai pra o slot de baterias usadas da mochila do jogador, ou do bolso. Para levar pro lixo de baterias ou recarregar. Nunca deve ser jogada fora."*): a bateria `DEPLETED` que sai da carta (troca em cidade, estação ou emergência in-battle — `cartas-spec-logica.md` §3.2-3.4) tem um **compartimento próprio** na mochila/bolso, não uma vaga qualquer do inventário geral. Não é mecânica nova — é o mesmo `BatteryItem{charge:0}` que o canon já descreve, agora com endereço fixo: dali ela vai pro **lixo de baterias** (ferro-velho, reciclagem) ou pra **recarga** (estação, carregador). **Leitura, porque é o ponto:** o jogo usa pilha CR2032 real, e lítio é resíduo perigoso que não vai no lixo comum — a regra ensina descarte correto pela mecânica, sem discurso, mesma pedagogia por sistema da equivalência mana-bateria (onboarding orgânico, corte `C-16`). **Não decidido, marcado:** se o slot tem capacidade limitada, e o que acontece se ele encher.
 
 ### Itens de energia (novos)
 - **Carregador solar** — recarrega baterias passivamente (evita depender de estação/compra).
