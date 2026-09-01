@@ -36,3 +36,12 @@ Trazidas inteiras pelo `technical-writer`, na varredura profunda de narrativa, c
 - `AUDIT-T6-PALAVRAS-V2.md` — auditoria de palavras/pontuação proibida; o achado principal (992 travessões/em-dash em prosa canônica) está hoje reduzido a 130 ocorrências em todo `docs/narrative/` (~87% de queda, conferido 25/08/2026), mas não foi feita varredura arquivo a arquivo do que resta.
 
 A auditoria de easter eggs (T5) tem lugar em `docs/_secret/`, cifrada — ver o `_INDEX.md` de lá.
+
+## Quatro auditorias adicionais resgatadas do `gusworld_legacy` (01/09/2026)
+
+Completam a cascata `AUDIT-T1` a `AUDIT-T10-V2` iniciada na seção acima. `docs/narrative/INCOHERENCES.md` já citava `AUDIT-T9-VOZ-NPC-V2` e `AUDIT-T10-AXIOLOGIA-V2` como fonte de autoridade antes de estes arquivos existirem neste repositório — a citação ficou órfã entre 25/08/2026 (migração parcial de T1-T6) e esta data. Trazidas como estão, sem reconferência contra a árvore atual — quem quiser aplicar os achados críticos confere primeiro.
+
+- `AUDIT-T7-PILLARS-V2.md` — consistência dos Pillars 1-5 cross-doc; 17 achados (3 críticos, 6 médios, 8 leves), veredito "aprovar com fixes médios"; os 3 críticos seguem pendentes de reverificação (fora do escopo das incoerências C1-C15 já fechadas).
+- `AUDIT-T8-CROSSREF-V2.md` — integridade de wikilinks `[[X]]` cross-doc (115 docs, 1.293 links, ~98% de resolução correta); 20 achados (5 críticos, 7 médios, 8 leves), veredito "aprovar com fixes médios"; os 5 críticos são de sintaxe de link, não factuais, e um deles (CRIT-T8v2-05) aponta que `~/.claude/agents/revisor-textual.md` referencia `/INCOHERENCES.md` num caminho que só existe como `docs/narrative/INCOHERENCES.md`.
+- `AUDIT-T9-VOZ-NPC-V2.md` — consistência de voz de NPC in-character cross-doc (14 contos da antologia, 23 DDs, 9 personagens); 9 achados (3 críticos, 4 médios, 2 leves), veredito "aprovar"; os críticos são de prosa de conto/estilo, pendentes.
+- `AUDIT-T10-AXIOLOGIA-V2.md` — axiologia canônica binária cross-doc (~4.500 linhas, 9 docs de canon crítico); 31 achados (6 críticos, 11 médios, 14 leves), veredito "aprovar com ressalvas médias"; o próprio documento declara a cascata "T1-T10 v2 completo, 10/10 tópicos auditados sequencialmente".
