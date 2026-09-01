@@ -80,7 +80,9 @@ Fase 0 de forma incremental, plugados um de cada vez, não como decisão em aber
 
 ## Em aberto (decisão do líder, não inventada aqui)
 
-- Gerador de build e sistema de empacotamento concreto.
+- Sistema de empacotamento concreto (o gerador de build já está decidido: CMake com
+  `VERSION 3.28` fixado, Ninja nas cinco plataformas, ver `docs/tech/adr/ADR-022-cmake-versao-minima-fixada.md`,
+  Accepted, e `TODO.md` item G6, ✅ Concluído).
 - Formato final do artefato distribuível por plataforma (ex.: pacote nativo Linux,
   arquivo compactado universal, instalador Windows) e limiar de tamanho que aciona
   alerta de inchaço.
