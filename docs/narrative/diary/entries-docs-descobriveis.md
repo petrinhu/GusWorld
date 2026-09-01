@@ -6,7 +6,7 @@
 >
 > **Trigger:** **pickup explícito**; player interage com objeto físico no mundo (carta, diário, memorando, transcrição, pichação, placa). Doc inteiro vai pro Diário em subseção "Lore" depois de coletado. Re-leitura permanente. Knowledge sobe por leitura inicial **e** por correlação entre docs (cross-link in-Diário).
 >
-> **Cross-ref imutáveis:** [[in-world-docs]] (base canônica), [[lore-bible]] §3 + §6 + §8 + §13, [[foreshadowing]] (cross-link denso), [[characters]], [[environments/_INDEX]], [[timeline]].
+> **Cross-ref imutáveis:** [[in-world-docs]] (base canônica), [[lore-bible]] §3 + §6 + §8 + §13, [[foreshadowing]] (cross-link denso), [[CHARS]], [[environments/_INDEX]], [[timeline]].
 
 ---
 
