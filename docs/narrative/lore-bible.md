@@ -515,7 +515,7 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 
 ## 14. NPCs lore-importantes (não-jogáveis, nomeados)
 
-Personagens secundários canônicos com peso narrativo no arco principal ou sidequests. Detalhes operacionais e relacionais em [[factions]] e [[characters]].
+Personagens secundários canônicos com peso narrativo no arco principal ou sidequests. Detalhes operacionais e relacionais em [[factions]] e [[CHARS]].
 
 ### Aliados e mentores
 

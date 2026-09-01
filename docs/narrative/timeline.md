@@ -189,7 +189,7 @@ Sterling Locke publica tese DRE (Dynamic-Runtime Evaluation). Migra para setor p
 
 ## Linhagens cruzadas (sumário rápido)
 
-Detalhes em cada [[characters]].
+Detalhes em cada [[CHARS]].
 
 | Linhagem | Origem documentada | Atual portador (jogo) |
 |---|---|---|

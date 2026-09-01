@@ -14,7 +14,7 @@ O `ADR-019` já canoniza "motor genérico + conteúdo como dado atômico" no ní
 
 ## Decisão
 
-1. **Generalizar o [[ADR-019]] do nível de CONTEÚDO pro nível de MÓDULO.** Assim como carta nova é linha de dado, assunto novo é **peça de dado + módulo estreito** — um campo aditivo, default-neutro, no objeto composto — **nunca um campo acretado num struct existente.**
+1. **Generalizar o [[ADR-019-arquitetura-conteudo-atomica-data-driven]] do nível de CONTEÚDO pro nível de MÓDULO.** Assim como carta nova é linha de dado, assunto novo é **peça de dado + módulo estreito** — um campo aditivo, default-neutro, no objeto composto — **nunca um campo acretado num struct existente.**
 
 2. **Padrão técnico de decomposição sem migrator: herança de agregados + fachada de re-export por `using`.** Exemplo aplicado: `CardPhysicalState` deixa de ser struct monolítico e vira um agregado C++20 que herda publicamente de `gus::domain::hardware::CardProvenance`, `gus::domain::hardware::BatteryState` e `gus::domain::infection::IntegrityState` (`is_burned_out` fica direto no agregado, por não ter invariante correlato com outra peça). O acesso flat (`p.origin`, `p.battery_recharge_cycles`, ...) e o serializer são preservados por construção da herança — save V7 ficou byte-idêntico: md5sum do bloco serializado (`CardPhysicalState` de 2 `CardInstance`, ativa+morta, campos não-default, roundtrip real via `serialize_save`/`deserialize_save`) igual antes/depois — `a6a3e6f01c30123e1565c5269f17a61a` — e as 4 suítes de save (`card_hardware_test.cpp`, `save_v7_test.cpp`, `save_serializer_fuzz_test.cpp`, `save_migrators_test.cpp`) com zero diff. `card_hardware.hpp`/`card_hardware_constants.hpp` viram fachadas: incluem as peças e re-exportam em `gus::domain::deck` via `using`-declaration, preservando a identidade de tipo — os consumidores existentes compilam intocados, sem editar nenhum.
 
@@ -57,7 +57,7 @@ O `ADR-019` já canoniza "motor genérico + conteúdo como dado atômico" no ní
 
 ## Onde aplicar a seguir (pendente)
 
-- **`ATOM-3` (items):** `items/`/`inventory/` nascem separados quando houver consumidor real (ver §Decisão item 4). Ver também o addendum de 2026-08-01 em [[ADR-019]] ("a lei do átomo, nomeada"): carta/bateria/item são átomo (registro de dado independente); o sistema que CONSOME o átomo (ex. consumo de energia de bateria) é que é módulo, seguindo este ADR.
+- **`ATOM-3` (items):** `items/`/`inventory/` nascem separados quando houver consumidor real (ver §Decisão item 4). Ver também o addendum de 2026-08-01 em [[ADR-019-arquitetura-conteudo-atomica-data-driven]] ("a lei do átomo, nomeada"): carta/bateria/item são átomo (registro de dado independente); o sistema que CONSOME o átomo (ex. consumo de energia de bateria) é que é módulo, seguindo este ADR.
 - **`ATOM-4` (world):** refactor do `maestro` para consumir `AreaDescriptor` como dado, pago junto com a primeira área nova real — ver §Decisão item 5.
 
 ## Reversibilidade

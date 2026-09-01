@@ -6,7 +6,7 @@
 >
 > **Princípio:** lore via objeto (Pillar — mostre não conte). Player não escuta monólogo expositivo; lê fragmento, conecta sozinho. **Cada documento serve a foreshadow, lore-expansão, reveal ou red herring** específico do arco.
 >
-> **Cross-ref:** [[lore-bible]], [[arco-principal]], [[timeline]], [[characters]], [[diary/entries-docs-descobriveis]].
+> **Cross-ref:** [[lore-bible]], [[arco-principal]], [[timeline]], [[CHARS]], [[diary/entries-docs-descobriveis]].
 
 ---
 
@@ -1048,7 +1048,7 @@ qualquer coisa em si mesmos.
 
 - Eras canônicas: [[lore-bible]] §3, [[timeline]]
 - Facções (autores e contexto): [[factions]]
-- Companions (cartas e diários relacionados): [[characters]]
+- Companions (cartas e diários relacionados): [[CHARS]]
 - Sterling backstory (doc 1, 5, 8, 14, 17, 21): [[prelore_vilao]], [[sterling-locke]]
 - Patch-Zero (doc 3, 10, 11, 14, 15, 20, 21, 23): [[patch-zero]]
 - Pillars (Knowledge gating): [[pillars]]

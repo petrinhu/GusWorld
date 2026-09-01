@@ -80,7 +80,7 @@ Two-way door quanto ao MECANISMO (nenhum código muda com este ADR — é canoni
 
 Decisão do líder supremo, verbatim: **"deixe canonizado: cada carta é um átomo, cada bateria um átomo, cada item no geral é um átomo."**
 
-Isto não é mecanismo novo. É o mesmo princípio deste ADR (§Decisão, "conteúdo como dado atômico composável"), agora dito na língua do líder e estendido explicitamente aos três substantivos que ele nomeia: carta, bateria, item. Registrado aqui porque este ADR é o lar canônico do princípio de conteúdo atômico; ver [[ADR-020]] para o mesmo racional no nível de MÓDULO (assunto novo nasce em módulo estreito, não campo acretado).
+Isto não é mecanismo novo. É o mesmo princípio deste ADR (§Decisão, "conteúdo como dado atômico composável"), agora dito na língua do líder e estendido explicitamente aos três substantivos que ele nomeia: carta, bateria, item. Registrado aqui porque este ADR é o lar canônico do princípio de conteúdo atômico; ver [[ADR-020-pecas-componiveis-modulo-e-mundo-data-driven]] para o mesmo racional no nível de MÓDULO (assunto novo nasce em módulo estreito, não campo acretado).
 
 ### O que a lei significa em prática
 
@@ -88,7 +88,7 @@ Toda unidade de conteúdo do jogo (carta, bateria, item, consumível, componente
 
 ### Átomo contra vocabulário compartilhado
 
-O átomo (a linha de dado, ex. uma entrada de `Card` em `master_cards.cpp`) é distinto do **vocabulário compartilhado** que o motor interpreta (ex. o `EffectKind` do executor `techMagic`, ver [[ADR-016]]). O vocabulário é maquinário escrito uma vez, reutilizável por qualquer átomo futuro que o invoque. Unidade nova que usa efeito já existente continua sendo só dado; só efeito INÉDITO custa código, e esse código passa a servir a todas as próximas unidades que precisarem dele. É o mesmo par "executor pequeno e fixo / coleção de dados" já descrito na §Decisão deste ADR, agora com o nome que o líder deu ao lado do dado: átomo.
+O átomo (a linha de dado, ex. uma entrada de `Card` em `master_cards.cpp`) é distinto do **vocabulário compartilhado** que o motor interpreta (ex. o `EffectKind` do executor `techMagic`, ver [[ADR-016-techmagic-effect-engine-data-driven]]). O vocabulário é maquinário escrito uma vez, reutilizável por qualquer átomo futuro que o invoque. Unidade nova que usa efeito já existente continua sendo só dado; só efeito INÉDITO custa código, e esse código passa a servir a todas as próximas unidades que precisarem dele. É o mesmo par "executor pequeno e fixo / coleção de dados" já descrito na §Decisão deste ADR, agora com o nome que o líder deu ao lado do dado: átomo.
 
 ### Estado verificado em 2026-08-01
 
@@ -96,7 +96,7 @@ O átomo (a linha de dado, ex. uma entrada de `Card` em `master_cards.cpp`) é d
 
 ### A fronteira da bateria
 
-A bateria (o item físico, CR2032) é átomo, como qualquer outro item. Mas o **sistema de consumo de energia** (como a carga da bateria é gasta ao longo de uma partida) mexe em COMO a carta é jogada, e por isso é módulo, não dado, seguindo [[ADR-020]]. Hoje esse sistema existe só em design (`docs/design/mecanicas/cartas-hardware-pirataria-energia.md`), sem código. Isso não contradiz a lei do átomo; é a fronteira dela: o átomo é a unidade, o sistema que a consome é módulo.
+A bateria (o item físico, CR2032) é átomo, como qualquer outro item. Mas o **sistema de consumo de energia** (como a carga da bateria é gasta ao longo de uma partida) mexe em COMO a carta é jogada, e por isso é módulo, não dado, seguindo [[ADR-020-pecas-componiveis-modulo-e-mundo-data-driven]]. Hoje esse sistema existe só em design (`docs/design/mecanicas/cartas-hardware-pirataria-energia.md`), sem código. Isso não contradiz a lei do átomo; é a fronteira dela: o átomo é a unidade, o sistema que a consome é módulo.
 
 ### Régua operacional
 
@@ -122,4 +122,4 @@ if (card.id == kUrandomCardId) {
 
 **Busca feita e o que NÃO apareceu:** varredura por `id ==` e por nome próprio de carta (godel, newton, einstein, tesla, faraday, maxwell, dee, planck, urandom) fora de `master_cards.cpp` (catálogo, onde nomear é esperado), dos arquivos de teste, e do dispatcher `techmagic.cpp` (que despacha por `EffectKind`, vocabulário, não por id). O `dispatch_adware_gate` (Adware Sterling) e o `dispatch_virus_payload_pre_cast/post_cast` (LogicBomb/Worm/ZipBomb/Backdoor) são despachados por um flag de dado (`Card::has_adware`) e por um enum de vocabulário (`VirusKind`, exaustivo via `switch` protegido por `-Werror=switch`), respectivamente, não por id de carta; ambos cumprem a lei. `mimics_special_id` é lido só via `.has_value()`, genérico. Nenhuma outra violação foi encontrada além da urandom.
 
-Cross-ref: [[ADR-016]] (o executor `techMagic` e o vocabulário `EffectKind`), [[ADR-020]] (a mesma lei no nível de módulo), `GusEngine/domain/src/combat/combat_state_machine.cpp` (o achado), `GusEngine/domain/include/gus/domain/combat/urandom_algorithm.hpp` (a justificativa registrada), `docs/design/mecanicas/cartas-hardware-pirataria-energia.md` (a fronteira da bateria).
+Cross-ref: [[ADR-016-techmagic-effect-engine-data-driven]] (o executor `techMagic` e o vocabulário `EffectKind`), [[ADR-020-pecas-componiveis-modulo-e-mundo-data-driven]] (a mesma lei no nível de módulo), `GusEngine/domain/src/combat/combat_state_machine.cpp` (o achado), `GusEngine/domain/include/gus/domain/combat/urandom_algorithm.hpp` (a justificativa registrada), `docs/design/mecanicas/cartas-hardware-pirataria-energia.md` (a fronteira da bateria).

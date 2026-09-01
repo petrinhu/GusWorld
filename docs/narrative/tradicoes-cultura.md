@@ -422,7 +422,7 @@ Nenhum grupo proselitiza ofensivamente. Conflito ideológico é técnico/políti
 - Lore (§11 cotidiano resumido): [[lore-bible]]
 - Calendário canônico: [[timeline]]
 - Facções (origens de festividades): [[factions]]
-- Companions (vínculo cultural específico): [[characters]]
+- Companions (vínculo cultural específico): [[CHARS]]
 - Comic relief (call-backs culturais): [[comic-reliefs]]
 - Documentos in-world (referências culturais): [[in-world-docs]]
 
