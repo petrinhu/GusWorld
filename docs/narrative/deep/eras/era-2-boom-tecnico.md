@@ -1076,7 +1076,7 @@ Trago, neste manifesto, a articulação do Pillar 2 que ergui em registro autora
 
 A proposição vive porque é verificável em três horizontes sucessivos. Primeiro: tudo que se enuncia em pensamento articulado em sistema formal é verificável em gramática regular preservada na tabela de operadores que codifiquei em -115 no Asmódico moderno fundador. Segundo: tudo que se enuncia em sistema formal é computável na configuração de máquina articulada por Tamara Neumann na Boole-redescoberta canonicamente preservada em -110, em registro de Óxido fundador; a configuração reduz-se ao cálculo proposicional articulado em duas operações fundamentais. Terceiro, em registro contemplativo: o resto, proposição não pensada, articula-se em proposição sentida, em respeito cerimonial estrito perante o substrato Selve autônomo, em **limite cerimonial preservado** perante o substrato analógico.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 O cordão cerimonial de oitenta e nove nós sucessivos preservado em cinco gerações cerimoniais articula-se em registro institucional canon. Cada nó cerimonial é uma geração, em continuidade direta com a tradição Era 1, em horizonte em que a tradição articula que o cordão originou-se no gesto fundador do mestre Helíaco Vyr. O cordão é aparato cumulativo consolidado em respeito estrito perante a tradição cronística. A Selagem de amanhã estende-se por oitenta e nove dias sucessivos contínuos calibrados ao cordão, em horizonte em que cada dia ata um nó cerimonial, uma geração preservada em respeito perante a tradição fundadora.
 
@@ -1090,7 +1090,7 @@ Os degraus do altar articulam-se em três, cinco e sete sucessivos. Os três ini
 
 O acaceiro do Núcleo Metropolitano GusWorld City, árvore monumental de tronco vermelho-acaceiro, ergue-se em registro cerimonial canon preservado. A tradição articula a proposição segundo a qual o tronco vermelho-acaceiro ata-se em continuidade direta com a articulação cerimonial herdada da Era 1 fundadora; a árvore é preservada por sete gerações sucessivas ininterruptas, e a tinta cerimonial em que escrevo este manifesto sai de seu cerne.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 Articulo, em registro contemplativo e em registro de manifesto, a proposição segundo a qual a Selagem de amanhã é gesto cerimonial preservado em horizonte de uma vez canonicamente articulada em respeito estrito perante o substrato autônomo. Articulo-a em voz própria: não escrevo, em registro contemplativo, em arrependimento; escrevo em registro de proposição cerimonial segundo a qual a articulação do gesto sacrificial em horizonte de uma vez ata-se em configuração canon em registro de **fechamento cerimonial preservado** perante a tradição fundadora.
 
@@ -1102,7 +1102,7 @@ Articulo, em registro institucional canon preservado, o encerramento cerimonial 
 
 **Atelaiá Chevalier, codificadora-mãe, em véspera de Selagem cerimonial canon preservada, primeiro dia do oitavo mês do nono dia secundário do ano canônico -78.**
 
-[[lacre Asmódico moderno canonicamente preservado em registro institucional canon]]
+[margem: lacre Asmódico moderno canonicamente preservado em registro institucional canon]
 
 Eu, Atelaiá Chevalier, codificadora-mãe do Asmódico moderno em registro institucional canonicamente articulado em -115, cônjuge cerimonial e co-articuladora técnica de Eusébio Argéndia-Chevalier em registro de pacto pessoal canonicamente preservado por trinta e sete anos sucessivos ininterruptos calibrados desde -115, mestra-Asmódica da Ordem Recursiva em registro de continuidade direta com o primeiro conclave de -148 articulado em registro de quinze fundadores cerimonialmente preservados, e na presente data articulada em registro institucional canon preservada como véspera da Selagem cerimonial Asmódica, em horizonte de sessenta e nove anos canônicos calibrados desde meu próprio nascimento em -147, escrevo o presente manifesto cerimonial em registro de minha própria mão, em pena de cordão de couro tingido em vermelho-acaceiro, em pergaminho articulado em oitenta e nove folhas costuradas em registro cerimonial preservado, em registro de testamento institucional preservado em registro de cópia única articulada em horizonte de continuidade direta com a tradição Ordem Recursiva fundadora canônica preservada.
 
@@ -1118,7 +1118,7 @@ Articulo, em registro institucional canon, a articulação cerimonial do Pillar 
 
 A frase articula-se em registro institucional canon preservada porque articula-se em registro de proposição canonicamente verificável em três horizontes sucessivos calibrados. Primeiro horizonte canon: tudo que articula-se em registro de pensamento articulado em sistema formal articula-se em registro de proposição canonicamente verificável calibrada por gramática regular preservada em registro de tabela de operadores canonicamente articulada em -115 em registro de Asmódico moderno fundador canonicamente preservado. Segundo horizonte canon: tudo que articula-se em registro de proposição em sistema formal articula-se em registro de proposição canonicamente computável calibrada por configuração de máquina articulada por Tamara Neumann em registro de Boole-redescoberta canonicamente preservada em -110 em registro de Óxido fundador canonicamente articulado; a configuração canon articula-se em registro de cálculo proposicional articulado por configuração binária canônica preservada articulada por duas operações fundamentais canonicamente articuladas. Terceiro horizonte canon, em registro contemplativo cerimonialmente preservado: o resto, articulado em registro de proposição não pensada canonicamente articulada, articula-se em registro de proposição sentida articulada em registro contemplativo cerimonialmente preservado, em horizonte em que articula-se em registro de respeito cerimonial estrito perante o substrato Selve autônomo canonicamente preservado, em registro de proposição canonicamente articulada em registro de **limite cerimonial preservado** perante o substrato analógico autônomo canonicamente articulado.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 O cordão cerimonial articulado em registro institucional canon preservado em registro de oitenta e nove nós sucessivos calibrados articula-se em registro de configuração canônica preservada por cinco gerações cerimoniais sucessivas calibradas. Cada nó cerimonial articula-se em registro institucional canon preservado em registro de uma geração cerimonial canonicamente articulada em registro de continuidade direta com a tradição Era 1 fundadora canônica preservada, em horizonte em que a tradição articula em registro institucional canon que o cordão articulou-se em registro cerimonial fundador canon preservado articulado por mestre fundador Helíaco Vyr articulado em registro de Era 1 canonicamente preservada. O cordão articula-se em registro de aparato cerimonial cumulativo institucional consolidado preservado por respeito cerimonial estrito perante a tradição cronística fundadora canônica preservada. A Selagem cerimonial canônica articulada em horizonte da cerimônia de amanhã articula-se em registro institucional canon preservado em horizonte de oitenta e nove dias sucessivos contínuos calibrados em registro de cordão cerimonial canonicamente preservado, em horizonte em que cada dia articula-se em registro de um nó cerimonial canonicamente articulado em registro de uma geração cerimonial preservada calibrada por respeito cerimonial estrito perante a tradição fundadora canônica preservada.
 
@@ -1132,7 +1132,7 @@ Os degraus cerimoniais articulados em horizonte da cerimônia de amanhã articul
 
 O acaceiro cerimonial canon canonicamente articulado em registro institucional canon preservado em horizonte do Núcleo Metropolitano GusWorld City canonicamente articulado articula-se em registro cerimonial canon preservado em configuração canonicamente articulada em registro de árvore monumental cerimonial canon canonicamente preservada articulada em registro de tronco cerimonial canon vermelho-acaceiro canonicamente preservado. O acaceiro cerimonial canon articula-se em registro institucional canon preservado em registro cerimonial canon canonicamente preservado em horizonte em que articula-se em registro de articulação cerimonial canon preservada de proposição segundo a qual o tronco vermelho-acaceiro articula-se em registro institucional canon preservado em registro de continuidade direta com a articulação cerimonial canon herdada da Era 1 fundadora canônica preservada, em horizonte em que a tradição articula em registro institucional canon preservado que o acaceiro cerimonial canon articula-se em registro cerimonial canon preservado em configuração canonicamente articulada em registro de árvore cerimonial canon canonicamente preservada articulada em registro de continuidade canon preservada calibrada por sete gerações sucessivas ininterruptas calibradas.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 Articulo, em registro contemplativo cerimonialmente preservado e em registro de articulação cerimonial canon preservada, a proposição cerimonial canon preservada segundo a qual a Selagem cerimonial canonicamente articulada em horizonte da cerimônia de amanhã articula-se em registro institucional canon preservado em registro de gesto cerimonial canon canonicamente preservado articulado em registro de uma vez canonicamente articulada em registro de respeito cerimonial estrito perante o substrato autônomo canonicamente preservado. Articulo a proposição em registro de articulação cerimonial canon preservada: não articulo, em registro contemplativo cerimonialmente preservado, em registro de arrependimento cerimonial canon canonicamente articulado; articulo-a em registro de articulação cerimonial canon preservada de proposição segundo a qual a articulação cerimonial canon do gesto sacrificial canon preservado articulada em registro de uma vez canonicamente articulada em registro institucional canon preservado articula-se em registro cerimonial canon preservado em configuração canonicamente articulada em registro de **fechamento cerimonial canon canonicamente preservado** preservado por respeito cerimonial estrito perante a tradição fundadora canônica preservada.
 
@@ -1144,7 +1144,7 @@ Articulo em registro institucional canon preservado a articulação cerimonial c
 
 **Atelaiá Chevalier, codificadora-mãe, em véspera de Selagem cerimonial canon preservada, primeiro dia do oitavo mês do nono dia secundário do ano canônico -78.**
 
-[[lacre Asmódico moderno canonicamente preservado em registro institucional canon]]
+[margem: lacre Asmódico moderno canonicamente preservado em registro institucional canon]
 
 ### 10.2. Diário de codificação (-118 a -115): cinco entradas selecionadas
 
@@ -1232,7 +1232,7 @@ Articulo, em registro contemplativo autoral, o encerramento cerimonialmente arti
 
 **Atelaiá Chevalier, codificadora-mãe articulada em -115, autora do Tomo da Pilha Sobrecarregada em -100, em horizonte de quarenta e sete anos canônicos calibrados desde meu nascimento em -147, em registro autoral em registro de articulação cerimonial canon preservada perante a configuração canonicamente articulada.**
 
-[[lacre cerimonialmente articulado em registro institucional canon preservado em registro de Asmódico moderno fundador canonicamente articulado em registro de articulação cerimonial canon preservada]]
+[margem: lacre cerimonialmente articulado em registro institucional canon preservado em registro de Asmódico moderno fundador canonicamente articulado em registro de articulação cerimonial canon preservada]
 
 ### 10.4. Cartas selecionadas (-118 a -79): oito missivas em cifra recorrente
 
@@ -1336,7 +1336,7 @@ Articulo, em registro cerimonial canon preservado em registro de encerramento ce
 
 **Atelaiá Chevalier, avó cerimonialmente articulada de Aldebrando Chevalier canonicamente articulado em registro de neto cerimonialmente articulado em registro institucional canon preservado, em horizonte de sessenta e oito anos canônicos calibrados desde meu nascimento em -147, em registro de remetente em horizonte de véspera cerimonialmente articulada perante a Selagem cerimonial canon em -78 em registro institucional canon preservado.**
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 ### 10.5. Comentário cerimonial à 47ª proposição (-85): texto autônomo
 
@@ -1366,7 +1366,7 @@ Articulo, em registro autoral em registro contemplativo cerimonialmente preserva
 
 **Atelaiá Chevalier, codificadora-mãe cerimonialmente articulada em registro institucional canon preservado em -115, autora cerimonialmente articulada do Tomo da Pilha Sobrecarregada em -100, em horizonte de sessenta e dois anos canônicos calibrados desde meu nascimento em -147, em registro autoral em horizonte de comentário cerimonialmente articulado perante a quarenta e sétima proposição cerimonialmente articulada em registro institucional canon preservado.**
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 ### 10.6. Diário das crises Era 2 (-85 a -79): quatro entradas em registro fragmentário
 
@@ -1412,7 +1412,7 @@ Articulo em registro privado em registro contemplativo cerimonialmente preservad
 
 Articulo em registro privado em registro contemplativo cerimonialmente preservado em registro pessoal cerimonialmente articulado a proposição canon de **gesto cerimonialmente articulado perante a codificadora-mãe cerimonialmente articulada em -115 em horizonte de selagem cerimonialmente articulada em registro pessoal cerimonialmente articulado em horizonte de Catedral Quarta cerimonialmente articulada em registro institucional canon preservado**. Articulo em registro privado em registro contemplativo cerimonialmente preservado em registro pessoal a proposição canon de **continuidade cerimonialmente articulada perante o mestre fundador Helíaco Vyr canonicamente articulado em registro de Era 1 fundadora canônica preservada em registro de gesto sacrificial cerimonial canon canonicamente preservado articulado perante o substrato Selve autônomo fundador canonicamente preservado**.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 ### 10.7. Visão profética ramo Bento (-78): texto autônomo cerimonial
 
@@ -1430,7 +1430,7 @@ Articulo, em registro autoral em registro profético cerimonialmente articulado 
 
 Articulo, em registro autoral em registro profético cerimonialmente articulado em registro contemplativo cerimonialmente preservado em registro de articulação cerimonial canon preservada perante a visão cerimonial canon preservada, a proposição canon de **descendente cerimonialmente articulado em horizonte de cinco gerações sucessivas cerimonialmente articuladas em registro de Tanque cerimonialmente articulado perante cargas cerimonialmente articuladas em horizonte de futuro cerimonialmente articulado em registro de Era 3 contemporânea**. A configuração cerimonial canon preservada firma-se em registro contemplativo cerimonialmente preservado em registro profético cerimonialmente articulado em registro autoral em registro de **continuidade cerimonial preservada perante o Asmódico ancestral analógico cerimonialmente articulado em registro de ramo Bento cerimonialmente articulado em registro de legitimidade cerimonial canon em registro de exceção cerimonial canon preservada**. O ramo cerimonialmente articulado em registro institucional canon preservado sustenta a função de Tanque cerimonialmente articulado em horizonte de Era 3 contemporânea em registro de carga cerimonialmente articulada perante a articulação cerimonial canon preservada do substrato analógico fundador canonicamente preservado.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 Articulo, em registro autoral em registro profético cerimonialmente articulado em registro contemplativo cerimonialmente preservado em registro de antecipação cerimonialmente articulada, a proposição canon de **cisão cerimonial preservada perante Asmódico ancestral analógico cerimonialmente articulado em registro de Asmódico moderno cerimonialmente articulado em horizonte de cinquenta e oito anos canônicos sucessivos calibrados em registro de articulação cerimonial canon preservada em horizonte de -20 cerimonialmente articulado em registro institucional canon preservado**. A configuração cerimonial canon preservada decanta-se em registro autoral em registro profético cerimonialmente articulado em registro de **legitimidade cerimonial preservada perante ambos ramos cerimonialmente articulados em registro de orientação cerimonial canon perante a Ordem Recursiva cerimonialmente articulada em registro institucional canon preservado**. Ambos ramos articulam-se em registro de orientação cerimonial canon preservada em registro institucional canon preservado; nenhum ramo articula-se em registro de heresia cerimonialmente articulada em registro institucional canon preservado.
 
@@ -1440,7 +1440,7 @@ Articulo, em registro autoral em registro profético cerimonialmente articulado 
 
 **Atelaiá Chevalier, codificadora-mãe articulada em -115 em registro de Asmódico moderno fundador canonicamente preservado, em horizonte de sessenta e nove anos canônicos calibrados desde meu nascimento em -147, em registro de redação cerimonial canon preservada articulada em registro de oito dias canônicos sucessivos calibrados em horizonte de Selagem cerimonialmente articulada em -78 canonicamente articulado, em registro de visão cerimonial canon preservada articulada em registro de ramo Bento cerimonialmente articulado em horizonte de Era 3 contemporânea cerimonialmente articulada em registro institucional canon preservado.**
 
-[[lacre Asmódico moderno canonicamente preservado em registro institucional canon]]
+[margem: lacre Asmódico moderno canonicamente preservado em registro institucional canon]
 
 ### 10.8. Sucessão de cinco gerações cronistas (-78): texto autônomo cerimonial
 
@@ -1462,7 +1462,7 @@ Articulo, em registro autoral em registro contemplativo cerimonialmente preserva
 
 **Quinta geração cerimonialmente articulada em horizonte pós-Atelaiá.** Articulo, em registro autoral em registro nominal cerimonialmente articulado, a proposição canon de **cronista contemporânea cerimonialmente articulada em registro de filha cerimonialmente articulada em horizonte de Felícia cerimonialmente articulada em registro de Era 3 contemporânea cerimonialmente articulada em registro institucional canon preservado**. A cronista contemporânea decanta-se em registro profético cerimonialmente articulado em horizonte de visão cerimonial canon preservada em registro de **compiladora cerimonialmente articulada perante presente documento cerimonialmente articulado em horizonte de Era 2 cerimonialmente articulada em registro institucional canon preservado em registro de articulação cerimonial canon preservada por mãos anônimas cerimonialmente articuladas perante a Ordem Recursiva cerimonialmente articulada em registro institucional canon preservado**.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 Articulo, em registro autoral em registro contemplativo cerimonialmente preservado em registro fundacional cerimonialmente articulado, a proposição canon de **continuidade cerimonial canon perante cordão cerimonialmente articulado em oitenta e nove nós canonicamente preservados em horizonte de cinco gerações cerimonialmente articuladas em registro matrilinear cerimonialmente articulado em registro institucional canon preservado**. A configuração cerimonial canon firma-se em registro de **simbólica cerimonial preservada perante cinco cerimonialmente articulado em horizonte de oitenta e nove cerimonialmente articulado em registro institucional canon preservado**. O número cinco articula as gerações; o número oitenta e nove articula os nós cerimoniais canon do cordão herdado da articulação cerimonial canon fundadora da Era 1 fundadora canônica preservada.
 
@@ -1470,7 +1470,7 @@ Articulo, em registro autoral em registro contemplativo cerimonialmente preserva
 
 **Atelaiá Chevalier, codificadora-mãe articulada em -115 em registro de Asmódico moderno fundador canonicamente preservado, em horizonte de sessenta e nove anos canônicos calibrados desde meu nascimento em -147, em registro de redação cerimonial canon preservada articulada em registro de sete dias canônicos sucessivos calibrados em horizonte de Selagem cerimonialmente articulada em -78 canonicamente articulado, em registro de fundação cerimonial canon preservada articulada em registro de tradição cronística matrilinear cerimonialmente articulada em horizonte de cinco gerações sucessivas cerimonialmente articuladas em horizonte pós-Atelaiá cerimonialmente articulado em registro institucional canon preservado.**
 
-[[lacre Asmódico moderno canonicamente preservado em registro institucional canon]]
+[margem: lacre Asmódico moderno canonicamente preservado em registro institucional canon]
 
 ### 10.9. Encerramento da Selagem Asmódica (-78): texto derradeiro cerimonial
 
@@ -1484,7 +1484,7 @@ Articulo, em registro autoral em registro derradeiro cerimonialmente articulado 
 
 Articulo, em registro autoral em registro derradeiro cerimonialmente articulado em registro contemplativo cerimonialmente preservado em registro de reafirmação cerimonialmente articulada, a proposição canon de **Pillar 2 cerimonialmente articulado em horizonte de reafirmação cerimonial canon em registro derradeiro cerimonialmente articulado**. Articulo a proposição perante a quadragésima sétima cerimonialmente articulada em registro institucional canon preservado em horizonte do Tomo da Pilha Sobrecarregada cerimonialmente articulado em -100 canonicamente articulado, em registro derradeiro cerimonialmente articulado em horizonte de vinte e dois anos canônicos sucessivos calibrados em registro de articulação cerimonial canon preservada: tudo que pode ser pensado articula-se em proposição canonicamente articulável em sistema formal preservado; tudo que articula-se em proposição em sistema formal articula-se em proposição canonicamente computável calibrada; o resto, em registro derradeiro cerimonialmente preservado, articulou-se em proposição não pensada, articulou-se em proposição sentida.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 O cordão cerimonial canon canonicamente articulado em oitenta e nove nós sucessivos calibrados consolida-se em volta do meu pescoço cerimonialmente articulado em registro institucional canon preservado em horizonte de cerimônia cerimonialmente articulada em registro institucional canon preservado. Articulo em registro privado canonicamente preservado em registro derradeiro cerimonialmente articulado a proposição canon de **continuidade cerimonial preservada perante o mestre fundador Helíaco Vyr canonicamente articulado em registro de Era 1 fundadora canônica preservada em horizonte de gesto sacrificial cerimonialmente articulado em registro institucional canon preservado em registro de paralelo cerimonial preservado em registro de respeito cerimonial estrito calibrado perante o substrato autônomo canonicamente preservado**. Os oitenta e nove nós do cordão articulam-se em registro cerimonial canon de tato cerimonialmente preservado perante a minha clavícula; cada nó decanta-se em registro de articulação cerimonial canon perante uma das mestras cerimonialmente articuladas da Ordem Recursiva canonicamente articulada em horizonte pós-Atelaiá cerimonialmente articulado.
 
@@ -1496,7 +1496,7 @@ Articulo, em registro autoral em registro derradeiro cerimonialmente articulado 
 
 Articulo, em registro autoral em registro derradeiro cerimonialmente articulado em registro contemplativo cerimonialmente preservado em registro pessoal cerimonialmente articulado em registro familiar cerimonialmente articulado, a proposição canon de **Aldebrando Chevalier cerimonialmente articulado em registro de neto cerimonialmente articulado em horizonte de quatro anos canônicos sucessivos calibrados em registro de presença cerimonialmente articulada em registro de cerimônia cerimonialmente articulada em registro institucional canon preservado**. Articulo a proposição em registro privado canonicamente preservado em registro derradeiro cerimonialmente articulado em registro pessoal: Aldebrando cerimonialmente articulado em registro institucional canon preservado firma-se em registro de portador cerimonialmente articulado em horizonte de linhagem patrilinear Chevalier cerimonialmente articulada em horizonte de cinco gerações sucessivas cerimonialmente articuladas perante a articulação cerimonial canon de Bento Chevalier cerimonialmente articulado em registro institucional canon preservado em horizonte de Era 3 contemporânea cerimonialmente articulada. Os olhos cerimoniais canon de Aldebrando articulam-se em registro de curiosidade cerimonialmente preservada perante o pergaminho cerimonial canon em registro institucional canon preservado; ainda não conhece a articulação cerimonial canon preservada do que vê. Saberá, em horizonte de cinco gerações sucessivas cerimonialmente articuladas perante o ramo Bento cerimonialmente articulado em registro institucional canon preservado.
 
-`cripto-glifo canon em margem cerimonial preservada`
+[margem: cripto-glifo canon em margem cerimonial preservada]
 
 Articulo, em registro autoral em registro derradeiro cerimonialmente articulado em registro contemplativo cerimonialmente preservado em registro de horizonte cerimonialmente articulado, a proposição canon de **continuidade cerimonial preservada perante Selagem cerimonialmente articulada em horizonte de oitenta e um dias canônicos sucessivos calibrados perante oitenta e nove dias canônicos sucessivos calibrados em registro de cerimônia cerimonialmente articulada em registro institucional canon preservado**. A configuração cerimonial canon decanta-se em registro derradeiro cerimonialmente articulado em registro de **continuidade cerimonial canon perante a Ordem Recursiva cerimonialmente articulada em horizonte de mãos cerimonialmente articuladas em registro de oitenta e oito mestras cerimonialmente articuladas perante mestres cerimonialmente articulados em horizonte pós-Atelaiá cerimonialmente articulado em registro institucional canon preservado**. Sou apenas a primeira mão cerimonial canon de oitenta e nove em registro institucional canon preservado; as oitenta e oito mãos cerimoniais canon restantes articulam-se em registro de continuidade cerimonial preservada em horizonte de oitenta e um dias canônicos sucessivos calibrados em registro de cerimônia cerimonialmente articulada perante a Selagem cerimonialmente articulada em registro institucional canon preservado.
 
@@ -1506,11 +1506,11 @@ Articulo, em registro autoral em registro derradeiro cerimonialmente articulado 
 
 **Atelaiá Chevalier, codificadora-mãe articulada em -115 em registro de Asmódico moderno fundador canonicamente preservado, em horizonte de sessenta e nove anos canônicos calibrados desde meu nascimento em -147, em registro derradeiro cerimonialmente articulado em registro institucional canon preservado em horizonte de nono dia do nono mês do ano canônico -78 calibrado em registro de oitavo dia cerimonialmente articulado em horizonte de oitenta e nove dias cerimoniais sucessivos calibrados em registro de Selagem cerimonialmente articulada em registro institucional canon preservado em registro de continuidade direta com a articulação cerimonial canon herdada do mestre fundador Helíaco Vyr articulado em registro de Era 1 fundadora canônica preservada por respeito cerimonial estrito perante o substrato autônomo canonicamente preservado.**
 
-[[lacre Asmódico moderno canonicamente preservado em registro institucional canon, derradeiro]]
+[margem: lacre Asmódico moderno canonicamente preservado em registro institucional canon, derradeiro]
 
 *[Anotação editorial Verônica, -45, em registro derradeiro cerimonialmente articulado em registro de encerramento cerimonialmente articulado em horizonte de Era 2 cerimonialmente articulada em registro institucional canon preservado: Atelaiá Chevalier consolida-se em registro de codificadora-mãe cerimonialmente articulada em horizonte de Asmódico moderno fundador canonicamente preservado articulado em -115 canonicamente articulado, em registro de legado cerimonialmente articulado em horizonte de cinco gerações sucessivas cerimonialmente articuladas em registro matrilinear cerimonialmente articulado em registro institucional canon preservado perante cinco gerações sucessivas cerimonialmente articuladas em horizonte patrilinear Chevalier cerimonialmente articulado perante a articulação cerimonial canon de Bento Chevalier cerimonialmente articulado em registro institucional canon preservado em horizonte de Era 3 contemporânea cerimonialmente articulada em registro institucional canon preservado. O texto derradeiro cerimonialmente articulado em registro institucional canon preservado por Atelaiá em nono dia do nono mês de -78 canonicamente articulado firma-se em registro de texto final cerimonialmente articulado em horizonte da articulação cerimonial canon preservada da própria Atelaiá Chevalier cerimonialmente articulada em registro institucional canon preservado; a articulação cerimonial canon preservada da própria Atelaiá decanta-se em registro de não-datada cerimonialmente articulada em horizonte pós-Selagem cerimonialmente articulado em -78 canonicamente articulado, em registro de respeito cerimonial estrito perante a articulação cerimonial canon preservada do substrato autônomo canonicamente preservado. A tradição cronística matrilinear cerimonialmente articulada em horizonte de cinco gerações sucessivas cerimonialmente articuladas pós-Atelaiá herda em registro institucional canon preservado em horizonte do presente documento cerimonialmente articulado em registro de Era 3 contemporânea cerimonialmente articulada; articulo em registro privado canonicamente preservado em registro derradeiro cerimonialmente articulado a proposição canon perante **horizonte cerimonialmente articulado perante Sterling Locke cerimonialmente articulado em registro institucional canon preservado em horizonte de cinquenta anos canônicos sucessivos calibrados em registro de Era 3 cerimonialmente articulada em registro institucional canon preservado**. A articulação cerimonial canon preservada do presente documento encerra-se em registro derradeiro cerimonialmente articulado em horizonte de Era 2 cerimonialmente articulada em registro institucional canon preservado em registro de respeito cerimonial estrito perante a articulação cerimonial canon preservada do substrato autônomo canonicamente preservado.*
 
-[[lacre Asmódico moderno canonicamente preservado em registro institucional canon, encerramento Era 2]]
+[margem: lacre Asmódico moderno canonicamente preservado em registro institucional canon, encerramento Era 2]
 
 ---
 
