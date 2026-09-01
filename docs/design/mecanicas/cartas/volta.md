@@ -11,11 +11,13 @@ Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/v
 
 ## Ficha rápida
 
-Família **Elétrico** · categoria **Ativa** · especial · mana 6 · alvo único · 1×/batalha.
+Família **Elétrico** · categoria **Ativa** · especial · mana 6 · alvo único · consome **1 bateria inteira por uso** — repetível na mesma batalha enquanto houver bateria disponível (não é limite de 1×/batalha; corrigido em 31/08/2026, ver "Por que é assim").
 
 ## Como funciona
 
 Ao ser usada, drena **21% da energia do ALVO** por uso (porcentagem do alvo, não valor absoluto). **55% do drenado converte e chega à party**; os outros **45% se perdem como calor** (2ª lei da termodinâmica). No momento do uso, **o jogador escolhe** se o retorno vira mana ou vida — a escolha é **cronometrada por dificuldade**: Fácil 13s, Médio 8s, Difícil 5s, Hardcore 3s. Esgotado o tempo sem escolha, a energia dissipa e o jogador **não recebe nada** (nem mana, nem vida).
+
+Usar a carta consome **uma bateria inteira** (não uma fração dela). Com outra bateria disponível no inventário, a carta pode ser usada de novo na mesma batalha — não há teto de usos por combate; o teto é a quantidade de baterias que o jogador tem.
 
 ## Por que é assim
 
@@ -25,10 +27,19 @@ Vale notar a garantia que já valia antes e continua valendo: este leech **não 
 
 **Revogado em 31/08/2026, por decisão do líder:** a leitura anterior descrita aqui — gatilho `OnDamageDealt → Leech`, drenando uma fração do **DANO CAUSADO**, e a constante `kVoltaLeechPercent = 50` — está morta. O dreno é sobre a **energia do alvo**, em porcentagem, nunca sobre o dano.
 
-Duas consequências desta decisão, registradas e **não resolvidas aqui**: o combate por turnos ganha um elemento em tempo real, e a escolha cronometrada é barreira de acessibilidade conhecida. Detalhe completo em `_EFEITOS-ESCOLHIDOS.md` linha 14.
+**Segunda correção do líder, 31/08/2026, verbatim:** *"A carta de volta é uma vez por bateria. Ela drena a bateria toda. Se tiver outra bateria, pode usar novamente."* Isto substitui a leitura de **1×/batalha** que a Ficha Rápida registrava até aqui (herdada do código do projeto anterior como regra geral de anti-abuso das especiais, `cartas-technomagik.md` §2.1) — o Volta é uma **exceção deliberada** a essa regra geral. **Isto encerra o ponto que antes estava marcado para revisão do líder:** não existe mais tensão entre "21% por uso" e um teto de usos por combate — a carta é repetível, limitada por recurso (bateria), não por contagem de batalha.
+
+**Leitura de desenho, registrada porque explica o conjunto:** a bateria é o **combustível** e o dreno é o **efeito**. O jogador gasta energia armazenada (a bateria) para extrair energia do inimigo, e perde 45% como calor no processo — a 2ª lei da termodinâmica aparece nas **duas pontas** da carta (o custo de acionar e o custo de converter), não só numa.
+
+**Decisão consciente, não descuido — registrado para ninguém "corrigir" depois achando que foi engano:** o canon geral de energia (`docs/design/mecanicas/cartas-hardware-pirataria-energia.md` §5, "Energia: baterias CR2032") descreve o DEFAULT como degradação gradual da bateria com o uso, não consumo total de uma vez. O Volta desvia desse default por ordem explícita do líder — consome a bateria inteira por uso. Não é pedido de confirmação: ele foi explícito. (Precedente mecânico já existente no corpus para "consumir a bateria de uma vez": o payload de vírus Zip-bomb, mesmo documento §8 — lá é malware que estoura a bateria; aqui é desenho legítimo da carta, mesma primitiva, uso oposto.)
+
+**Mana e bateria coexistem por padrão — canon já fechado, não é pergunta nova:** `cartas-hardware-pirataria-energia.md` §3 fixa o princípio (líder, 08/08/2026, ampliado no mesmo dia): *"TODAS as cartas devem passar pelo mecanismo de originalidade da carta (§3) E degradação da bateria (§5) — as duas variáveis JUNTAS, não uma ou outra. Isso é o DEFAULT; exceções existem, mas cada uma se discute e se aprova caso a caso com o líder, nunca por omissão."* Logo mana 6 (Ficha Rápida) e o custo de bateria coexistem nesta carta por padrão; não há exceção registrada para o Volta quanto a isso. Ponteiro (L-30): `cartas-hardware-pirataria-energia.md` §3.
+
+Duas consequências da especificação numérica, registradas e **não resolvidas aqui**: o combate por turnos ganha um elemento em tempo real, e a escolha cronometrada é barreira de acessibilidade conhecida. Detalhe completo em `_EFEITOS-ESCOLHIDOS.md` linha 14.
 
 ## Pontas soltas
 
-- ⚠️ **MARCADO PARA O LÍDER, NÃO RESOLVIDO AQUI:** a Ficha Rápida (acima) registra a carta como **1×/batalha**. Se essa restrição continuar valendo tal como está, os 21% de dreno acontecem **uma única vez por combate**, e a carta deixa de ser a sustentação REPETÍVEL que foi descrita a ele no momento em que escolheu o número (`_EFEITOS-ESCOLHIDOS.md` linha 14 já registra: "a carta é sustentação, não execução — precisa de vários usos para esvaziar um alvo"). A interação entre "21% por uso" e "1×/batalha" precisa da revisão dele. Já foi avisado pelo orquestrador. Não alterada aqui.
+- ⚠️ **MARCADO PARA O LÍDER, NÃO RESOLVIDO AQUI:** o princípio canônico de `cartas-hardware-pirataria-energia.md` §3 exige responder, ao planejar cada carta, **"o que muda se ela for original × pirata × homebrew?"** — essa resposta **não existe em lugar nenhum** para o Volta. Não inventada aqui.
+- ⚠️ **ACHADO ADICIONAL, MESMA CATEGORIA, TAMBÉM NÃO RESOLVIDO:** o mesmo §3 exige responder, para toda carta, uma segunda pergunta — **"o que muda se a bateria estiver nova × degradada?"** — e essa resposta também não foi encontrada em lugar nenhum para o Volta. Marcado junto, sem inventar resposta.
 - `resources/cards/volta.gw.card` segue com o número e o gatilho revogados (ver aviso no topo deste documento) — atualização do dado é tarefa separada, não feita aqui.
 - A chave `CARD_EXEC_VOLTA_NAME` resolve para **"Volt-Leech"** em `resources/translations/pt_br.md` — sem mudança.
