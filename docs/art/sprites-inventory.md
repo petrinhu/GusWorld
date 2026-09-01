@@ -3,52 +3,201 @@
 Mapa de onde vivem os sprites de cada personagem, o que cada pasta já tem, e como
 gerar o que falta. **Fonte da verdade sobre a árvore `resources/sprites/`.**
 
-> Atualizado 2026-08-06 (ASSETS-VERSIONAR-SPRITES). Contagem via `identify` + `find`
-> sobre o disco.
+> Reformado 31/08/2026 (decisão do líder de 30/08/2026, por `AskUserQuestion`): o
+> documento passa a separar PARTE MEDIDA de PARTE DE JULGAMENTO, e corrige oito
+> divergências achadas entre o texto anterior e o disco.
 
-## Tamanho canônico vs. tamanho no disco (decisão do líder, 30/08/2026)
+## Como ler este documento
 
-**O tamanho CANÔNICO e lógico do sprite de personagem é 180×180 para TODO o elenco**, decisão do
-líder por `AskUserQuestion` em 30/08/2026 (conteúdo completo em `docs/art/style-guide.md` §8).
-Isto **não é** o mesmo que o tamanho do arquivo no disco hoje: a maior parte do elenco já nasceu
-em 180×180, mas dois personagens estão em **256×256** — o **Gus** (protagonista, ver bloco ⭐
-abaixo) e o **`bento_requiem`** (confirmado por `identify` em 30/08/2026). **Esses arquivos NÃO
-são regerados** para bater com o canônico; o ajuste de 256 para 180 é feito **em tempo de
-execução, pelo motor gráfico do GlintFx**, na camada de apresentação — que ainda não existe
-(L-06, L-27). Isto abre uma exigência nova ao framework, registrada no `TODO.md` como item `P4`;
-o pedido só vai ao bus quando `present/` esbarrar de fato na falta (L-07).
+Duas partes, deliberadamente separadas:
 
-**Ao ler a coluna `dim` da tabela abaixo:** ela descreve o **arquivo real no disco**, não o
-canônico. Onde os dois coincidem (180×180), nenhuma nota é necessária. Onde divergem (o
-`bento_requiem`), a tabela sinaliza.
+- **PARTE MEDIDA** — fatos verificáveis no disco e no git, num instante datado. Cada
+  afirmação vem acompanhada do comando que a produz, para que qualquer pessoa
+  reconfira num comando só. Ela descreve o disco em **31/08/2026, 21:11
+  (America/Recife)** — divergência entre esta parte e o disco é erro DESTE
+  documento, nunca do disco. **Rode o comando; não cite o número daqui de cabeça**
+  depois que o disco tiver mudado.
+- **PARTE DE JULGAMENTO** — o que não se mede: qual pasta é a ativa e por quê, o que
+  foi decidido pelo líder e quando, o que aguarda decisão, papel de cada
+  personagem. Escrita à mão, como antes.
 
-## Onde ficam
+---
+
+## PARTE MEDIDA (disco em 31/08/2026, 21:11 — America/Recife)
+
+### Versionamento — o mecanismo real
+
+Os PNGs de `resources/sprites/` **não são ignorados pelo git**. São rastreados de
+forma **incondicional** via Git LFS, pela regra do `.gitattributes` (linhas 14-23):
+
+```
+resources/**/*.png filter=lfs diff=lfs merge=lfs -text
+```
+
+(mesma regra para `.jpg`, `.jpeg`, `.gif`, `.wav`, `.mp3`, `.ogg`, `.flac`, `.zip`.)
+
+Verificação:
+
+- `/usr/bin/grep -i sprite .gitignore` → **zero linhas**. Não existe regra
+  `resources/sprites/*` no `.gitignore`.
+- `find resources/sprites -type f | wc -l` → **898**.
+- `git ls-files resources/sprites | wc -l` → **898**.
+- `comm -3` entre as duas listas ordenadas → **0 linhas de diferença**: os 898
+  arquivos do disco são exatamente os 898 rastreados, sem arquivo fora do git nem
+  entrada fantasma no git.
+
+Não existe hoje nenhuma "exceção seletiva por arquivo" (nem `vanda_do_cafe/south.png`
+isolado, nem tratamento especial de `caua_volt/walk/`) — o mecanismo é LFS
+incondicional sobre todo PNG de `resources/`, sem lista de exceções.
+
+### Estrutura de topo
+
+- `find resources/sprites -mindepth 1 -maxdepth 1 -type d | wc -l` → **87 pastas de
+  nível 1**.
+- Pastas que **não** são personagem 1:1 (5): `icons-m5`, `personagens_inspirados`,
+  `world`, `models_frente`, `prospero_vance`.
+- **Personagens = 87 − 5 = 82.**
+- Varredura pasta a pasta dos 82 (`find "resources/sprites/<slug>" -maxdepth 1
+  -type d -name walk`): **6 têm `walk/`** — `caua_volt`, `iara_lumen`,
+  `bento_requiem`, `linda_siren`, `dante_grid`, `jaci_proxy`. **76 não têm.**
+- **Estáticos sem walk = 82 − 6 = 76.**
+- Dos 76, contagem item a item de `find "resources/sprites/<slug>" -maxdepth 1
+  -iname '*.png' | wc -l` mostra que **67 têm exatamente 4 arquivos**
+  (`south/north/east/west.png`) e **9 divergem**: 7 têm só `_concept_front.png` (1
+  arquivo — aguardando geração, ver parte de julgamento), `otelo_pancha` tem 5
+  (`_concept_front.png` + as 4 direções) e `patch_zero` tem 8 (4 direções cardeais +
+  4 diagonais).
+
+### `models_frente/`
+
+`find resources/sprites/models_frente -type f` → **9 arquivos**, todos rastreados
+(`git ls-files resources/sprites/models_frente | wc -l` também dá 9):
+`androide_inimigo.png`, `bento.png`, `bertoldo_caim.png`, `caua.png`, `dante.png`,
+`iara.png`, `jaci.png`, `linda.png`, `sterling.png`.
+
+### `personagens_inspirados/`
+
+`find resources/sprites/personagens_inspirados -type f | wc -l` → **183 arquivos**.
+Por subpasta:
+
+| subpasta | arquivos |
+|---|---|
+| `gus` | 173 |
+| `pyotor_vance` | 4 |
+| `yakov` | 3 |
+| `brunus_vetorial` | 3 |
+
+173 + 4 + 3 + 3 = **183**.
+
+### Gus — `anims/breathing_idle/`
+
+`find .../gus/anims/breathing_idle -type f` → **20 arquivos**, 5 em cada uma das 4
+subpastas (`south`, `north`, `east`, `west`). `md5sum` dos 20 arquivos: **hashes
+todos distintos**, nenhuma repetição. Datas (`find -printf '%T+'`): `south/` em
+23/06/2026; `north/`, `east/` e `west/` em 23/07/2026 (lote posterior).
+
+A convenção `_breathing_idle_dirs_STAGING_2026-07-23/` **não existe**:
+`find resources -iname '*STAGING*'` (buscado no projeto inteiro) → **0
+resultados**. As 3 direções extras já estão na pasta final
+`breathing_idle/<dir>/`, não em nenhuma pasta de staging.
+
+Arquivo solto fora do padrão de 4 subpastas:
+`personagens_inspirados/gus/walk/_south_strip.png`.
+
+### `bento_requiem/` — pasta mista de tamanho
+
+- Direções (`south/north/east/west.png`, 4 arquivos no topo da pasta): `identify`
+  → **256×256** cada.
+- `anims/` (14 subpastas; `find resources/sprites/bento_requiem/anims -type f |
+  wc -l`): **181 arquivos**, todos **256×256** (amostrado por `identify`).
+- `walk/` (`find resources/sprites/bento_requiem/walk -type f | wc -l`): **24
+  arquivos**, todos **180×180** (`walk_<dir>_<n>.png`, plano, sem subpasta por
+  direção).
+
+### Anims dos companheiros (party)
+
+`find resources/sprites/<slug>/anims -type f | wc -l` para cada um dos 6 com
+`walk/`:
+
+| slug | arquivos em `anims/` |
+|---|---|
+| `caua_volt` | 0 |
+| `iara_lumen` | 0 |
+| `linda_siren` | 0 |
+| `dante_grid` | 0 |
+| `jaci_proxy` | 0 |
+| `bento_requiem` | 181 |
+
+Só `bento_requiem` tem `anims/` preenchido; nos outros 5 a pasta existe (`find`
+confirma o diretório) e está vazia.
+
+### `aleatorio.png`
+
+Não existe. `find . -iname 'aleatorio.png'` (projeto inteiro) → **0 resultados** no
+disco. `git log --all --diff-filter=A --name-only | grep -i aleatorio` só acha
+`docs/design/mecanicas/encontros-aleatorios.md` — falso-positivo do substring
+"aleatorio" num nome de arquivo de design, nunca uma imagem. `resources/images/`
+(raiz) tem **1 arquivo direto** (`find resources/images -maxdepth 1 -type f`):
+`vance_dragon_glyph.png` (244.826 bytes), mais 12 subpastas.
+
+### `icons-m5/`
+
+`find resources/sprites/icons-m5 -type f | wc -l` (recursivo, com subpastas
+`app_icon/familias/intent/modificador/retratos/status/`) → **55 arquivos**: **54
+PNGs** (`-iname '*.png'`) + **1 `REVISAO.html`** — não mencionado em versões
+anteriores deste documento.
+
+### `prospero_vance/`
+
+`find resources/sprites/prospero_vance -type f | wc -l` → **0**. A pasta **existe e
+está vazia** (`ls -la` mostra só `.` e `..`). Ausente de `CHARS.md`
+(`/usr/bin/grep -i prospero_vance CHARS.md` → zero linhas). Está sob investigação
+separada — origem não apurada aqui.
+
+### `seu_bertoldo_caim/`
+
+`find resources/sprites/seu_bertoldo_caim -type f` → 4 arquivos:
+`east.png`, `north.png`, `south.png`, `west.png` (as 4 direções estáticas,
+sem `walk/`).
+
+---
+
+## PARTE DE JULGAMENTO
+
+### Tamanho canônico vs. tamanho no disco (decisão do líder, 30/08/2026)
+
+**O tamanho CANÔNICO e lógico do sprite de personagem é 180×180 para TODO o elenco**,
+decisão do líder por `AskUserQuestion` em 30/08/2026 (conteúdo completo em
+`docs/art/style-guide.md` §8). Isto **não é** o mesmo que o tamanho do arquivo no
+disco hoje: a maior parte do elenco já nasceu em 180×180, mas dois personagens
+estão em **256×256** — o **Gus** (protagonista, ver bloco ⭐ abaixo) e o
+**`bento_requiem`** (a parte medida acima confirma: direções + `anims/` em
+256×256, só `walk/` já em 180×180). **Esses arquivos NÃO são regerados** para
+bater com o canônico; o ajuste de 256 para 180 é feito **em tempo de execução,
+pelo motor gráfico do GlintFx**, na camada de apresentação — que ainda não existe
+(L-06, L-27). Isto abre uma exigência nova ao framework, registrada no `TODO.md`
+como item `P4`; o pedido só vai ao bus quando `present/` esbarrar de fato na falta
+(L-07).
+
+**Ao ler a coluna `dim` da tabela abaixo:** ela descreve o **arquivo real no
+disco**, não o canônico. Onde os dois coincidem (180×180), nenhuma nota é
+necessária. Onde divergem (o `bento_requiem`, e só na parte 256×256 dele), a
+tabela sinaliza.
+
+### Onde ficam
 
 Todos em **`resources/sprites/<slug>/`**, um diretório por personagem. Os PNGs são
-**gitignored por padrão** (`.gitignore`: `resources/sprites/*`), vivem só no disco +
-backup IDrive — este doc, sim, é versionado, então o mapa sobrevive a um clone limpo
-mesmo que a maior parte dos binários não.
+rastreados incondicionalmente via Git LFS (ver PARTE MEDIDA acima) — vivem no
+git **e** no disco local, não só no disco.
 
-**Exceção (ASSETS-VERSIONAR-SPRITES, 2026-08-06):** um punhado de arquivos ESPECÍFICOS
-(não a pasta inteira) é versionado no git normal porque **código de produção e testes
-automatizados exigem que existam num clone limpo** — sem eles a suíte fica vermelha,
-já que o CI não tem o disco local do líder. Padrão do `.gitignore`: un-ignore o
-diretório → re-ignore o conteúdo → un-ignore só o(s) arquivo(s)/subpasta(s) citados por
-código/teste (por diretório, nunca por nome exato solto — nome exato deixa de casar em
-silêncio se o arquivo for renomeado). Hoje são 3 exceções:
-- `resources/sprites/vanda_do_cafe/south.png` — NPC fixo do overworld (`city_actors.hpp`).
-- `resources/sprites/caua_volt/walk/` (24 arquivos) — o walk do Cauã ativo.
-- `resources/sprites/caua_volt/south.png` — fixture da família GENÉRICA da cascata de
-  assets (`platform/tests/asset_source_test.cpp`); ver seção do Cauã abaixo.
-
-## Convenção de arquivos por personagem
+### Convenção de arquivos por personagem
 
 ```
 resources/sprites/<slug>/
 ├── south.png            # frente (vira o jogador). É a REFERÊNCIA canônica do char.
-├── north.png            # costas
-├── east.png             # direita
-├── west.png             # esquerda   (sem flip de east — Pillar 3, ver locomotion)
+├── north.png             # costas
+├── east.png              # direita
+├── west.png               # esquerda   (sem flip de east — Pillar 3, ver locomotion)
 └── walk/
     ├── south/{0,1,2,3,...}.png   # ciclo de caminhada por direção
     ├── north/...
@@ -60,7 +209,11 @@ Retratos/bustos de combate ficam à parte em `resources/sprites/icons-m5/retrato
 O jogo é **4-direcional sem flip** por design (Pillar 3); ver a memória
 `project_locomotion_animacao`.
 
-## Estado atual (81 pastas de personagem)
+## Estado atual (82 pastas de personagem)
+
+**`seu_bertoldo_caim` É PERSONAGEM** (decisão do líder, 30/08/2026): sai da lista de
+pastas especiais e conta no total. A contagem de personagens, antes 81, passa a
+**82** (ver aritmética completa na PARTE MEDIDA, seção "Estrutura de topo").
 
 ### `personagens_inspirados/` = os HOMENAGEADOS (inspirados em pessoas reais)
 
@@ -77,25 +230,30 @@ homenageados-mestres (Faraday, Turing, Gödel, von Neumann...) vive em
 
 **ATENÇÃO: o Gus NÃO fica em `sprites/gus/`.** A pasta canônica é
 `sprites/personagens_inspirados/gus/`, apontada pela constante `kGusSpritesDir =
-"sprites/personagens_inspirados/gus"` (header `asset_paths.hpp`). (O `gustaf_i_tavus_vance/` é o **ancestral
-Gustaf I**, não o protagonista — não confundir.) Tudo 256×256 **no arquivo em disco**.
-⚠️ **O tamanho canônico e lógico é 180×180** (decisão do líder, 30/08/2026, ver seção
-"Tamanho canônico vs. tamanho no disco" acima) — este arquivo **não é regerado** para bater com
-ele; o ajuste é feito em tempo de execução pelo motor gráfico do GlintFx.
+"sprites/personagens_inspirados/gus"` (header `asset_paths.hpp`). (O
+`gustaf_i_tavus_vance/` é o **ancestral Gustaf I**, não o protagonista — não
+confundir.) Tudo 256×256 **no arquivo em disco**. ⚠️ **O tamanho canônico e lógico
+é 180×180** (decisão do líder, 30/08/2026, ver seção "Tamanho canônico vs. tamanho
+no disco" acima) — este arquivo **não é regerado** para bater com ele; o ajuste é
+feito em tempo de execução pelo motor gráfico do GlintFx.
 
 ```
 personagens_inspirados/gus/
 ├── rotations/            # 8 direções estáticas: 0_south 1_south-west 2_west
 │                         #   3_north-west 4_north 5_north-east 6_east 7_south-east
-├── walk/{south,north,east,west}/   # 7 frames cada (locomoção 4-dir)
+├── walk/{south,north,east,west}/   # 7 frames cada (locomoção 4-dir), mais
+│                                    #   _south_strip.png solto no topo de walk/
 ├── anims/                # estados de combate + idle (frames por estado):
-│   ├── breathing_idle/ (5)   ← a "RESPIRAÇÃO"/cansado, virada pro Sul.
-│   ├── _breathing_idle_dirs_STAGING_2026-07-23/{north,east,west}/ (5 cada)
-│   │        ← GERADO 2026-07-23 via API HTTP direta (/animate-with-text-v3, first_frame
-│   │          = a rotação real de cada dir, animação "winded/ofegante", antena preservada
-│   │          por construção). STAGING: aguarda aval do líder + wiring do loader
-│   │          (ARTE-RESP-4DIR: montar breathing direcional + desligar
-│   │          idle_animated_only_one_facing). NÃO sobrescreveu o Sul nem o código.
+│   ├── breathing_idle/{south,north,east,west}/ (5 cada, 20 total)
+│   │        ← a "RESPIRAÇÃO"/cansado. Sul gerado 23/06/2026; Norte/Leste/Oeste
+│   │          gerados 23/07/2026 via API HTTP direta (/animate-with-text-v3,
+│   │          first_frame = a rotação real de cada dir, animação
+│   │          "winded/ofegante", antena preservada por construção). ⚠️ Já estão
+│   │          na pasta FINAL (não há mais staging — ver parte medida), o que
+│   │          pode significar que o item de backlog `ARTE-RESP-4DIR` (montar
+│   │          breathing direcional + desligar idle_animated_only_one_facing)
+│   │          já está fechado. **Isto é achado, não decisão** — precisa de
+│   │          revisão do líder antes de fechar o item.
 │   ├── battle_idle/ (7)  cast/ (7)  attack_melee/ (7)  attack_melee_east/ (9)
 │   ├── defend/ (5)  hurt_magic/ (5)  hurt_physical/ (5)  ko/ (7)  revive/ (7)
 │   ├── run/ (7)  run_east/ (9)  run_west/ (9)  victory/ (7)  dragon_victory/ (9)
@@ -111,82 +269,107 @@ mas é crítico no Gus.
 
 ### Party jogável — locomoção COMPLETA (4 dir + walk)
 
-Estes 7 têm ciclo de caminhada pronto (o alvo de completude):
+Estes 6 têm ciclo de caminhada pronto no top-level de `resources/sprites/`
+(o Gus, à parte, também tem — ver bloco ⭐ acima):
 
 | slug | dim (arquivo no disco) | walk frames | nota |
 |---|---|---|---|
 | `caua_volt` | 180×180 | 24 | **ATIVA — o Cauã do jogo**, desde a reversão do líder em 08/08/2026 — leia a nota abaixo |
 | `iara_lumen` | 180×180 | 24 | Infiltradora |
-| `bento_requiem` | **256×256** | 24 | Tanque. ⚠️ **Divergente do canônico (180×180)** — confirmado por `identify` em 30/08/2026. Não regerar: o ajuste é do motor gráfico do GlintFx em tempo de execução (ver seção "Tamanho canônico vs. tamanho no disco" acima). |
+| `bento_requiem` | **256×256 nas direções e em `anims/`; 180×180 em `walk/`** | 24 | Tanque. ⚠️ **Pasta mista** (ver PARTE MEDIDA) — o `walk/` já está no canônico, o resto não. Não regerar: o ajuste do resto é do motor gráfico do GlintFx em tempo de execução. |
 | `linda_siren` | 180×180 | 24 | Crowd Control |
 | `dante_grid` | 180×180 | 24 | TRAIDOR |
 | `jaci_proxy` | 180×180 | 24 | Healer |
+
+Nenhum dos 6 tem `anims/` preenchido hoje, exceto `bento_requiem` (181 arquivos —
+ver PARTE MEDIDA, "Anims dos companheiros").
 
 ### Cauã Volt — reversão de 08/08/2026 (decisão do líder)
 
 Em 2026-08-06, um agente moveu por engano arquivos de personagens **diferentes com o
 MESMO nome** (`east.png`/`north.png`/`west.png`) para um destino plano, e a movida
 sobrescreveu em silêncio os 3 arquivos de idle congelado (68×68) da pasta antiga
-`caua_volt/`. Nunca estiveram no git (a política era "sprite = disco local", ver seção
-"Onde ficam" acima), então não havia como recuperá-los ali. Como contorno temporário, o
-projeto anterior passou a apontar `kCauaSpritesDir` para uma pasta nova,
-`caua_volt_cyan_v2/` (180×180).
+`caua_volt/`. Nunca estiveram no git (a política era "sprite = disco local", texto
+já corrigido acima), então não havia como recuperá-los ali. Como contorno
+temporário, o projeto anterior passou a apontar `kCauaSpritesDir` para uma pasta
+nova, `caua_volt_cyan_v2/` (180×180).
 
 **Em 2026-08-08 o líder recuperou os 3 arquivos perdidos e o `walk/` completo (24
-quadros) de uma cópia própria, e decidiu reverter `kCauaSpritesDir` + `caua_layout()` de
-volta para `caua_volt/`** (commit `840479e` do projeto anterior, `gusworld_legacy`,
-verbatim: *"O Caua Volt volta a usar a arte recuperada em caua_volt/ [...] Os 24 quadros
-de walk/ de caua_volt_cyan_v2/ saem do git por decisao dele"*). A pasta
-`caua_volt_cyan_v2/` foi descartada por essa decisão e **não existe neste projeto** —
-nunca esteve no disco nem no histórico deste repositório.
+quadros) de uma cópia própria, e decidiu reverter `kCauaSpritesDir` + `caua_layout()`
+de volta para `caua_volt/`** (commit `840479e` do projeto anterior,
+`gusworld_legacy`, verbatim: *"O Caua Volt volta a usar a arte recuperada em
+caua_volt/ [...] Os 24 quadros de walk/ de caua_volt_cyan_v2/ saem do git por
+decisao dele"*). A pasta `caua_volt_cyan_v2/` foi descartada por essa decisão e
+**não existe neste projeto** — nunca esteve no disco nem no histórico deste
+repositório.
 
-- **`kCauaSpritesDir`** (`core/asset_paths.hpp`) aponta para `sprites/caua_volt` — **essa**
-  é a pasta que o Cauã do jogo usa.
-- **`caua_layout()`** (`player_sprites_loader.cpp`) tem o mesmo comportamento gracioso do
-  Gus: sem `anims/breathing_idle/` no disco, o idle cai no **walk f0** congelado de cada
-  direção. `walk/` de `caua_volt/` é **plano** (`walk_<dir>_<f>.png`, sem subpasta por
-  direção — export direto do gerador), suportado pelo campo de dado
-  `SpriteLayout::walk_dir_subfolder` (não um `if` por personagem — lei do átomo,
-  ADR-020).
+- **`kCauaSpritesDir`** (`core/asset_paths.hpp`) aponta para `sprites/caua_volt` —
+  **essa** é a pasta que o Cauã do jogo usa.
+- **`caua_layout()`** (`player_sprites_loader.cpp`) tem o mesmo comportamento
+  gracioso do Gus: sem `anims/breathing_idle/` no disco, o idle cai no **walk f0**
+  congelado de cada direção. `walk/` de `caua_volt/` é **plano**
+  (`walk_<dir>_<f>.png`, sem subpasta por direção — export direto do gerador),
+  suportado pelo campo de dado `SpriteLayout::walk_dir_subfolder` (não um `if` por
+  personagem — lei do átomo, ADR-020).
 - **`caua_volt/` é a pasta ATIVA**: os 28 arquivos no disco (4 direções soltas + 24
   quadros de `walk/`) são os recuperados pelo líder em 08/08/2026, medidos por
-  `identify` em 180×180, `PaletteAlpha`, 34 a 53 cores conforme o quadro — já satisfazem
-  o tamanho canônico de 180×180 (decisão do líder, 30/08/2026) **sem nenhuma
-  regeração**.
+  `identify` em 180×180, `PaletteAlpha`, 34 a 53 cores conforme o quadro — já
+  satisfazem o tamanho canônico de 180×180 (decisão do líder, 30/08/2026) **sem
+  nenhuma regeração**.
 
-**GERAÇÃO 2026-07-23 (party completa + Gus breathing):** os 6 companions ganharam o
-conjunto de anims do Gus via API HTTP direta (`animate-with-text-v3`, `no_background`,
-referência = o sprite direcional real de cada um). **14 tipos de anim × 6, 1086 frames,
-0 opaco** (conferido). Em STAGING (`anims/_<anim>_STAGING_2026-07-23/`), aguardando
-wiring do loader: breathing_idle/walk/run/caindo/caido_desacordado (direcionais 4-dir) +
-battle_idle/cast/attack_melee/defend/hurt_magic/hurt_physical/ko/revive/victory
-(front). `dragon_victory` NÃO (lore só do Gus). Gus breathing_idle N/L/O regenerado
-transparente (o 1º lote saiu opaco, bug de `no_background` esquecido).
+### Geração 2026-07-23 (party completa + Gus breathing)
+
+Os 6 companheiros **deveriam** ganhar o conjunto de anims do Gus via API HTTP
+direta (`animate-with-text-v3`, `no_background`, referência = o sprite direcional
+real de cada um) — mas **a parte medida confirma que só o `bento_requiem` recebeu
+o lote** (181 arquivos); `caua_volt`, `iara_lumen`, `linda_siren`, `dante_grid` e
+`jaci_proxy` têm `anims/` vazio. **Não existe** a pasta de staging
+`_<anim>_STAGING_2026-07-23/` citada em versões anteriores deste documento — nem
+para o Bento, nem para nenhum outro. O Gus recebeu, no mesmo período, o
+`breathing_idle` de Norte/Leste/Oeste (ver bloco ⭐ acima), já na pasta final.
 
 O **Gus protagonista** tem a árvore mais completa de todas (ver bloco ⭐ acima:
-8 rotações + walk 4-dir + 16 estados de anim). O que FALTA nele é pontual: a
-**respiração/cansado (`breathing_idle`) para Norte, Leste e Oeste** — hoje só o
-Sul tem, e os outros lados caem no walk-f0 congelado (item `ARTE-RESP-4DIR`).
+8 rotações + walk 4-dir + 16 estados de anim, incluindo agora `breathing_idle` nas
+4 direções). O que falta nele hoje é o resto do elenco: os 6 companheiros ainda não
+receberam o pacote de `anims/` que essa geração pretendia entregar, exceto o
+Bento.
 
-### Personagens com 4 direções estáticas, SEM walk (70)
+### `models_frente/`
+
+Existe com 9 arquivos rastreados (ver PARTE MEDIDA) e não estava documentada em
+nenhuma versão anterior deste mapa. **O papel dela não está decidido aqui** — só
+o conteúdo é descrito.
+
+### Personagens com 4 direções estáticas, SEM walk (76)
 
 A maioria do elenco de mundo/NPCs: 180×180, `south/north/east/west.png`, zero
-walk. São NPCs que hoje não andam (parados no mundo). Ex.: `seu_bertoldo_caim`
-(o NPC do M7), a família Chevalier, os Ferraz, `patch_zero` (+4 extras),
+walk. 67 deles têm exatamente esses 4 arquivos. Os outros 9 divergem (ver PARTE
+MEDIDA, "Estrutura de topo"): 7 aguardando geração (só `_concept_front.png`),
+`otelo_pancha` (5 arquivos) e `patch_zero` (8 arquivos, com diagonais). Ex.:
+`seu_bertoldo_caim` (o NPC do M7), a família Chevalier, os Ferraz, `patch_zero`,
 `sterling`/antagonistas, etc. Lista completa: `ls -d resources/sprites/*/`.
 
 ### Pastas especiais (não são um personagem 1:1)
 
-- `icons-m5/` — retratos de combate + ícones (54 PNGs, inclui `retratos/retrato_gus_*`).
-- `personagens_inspirados/` — arte-conceito HD de referência (161 arquivos; ex.
+- `icons-m5/` — retratos de combate + ícones (55 arquivos: 54 PNGs, inclui
+  `retratos/retrato_gus_*`, mais `REVISAO.html`).
+- `personagens_inspirados/` — arte-conceito HD de referência (183 arquivos; ex.
   `gus/gus_conceito.png` 1844×2304 — HD, NÃO é sprite de jogo).
 - `world/` — cenário dos Distritos Inferiores.
-- `seu_bertoldo_caim/` — NPC do M7 (retrato usado no diálogo).
+- `models_frente/` — 9 arquivos, papel ainda não documentado (ver acima).
+- `prospero_vance/` — pasta vazia, órfã, ausente de `CHARS.md`. **Sob investigação
+  separada**; existência registrada aqui, origem não decidida.
 
 ## Como gerar o que falta (PixelLab, pipeline canônica)
 
-**RITUAL OBRIGATÓRIO de 5 passos (líder 2026-07-23, memória `feedback_ritual_geracao_sprite`):**
-1. **Buscar NESTE mapa** (nunca sair procurando no disco). 2. **Buscar referência** aprovada do personagem (é o insumo; trava identidade+antena, ZERO flip). 3. **Gerar** via PixelLab, pasta nova para variante/regen. 4. **Baixar** os PNGs pra `resources/sprites/<slug>/` (sem isso ficam invisíveis pro jogo). 5. **Atualizar ESTE mapa** com o que foi gerado. O mapa alimenta a geração (passo 1) e a geração alimenta o mapa (passo 5) — nunca envelhece.
+**RITUAL OBRIGATÓRIO de 5 passos (líder 2026-07-23, memória
+`feedback_ritual_geracao_sprite`):**
+1. **Buscar NESTE mapa** (nunca sair procurando no disco). 2. **Buscar referência**
+aprovada do personagem (é o insumo; trava identidade+antena, ZERO flip).
+3. **Gerar** via PixelLab, pasta nova para variante/regen. 4. **Baixar** os PNGs
+pra `resources/sprites/<slug>/` (sem isso ficam invisíveis pro jogo).
+5. **Atualizar ESTE mapa** com o que foi gerado. O mapa alimenta a geração
+(passo 1) e a geração alimenta o mapa (passo 5) — nunca envelhece.
 
 Detalhe da ferramenta em `reference_pixellab_mcp` (memória). Resumo:
 
@@ -210,17 +393,17 @@ e `list_*` não gastam.
 Props, cartas, símbolos e arte de lore vivem em `resources/images/` e têm mapa
 próprio: [`props-inventory.md`](props-inventory.md). Aqui é só personagem-sprite.
 
-## Conceitos de personagem aguardando geração (2026-07-23)
+## Conceitos de personagem aguardando geração
 
-6 personagens com **pasta criada 2026-07-23** e o conceito HD dentro como
-`sprites/<slug>/_concept_front.png` (a referência de geração). Falta GERAR os
-sprites de jogo a partir dele (`generate-8-rotations-v3` + `no_background` → 4
-direções; anims depois conforme o papel). Fila atrás da geração da party (limite de
-taxa):
+**7 personagens** com pasta criada e só o conceito HD dentro, como
+`sprites/<slug>/_concept_front.png` (a referência de geração), confirmado pela
+varredura da PARTE MEDIDA (os 7 folders com exatamente 1 arquivo, esse arquivo).
+Falta GERAR os sprites de jogo a partir dele (`generate-8-rotations-v3` +
+`no_background` → 4 direções; anims depois conforme o papel). Fila atrás da
+geração da party (limite de taxa):
 
 `anaximandro_vyrcatrix`, `anhuera_vanderbist`, `cassiano_vorto`, `yara_ducourt`,
-`anselmo_boroshova_vance`, `mariana_vanderbist` — cada um com `_concept_front.png`, zero
-sprite ainda.
-
-Órfão sem canon: `aleatorio.png` (fica em `images/` raiz; não é o Sterling; aguarda
-atribuição antes de virar pasta).
+`anselmo_boroshova_vance`, `mariana_vanderbist`, **`heliaco_vyr`** — cada um com
+`_concept_front.png`, zero sprite ainda. ⚠️ **`heliaco_vyr` é achado desta
+reforma**: casa exatamente no mesmo padrão dos outros 6 (só `_concept_front.png`
+no disco) mas não estava listado nesta seção em versões anteriores do documento.
