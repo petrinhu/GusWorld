@@ -205,12 +205,38 @@ Dois recursos, propósitos distintos. AP limita **quantas** ações; Mana limita
 - Cresce via skill tree em jogo posterior (fora do escopo do slice; o campo é parametrizável).
 - **Por-ator** (relógio de ação, §4): AP pertence ao ator eleito pelo relógio. Cada membro da party tem seus 3 AP independentes quando age. Canonizado D.1 Sprint 1 W2, 2026-06-03. ⚠️ Ver a lacuna de ativação registrada em §3 (AP=3/multi-ação vs uma carta por ativação).
 
-### Mana / Compilação
+### Mana / Compilação (bateria: estoque × vazão, decisão do líder 31/08/2026)
 
-- `manaMax = 2 + contagemPropriaDeTurnos`, com `cap = 8`. Contagem por-ator, substitui o antigo `turnoIndex` global (reconciliado com `ADR-017` em 25/08/2026; ver §2).
-- Recarrega ao **máximo** a cada `TurnStart`. **Sem carry-over** (impossível bankar mana entre turnos: anti-degeneração, ver §13).
-- Ramp linear garante que combos premium só ficam viáveis no mid-late do combate, preservando curva de tensão.
-- **Por-ator** (relógio de ação, §4): cada ator tem seu próprio pool de mana independente. Sem pool compartilhado entre personagens. Canonizado D.1 Sprint 1 W2, 2026-06-03.
+**Mana e a carga de bateria são o MESMO recurso, com duas propriedades físicas de uma só bateria**
+(`cartas-hardware-pirataria-energia.md` §5, "Mana e bateria são o mesmo recurso" e "Múltiplas
+baterias e a barra da tela"): **estoque** (a carga disponível na bateria ativa — persiste entre
+batalhas, degrada, exige recarga real) e **vazão** (a taxa máxima de descarga por turno).
+
+- `manaMax = 2 + contagemPropriaDeTurnos`, com `cap = 8`, é a **vazão**: o quanto o ator PODE sacar
+  da bateria ativa naquele turno — não um orçamento próprio que nasce do nada a cada turno. O
+  número não muda; muda só a natureza do que ele mede. Contagem por-ator, substitui o antigo
+  `turnoIndex` global (reconciliado com `ADR-017` em 25/08/2026; ver §2).
+- **O limite real de cada turno é o MENOR dos dois: a vazão do turno, ou o que ainda resta de
+  estoque na bateria ativa.** Nunca se saca mais do que a bateria tem, mesmo que a vazão do turno
+  permitisse mais.
+- A **vazão** cresce e reseta a cada `TurnStart`, como antes (sem mudança de número). **O estoque
+  NÃO recarrega no `TurnStart`** — é a carga real da bateria, e só sobe por recarga de verdade
+  (troca de bateria, estação de recarga, cidade; `cartas-hardware-pirataria-energia.md` §5, "Troca
+  e recarga"). "Sem carry-over" segue valendo, mas agora só para a VAZÃO não usada no turno (não dá
+  para acumular capacidade de saque de um turno para o outro); o estoque, ao contrário, PERSISTE
+  entre turnos e entre batalhas, porque é a bateria — ficar sem estoque no meio de uma batalha passa
+  a ser possível (não decidido aqui o que acontece nesse momento; ver
+  `cartas-hardware-pirataria-energia.md` §5).
+- Ramp linear garante que combos premium só ficam viáveis no mid-late do combate, preservando curva
+  de tensão — **contanto que a bateria ativa tenha estoque suficiente**; se não tiver, o teto real é
+  o estoque, não a vazão.
+- **Por-ator** (relógio de ação, §4): a vazão é calculada por ator, como antes. ⚠️ **Não decidido
+  nesta fatia, sinalizado e não resolvido:** se a bateria ativa (o estoque) é própria de cada ator ou
+  selecionada pelo jogador dentre as várias baterias que ele carrega
+  (`cartas-hardware-pirataria-energia.md` §5, "Múltiplas baterias"). A frase "cada ator tem seu
+  próprio pool de mana independente, sem pool compartilhado entre personagens" (canonizada D.1
+  Sprint 1 W2, 2026-06-03) descrevia o modelo antigo de recurso-próprio-do-ator; ela fica sinalizada
+  aqui, não reafirmada nem apagada, até o líder esclarecer se o estoque também é por-ator.
 
 ### Tabela de custos canônica
 
@@ -229,7 +255,7 @@ Modificadores anexados a cartas somam mana (Object +1, Stream +2, Null +1; ver �
 
 ### Recarga de recurso via carta comum (CARTAS-COMUNS-ENGINE, "Tavus-Overclock", canonizado 2026-07-16)
 
-Elétrico-utilidade (versão forte escolhida pelo líder, não o fallback Haste): carta comum que devolve AP e/ou mana ao próprio conjurador, campos `Card.RestoreAp`/`Card.RestoreMana` (record-base §7, `//PLAYTEST` a carta canônica usa +1 AP / +2 mana). Custo de mana da carta é **sempre pago primeiro** (`spend_mana`), a recarga entra depois — anti-exploit de "a carta paga a si mesma". `RestoreAp` usa a MESMA semântica temporária do bônus de Calc-Edge/Mises (§20 do executor techMagic): não muta `MaxAp`, some no próximo `TurnStart`. `RestoreMana` clampa em `manaMax` (sem overflow).
+Elétrico-utilidade (versão forte escolhida pelo líder, não o fallback Haste): carta comum que devolve AP e/ou mana ao próprio conjurador, campos `Card.RestoreAp`/`Card.RestoreMana` (record-base §7, `//PLAYTEST` a carta canônica usa +1 AP / +2 mana). Custo de mana da carta é **sempre pago primeiro** (`spend_mana`), a recarga entra depois — anti-exploit de "a carta paga a si mesma". `RestoreAp` usa a MESMA semântica temporária do bônus de Calc-Edge/Mises (§20 do executor techMagic): não muta `MaxAp`, some no próximo `TurnStart`. `RestoreMana` clampa em `manaMax` (sem overflow). ⚠️ **Sinalizado pelo modelo estoque×vazão (acima), não resolvido aqui:** com mana = carga de bateria, falta dizer se este clamp devolve carga real ao ESTOQUE da bateria (capado pela capacidade física dela) ou se continua capado pela VAZÃO do turno (`manaMax`) — os dois números não são o mesmo sob o novo modelo, e a redação atual não distingue.
 
 **Trava 1×/TURNO (decisão do líder):** sem ela, a carta vira loop infinito de AP/mana dentro do mesmo turno + farm degenerado de Mastery (confirmado pelo economy-designer). Flag por-ator (`CombatActor.OverclockUsed`), **resetada no MESMO `TurnStart`** que zera AP/mana (não é 1×/batalha como a Análise Preditiva §2.1 nem as especiais Ativa/Hibrida — é 1× por turno, todo turno). 2ª tentativa no mesmo turno paga o custo normalmente mas NÃO recarrega; loga o bloqueio (regra "todo efeito loga", inclusive quando não faz nada). Silence bloqueia o cast inteiro (gate no topo de `ResolveUseCard`, mesmo padrão de qualquer carta).
 
