@@ -161,21 +161,23 @@ consumir a ativa inteira, o custo fixo de "mana 6" que algumas cartas registram 
 escrito em lugar nenhum. A mesma dúvida já está marcada, de forma independente, em
 `docs/design/mecanicas/cartas/volta.md` ("Pontas soltas"): não decidida ali, não decidida aqui.
 
-**Duas contradições candidatas achadas na varredura de 31/08/2026, uma delas RESPONDIDA pelo líder no
-mesmo dia (ver "Estoque e vazão", logo abaixo), a outra ainda sinalizada e NÃO resolvida ou editada:**
+**Duas contradições candidatas achadas na varredura de 31/08/2026, AMBAS respondidas pelo líder no
+mesmo dia (ver "Estoque e vazão", logo abaixo):**
 
 1. ✅ **Respondida.** `docs/design/mecanicas/combat.md` §5 especificava um pool de mana do ATOR,
    separado da bateria física da carta. O líder respondeu: não são dois medidores, são duas
    propriedades da MESMA bateria (estoque e vazão) — ver "Estoque e vazão" abaixo, e a correção já
    aplicada em `combat.md` §5 e `cartas-spec-logica.md` §3.1.
-2. `docs/design/mecanicas/battle-screen.md` (linhas 50, 58, 222) é spec de tela já detalhada e
-   embarcada como constantes (`kCyan` etc. em `battle_scene.cpp`, conforme a própria nota do
-   documento): Mana aparece como **pips** (cyan), dentro do painel lateral ("cockpit"), ao lado do
-   retrato — não como **barra** "abaixo do quadro do personagem", e o documento não descreve seleção
-   de bateria pelo jogador. Pode ser só troca de palavra (pip é uma forma de barra), pode ser
-   atualização de layout que este acréscimo do líder pede — **não decidido aqui.** Não editado: é
-   spec de tela já canônica, e a L-27 deste projeto proíbe desenhar interface nesta fatia de qualquer
-   forma.
+2. ✅ **Respondida.** `docs/design/mecanicas/battle-screen.md` linha 50 descreve, dentro do painel
+   lateral ("cockpit"), "retrato GRANDE (64px) + nome + barra de HP (com número) + pips de AP (latão)
+   e Mana (cyan)". **Correção de fato, para não repetir:** esta seção havia dito que essa spec estava
+   "embarcada como constantes em `battle_scene.cpp`" — esse arquivo **não existe**; este repositório
+   não tem código nenhum (`find` por `battle_scene*` devolve vazio, `CLAUDE.md` confirma ausência de
+   `CMakeLists.txt`/`src/`/`include/`). O documento cita nomes de um consumidor planejado, não de
+   código que roda aqui — não é spec "já implementada". Quanto à pergunta em si: os pips de Mana não
+   eram forma errada nem tela desatualizada, era só metade do que agora existe — ver "Estoque e
+   vazão" abaixo. Não editado: é spec de tela, e a L-27 deste projeto proíbe desenhar interface nesta
+   fatia de qualquer forma.
 
 ### Estoque e vazão: a bateria tem duas propriedades físicas (decisão do líder, 31/08/2026)
 
@@ -194,6 +196,22 @@ sistema, com duas propriedades físicas da mesma bateria.**
    Agora é **uma subtração só**, da bateria, limitada pela vazão do turno. Redação corrigida no
    próprio `cartas-spec-logica.md` §3.1 (L-24 deste projeto: o que virou passado se apaga, não se
    guarda como histórico).
+5. **Os dois elementos da tela existem, e cada um mostra uma coisa** (decisão do líder, 31/08/2026,
+   completando o acréscimo de "Múltiplas baterias e a barra da tela"): **barra contínua = o ESTOQUE**
+   (a carga da bateria ativa); **pips discretos = a VAZÃO** (quanto ainda se pode sacar neste turno).
+   Razão que o líder acolheu: as duas propriedades que esta decisão separou passam a ser visíveis e
+   distintas, e o jogador enxerga de relance se está limitado pela carga que resta ou pelo teto do
+   turno — o sistema se ensina sozinho, sem tutorial, o que casa com o corte `C-16` (onboarding
+   orgânico, sem parede de texto). **Isto resolve a contradição candidata 2 acima:** a spec do
+   cockpit em `battle-screen.md` linha 50 não estava errada nem desatualizada, só descrevia um
+   elemento (pips) onde agora cabem dois (barra de carga da bateria + pips de vazão); os pips de AP,
+   que já existiam, não mudam — AP é outro recurso, com propósito distinto (`combat.md` linha 199).
+   **Posição confirmada, sem conflito:** "abaixo do quadro do personagem" (verbatim do acréscimo
+   anterior) bate com o cockpit da spec, onde o medidor de Mana já fica sob o retrato e o nome — a
+   dúvida anterior era de FORMA (pips × barra), nunca de posição; registrado aqui para ninguém reabrir
+   achando que há divergência de layout. **Detalhe que não é decidido aqui, por ser desenho de
+   interface (L-27):** cor, tamanho, posição fina, ordem de empilhamento e marcação dos dois
+   elementos — nasce com a camada `present/`.
 
 **Leitura que explica o conjunto:** a rampa deixa de ser um orçamento que aparece do nada a cada
 turno e vira o quanto a bateria consegue entregar por vez. Bateria real tem capacidade e tem corrente
