@@ -33,8 +33,8 @@ Princípio decisório: **toda regra abaixo existe para forçar decisão interess
 | Inimigos por encontro | 1 a 4 | encontros assimétricos são válidos (ex: 3 party vs 1 mini-boss) |
 | Ordem de turno | **Relógio de ação por ator** (`ActionClock`, `ADR-017`) | escalonador por instante-de-próxima-ação (inteiro); não é mais fila nem rodada global. Reconciliado com este canon em 25/08/2026 (decisão do líder); ver §3/§4 |
 | `AP` por turno | **3 fixo** | cresce via skill tree em jogo posterior; no slice é constante. ⚠️ Lacuna de spec aberta sobre ativação (uma ação por vez vs multi-ação): ver nota em §3 |
-| `Mana` (Compilação) | ramp linear | `manaMax = 2 + contagemPropriaDeTurnos`, cap 8. Contagem por-ator, substitui o antigo `turnoIndex` global (ver §5) |
-| Carry-over de mana | **nenhum** | recarrega ao máximo todo TurnStart; impossível bankar |
+| `Mana` (Compilação) | vazão: ramp linear | `manaMax = 2 + contagemPropriaDeTurnos`, cap 8, é a VAZÃO — taxa máxima de saque por turno da bateria ativa, não um pool do ator (§5, "Estoque e vazão"). Contagem por-ator, substitui o antigo `turnoIndex` global (ver §5) |
+| Carry-over de vazão | **nenhum** | a vazão reseta e cresce todo TurnStart; impossível bankar. O ESTOQUE da bateria (a carga real) não recarrega sozinho e persiste entre turnos e batalhas (`cartas-hardware-pirataria-energia.md` §5) |
 | Determinismo no slice | total (variância 0) | RNG visível plugado mas com variância zerada na entrega F2-E.5 |
 
 ### 2.1 Contrato de fragilidade do protagonista (Pillar 4, one-way door)
@@ -58,7 +58,7 @@ FSM por-ator. Cada ator (party ou inimigo) toma seu turno quando o **relógio de
                ▼            CombatBus.CombatStarted)
         ┌──────────────┐
    ┌───▶│  TurnStart   │  (o relogio elege o ator de menor next_action_at, §4;
-   │    └──────┬───────┘   recarrega mana do ator eleito: manaMax = 2 +
+   │    └──────┬───────┘   recalcula a vazao (mana) do ator eleito: manaMax = 2 +
    │           ▼            contagemPropriaDeTurnos, cap 8; aplica tick de status:
    │                        Poison/Regen/Duration--; reseta AP = 3, ver nota abaixo)
    │    ┌──────────────┐
@@ -230,13 +230,14 @@ batalhas, degrada, exige recarga real) e **vazão** (a taxa máxima de descarga 
 - Ramp linear garante que combos premium só ficam viáveis no mid-late do combate, preservando curva
   de tensão — **contanto que a bateria ativa tenha estoque suficiente**; se não tiver, o teto real é
   o estoque, não a vazão.
-- **Por-ator** (relógio de ação, §4): a vazão é calculada por ator, como antes. ⚠️ **Não decidido
-  nesta fatia, sinalizado e não resolvido:** se a bateria ativa (o estoque) é própria de cada ator ou
-  selecionada pelo jogador dentre as várias baterias que ele carrega
-  (`cartas-hardware-pirataria-energia.md` §5, "Múltiplas baterias"). A frase "cada ator tem seu
-  próprio pool de mana independente, sem pool compartilhado entre personagens" (canonizada D.1
-  Sprint 1 W2, 2026-06-03) descrevia o modelo antigo de recurso-próprio-do-ator; ela fica sinalizada
-  aqui, não reafirmada nem apagada, até o líder esclarecer se o estoque também é por-ator.
+- **Por-ator** (relógio de ação, §4): a vazão é calculada por ator, como antes. **A bateria (o
+  estoque) é PRÓPRIA DE CADA CARTA, não uma bateria única do ator nem um cinto comum do jogador**
+  (decisão do líder, 31/08/2026, `cartas-hardware-pirataria-energia.md` §5): cada carta consome a
+  bateria dela; baterias avulsas do inventário são peça de troca (encaixadas numa carta descarregada
+  para voltar a usá-la), não um pool do qual as cartas puxam. A frase "cada ator tem seu próprio pool
+  de mana independente, sem pool compartilhado entre personagens" (canonizada D.1 Sprint 1 W2,
+  2026-06-03) descrevia o modelo antigo de recurso-próprio-do-ator, e é **apagada** por L-24 deste
+  projeto: no modelo atual, a mana/carga pertence à CARTA que o ator está usando, não ao ator em si.
 
 ### Tabela de custos canônica
 
@@ -798,7 +799,7 @@ Subconjunto mínimo implementável via TDD. Tudo abaixo é entregável no slice;
 1. **FSM completa**: SetupPhase, TurnStart, ActionSelect (com loop interno por AP), ActionResolve, TurnEnd, CheckEnd, CombatEnd. Cobertura de testes por transição.
 2. **Relógio de ação por ator** (`ActionClock`, `ADR-017`, §4), com ordem total de desempate e reset pós-ação em aritmética inteira. Substitui a antiga fila de iniciativa por SPD e a operação `ReorderActor(actor, deltaPosicao)` com clamp; as primitivas que ajustam o relógio (Gambito-Reordenar, Knockback) somam ticks ao `next_action_at` do alvo (§4). Relógio visível (dado exposto; UI mínima, `battle-screen.md` D4).
 3. **AP = 3 fixo** por turno, reset no TurnStart.
-4. **Mana ramp**: `manaMax = 2 + contagemPropriaDeTurnos`, cap 8, recarrega ao máximo, sem carry-over. Contagem por-ator, substitui o antigo `turnoIndex` global (§2).
+4. **Mana ramp (vazão da bateria)**: `manaMax = 2 + contagemPropriaDeTurnos`, cap 8, é a VAZÃO — taxa máxima de saque por turno, que cresce e reseta a cada `TurnStart`, sem carry-over. O ESTOQUE da bateria (a carga real) não recarrega sozinho, persiste entre turnos e batalhas (`cartas-hardware-pirataria-energia.md` §5, "Estoque e vazão"). Contagem por-ator, substitui o antigo `turnoIndex` global (§2).
 5. **Records de dados**: `Card`, `CardFamily`, `StatusEffect`, mais enums de suporte (`CardBaseType`, `TargetShape`, `StackRule`, `StatusId`). Imutáveis.
 6. **5 famílias como dados** + roda de fraqueza determinística como tabela consultável (`multFraqueza` por par atacante/alvo).
 7. **3-4 status concretos**: `Stun`, `Poison`, `Shield`, `Expose` (cobrem aplicar / tick no TurnStart / expirar por Duration / StackRule / dispel).
