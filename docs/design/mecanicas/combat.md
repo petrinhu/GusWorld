@@ -729,7 +729,7 @@ Cada item abaixo é uma trava de design contra estratégia dominante ou jogo "re
 | **Sem grind (Knowledge)** | farmar reduz XP e aumenta conhecimento; não há power-creep por nível |
 | **RNG visível** | porcentagem mostrada + seedável + Gambito re-roll/cancela; variância nunca pune skill às cegas |
 | **Intent caótico** | Patch-Zero resiste a predição total (boss final exclusivo; mini-bosses têm intent legível porém complexo. N.2 R3.) |
-| **Sem mana banking** | mana recarrega ao máximo e não acumula; impossível estocar pra combo gigante |
+| **Sem combo gigante via estoque** | a VAZÃO do turno (`manaMax`) não acumula e reseta a cada `TurnStart` (isso não mudou); o ESTOQUE da bateria, ao contrário, persiste e pode crescer — mas o teto de vazão por turno segue capando quanto se pode sacar numa tacada só, não importa quanto estoque a bateria tenha acumulado (`cartas-hardware-pirataria-energia.md` §5, "Estoque e vazão") |
 | **Roda fechada** | relação de fraqueza é determinística e completa; sem família "sempre melhor" |
 | **Clamp dano mínimo 1** | impede build de Def infinita que zera dano (exceto imunidade telegrafa) |
 | **AP escasso (3)** | toda ação compete por AP; Scan/Gambito custam o turno de ataque (trade-off real) |
