@@ -132,6 +132,60 @@ batalhas, degrada, exige recarga real). A decisão do líder não diz se ela tam
 medidores numa métrica única, ou se cada um continua com seu rastreamento próprio enquanto nome e
 fala tratam as duas palavras como sinônimos. Isto não foi perguntado nem decidido nesta fatia.
 
+### Múltiplas baterias e a barra da tela (acréscimo do líder, 31/08/2026)
+
+> **Verbatim do líder:** *"A barra de mana que mostra na tela abaixo do quadro do personagem é
+> representa a carga/mana da bateria mais cheia, se o jogador não tiver selecionado outra."*
+
+Este acréscimo completa a decisão acima, no mesmo dia e sobre o mesmo assunto: não é só uma
+equivalência de nomes, é um sistema de recurso.
+
+1. **O jogador carrega VÁRIAS baterias**, não uma — rastreadas individualmente, cada uma com a
+   própria carga.
+2. **Existe uma bateria ATIVA**, e a barra na tela mostra a carga dela.
+3. **O padrão é a bateria mais cheia.** Sem escolha do jogador, o jogo elege automaticamente a de
+   maior carga.
+4. **O jogador pode selecionar outra bateria**, e a barra passa a mostrar a selecionada — a escolha
+   de qual bateria usar é decisão dele, não do sistema.
+5. **A barra fica abaixo do quadro do personagem.** Isto é posição de interface, registrada aqui como
+   decisão de layout já tomada pelo líder — **não é desenho de interface feito nesta fatia** (L-27
+   deste projeto: nenhuma interface se escreve antes de o GlintFx traduzir marcação). Nenhuma
+   marcação, folha de estilo ou mockup nasce deste parágrafo; ele só fixa o fato, para quando a
+   camada `present/` existir.
+
+**Leitura que isto abre, sem criar regra nova:** a bateria deixa de ser custo passivo e vira recurso
+que o jogador **gerencia** — escolher qual bateria gastar é decisão tática. Isso explica, sem nenhuma
+regra adicional, por que a carta do Volta pode ser usada de novo tendo outra bateria disponível: ela
+consome a bateria ativa por inteiro, e trocar de bateria devolve o recurso (`docs/design/mecanicas/cartas/volta.md`).
+
+**Consequência marcada, NÃO resolvida aqui:** se cada bateria tem carga própria e uma carta pode
+consumir a ativa inteira, o custo fixo de "mana 6" que algumas cartas registram (ex.: Volta, ver
+`cartas-technomagik.md` linha 70) precisa ser lido como "6 da bateria ativa" — coerente, mas não
+escrito em lugar nenhum. A mesma dúvida já está marcada, de forma independente, em
+`docs/design/mecanicas/cartas/volta.md` ("Pontas soltas"): não decidida ali, não decidida aqui.
+
+**Duas contradições candidatas achadas na varredura de hoje, sinalizadas e NÃO resolvidas ou
+editadas:**
+
+1. `docs/design/mecanicas/combat.md` §5 (linhas 36, 61, 210, 232, 775) especifica um **pool de mana
+   do ATOR**, não da carta: `manaMax = 2 + contagemPropriaDeTurnos` (cap 8), que cresce a cada turno e
+   reseta ao máximo sem carry-over, com `spend_mana`/`RestoreMana` operando sobre esse pool único por
+   ator. Isso não bate, sem mais explicação, com "várias baterias com carga própria, uma ativa,
+   escolhida pelo jogador": bateria (`cartas-spec-dados.md` linhas 82-84, 155-173) tem capacidade
+   **fixa por origem/dificuldade**, persiste **entre batalhas** e degrada por uso — não cresce com o
+   contador de turnos nem reseta ao entrar em combate. Se a barra da tela mostra carga de bateria,
+   falta dizer se o pool `manaMax` do ator continua existindo por baixo (e a barra é só uma janela
+   para ele) ou se a bateria SUBSTITUI esse pool de fato.
+2. `docs/design/mecanicas/battle-screen.md` (linhas 50, 58, 222) é spec de tela já detalhada e
+   embarcada como constantes (`kCyan` etc. em `battle_scene.cpp`, conforme a própria nota do
+   documento): Mana aparece como **pips** (cyan), dentro do painel lateral ("cockpit"), ao lado do
+   retrato — não como **barra** "abaixo do quadro do personagem", e o documento não descreve seleção
+   de bateria pelo jogador. Pode ser só troca de palavra (pip é uma forma de barra), pode ser
+   atualização de layout que este acréscimo do líder pede — não decidido aqui.
+
+Nenhuma das duas foi editada: são spec de combate e de tela já canônicas, e a L-27 deste projeto
+proíbe desenhar interface nesta fatia de qualquer forma.
+
 ### Troca e recarga
 - **Cidade:** grátis — abrir inventário, pôr carregada no lugar da usada.
 - **Estação de recarga:** te dá uma bateria **NOVA carregada** e cobra pela tua velha; o preço (**1,2x–2x** o de uma recarga) varia com a **degradação** da que você entrega.
