@@ -11,7 +11,7 @@ Dado completo em [`resources/cards/planck.gw.card`](../../../../resources/cards/
 
 ## Ficha rápida
 
-Família **Universal** · categoria **Passiva** · especial · mana 0 · equip-only, nunca jogada.
+Família **Universal** · categoria **Passiva** · especial · dois gastos de mana/bateria (standby + disparo, números pendentes, ver `_vocabulario.md` §9) · equip-only, nunca jogada.
 
 ## Como funciona
 

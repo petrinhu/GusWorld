@@ -2,7 +2,7 @@
 
 > **AVISO (atualizado 2026-07-14, achado PS-Y3):** este rascunho está **SUPERADO LINHA-A-LINHA por `_EFEITOS-ESCOLHIDOS.md`** — os 20 efeitos JÁ foram escolhidos pelo criador (2026-07-12/13), e várias linhas abaixo divergem do efeito real (ex.: Pythagoras aqui = "8/13/21% Sônico", mas o escolhido é "Hipotenusa √(a²+b²)"; Maxwell aqui = só ativa de área, mas o escolhido tem passiva "iluminar áreas escuras"; Volta aqui = passiva de carga, mas o escolhido é leech termodinâmico). **Use este arquivo só como REFERÊNCIA DE FORMATO DE TABELA, nunca de conteúdo.** A fonte de verdade dos efeitos é `_EFEITOS-ESCOLHIDOS.md`; os statlines numéricos finais fecham no playtest, em cima dos efeitos de lá (não daqui).
 >
-> **Arcabouço canônico** (esse sim fechado, ver `cartas-technomagik.md` §2.2/§2.3/§5): baseline comum ManaCost 1/2/3 → Power 3/5/8; especiais em 3 sub-categorias (ATIVA mana~6 / PASSIVA mana-0 equip-only / FORA-DE-COMBATE Faraday+Euler+Menger); os 2 status novos (Sobrecarga 8/5/2, Resfriamento card 4).
+> **Arcabouço canônico** (esse sim fechado, ver `cartas-technomagik.md` §2.2/§2.3/§5): baseline comum ManaCost 1/2/3 → Power 3/5/8; especiais em 3 sub-categorias (ATIVA mana~6 / PASSIVA dois gastos, standby + disparo, equip-only (decisão do líder, 02/09/2026) / FORA-DE-COMBATE Faraday+Euler+Menger); os 2 status novos (Sobrecarga 8/5/2, Resfriamento card 4).
 
 | # | cardExec- | Família (proposta) | ManaCost | Power / efeito-status | Ignora roda? | Sub-cat | Rationale |
 |---|---|---|---|---|---|---|---|
@@ -27,6 +27,6 @@
 | 19 | Menger | — | N/A | valor real de loot + item → Crédito, 1×/encontro | N/A | **fora-de-combate** | economia, não batalha |
 | 20 | Bastiat | Criptográfico | 0 | revela armadilhas + efeitos colaterais adiados inimigos | Não | passiva | o que não se vê |
 
-**Contagem provisória:** ~8 ativas (mana 6) / ~9 passivas (mana 0) / 3 fora-de-combate (Faraday, Euler, Menger). Nenhuma Bioquímico (gap aceito).
+**Contagem provisória:** ~8 ativas (mana 6) / ~9 passivas (dois gastos, standby + disparo, números pendentes) / 3 fora-de-combate (Faraday, Euler, Menger). Nenhuma Bioquímico (gap aceito).
 
 **Dados faltantes que travam número final:** Atk/SPD de Elite/boss (combat.md §17 TBD); tag "comando central" (Mises); plug técnico da quantização do Planck (§11). Ver `cartas-technomagik.md` §9.

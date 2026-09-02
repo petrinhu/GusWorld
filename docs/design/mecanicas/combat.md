@@ -557,7 +557,7 @@ A falha chega a **0% a partir de 5 kills** do mesmo tipo de inimigo.
 
 #### Quantum-Lock (Planck) — quantização do canal COMUM (ADR-016 manifesto item 5, canonizado 2026-07-15)
 
-Passiva mana-0 (carta HISTÓRICA — só o Gus equipa; o **motor é agnóstico por-ator**, zero hardcode de personagem no domínio, mesmo padrão do Reflect/Newton). Quando o **atacante** porta a passiva equipada, o canal COMUM deixa de sortear um `r` contínuo e passa a sortear um **degrau discreto** dentro da MESMA faixa da variância Knowledge — elimina os "quase-acertos", sem mexer na largura do range nem na média.
+Passiva com dois gastos de mana/bateria — standby e disparo, números pendentes de ratificação (decisão do líder, 02/09/2026, ver `cartas-hardware-pirataria-energia.md` §5, "Passiva tem dois gastos: standby e disparo") — carta HISTÓRICA, só o Gus equipa; o **motor é agnóstico por-ator**, zero hardcode de personagem no domínio, mesmo padrão do Reflect/Newton. Quando o **atacante** porta a passiva equipada, o canal COMUM deixa de sortear um `r` contínuo e passa a sortear um **degrau discreto** dentro da MESMA faixa da variância Knowledge — elimina os "quase-acertos", sem mexer na largura do range nem na média.
 
 ```
 // SEM Quantum-Lock (de sempre):

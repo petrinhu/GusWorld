@@ -11,7 +11,7 @@ Dado completo em [`resources/cards/hayek.gw.card`](../../../../resources/cards/h
 
 ## Ficha rápida
 
-Família **Universal** · categoria **Passiva** · especial · mana 0 · equip-only, nunca jogada. Beneficia o **lado inteiro**, não só o dono, enquanto ele estiver vivo e a carta equipada.
+Família **Universal** · categoria **Passiva** · especial · dois gastos de mana/bateria (standby + disparo, números pendentes, ver `_vocabulario.md` §9) · equip-only, nunca jogada. Beneficia o **lado inteiro**, não só o dono, enquanto ele estiver vivo e a carta equipada.
 
 ## Como funciona
 

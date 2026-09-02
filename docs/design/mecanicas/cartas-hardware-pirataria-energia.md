@@ -45,8 +45,9 @@ O mesmo raciocínio vale, com um grau a mais de dificuldade, para a **SUPER**: e
 > "qualquer efeito que CONSOME energia" — o líder ampliou para "todas as cartas" horas
 > depois, ao ver a implementação da curandeira fechar. Ao planejar uma carta nova,
 > o ponto de partida é "ela passa pelo mecanismo"; só vira exceção se alguém levantar
-> o caso e o líder concordar (ex.: uma passiva mana-0 sem custo de bateria pode ser
-> candidata a exceção, mas isso ainda não foi decidido — não presumir). Nasceu da
+> o caso e o líder concordar (a única candidata cogitada até aqui, a passiva mana-0,
+> foi fechada em sentido contrário em 02/09/2026: carta passiva nunca tem custo zero,
+> tem dois gastos, ver §5, "Passiva tem dois gastos: standby e disparo"). Nasceu da
 > carta de cura da curandeira (`CURANDEIRA-LIMITE-USOS`), primeiro caso implementado:
 > ao planejar CADA carta nova, responder às duas perguntas antes de existir — "o que
 > muda se a carta for original × pirata × homebrew?" e "o que muda se a bateria
@@ -272,6 +273,42 @@ ser propriedade física de UMA carta específica.
 **Isto fecha, sem ambiguidade restante, a pergunta `card_instance.battery`** que `G26`/`G27`
 (`TODO.md`) vinham marcando: é a bateria própria da carta. Refletido em `combat.md` §5 e
 `cartas-spec-logica.md` §3.1.
+
+### Passiva tem dois gastos: standby e disparo (decisão do líder, 02/09/2026)
+
+> **Decisão do líder, verbatim:** *"Neste jogo, mana e carga de bateria é a mesma coisa! Logo, mana 6
+> é a mesma coisa de dizer que gastou seis de carga da bateria. Mude o canon, carta passiva tem dois
+> tipos de gasto de mana/carga: gasto menor para ficar ativa em standby e carga maior quando o efeito
+> for exercido/usado."*
+
+Decisões anteriores do líder, no mesmo assunto, verbatim:
+
+- 31/08/2026: *"opcao 1. mana = bateria. Leis da termodinamica: nao existe trabalho sem energia."*
+- 01/09/2026: *"Nascem dois tipos de consumo."*
+- 01/09/2026: *"A carta passiva tem uma mecanica de uso de bateria diferente: enquanto ligada em
+  standby, usa o mínimo para ficar apenas ativa. Mas quano o poder dela é ativado, o gasto de energia
+  sai pelo poder."*
+
+**A carta `passiva` (`cartas/_vocabulario.md` §9) nunca tem custo zero de mana/bateria.** O canon
+anterior descrevia a passiva como "ManaCost 0, equip-only" (`cartas-technomagik.md` §2.3), como se
+ela não consumisse nada além do slot ocupado — essa leitura está revogada por completo; o texto que a
+sustentava foi corrigido nos documentos que a repetiam, sem guardar a redação antiga como histórico
+(L-24 deste projeto). No lugar dela, toda passiva tem **dois gastos distintos**, na mesma moeda
+(mana = bateria, seção acima):
+
+1. **Gasto de standby:** contínuo, menor, cobra enquanto a carta está equipada e ligada, mesmo sem o
+   efeito ter sido exercido.
+2. **Gasto de disparo:** maior, cobra no momento em que o efeito da passiva é de fato exercido/usado.
+
+**Os dois números, quanto é o gasto de standby e quanto é o gasto de disparo, para cada uma das
+passivas hoje catalogadas (Ada, Hayek, Mises, Planck, Pythagoras), não foram decididos pelo líder
+nesta rodada e não são inventados aqui.** Ficam para a fatia seguinte: proposta do `economy-designer`
+e ratificação do líder (item de INBOX aberto em `TODO.md`).
+
+**Em aberto, não decidido, não presumido:** se a mesma regra vale para a **face passiva** das cartas
+Híbridas (Faraday, Maxwell, Newton, von Neumann, John Dee, `cartas-technomagik.md` §2.3) e para as
+cartas **Fora de combate** (Euler, Menger, Turing) — o líder falou de "carta passiva" especificamente;
+estender a regra a essas outras categorias é proposta a submeter a ele, não decisão desta rodada.
 
 ### Troca e recarga
 - **Cidade:** grátis — abrir inventário, pôr carregada no lugar da usada.
