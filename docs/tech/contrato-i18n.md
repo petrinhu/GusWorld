@@ -265,12 +265,13 @@ Pluralização hoje é feita **por escrita manual**, caso a caso:
   de plural que o inglês (russo tem quatro; árabe tem seis) não tem como caber nesse padrão de
   jeito nenhum.
 
-### 6.2 Recomendação: ICU MessageFormat, num subconjunto escrito em casa
+### 6.2 Decisão: ICU MessageFormat, num subconjunto escrito em casa
 
-**Isto é recomendação, não decisão fechada** — fica registrada aqui como a posição técnica deste
-contrato, para o líder confirmar ou pedir alternativa.
+**Decidido pelo líder em 01/09/2026, por `AskUserQuestion`:** adotar a sintaxe proposta abaixo.
+Verbatim da descrição que ele leu antes de decidir: *"O jogo passa a marcar plural e gênero na
+convenção que a indústria já usa, implementada em casa, sem dependência externa."*
 
-Recomendo adotar **a sintaxe de plural e seleção do ICU MessageFormat** para toda chave nova que
+Adota-se **a sintaxe de plural e seleção do ICU MessageFormat** para toda chave nova que
 precise de número variável ou de concordância de gênero, com placeholder **nomeado** em vez de
 posicional:
 
@@ -314,9 +315,10 @@ chave existente de `{0}` para `{count}` é uma edição de valor por locale, exa
 mudança que o §4.3 já classifica como segura (reword, não rekey) — e pode ser feita
 progressivamente, sem pressa e sem quebrar nada, à medida que cada chave for revisitada.
 
-### 6.3 O que fica pendente, para o líder ou para quem implementar `B9`
+### 6.3 O que fica pendente, para quem implementar `B9`
 
-- Confirmar a adoção do subconjunto ICU acima (ou pedir alternativa).
+- **Adoção do subconjunto ICU: decidida** pelo líder em 01/09/2026 (§6.2). Fica pendente só a
+  implementação do parser em `B9`/`domain/i18n/`.
 - Decidir o momento da migração de `{0}`/`{1}` para nomeado nas chaves já publicadas — pode ser
   gradual, já que §4.3 mostra que isto não quebra nada.
 
@@ -425,10 +427,11 @@ O formato que `B9` desenhar só cumpre este contrato se, para os itens abaixo, a
 
 ## 11. Pendências registradas neste documento
 
-1. Adoção do subconjunto ICU MessageFormat como sintaxe de placeholder/plural/gênero — recomendação
-   do §6.2, decisão do líder.
-2. Esquema de identificador para locales futuros (BCP 47 ou manter convenção livre) — §2.1.
-3. Fonte por locale na camada de apresentação, quando `present/` nascer — risco declarado no §8,
+1. Esquema de identificador para locales futuros (BCP 47 ou manter convenção livre) — §2.1.
+2. Fonte por locale na camada de apresentação, quando `present/` nascer — risco declarado no §8,
    não decidido aqui.
-4. Momento de migrar placeholder posicional para nomeado nas chaves já publicadas — §6.3, pode ser
+3. Momento de migrar placeholder posicional para nomeado nas chaves já publicadas — §6.3, pode ser
    gradual.
+
+**Decidido, fora desta lista:** adoção do subconjunto ICU MessageFormat como sintaxe de
+placeholder/plural/gênero — decisão do líder em 01/09/2026, registrada no §6.2.
