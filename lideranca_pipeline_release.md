@@ -48,13 +48,13 @@ R = Responsável, A = Aprovador, C = Consultado, I = Informado. Mapa de fase em 
 
 Em toda linha, o trabalho de C-level é sempre `fable` e a implementação é sempre agente operacional `sonnet` (L-10).
 
-A tabela acima lista o responsável técnico de cada fase; os demais C-levels da constelação (Capitolino, Cosmo, Camilo, Cândido, Caio, Confúcio, Cícero) têm mandato próprio fora do escopo fase a fase, descrito no `ORG.md` secao 2. Nenhum fica sem mandato ativo por presunção de agente (L-10).
+A tabela acima lista o responsável técnico de cada fase; os demais C-levels da constelação (Capitolino, Cosmo, Camilo, Cândido, Caio, Confúcio, Cícero) têm mandato próprio fora do escopo fase a fase, descrito no `ORG.md` secao 2. Nenhum fica dormente por presunção de agente (L-10).
 
 ---
 
 ## 4. Anti-padrões de liderança, aplicados aqui
 
-1. **Deixar C-level sem mandato ativo por presunção de agente** (Camilo, Cícero, Confúcio, Cândido e Caio inclusive): o porte é COMPLETO e a constelação inteira tem mandato aqui (`ORG.md` secao 2); quando uma fase parecer não se aplicar, o caso vai ao líder por `AskUserQuestion`, nunca vira corte silencioso. Cósimo confirma isso a cada onda.
+1. **Deixar C-level dormente por presunção de agente** (Camilo, Cícero, Confúcio, Cândido e Caio inclusive): o porte é COMPLETO e a constelação inteira tem mandato aqui (`ORG.md` secao 2); quando uma fase parecer não se aplicar, o caso vai ao líder por `AskUserQuestion`, nunca vira corte silencioso. Cósimo confirma isso a cada onda.
 2. **CTO decidindo proteção de dado sozinho**, sem Narciso: a L-25 exige o CISO no desenho.
 3. **Licenciamento decidido sem Cláudio**: a L-08 é jurídica por natureza (REUSE/SPDX, regime de asset, catálogo fatiado).
 4. **`main` executando trabalho de produto** em vez de orquestrar: viola a L-10 diretamente.
