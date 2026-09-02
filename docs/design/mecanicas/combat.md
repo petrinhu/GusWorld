@@ -33,7 +33,7 @@ Princípio decisório: **toda regra abaixo existe para forçar decisão interess
 | Inimigos por encontro | 1 a 4 | encontros assimétricos são válidos (ex: 3 party vs 1 mini-boss) |
 | Ordem de turno | **Relógio de ação por ator** (`ActionClock`, `ADR-017`) | escalonador por instante-de-próxima-ação (inteiro); não é mais fila nem rodada global. Reconciliado com este canon em 25/08/2026 (decisão do líder); ver §3/§4 |
 | `AP` por turno | **3 fixo** | cresce via skill tree em jogo posterior; no slice é constante. ⚠️ Lacuna de spec aberta sobre ativação (uma ação por vez vs multi-ação): ver nota em §3 |
-| `Mana` (Compilação) | vazão: ramp linear | `manaMax = 2 + contagemPropriaDeTurnos`, cap 8, é a VAZÃO — taxa máxima de saque por turno da bateria ativa, não um pool do ator (§5, "Estoque e vazão"). Contagem por-ator, substitui o antigo `turnoIndex` global (ver §5) |
+| `Mana` (Compilação) | vazão: ramp linear | `manaMax = 2 + contagemPropriaDeTurnos`, é a VAZÃO — taxa máxima de saque por turno da bateria ativa, com teto no CCA efetivo da bateria em uso, não um pool do ator (§5, "Estoque e vazão"). Contagem por-ator, substitui o antigo `turnoIndex` global (ver §5) |
 | Carry-over de vazão | **nenhum** | a vazão reseta e cresce todo TurnStart; impossível bankar. O ESTOQUE da bateria (a carga real) não recarrega sozinho e persiste entre turnos e batalhas (`cartas-hardware-pirataria-energia.md` §5) |
 | Determinismo no slice | total (variância 0) | RNG visível plugado mas com variância zerada na entrega F2-E.5 |
 
@@ -59,7 +59,7 @@ FSM por-ator. Cada ator (party ou inimigo) toma seu turno quando o **relógio de
         ┌──────────────┐
    ┌───▶│  TurnStart   │  (o relogio elege o ator de menor next_action_at, §4;
    │    └──────┬───────┘   recalcula a vazao (mana) do ator eleito: manaMax = 2 +
-   │           ▼            contagemPropriaDeTurnos, cap 8; aplica tick de status:
+   │           ▼            contagemPropriaDeTurnos, com teto no CCA efetivo da bateria ativa; aplica tick de status:
    │                        Poison/Regen/Duration--; reseta AP = 3, ver nota abaixo)
    │    ┌──────────────┐
    │    │ ActionSelect │  ◀─┐  loop interno: jogador/AI escolhe ação enquanto AP > 0 e não "passar"
@@ -212,13 +212,14 @@ Dois recursos, propósitos distintos. AP limita **quantas** ações; Mana limita
 baterias e a barra da tela"): **estoque** (a carga disponível na bateria ativa — persiste entre
 batalhas, degrada, exige recarga real) e **vazão** (a taxa máxima de descarga por turno).
 
-- `manaMax = 2 + contagemPropriaDeTurnos`, com `cap = 8`, é a **vazão**: o quanto o ator PODE sacar
+- `manaMax = 2 + contagemPropriaDeTurnos` é a **vazão**: o quanto o ator PODE sacar
   da bateria ativa naquele turno — não um orçamento próprio que nasce do nada a cada turno. O
-  número não muda; muda só a natureza do que ele mede. Contagem por-ator, substitui o antigo
+  teto passa a ser o CCA efetivo da bateria em uso, e o ritmo do combate precisa de recalibração
+  (`cartas-hardware-pirataria-energia.md` §5). Contagem por-ator, substitui o antigo
   `turnoIndex` global (reconciliado com `ADR-017` em 25/08/2026; ver §2).
-- **O limite real de cada turno é o MENOR dos dois: a vazão do turno, ou o que ainda resta de
-  estoque na bateria ativa.** Nunca se saca mais do que a bateria tem, mesmo que a vazão do turno
-  permitisse mais.
+- **O limite real de cada turno é o MENOR entre a vazão do turno (a rampa, limitada pelo CCA
+  efetivo da bateria) e o que ainda resta na bateria ativa.** Nunca se saca mais do que a
+  bateria tem.
 - A **vazão** cresce e reseta a cada `TurnStart`, como antes (sem mudança de número). **O estoque
   NÃO recarrega no `TurnStart`** — é a carga real da bateria, e só sobe por recarga de verdade
   (troca de bateria, estação de recarga, cidade; `cartas-hardware-pirataria-energia.md` §5, "Troca
@@ -729,7 +730,7 @@ Cada item abaixo é uma trava de design contra estratégia dominante ou jogo "re
 | **Sem grind (Knowledge)** | farmar reduz XP e aumenta conhecimento; não há power-creep por nível |
 | **RNG visível** | porcentagem mostrada + seedável + Gambito re-roll/cancela; variância nunca pune skill às cegas |
 | **Intent caótico** | Patch-Zero resiste a predição total (boss final exclusivo; mini-bosses têm intent legível porém complexo. N.2 R3.) |
-| **Sem combo gigante via estoque** | a VAZÃO do turno (`manaMax`) não acumula e reseta a cada `TurnStart` (isso não mudou); o ESTOQUE da bateria, ao contrário, persiste e pode crescer — mas o teto de vazão por turno segue capando quanto se pode sacar numa tacada só, não importa quanto estoque a bateria tenha acumulado (`cartas-hardware-pirataria-energia.md` §5, "Estoque e vazão") |
+| **Sem combo gigante via estoque** | a VAZÃO do turno (`manaMax`) não acumula e reseta a cada `TurnStart` (isso não mudou); o ESTOQUE da bateria, ao contrário, persiste e pode crescer — mas o teto de vazão por turno, que depende da saúde da bateria em uso (CCA efetivo), segue capando quanto se pode sacar numa tacada só, não importa quanto estoque a bateria tenha acumulado (`cartas-hardware-pirataria-energia.md` §5, "Estoque e vazão") |
 | **Roda fechada** | relação de fraqueza é determinística e completa; sem família "sempre melhor" |
 | **Clamp dano mínimo 1** | impede build de Def infinita que zera dano (exceto imunidade telegrafa) |
 | **AP escasso (3)** | toda ação compete por AP; Scan/Gambito custam o turno de ataque (trade-off real) |
@@ -800,7 +801,7 @@ Subconjunto mínimo implementável via TDD. Tudo abaixo é entregável no slice;
 1. **FSM completa**: SetupPhase, TurnStart, ActionSelect (com loop interno por AP), ActionResolve, TurnEnd, CheckEnd, CombatEnd. Cobertura de testes por transição.
 2. **Relógio de ação por ator** (`ActionClock`, `ADR-017`, §4), com ordem total de desempate e reset pós-ação em aritmética inteira. Substitui a antiga fila de iniciativa por SPD e a operação `ReorderActor(actor, deltaPosicao)` com clamp; as primitivas que ajustam o relógio (Gambito-Reordenar, Knockback) somam ticks ao `next_action_at` do alvo (§4). Relógio visível (dado exposto; UI mínima, `battle-screen.md` D4).
 3. **AP = 3 fixo** por turno, reset no TurnStart.
-4. **Mana ramp (vazão da bateria)**: `manaMax = 2 + contagemPropriaDeTurnos`, cap 8, é a VAZÃO — taxa máxima de saque por turno, que cresce e reseta a cada `TurnStart`, sem carry-over. O ESTOQUE da bateria (a carga real) não recarrega sozinho, persiste entre turnos e batalhas (`cartas-hardware-pirataria-energia.md` §5, "Estoque e vazão"). Contagem por-ator, substitui o antigo `turnoIndex` global (§2).
+4. **Mana ramp (vazão da bateria)**: `manaMax = 2 + contagemPropriaDeTurnos`, com teto no CCA efetivo da bateria em uso, é a VAZÃO — taxa máxima de saque por turno, que cresce e reseta a cada `TurnStart`, sem carry-over. O ESTOQUE da bateria (a carga real) não recarrega sozinho, persiste entre turnos e batalhas (`cartas-hardware-pirataria-energia.md` §5, "Estoque e vazão"). Contagem por-ator, substitui o antigo `turnoIndex` global (§2).
 5. **Records de dados**: `Card`, `CardFamily`, `StatusEffect`, mais enums de suporte (`CardBaseType`, `TargetShape`, `StackRule`, `StatusId`). Imutáveis.
 6. **5 famílias como dados** + roda de fraqueza determinística como tabela consultável (`multFraqueza` por par atacante/alvo).
 7. **3-4 status concretos**: `Stun`, `Poison`, `Shield`, `Expose` (cobrem aplicar / tick no TurnStart / expirar por Duration / StackRule / dispel).
