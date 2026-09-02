@@ -1,6 +1,6 @@
 # Quem Lidera o Pipeline de Release do GusWorld
 
-> Resposta curta: **nenhum C-level único lidera o pipeline inteiro**, mas neste projeto a maioria dos C-levels fica dormente (ver `ORG.md` secao 2). Caetano (CTO) lidera a engenharia na prática; Celso (CEO) coordena e arbitra; Narciso (CISO) e Cláudio (CLO) entram nas fases de proteção de dado e licença. Este documento mapeia a teoria de liderança C-level e como ela se aplica **especificamente ao GusWorld**, sob a **L-10** do `GODS_LAWS.md`.
+> Resposta curta: **nenhum C-level único lidera o pipeline inteiro**, e a constelação inteira está ativa neste projeto, com mandato próprio para cada C-level (ver `ORG.md` secao 2). Caetano (CTO) lidera a engenharia na prática; Celso (CEO) coordena e arbitra; Narciso (CISO) e Cláudio (CLO) entram nas fases de proteção de dado e licença; os demais C-levels atuam conforme o mandato descrito no `ORG.md`. Este documento mapeia a teoria de liderança C-level e como ela se aplica **especificamente ao GusWorld**, sob a **L-10** do `GODS_LAWS.md`.
 
 ---
 
@@ -16,7 +16,7 @@ O GusWorld não tem os três domínios clássicos de produto comercial (o quê c
 | **CEO** | Celso | Como alinhar as três decisões acima e arbitrar trade-off entre elas? | 0, 10, 11 |
 | **Chief of Staff** | Cósimo | Este projeto ainda justifica cada C-level ativo? | transversal |
 
-**Dormentes neste projeto** (sem produto comercial, sem GTM pago, sem dado como ativo de negócio, sem IA como capability, sem receita B2B): Capitolino (CPO), Camilo (CMO), Cosmo (COO), Cândido (CDO), Caio (CAIO), Confúcio (CFO), Cícero (CRO). Detalhe e motivo de cada um em `ORG.md` secao 2.
+**Ativos neste projeto, com mandato adaptado** (não sem produto comercial, sem GTM pago, sem dado como ativo de negócio clássico ou sem receita B2B, mas com escopo próprio definido pelo `ORG.md` secao 2): Capitolino (CPO, design do jogo: GDD, pilares, mecânicas, cartas, economia, níveis e narrativa), Camilo (CMO, comunicação pública do projeto FOSS e o canal com o Gus Dragon), Cosmo (COO, cadência das ondas do `TODO.md` e sincronia dos quatro repositórios ligados pelo bus), Cândido (CDO, dado de simulação e balanceamento), Caio (CAIO, IA na produção: `AI-DISCLOSURE.md` e o tiering de modelo da L-10), Confúcio (CFO, custo de tokens, quota de Git LFS e minutos de CI), Cícero (CRO, ativo e sem tarefa despachada até a distribuição em loja virar real). Detalhe de cada mandato em `ORG.md` secao 2.
 
 ---
 
@@ -48,11 +48,13 @@ R = Responsável, A = Aprovador, C = Consultado, I = Informado. Mapa de fase em 
 
 Em toda linha, o trabalho de C-level é sempre `fable` e a implementação é sempre agente operacional `sonnet` (L-10).
 
+A tabela acima lista o responsável técnico de cada fase; os demais C-levels da constelação (Capitolino, Cosmo, Camilo, Cândido, Caio, Confúcio, Cícero) têm mandato próprio fora do escopo fase a fase, descrito no `ORG.md` secao 2. Nenhum fica sem mandato ativo por presunção de agente (L-10).
+
 ---
 
 ## 4. Anti-padrões de liderança, aplicados aqui
 
-1. **Ativar C-level sem trabalho real** (Camilo, Cícero, Confúcio, Cândido, Caio) só porque existem na constelação global. Cósimo previne.
+1. **Deixar C-level sem mandato ativo por presunção de agente** (Camilo, Cícero, Confúcio, Cândido e Caio inclusive): o porte é COMPLETO e a constelação inteira tem mandato aqui (`ORG.md` secao 2); quando uma fase parecer não se aplicar, o caso vai ao líder por `AskUserQuestion`, nunca vira corte silencioso. Cósimo confirma isso a cada onda.
 2. **CTO decidindo proteção de dado sozinho**, sem Narciso: a L-25 exige o CISO no desenho.
 3. **Licenciamento decidido sem Cláudio**: a L-08 é jurídica por natureza (REUSE/SPDX, regime de asset, catálogo fatiado).
 4. **`main` executando trabalho de produto** em vez de orquestrar: viola a L-10 diretamente.
