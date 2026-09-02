@@ -52,7 +52,7 @@
 
 | Arquétipo | Nome provisório | Mana | Power | Efeito/status | Intenção |
 |---|---|---|---|---|---|
-| Jab | Lhinin-Estalo | 1 | 3 | (nenhum) | hit barato |
+| Jab | Lhinin-Estalo | 1 | 2 | (nenhum) | hit barato //PT: poder baixado de 3 para 2, decisão do líder de 02/09/2026, junto do ajuste de mana da `eco_sonico` (a contraparte de família no vertical slice) |
 | Golpe+status | Lhinin-Ruído | 2 | 5 | Disrupt −30% Power próxima ação, 1t //PT | dano + sabotagem |
 | Assinatura | Lhinin-Onda | 3 | 5/alvo //PT | AoE (Grupo/Área), Disrupt em cada, 1t | área-CC de verdade |
 | Status-puro | Lhinin-Estático | 2 //PT | 0 | Disrupt −50% (teto canon), 2t //PT | controle forte |
