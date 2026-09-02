@@ -88,6 +88,8 @@ Fila de exceção: descoberta que ainda não virou item. Drenada de novo na reor
 
 - `[inbox 2026-09-01]` **Reconciliação nome a nome das três cadeias genealógicas de `era-1` ainda não foi feita.** O líder confirmou em 01/09/2026 que a cadeia institucional (dez nomes, linha 2747), a descendência de sangue da narradora (sete gerações, linhas 2811 e 3087) e a linhagem matrilinear canônica de `CHARS.md` são objetos distintos e não precisam bater nome a nome entre si; ninguém, porém, cruzou os três conjuntos de nomes para checar se há alguma incoerência dentro de cada um sozinho. Ponteiro: `CHARS.md` (bloco "Linhagem matrilinear cronistas Atelaiá") e `docs/narrative/deep/eras/era-1-pre-codigo.md` (linhas 2747, 2811, 3087).
 
+- `[inbox 2026-09-02]` **Números do gasto de standby e do gasto de disparo das cinco cartas passivas (Ada, Hayek, Mises, Planck, Pythagoras) estão pendentes.** O líder decidiu em 02/09/2026 que toda carta passiva tem dois gastos de mana/bateria, nunca custo zero (canon fechado em `docs/design/mecanicas/cartas-hardware-pirataria-energia.md` §5, "Passiva tem dois gastos: standby e disparo"), mas não fixou nenhum valor numérico. Falta proposta do `economy-designer` e ratificação do líder para os dois números de cada uma das cinco cartas. Em aberto, sem decisão: se a mesma regra se estende à face passiva das cartas Híbridas e às cartas Fora de combate (Euler, Menger, Turing). Ponteiro (L-30): `docs/design/mecanicas/cartas-hardware-pirataria-energia.md` §5, `docs/design/mecanicas/cartas/_vocabulario.md` §9.
+
 
 ## TABELA UNIFICADA
 

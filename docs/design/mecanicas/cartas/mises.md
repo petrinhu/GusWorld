@@ -11,7 +11,7 @@ Dado completo em [`resources/cards/mises.gw.card`](../../../../resources/cards/m
 
 ## Ficha rápida
 
-Família **Universal** · categoria **Passiva** · especial · mana 0 · equip-only, nunca jogada. Passiva **dupla**, num único registro de efeito.
+Família **Universal** · categoria **Passiva** · especial · dois gastos de mana/bateria (standby + disparo, números pendentes, ver `_vocabulario.md` §9) · equip-only, nunca jogada. Passiva **dupla**, num único registro de efeito.
 
 ## Como funciona
 

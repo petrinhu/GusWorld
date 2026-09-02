@@ -97,7 +97,7 @@ Quando, dentro do ciclo de combate, um `@effect` dispara: `OnCast` (no momento e
 `tier` distingue as três trilhas de raridade: `comum` (obtida por loja/craft/loot, sem exclusividade), `especial` (uma cópia no jogo inteiro, entregue por progresso narrativo — nunca comprada, craftada ou dropada), `super` (a carta-capstone, carta original, nunca forjada; as 20 especiais são pré-requisito de ACESSO à missão-capstone que leva até ela, não matéria-prima de criação; correção 25/08/2026, decisão do líder, ver `cartas-technomagik.md` §2.1/§2.4). `category` só faz sentido quando `tier` não é `comum`, e distingue **quatro** formas de uso, todas descritas em `cartas-technomagik.md` §2.3 deste projeto (não repetido aqui, L-30):
 
 - **`ativa`** — jogada uma vez por batalha, com custo de mana.
-- **`passiva`** — sempre ligada enquanto equipada, sem custo de mana, sem consumir o uso único da batalha.
+- **`passiva`** — sempre ligada enquanto equipada, sem consumir o uso único da batalha. Nunca tem custo zero: carrega **dois gastos** de mana/carga de bateria (mana e bateria são o mesmo recurso, `cartas-hardware-pirataria-energia.md` §5, "Mana e bateria são o mesmo recurso"), um gasto **menor**, contínuo, para ficar ativa em standby, e um gasto **maior** no momento em que o efeito é exercido (decisão do líder, 02/09/2026, `cartas-hardware-pirataria-energia.md` §5, "Passiva tem dois gastos: standby e disparo"). Os dois números, por carta, são pendentes de proposta do `economy-designer` e ratificação do líder (INBOX, `TODO.md`).
 - **`hibrida`** — duas faces no mesmo objeto: uma sempre ligada e uma jogável.
 - **`fora_de_combate`** — não ocupa o deck de batalha; age fora do combate (exploração, economia).
 
