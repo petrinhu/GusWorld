@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Índice de gatilhos
 
-Transcrito de `GODS_LAWS.md` (36 leis, medido em 01/09/2026 por `grep -c "^## L-" GODS_LAWS.md`). Este índice é cópia; a fonte de verdade é sempre o arquivo, nunca esta tabela.
+Transcrito de `GODS_LAWS.md` (37 leis, medido em 01/09/2026 por `grep -c "^## L-" GODS_LAWS.md`). Este índice é cópia; a fonte de verdade é sempre o arquivo, nunca esta tabela.
 
 | Lei | Gatilho: dispara quando você vai... | Resumo |
 |---|---|---|
@@ -58,6 +58,7 @@ Transcrito de `GODS_LAWS.md` (36 leis, medido em 01/09/2026 por `grep -c "^## L-
 | [L-34](GODS_LAWS.md#l-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato, interrompe onda |
 | [L-35](GODS_LAWS.md#l-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, o resultado é "não executado" |
 | [L-36](GODS_LAWS.md#l-36) | decidir se lore ainda não escrita atrasa uma fatia de engenharia, ou sentir a tentação de esperar completar canon antes de codar | Lore que falta não bloqueia código, puxa-se sob demanda em micro-sessão pontual; distinta da L-13, que trava por canon que contradiz, não por canon que ainda falta |
+| [L-37](GODS_LAWS.md#l-37) | editar, revisar ou propor mudança em fala, aparte, revide, cena ou traço de caracterização já aprovado que define o Gus original | Mudança em conteúdo já aprovado do Gus original exige nova autorização explícita do líder; parente da L-16, sem fundir nela |
 
 ## O que é o GusWorld
 
