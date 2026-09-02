@@ -45,7 +45,7 @@
 | Golpe+status | Erynin-Infecção | 2 | (n/a) | Poison DoT 5/tick×3 = 15 (CANON) | a DoT é o golpe |
 | Assinatura | Erynin-Toxina | 3 | (n/a) | Poison DoT 8/tick×3 = 24 //PT | DoT forte |
 | Status-puro | Erynin-Ferrugem | 2 //PT | 0 | Corrode, Def −4, 4t //PT | controle (Def down) |
-| Utilidade | Sylvesse-Religação | 2 //PT | 0 | Regen +3/turno (CANON), 3t //PT self/aliado | única cura do jogo (exclusiva Bio) |
+| Utilidade | Sylvesse-Religação | 2 //PT | 0 | Regen +3/turno (CANON), 3t //PT self/aliado | cura de aliado (não exclusiva — a Raiz Curativa cura o próprio conjurador; decisão do líder, 02/09/2026) |
 | Finalizador | Erynin-Epidemia | 3 | 8 | +40% se alvo tem Poison/Corrode (SynergyStatus) //PT | recompensa manter doente |
 
 ## Sônico (Linda "Siren"): área-CC/interrupção, Disrupt/Silence
@@ -342,7 +342,7 @@ Convenção: `frase de cast` = o texto técnico da tela de conjuração (registr
 
 - **Frase de cast:** `@jit(nogil=True)` seguido de `def religacao(): self.hp += cura`
 - **Motivo real:** `nogil` é opção real (Numba/Cython) que **compila** e libera a trava global do interpretador numa chamada crítica. Compila de verdade, roda sem fila.
-- **Por que fecha:** Religação é a **ÚNICA cura do jogo**. Código de emergência é pré-compilado justamente porque não pode esperar a fila de interpretação. Emergência fura fila, e fura fila **compilando**.
+- **Por que fecha:** Religação é a cura de **aliado** do jogo (não exclusiva — a Raiz Curativa cura o próprio conjurador; decisão do líder, 02/09/2026). Código de emergência é pré-compilado justamente porque não pode esperar a fila de interpretação. Emergência fura fila, e fura fila **compilando**.
 - **Nome:** "Religação" já é reconectar às pressas. A urgência está no nome.
 
 ---

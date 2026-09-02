@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 ## As 5 cartas COMUNS
 
 - **Pulso Elétrico** (`pulso_eletrico`) — Elétrico, dano + Stun curto. [dado](../../../../resources/cards/pulso_eletrico.gw.card) · [prosa](pulso_eletrico.md)
-- **Raiz Curativa** (`raiz_cura`) — Bioquímico, a única cura das 5, Regen no próprio conjurador. [dado](../../../../resources/cards/raiz_cura.gw.card) · [prosa](raiz_cura.md)
+- **Raiz Curativa** (`raiz_cura`) — Bioquímico, cura o próprio conjurador via Regen; não exclusiva (decisão do líder, 02/09/2026 — a Sylvesse-Religação, da proposta de 30 comuns, cura aliado). [dado](../../../../resources/cards/raiz_cura.gw.card) · [prosa](raiz_cura.md)
 - `eco_sonico` — Sônico, dano leve + Disrupt. Nome de exibição pt-br ainda sem entrada no catálogo. [dado](../../../../resources/cards/eco_sonico.gw.card) · [prosa](eco_sonico.md)
 - `fenda_criptica` — Criptográfico, dano + Expose. Nome de exibição pt-br ainda sem entrada no catálogo. [dado](../../../../resources/cards/fenda_criptica.gw.card) · [prosa](fenda_criptica.md)
 - `impacto_cinetico` — Cinético, o maior dano-base das 5 + Knockback. Nome de exibição pt-br ainda sem entrada no catálogo. [dado](../../../../resources/cards/impacto_cinetico.gw.card) · [prosa](impacto_cinetico.md)
