@@ -38,7 +38,7 @@ Cada fase tem loop interno (uma descoberta volta ao Discovery, um bug volta ao D
 | 11. Release 1.0 | Celso (CEO) coordena | `devops-sre`, `tech-lead`, `qa-engineer` |
 | 12. Pós | Caetano (CTO) | `qa-engineer`, `technical-writer` |
 
-Antes de iniciar uma fase nova, o Cósimo (Chief of Staff) confirma que ela ainda faz sentido no porte do projeto; C-level sem trabalho real fica dormente (ver `ORG.md` secao 2).
+Antes de iniciar uma fase nova, o Cósimo (Chief of Staff) confirma que toda fase tem C-level nomeado e que nenhum C-level fica sem mandato ativo por presunção de agente: o porte é COMPLETO e a constelação inteira tem mandato neste projeto (ver `ORG.md` secao 2). A tabela acima lista o C-level tecnicamente responsável por cada fase; os demais C-levels (Capitolino, Cosmo, Camilo, Cândido, Caio, Confúcio, Cícero) têm mandato próprio, descrito no `ORG.md` secao 2, mesmo quando não lideram uma fase específica. Quando uma fase ou um mandato parecer não se aplicar, o caso vai ao líder por `AskUserQuestion`, nunca vira corte silencioso.
 
 ---
 
@@ -160,4 +160,4 @@ Estabilização por bug reportado (via bus com Gus Dragon ou issue pública), se
 3. Meta numérica de cobertura de teste (L-19).
 4. Prometer "impossível editar" em comunicação pública (L-25).
 5. Aplicar pipeline comercial (GTM pago, LGPD, mobile store) a um jogo FOSS single-player sem esses domínios.
-6. Sobre-escalar a constelação: C-level sem trabalho real neste projeto fica dormente (`ORG.md` secao 2), nunca ativado por hábito.
+6. Deixar C-level sem mandato ativo por presunção de agente: o porte é COMPLETO (`ORG.md` secao 2) e a constelação inteira tem mandato aqui; quando uma fase parecer não se aplicar a um C-level, o caso vai ao líder por `AskUserQuestion`, nunca vira corte silencioso.
