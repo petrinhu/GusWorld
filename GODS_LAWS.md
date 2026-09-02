@@ -55,6 +55,7 @@
 | [L-34](#l-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato, interrompe onda |
 | [L-35](#l-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, o resultado é "não executado" |
 | [L-36](#l-36) | decidir se lore ainda não escrita atrasa uma fatia de engenharia, ou sentir a tentação de esperar completar canon antes de codar | Lore que falta não bloqueia código, puxa-se sob demanda em micro-sessão pontual; distinta da L-13, que trava por canon que contradiz, não por canon que ainda falta |
+| [L-37](#l-37) | editar, revisar ou propor mudança em fala, aparte, revide, cena ou traço de caracterização já aprovado que define o Gus original | Mudança em conteúdo já aprovado do Gus original exige nova autorização explícita do líder; parente da L-16, sem fundir nela |
 
 
 ---
@@ -761,3 +762,15 @@ Lei qualitativa sem lugar no processo é lei que ninguém aplica. Três amarras,
 - A **L-36** libera quando o corpus **ainda não escreveu** um detalhe. Não há contradição nenhuma ali, só ausência. Lore que falta não é canon errado, é canon **não escrito ainda**.
 
 **As duas nunca competem pelo mesmo caso:** canon que existe e contradiz o que se vai implementar bloqueia, pela L-13; canon que simplesmente ainda não existe não bloqueia, puxa-se sob demanda, pela L-36. Diante de dúvida sobre qual das duas se aplica, a pergunta é sempre a mesma: **o corpus diz algo errado, ou o corpus ainda não diz nada?** Errado é L-13. Nada ainda é L-36.
+
+## L-37
+
+**Data:** 01/09/2026, decisão do líder por `AskUserQuestion`. **Formulação de origem**, repetida sem nenhuma fonte única em quatro documentos do corpus: `docs/narrative/gus-apartes-c-arcane.md:4` e `:281`, `docs/narrative/propostas/disputas-linguagens-farpas-PROPOSTA.md:384`, `docs/narrative/propostas/disputas-linguagens-cenas-PROPOSTA.md:9` e `:504`, `docs/design/propostas/copy-stubs-combate.md:104`. A formulação mais antiga localizada, em `gus-apartes-c-arcane.md:4`: *"APROVADO pelo líder, uma a uma, 2026-07-17. CANON. Qualquer mudança futura exige nova autorização explícita dele (regra: tudo que define o Gus original passa por ele)."* ⚠️ **Isto não é um verbatim falado nesta sessão** — é texto já canônico do corpus, registrando uma aprovação de 2026-07-17; a decisão de hoje foi elevar esta prática, já em uso havia mais de um mês, a lei do projeto, pela mesma via que elevou a L-36.
+
+**Qualquer mudança em conteúdo já aprovado que define o "Gus original" exige nova autorização explícita do líder.** Alcança fala, aparte, revide, cena ou traço de caracterização **já aprovado por ele linha a linha** — o precedente é a aprovação de 2026-07-17 dos apartes e revides. Editar, reescrever, cortar, comprimir ou acrescentar a esse material sem essa nova autorização é proibido, **mesmo quando a mudança parece compressão honesta de um juízo já aprovado**: foi exatamente esse tipo de mudança pequena que o corpus registrou como precisando de nova autorização em `disputas-linguagens-farpas-PROPOSTA.md:384`.
+
+**O que a regra NÃO é, e por que não é a mesma coisa que a L-16:** a L-16 governa o **aceite de existir a homenagem**, dado pelo **Gus Dragon real** — é consentimento de pessoa homenageada. Esta lei governa a **autorização de MUDAR o que já foi aprovado**, dada pelo **líder** — ele é quem aprova o texto canônico linha a linha, e é dele que sai a nova autorização quando algo aprovado precisa mudar. As duas leis protegem o mesmo personagem, por portas diferentes: uma pergunta "pode existir?", a outra pergunta "pode mudar o que já existe?".
+
+**Por que esta lei nasceu separada da L-16, em vez de fundida nela — registro de processo, não decisão de conteúdo:** as duas têm parentesco temático real, e um agente que só olhasse o assunto (o personagem Gus original) teria motivo para fundi-las num texto só, como manda a prática padrão de não duplicar lei irmã. **Isto não foi feito aqui** porque fundir alteraria o texto de uma lei já existente (L-16), e alterar lei exige `AskUserQuestion` ao líder, sob o protocolo deste arquivo (item 5) e sob a lei das leis global — confirmação que o agente que escreveu esta entrada não tinha meio de obter na tarefa que a gerou. **Se o líder preferir as duas leis unidas num texto só, é decisão dele**, a ser tomada depois e não presumida aqui.
+
+**Aplicação:** ao propor ou executar mudança em conteúdo do Gus original já canônico, o agente cita esta lei ao pedir a nova autorização, e não trata concessão anterior — inclusive a de 2026-07-17 — como cobrindo a mudança nova.
