@@ -1,6 +1,8 @@
 # Parecer do CLO (Cláudio): statline de carta, AGPL e o catálogo compilado
 
-> **Natureza deste documento:** orientação jurídico-técnica para decisão do líder. Não é aconselhamento jurídico vinculante e não substitui advogado humano. Nenhuma opção aqui é decisão: a decisão é do líder (L-11). A seção 10 diz exatamente onde um advogado de carne e osso é necessário.
+> **Status: DECIDIDO em 01/09/2026, por `AskUserQuestion` (L-11).** O líder escolheu a **Opção A** (§4): o catálogo é fatiado por natureza jurídica, e o texto de sabor mora fora do executável, em pacote binário selado. Ver §11 para o registro completo da decisão.
+>
+> **Natureza deste documento:** orientação jurídico-técnica que fundamentou a decisão do líder. Não é aconselhamento jurídico vinculante e não substitui advogado humano. A seção 10 diz exatamente onde um advogado de carne e osso é necessário.
 >
 > **Método:** cada afirmação vem marcada como **FATO** (com citação de arquivo, linha ou texto de licença com URL) ou **INFERÊNCIA** (leitura minha, defensável mas não garantida).
 
@@ -231,4 +233,19 @@ Mesmo gate pré-commit da L-15 (`.gitignore`/`.gitattributes`): depois do primei
 4. **Qualquer revogação prospectiva** de permissão já concedida ao público.
 5. **Qualquer disputa real** envolvendo Zona 1/CC-BY-SA do projeto anterior.
 
-*Cláudio, CLO. Orientação técnica; decisão final do líder via AskUserQuestion (L-11).*
+## 11. Decisão do líder (01/09/2026)
+
+**Decisão, por `AskUserQuestion` (L-11):** **Opção A** (§4) — o catálogo é fatiado por natureza jurídica. Verbatim: *"manter licença do projeto, cada carta um átomo separado, cada uma com seu POCO"*.
+
+Perguntado onde mora o texto de sabor da carta, o líder escolheu **"Fora, em pacote selado"**, tendo lido esta descrição: *"O objeto da carta carrega número e regra, compilados sob a licença do código; o texto de sabor e a lore vão num pacote binário selado à parte, com direitos reservados."*
+
+**O que fica fixado:**
+
+- O regime de licença do projeto **não muda**: código sob AGPL, assets e lore com direitos reservados (L-08).
+- **Cada carta continua sendo um átomo com objeto próprio** (L-04): o objeto carrega **número e regra**, e vai compilado sob AGPL.
+- **Texto de sabor e lore ficam fora do objeto**, no pacote binário selado, sob direitos reservados.
+- Fundamento jurídico (ver §1 e §7 acima, não recopiado aqui): número e regra de carta não têm proteção autoral no Brasil (Lei 9.610/98, art. 8º, II) nem nos Estados Unidos (Feist v. Rural; orientação do US Copyright Office sobre jogos).
+
+Esta decisão confirma, sob a lente mais funda deste parecer, o mesmo desenho que a L-25 já registrava para o fatiamento do catálogo. As pendências da seção 8 (kit de arquivos de licença) e da seção 10 (onde advogado humano é necessário) seguem abertas.
+
+*Cláudio, CLO. Orientação técnica; decisão do líder registrada em 01/09/2026 via `AskUserQuestion` (L-11).*
