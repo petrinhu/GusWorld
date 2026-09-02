@@ -75,15 +75,15 @@ Quebrar o dia comum. Catalyst (Save the Cat) / chamado à aventura que ainda nã
 
 ### Conteúdo estrutural
 
-O mentor **Brunus Vetorial** (boticário itinerante, ~700 anos, cf. `brunus-vetorial.md`) **desaparece**. O sumiço precisa ser sentido, não anunciado por HUD. Três mecanismos candidatos de descoberta, estruturalmente equivalentes, não decididos:
+O mentor **Brunus Vetorial** (boticário itinerante, ~700 anos, cf. `brunus-vetorial.md`) **desaparece**. O sumiço precisa ser sentido, não anunciado por HUD. Três mecanismos candidatos de descoberta foram considerados, estruturalmente equivalentes:
 
 | Opção | Mecanismo | Prós | Contras |
 |---|---|---|---|
 | A | Brunus tinha visita agendada/rotineira ao apartamento Vance e não aparece; Gargi ou o próprio Gus estranha o atraso | Reforça vínculo cotidiano já estabelecido em `brunus-vetorial.md` (§ "Ponte com o pai ausente", relação de confiança) | Exige estabelecer a rotina de visitas no próprio beat 1, sem tempo de tutorial sobrando |
 | B | Gus tenta contato de rotina (rádio, mensagem, qualquer canal diegético já estabelecido) e não recebe resposta | Econômico, cabe dentro do próprio quarto, sem mudar de cena | Depende de existir um canal de comunicação diegético já definido (a confirmar em design técnico) |
-| C | Gus vai à botica-laboratório por outro motivo (buscar reagente, entregar recado do pai) e encontra o lugar vazio/trancado/em desordem | Motiva a transição espacial pro beat 3 organicamente; permite environmental storytelling forte (loja bagunçada, sinais de saída apressada) | Precisa de um motivo prévio plausível pro Gus ir até lá logo cedo |
+| **C** | Gus vai à botica-laboratório por outro motivo (buscar reagente, entregar recado do pai) e encontra o lugar vazio/trancado/em desordem | Motiva a transição espacial pro beat 3 organicamente; permite environmental storytelling forte (loja bagunçada, sinais de saída apressada) | Precisa de um motivo prévio plausível pro Gus ir até lá logo cedo |
 
-Recomendação estrutural (não vinculante, é do narrative-designer, decisão final é do criador): **C**, porque resolve dois problemas de uma vez, motiva a transição espacial (beat 2 -> beat 3 no mesmo local) e entrega environmental storytelling sem exigir infraestrutura nova de comunicação diegética.
+**Decisão do líder, 01/09/2026, por `AskUserQuestion`:** opção **C**. Verbatim: *"Ele vai até lá por outro motivo, buscar um reagente ou entregar recado do pai, e encontra o lugar vazio ou revirado."* Coincide com a recomendação estrutural que o `narrative-designer` já havia apontado como não vinculante: resolve dois problemas de uma vez, motiva a transição espacial (beat 2 -> beat 3 no mesmo local) e entrega environmental storytelling sem exigir infraestrutura nova de comunicação diegética.
 
 ### Tom
 
@@ -91,7 +91,7 @@ Curto. Não é jump scare, é vazio errado: a ausência de alguém confiável, p
 
 ### [A BRAINSTORMAR]
 
-Mecanismo exato de descoberta (escolher entre A/B/C ou variante), blocking, se há diálogo de terceiros (Gargi comentando) nesse beat ou se é solitário desde já.
+Blocking, se há diálogo de terceiros (Gargi comentando) nesse beat ou se é solitário desde já.
 
 ---
 
@@ -250,7 +250,7 @@ O documento `arco-principal.md` (canônico, Revisão 1) já contém um rascunho 
 2. Identidade da "força antiga" (fica velada; lore de endgame, ligada a `LORE-ORIGEM-MULTIVERSO`).
 3. Primeiro companion e primeira área (item `MUNDO-TOPOLOGIA`, documento à parte).
 4. Cena e scripting fino do tutorial (blocking exato, timing, câmera, diálogo final).
-5. Mecanismo exato de descoberta do sumiço (escolher entre as opções A/B/C do §3, ou variante).
+5. **RESOLVIDO (01/09/2026):** mecanismo de descoberta do sumiço = opção **C** (decisão do líder, ver §3).
 6. Se há ou não beat de despedida com a Gargi no beat 5, e seu conteúdo exato.
 7. Suporte físico do recado (papel vs outro meio) e se há puzzle leve para encontrá-lo.
 8. Local canônico da botica-laboratório do Brunus em `PLACES.md` (ainda não cadastrado).
