@@ -62,13 +62,11 @@ Domínios cognitivos: programação arcana em baixo nível, lógica estocástica
 
 **Linguagem profana zero.** "Que horror" é o palavrão máximo do registro de Gus.
 
-**Codinome de clímax: "Dragon".** Canon Dragon Victory (2026-05-19). O codinome refere-se à dinastia perdida da casa Vance Era 1: **Pyotor I Draco Vance** (dragonrider ancestral, sobrenome "Draco" perdido ao longo das gerações) montado em **Vyrdragon** (dragão alado europeu vermelho carmesim, defensor do Castelo Vance Era 1 contra cerco). O sangue dragon, adormecido por gerações sob a tecnologia, reacorda no clímax da batalha final de segunda fase contra Sterling Locke, condicionado a três pré-requisitos:
+**Codinome de clímax: "Dragon".** Canon Dragon Victory (2026-05-19). Linhagem completa (Pyotor I Draco Vance, Vyrdragon, Castelo Vance Era 1) e a cutscene: ver `docs/narrative/deep/dragon-victory-deep.md`. O sangue dragon, adormecido por gerações sob a tecnologia, reacorda no clímax da batalha final de segunda fase contra Sterling Locke, condicionado a três pré-requisitos:
 
-1. **Gus perdoou Dante** (escolha binária canônica em cena pós-Caverna dos Perdidos). Se rejeitou, Dragon Victory não ocorre e a luta segue por rota alternativa.
+1. **Gus perdoou Dante** (pré-condição; escolha binária canônica em cena pós-Caverna dos Perdidos). Consequência da rejeição e detalhe completo: ver `docs/narrative/deep/dragon-victory-deep.md`.
 2. **Sterling em segunda fase** (a primeira é vencida pela party; força sobrenatural restaura o vilão).
 3. **Trigger expandido:** Sterling em 10% de HP, ou Gus em menos de 3% de HP, ou party inteira KO exceto Gus, ou três combos consecutivos da party em sequência.
-
-A cutscene resultante é autônoma e ininterrompível: visão ancestral do céu medieval Era 1 com dragões em formação, ancestral Vance armado de cota de malha e capa vermelha cavalgando Vyrdragon, fogo solto pelas mãos do ancestral e pela boca do dragão sobre os cercadores do Castelo Vance. Retorno a Gus em pose ofensiva, corpo marcado de batalha, aura gradient cyan-para-vermelho (cyan dos óculos, vermelho do sangue ancestral). Fireball decisivo, 100% certeiro, tira 100% do HP restante de Sterling. Sterling escapa por canon ambíguo, espaço aberto para sequel. HP de Gus restaurado a 110% durante o despertar.
 
 Foreshadow plant: Gus tem desde os sete anos sonho recorrente com dragão vermelho sobre castelo medieval e fogo nas próprias mãos sem queimar. Nunca articula em voz alta. Pyotor, seu pai, teve a mesma série de sonhos juvenis e nunca mencionou ao filho (last dragon-keeper silencioso).
 
@@ -235,7 +233,7 @@ Estrutura canon de três atos sobre oito beats Kishōtenketsu, recrutamento livr
 
 **Ato 2 (confronto).** Quatro a cinco companions recrutados em rota livre. Cada arco de companion abre um setting (Catedrais via Bento, Dutos via Cauã, Setor Mirage via Iara, Zona via Linda, Periferia via Dante, Selve via Jaci). Sterling Corp emerge como antagonista articulado, FIR como vassalo regulatório, Cult Mirage como culto manipulador, Underground do Silêncio como rede aliada descentralizada. Patch-Zero manifesta em quatro canais (texto, áudio, persona, bug Perlin) sem ser nomeado pela maioria da população. Midpoint (Beat Ten Kishōtenketsu): **reveal Dante traidor** após três arcos completos. Caverna dos Perdidos. Morte de Dante (sacrifício redentor) e cordão de 89 nós entregue a Gus. Escolha binária canônica (perdoar ou rejeitar).
 
-**Ato 3 (resolução).** Climax na Selve Profunda, no Núcleo Mandelbrot Interno. Três rotas knowledge-gated (Bronze, Prata, Ouro) dependentes da progressão de conhecimento do player ao longo do jogo. Cúpula Sterling como contraponto urbano (climax setting variação). Combate final em duas fases contra Sterling. Se Gus perdoou Dante e os triggers da segunda fase batem: **Dragon Victory** (cutscene autônoma, sangue Pyotor I Draco Vance reacordando, Vyrdragon na visão ancestral, fireball decisivo 100% certeiro). Sterling escapa por canon ambíguo (sequel hooks). Patch-Zero **selado** (não destruído); variação Ouro entrega contenção mais limpa, variação Bronze deixa fissura aberta.
+**Ato 3 (resolução).** Climax na Selve Profunda, no Núcleo Mandelbrot Interno. Três rotas knowledge-gated (Bronze, Prata, Ouro) dependentes da progressão de conhecimento do player ao longo do jogo. Cúpula Sterling como contraponto urbano (climax setting variação). Combate final em duas fases contra Sterling, resolvido por **Dragon Victory** quando as pré-condições batem (ver `docs/narrative/deep/dragon-victory-deep.md`). Patch-Zero **selado** (não destruído); variação Ouro entrega contenção mais limpa, variação Bronze deixa fissura aberta.
 
 **Triple hook pós-créditos canon:** stinger Patch-Zero ativo em rede paralela, entrada de diário sugerindo cidade-irmã ainda viva, sinal off-screen de Dante vivo (canon ambíguo deliberado).
 
