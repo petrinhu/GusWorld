@@ -37,7 +37,7 @@
 | 7 | Carregador solar | **55 cr** | escada numérica |
 | 7 | Powerbank c/ visor LED | **34 cr** | escada numérica |
 | 7 | Carregador rápido | **21 cr** | escada numérica |
-| 7 | Voltímetro | **13 cr** (ou grátis, missão do Volta) | escada numérica |
+| 7 | Multímetro | **13 cr** (ou grátis, missão do Volta) | escada numérica |
 | 7 | Pirata comum (preço) | escala com o desconto por dificuldade (linha abaixo) | comum original 12-18cr (economia.md §8c) |
 | 7 | **Desconto mercado negro — FECHADO PELO LÍDER: escala por dificuldade** (§8.4) | Fácil 30% · Médio 50% · Difícil 70% · Hardcore 70% | ver §7.3 — quanto mais difícil, maior o desconto (mais tentador) |
 
@@ -211,7 +211,7 @@ A simetria (Comum ↔ Homebrew espelhados; Pirata especial ↔ Pirata comum espe
 | **Carregador solar** (recarga passiva) | **55 cr** | maior investimento, payback em ~14 recargas evitadas (55 ÷ ~4cr médio) |
 | **Powerbank c/ visor LED** | **34 cr** | conveniência+informação, sem economia direta de crédito |
 | **Carregador rápido** | **21 cr** | só reduz o tempo de espera do autorrecarregamento |
-| **Voltímetro** | **13 cr** (ou grátis via missão do Volta, já canônico) | ferramenta de diagnóstico simples, preço-de-entrada baixo |
+| **Multímetro** | **13 cr** (ou grátis via missão do Volta, já canônico) | ferramenta de diagnóstico simples, preço-de-entrada baixo |
 
 Escada 13/21/34/55, todos dentro da faixa "pequeno investimento" já usada em `economia.md` §8c (comum 12-18cr) e §2 (baú 13-34cr) — nenhum desses itens compete de preço com craft de tier 2/3 (~150-400cr).
 

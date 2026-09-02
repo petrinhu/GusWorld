@@ -180,69 +180,217 @@ mesmo dia (ver "Estoque e vazão", logo abaixo):**
    vazão" abaixo. Não editado: é spec de tela, e a L-27 deste projeto proíbe desenhar interface nesta
    fatia de qualquer forma.
 
-### Estoque e vazão: a bateria tem duas propriedades físicas (decisão do líder, 31/08/2026)
+### Estoque, vazão e saúde: as propriedades físicas da bateria (decisões do líder, 31/08/2026 e 02/09/2026)
 
-**O líder respondeu a ambiguidade combat.md × bateria levantada acima: não são dois medidores, é UM
-sistema, com duas propriedades físicas da mesma bateria.**
+**Em 31/08/2026 o líder respondeu a ambiguidade combat.md × bateria levantada acima: não são dois
+medidores, é UM sistema, com propriedades físicas da mesma bateria. Em 02/09/2026 ele deu a essas
+propriedades o vocabulário elétrico definitivo, acrescentou a terceira, a saúde, fundiu a vazão do
+turno com a corrente que a bateria consegue entregar, e fixou que toda bateria perde carga com o
+tempo.**
 
-1. **Capacidade (estoque):** a carga da bateria ativa. Persiste entre batalhas, degrada, exige
-   recarga real. É o que a barra na tela mostra.
-2. **Vazão (taxa máxima de descarga por turno):** por turno, o ator pode sacar até `2 +
-   contagemPropriaDeTurnos`, com teto de 8 — a mesma rampa que `combat.md` §5 já definia, **mas
-   relida como taxa, não como orçamento próprio.**
-3. **O limite real de cada turno é o MENOR dos dois:** a vazão do turno, ou o que ainda resta na
-   bateria ativa. Nunca se saca mais do que a bateria tem.
+> **Decisão do líder, 02/09/2026, verbatim:** *"Sobre a bateria: ela deve ter no POCO as
+> caracteristicas de Tensão de repouso (tensão em circuito aberto / OCV) e Tensão sob carga (tensão
+> de partida / cranking voltage). Na mesa de manutencao/craft e item de medicao da bateria, informa:
+> estado de saúde (SoH) e capacidade de entregar corrente e informa: estado de carga (SoC). O
+> parâmetro de fábrica correspondente é o CCA (Cold Cranking Amps / corrente de partida a frio):
+> quantos amperes a bateria consegue fornecer. A tensão de repouso sozinha engana. Uma bateria velha
+> pode estar cheia (12,6 V) e mesmo assim não acionar o efeito da carga, porque não aguenta a
+> corrente de pico. A tensão de partida sozinha também engana se a bateria estiver só descarregada:
+> uma bateria boa com 12,1 V em repouso também cai demais sob carga. Por isso o protocolo correto é:
+> Medir tensão de repouso (SoC); Se estiver abaixo de ~12,4 V, recarregar primeiro; Só então fazer o
+> teste sob carga (SoH / CCA). Resumo:*
+> *voltagem parada = carga*
+> *voltagem na partida = capacidade de entregar corrente (saúde / resistência interna / CCA)"*
+>
+> E, em seguida, verbatim: *"esses parametros podem ser testados na mesa de craft ou com um item
+> chamado multimetro"*
+>
+> Respostas do líder no mesmo dia, por `AskUserQuestion`, verbatim: escala de tensão, *"Escala
+> própria, ancorada nos 3 V da CR2032"*; vazão contra CCA, *"São o mesmo limite, e o teto 8 passa a
+> depender da saúde"*; pico por efeito, *"Cada carta declara o próprio pico, independente do gasto"*;
+> visibilidade da saúde, *"Só depois de medir; até lá fica desconhecida"*; instrumento, *"multimetro
+> substitui voltimetro sim"*; entrega insuficiente, *"Uma coisa só: ela não funciona direito e drena
+> a bateria interia, enquanto fica soltando fumacinhas e faíscas [sinalizacao visual ao jogador]"*;
+> perda de carga, *"Toda bateria perde carga com o tempo (2a lei da termodinamica). Baterias
+> originais de qualidade tem isso insensivel e faz parecer na prática que não perde, mas baterias
+> velhas tem queda de carga em pouco tempo, mesmo sem uso."*; classes, *"cada carta tem sua classe.
+> cada bateria tem sua classe, sao coisas diferentes"*; e, sobre a expressão "bateria de internet",
+> *"ELe chama bateria de internet as baterias que são compradas pela internet com vendedores e
+> fornecedores de origem duvidosa, são baterias de baixa qualidade no geral"*.
+
+**Escala de tensão do jogo (decisão do líder, 02/09/2026):** os volts do jogo são uma escala própria,
+ancorada no nominal de **3 V da CR2032** (§5, cabeçalho). ⚠️ **Os valores 12,6 V, 12,4 V e 12,1 V que
+aparecem no verbatim acima são o exemplo do líder sobre bateria de carro real, e NÃO são valores do
+jogo.** Ninguém os transcreve para tabela, catálogo, texto de carta ou fala de personagem. O que
+sobrevive deles é a forma: três patamares (cheia, limiar de recarga, descarregada) como proporções
+do nominal de 3 V, cujos números são do `economy-designer` e ratificação do líder. O vocabulário em
+volts que o §5 já usava permanece.
+
+Os termos SoC, SoH, CCA e OCV ficam em inglês, pela regra de nomenclatura do §4 (termos de TI e
+engenharia são universais em inglês; o giro diegético entra no conceito, nunca na sigla).
+
+1. **Capacidade (estoque), em vocabulário elétrico o estado de carga, SoC:** a carga da bateria
+   ativa. Persiste entre batalhas, degrada, exige recarga real. É o que a barra na tela mostra, e
+   **a carga aparece sempre** (decisão do líder, 02/09/2026). A leitura que revela o estoque é a
+   **tensão de repouso (OCV)**: bateria parada, sem nada puxando corrente. Resumo do líder:
+   *"voltagem parada = carga"*.
+2. **Vazão (taxa máxima de descarga por turno), que é a capacidade da bateria de entregar corrente
+   (decisão do líder, 02/09/2026: "são o mesmo limite").** Por turno, o ator pode sacar até `2 +
+   contagemPropriaDeTurnos`, a rampa de `combat.md` §5 relida como taxa, não como orçamento próprio
+   (decisão de 31/08/2026, forma preservada). **O teto dessa rampa é o CCA efetivo da bateria em
+   uso**: o CCA de fábrica do modelo, descontado pela saúde (SoH) daquele exemplar. Bateria nova de
+   modelo bom entrega mais por turno; bateria velha, ou de modelo fraco, entrega menos, mesmo cheia.
+   Vazão do turno e capacidade de entregar corrente não são dois limites: são um só, visto de dois
+   lados, o do ator e o da bateria. **Consequência de trabalho, não de número:** o ritmo do combate
+   (`combat.md` §5, `cartas-technomagik.md` §2.3, a rodada em que o custo premium das ESPECIAIS
+   destrava) foi calibrado com um teto fixo de vazão e **precisa ser recalibrado**, porque o teto
+   agora depende do hardware que o jogador estiver usando; é trabalho do `economy-designer`, com o
+   líder ratificando, e nenhum número novo é proposto aqui.
+3. **O limite real de cada turno é o MENOR entre a vazão do turno (a rampa, limitada pelo CCA efetivo
+   da bateria) e o que ainda resta na bateria ativa.** Nunca se saca mais do que a bateria tem.
 4. **Deixa de existir subtração dupla.** `cartas-spec-logica.md` §3.1 dizia que o `ManaCost` sai da
-   bateria e "o mesmo valor que já sai da mana do ator" — isso descrevia dois medidores em paralelo.
+   bateria e "o mesmo valor que já sai da mana do ator"; isso descrevia dois medidores em paralelo.
    Agora é **uma subtração só**, da bateria, limitada pela vazão do turno. Redação corrigida no
    próprio `cartas-spec-logica.md` §3.1 (L-24 deste projeto: o que virou passado se apaga, não se
    guarda como histórico).
 5. **Os dois elementos da tela existem, e cada um mostra uma coisa** (decisão do líder, 31/08/2026,
    completando o acréscimo de "Múltiplas baterias e a barra da tela"): **barra contínua = o ESTOQUE**
-   (a carga da bateria ativa); **pips discretos = a VAZÃO** (quanto ainda se pode sacar neste turno).
-   Razão que o líder acolheu: as duas propriedades que esta decisão separou passam a ser visíveis e
-   distintas, e o jogador enxerga de relance se está limitado pela carga que resta ou pelo teto do
-   turno — o sistema se ensina sozinho, sem tutorial, o que casa com o corte `C-16` (onboarding
-   orgânico, sem parede de texto). **Isto resolve a contradição candidata 2 acima:** a spec do
-   cockpit em `battle-screen.md` linha 50 não estava errada nem desatualizada, só descrevia um
-   elemento (pips) onde agora cabem dois (barra de carga da bateria + pips de vazão); os pips de AP,
-   que já existiam, não mudam — AP é outro recurso, com propósito distinto (`combat.md` linha 199).
-   **Posição confirmada, sem conflito:** "abaixo do quadro do personagem" (verbatim do acréscimo
-   anterior) bate com o cockpit da spec, onde o medidor de Mana já fica sob o retrato e o nome — a
-   dúvida anterior era de FORMA (pips × barra), nunca de posição; registrado aqui para ninguém reabrir
-   achando que há divergência de layout. **Detalhe que não é decidido aqui, por ser desenho de
-   interface (L-27):** cor, tamanho, posição fina, ordem de empilhamento e marcação dos dois
-   elementos — nasce com a camada `present/`.
+   (a carga da bateria ativa); **pips discretos = a VAZÃO** (quanto ainda se pode sacar neste turno;
+   com a decisão de 02/09/2026, esse quanto depende da saúde da bateria em uso). Razão que o líder
+   acolheu: as duas propriedades separadas passam a ser visíveis e distintas, e o jogador enxerga de
+   relance se está limitado pela carga que resta ou pelo teto do turno; o sistema se ensina sozinho,
+   sem tutorial, o que casa com o corte `C-16` (onboarding orgânico, sem parede de texto). **Isto
+   resolve a contradição candidata 2 acima:** a spec do cockpit em `battle-screen.md` linha 50 não
+   estava errada nem desatualizada, só descrevia um elemento (pips) onde agora cabem dois (barra de
+   carga da bateria + pips de vazão); os pips de AP, que já existiam, não mudam, porque AP é outro
+   recurso, com propósito distinto (`combat.md` linha 199). **Posição confirmada, sem conflito:**
+   "abaixo do quadro do personagem" (verbatim do acréscimo anterior) bate com o cockpit da spec, onde
+   o medidor de Mana já fica sob o retrato e o nome; a dúvida anterior era de FORMA (pips × barra),
+   nunca de posição; registrado aqui para ninguém reabrir achando que há divergência de layout.
+   **Requisito novo para a tela, registrado como fato e não desenhado aqui (L-27):** como a saúde só
+   se conhece depois de medir (item 8), a interface vai precisar distinguir saúde DESCONHECIDA de
+   saúde RUIM; a forma disso, assim como cor, tamanho, posição fina, ordem de empilhamento e
+   marcação dos dois elementos, nasce com a camada `present/` e espera o GlintFx.
+6. **Saúde (SoH) e capacidade de entregar corrente (decisão do líder, 02/09/2026):** a terceira
+   propriedade, independente do estoque. Toda bateria nasce com um **parâmetro de fábrica, o CCA**
+   (corrente de partida a frio): quantos amperes ela consegue fornecer no pico. O uso e os ciclos de
+   recarga degradam a saúde (a resistência interna sobe), e com ela cai a corrente que a bateria
+   ainda consegue entregar, que é o teto da vazão do item 2. A leitura que revela a saúde é a
+   **tensão sob carga (tensão de partida)**: o quanto a tensão cai quando o efeito puxa a corrente
+   de pico. Resumo do líder: *"voltagem na partida = capacidade de entregar corrente (saúde /
+   resistência interna / CCA)"*. O CCA de cada modelo e a curva de queda por SoH são balanceamento
+   (`economy-designer`), não decididos aqui.
+7. **Por que cada medida sozinha engana, com os dois exemplos do líder** (volts de bateria de carro,
+   exemplo dele, nunca valor do jogo): uma bateria **velha pode estar cheia** (12,6 V em repouso, no
+   exemplo) **e mesmo assim não acionar o efeito da carta**, porque não aguenta a corrente de pico: o
+   estoque está lá, a saúde não. E uma bateria **boa, só descarregada** (12,1 V em repouso, no
+   exemplo), **também cai demais sob carga**: a saúde está lá, o estoque não. Estoque e saúde são
+   eixos separados; ler um e concluir sobre o outro é o erro que o protocolo abaixo existe para
+   impedir.
+8. **A saúde é desconhecida até ser medida (decisão do líder, 02/09/2026).** A carga aparece sempre;
+   a saúde só depois do teste sob carga, na mesa ou com o multímetro (item 9). O exemplar guarda se
+   já foi medido (`is_health_measured`), e a regra do que pode ser mostrado é do domínio, obedecida
+   pela tela (L-17, armadilha 5). **O protocolo de medição, na ordem do líder:** (1) medir a tensão
+   de repouso, que dá o SoC; (2) se estiver abaixo do limiar de recarga (na escala do jogo, o
+   patamar correspondente ao "~12,4 V" do exemplo dele), **recarregar primeiro**; (3) só então fazer
+   o **teste sob carga**, que dá o SoH e a corrente disponível (CCA efetivo). Testar sob carga uma
+   bateria só descarregada dá diagnóstico falso de bateria ruim.
+9. **Onde se mede (decisão do líder, 02/09/2026):** na **mesa de manutenção/craft** (o ramo de reparo
+   do `.gw.table`, a mesma bancada do §4/§14/§15.5 que já recarrega, troca bateria e limpa vírus) ou
+   com o **multímetro**, item de catálogo que substitui o antigo medidor (ver "Itens de energia",
+   abaixo): mesmo preço de 13 cr e mesma concessão gratuita pela missão do Volta. Os dois informam as
+   mesmas três coisas: SoC, SoH e capacidade de entregar corrente. A mesa, além de medir, executa o
+   passo 2 do protocolo (recarregar); o multímetro só mede. Nenhum dos dois revela nada de bateria
+   que ainda não é do jogador: a regra do §14 ("as ferramentas NÃO revelam antes de comprar")
+   continua de pé, senão o risco da bateria pirata morreria.
+10. **O encontro entre os dois POCOs é o mecanismo central, e tem dois resultados (decisões do
+    líder, 01/09/2026 e 02/09/2026).** A carta declara o que EXIGE, a bateria declara o que ENTREGA.
+    Ao acionar, o jogo confere se a bateria instalada segura, sob a carga que a carta puxa, a tensão
+    de pico que a carta pede. **(1) Entrega plena:** segura; o efeito sai inteiro e a carga cai o
+    gasto normal. **(2) Falha por entrega insuficiente:** não segura; **a carta não funciona direito
+    E a bateria drena por inteiro**, vira `DEPLETED` (`cartas-spec-logica.md` §3.2), **e enquanto
+    isso acontece saem fumacinhas e faíscas, que são o SINAL VISUAL desse processo ao jogador**, não
+    um estado mais brando anterior a ele. Verbatim do líder, 01/09/2026: *"Depende: se um poder
+    gasta x de bateria e o jogador liga uma bateria que o máximo dela pela degradação ou tipo é x-10
+    (por exemplo), além da carta não funcionar direito, ela drena a bateria inteira."* E, 02/09/2026,
+    sobre o sinal: *"Uma coisa só: ela não funciona direito e drena a bateria interia, enquanto fica
+    soltando fumacinhas e faíscas"*. "O máximo dela pela degradação ou tipo" é o CCA efetivo: o tipo
+    dá o CCA de fábrica, a degradação o desconta. É a bateria velha cheia do exemplo 7, vista pelo
+    lado da carta. O que "não funcionar direito" significa em cada carta é dado dela, no espírito do
+    princípio canônico do §3 (a variação vem de dado cruzando originalidade × bateria). A carta do
+    Volta já carrega o mesmo perfil, por decisão do líder de 02/09/2026: um pico de consumo para dar
+    o início, depois consumo contínuo até acabar (`docs/design/mecanicas/cartas/volta.md`).
+    **Fronteira (LEI ZERO, L-06, L-27):** o que é do GusWorld é o resultado (plena ou falha) e o
+    evento que a falha emite; fumaça e faísca são desenho, nascem em `present/` ligada direto ao
+    GlintFx, e nada disso se especifica aqui.
+11. **Os dois lados da conta moram em átomos diferentes, e cada lado tem a própria classe (decisões
+    do líder, 02/09/2026).** Verbatim: *"E cada carta passa a ter no POCO a tensao de pico necessária
+    para acionar o efeito e o gasto de carga/mana, além da carga em repouso"*, e *"cada carta tem sua
+    classe. cada bateria tem sua classe, sao coisas diferentes"*. A CARTA carrega a DEMANDA, em **três
+    números soltos, nenhum derivado do outro** ("cada carta declara o próprio pico, independente do
+    gasto"): a tensão de pico necessária para acionar o efeito, o gasto de carga/mana por
+    acionamento (que já era o `ManaCost`) e a carga em repouso (o consumo por ficar equipada e ligada
+    sem disparar, o "gasto de standby" da passiva, agora campo de toda carta). É essa independência
+    que arma a armadilha desenhada pelo líder: uma carta de gasto baixo pode exigir pico alto, e a
+    bateria velha e cheia não a aciona. A BATERIA carrega a OFERTA: capacidade, CCA de fábrica,
+    perda de carga com o tempo, carga atual, ciclos, se a saúde já foi medida, e as duas leituras,
+    tensão de repouso e tensão sob carga. **A classe da carta (homebrew, pirata comum, pirata
+    especial falso, comum original, especial) e a classe da bateria (os tipos do §5: de fábrica,
+    selada das ESPECIAIS, pirata/genérica, de baixa qualidade craftada) são dois eixos
+    independentes; capacidade é propriedade da BATERIA, nunca da classe da carta.** Nenhum campo de
+    demanda entra na bateria e nenhum campo de oferta entra na carta (L-04, L-33). Cada TIPO de
+    bateria é átomo com POCO próprio (verbatim: *"lembre que cada bateria é um átomo e cada um tipo
+    tem seu poco"*). Campo existir não obriga valor diferente de zero. A especificação campo a campo
+    dos POCOs é documento próprio (ver "Pontos ABERTOS").
+12. **Toda bateria perde carga com o tempo (decisão do líder, 02/09/2026, segunda lei da
+    termodinâmica).** Vale para todos os tipos, inclusive a de fábrica: na original de qualidade a
+    perda é imperceptível, a ponto de o jogador jurar que ela não perde; na bateria velha a queda é
+    rápida, **mesmo sem uso**. A perda é função da saúde (SoH) do exemplar, não só do tipo: a mesma
+    bateria perde mais à medida que envelhece. Vale também para bateria guardada na mochila ou no
+    slot de usadas, não só para a instalada numa carta. **"Com o tempo" é tempo DE JOGO contado,
+    nunca o relógio da máquina** (`docs/tech/convencao-formatos-gw.md`, "A mochila registra, não
+    age": degrada por uso e ciclo, nunca por tempo de parede, senão o replay byte a byte da L-17 não
+    fecha). A curva da perda por SoH é número do `economy-designer`; a unidade de tempo de jogo em
+    que ela se aplica é proposta de agente, não decisão do líder (ver "Pontos ABERTOS").
 
 **Leitura que explica o conjunto:** a rampa deixa de ser um orçamento que aparece do nada a cada
-turno e vira o quanto a bateria consegue entregar por vez. Bateria real tem capacidade e tem corrente
-máxima; o modelo agora tem as duas.
+turno e vira o quanto a bateria consegue entregar por vez, e esse quanto tem dono: a saúde da
+bateria em uso. Bateria real tem capacidade, tem corrente máxima, tem saúde e perde carga parada; o
+modelo agora tem as quatro, e a segunda e a quarta são função da terceira. A bateria pirata que
+"mente sobre a carga" (§5, "Bateria pirata / genérica") cabe neste modelo sem regra extra: a carga
+dela aparece boa, sempre visível, e a saúde, que é o que está ruim, fica desconhecida até alguém
+medir (leitura de agente sobre as decisões de 01/09 e 02/09, não frase do líder; sinalizada para
+confirmação).
 
-**Duas consequências da resposta — JÁ RESPONDIDAS no canon vizinho, não são pendência nova.**
+**Duas consequências da resposta de 31/08, JÁ RESPONDIDAS no canon vizinho, não são pendência nova.**
 Corrigido em 31/08/2026, depois de o orquestrador conferir o corpus inteiro antes de marcar qualquer
 coisa como aberta:
 
 - **(a) Ficar sem bateria no meio da batalha passa a ser possível, e o mecanismo JÁ ESTÁ ESPECIFICADO.**
   Antes não era possível: a rampa recarregava ao máximo todo turno. Agora o estoque pode acabar, e a
-  carta vira `DEPLETED` (inerte, gate sempre `REJECTED` até troca — `cartas-spec-logica.md` §3.2). O
+  carta vira `DEPLETED` (inerte, gate sempre `REJECTED` até troca, `cartas-spec-logica.md` §3.2). O
   jogador troca por uma bateria carregada do inventário em combate via ação de emergência dedicada,
   `SwapBattery`, custando **2 AP fixo, sem escalar por dificuldade** (`cartas-spec-logica.md` §3.3-3.4,
   `cartas-numeros-proposta.md` §1c). A bateria velha `DEPLETED` retirada vai para o inventário como
-  item — não desaparece (ver "Descarte", abaixo). A carta do Volta já dependia exatamente disso
+  item, não desaparece (ver "Descarte", abaixo). A carta do Volta já dependia exatamente disso
   (`docs/design/mecanicas/cartas/volta.md`). **Precedente do líder no mesmo padrão** (`TODO.md` item
-  `F1`, decisão de 24/08/2026): a carta `glitch` não recebe exceção — "bateria em batalha: consome,
+  `F1`, decisão de 24/08/2026): a carta `glitch` não recebe exceção, "bateria em batalha: consome,
   sem exceção", porque "TODAS as cartas passam por originalidade E degradação da bateria; exceção
   nunca por omissão" (decisão do líder, 08/08/2026). Fora de combate, a mesma carta já fixa o que
   acontece quando a carga acaba no meio de um uso (dentro da parede: o personagem é cuspido de volta
-  pelo lado por onde entrou, com preço em dano) — precedente de forma, não de conteúdo, para o caso
+  pelo lado por onde entrou, com preço em dano), precedente de forma, não de conteúdo, para o caso
   de combate. **O que continua genuinamente aberto, e só isto:** se ficar sem carga da bateria ativa
-  no meio do combate tem alguma consequência ALÉM de não poder jogar a carta até trocar — o canon não
-  cobre isso.
+  no meio do combate tem alguma consequência ALÉM de não poder jogar a carta até trocar; o canon não
+  cobre isso. A decisão de 02/09 acrescenta um segundo jeito de chegar a `DEPLETED`, a falha por
+  entrega insuficiente do item 10, sem mudar o que acontece depois.
 - **(b) A degradação da bateria ganha efeito mecânico direto, e a curva JÁ TEM NÚMERO.** Cada recarga
   tira **13 pontos percentuais de SoH** (começa em 100%); abaixo de **21% SoH** a bateria é
-  considerada morta, só serve pra vender/reciclar no ferro-velho — dando **~6 recargas de vida útil**
+  considerada morta, só serve pra vender/reciclar no ferro-velho, dando **~6 recargas de vida útil**
   por bateria física (`cartas-numeros-proposta.md` §1b). O preço de recarga na estação também escala
-  com o SoH entregue (base 3 cr, multiplicador 1,2×-2,0×, mesma fonte).
+  com o SoH entregue (base 3 cr, multiplicador 1,2×-2,0×, mesma fonte). Com a decisão de 02/09, o
+  SoH deixa de ser só preço de recarga e passa a ser a grandeza que decide o teto de vazão de cada
+  turno (item 2), se a bateria aguenta o pico de cada efeito (itens 6 e 10) e quanto ela perde
+  parada (item 12); as curvas SoH → CCA efetivo e SoH → perda de carga são números novos, pendentes.
 
 ### Cada carta gasta a própria bateria: o fecho do sistema (decisão do líder, 31/08/2026)
 
@@ -324,7 +472,7 @@ estender a regra a essas outras categorias é proposta a submeter a ele, não de
 - **Carregador solar** — recarrega baterias passivamente (evita depender de estação/compra).
 - **Powerbank** com visor LED de carga própria restante.
 - **Carregador rápido** de bateria.
-- **Medidor (voltímetro)** — mostra carga atual e degradação **em volts**; comprável OU adquirido na **missão do Volta**.
+- **Multímetro** (item de medição): informa estado de carga (SoC), estado de saúde (SoH) e capacidade de entregar corrente, na escala de volts do jogo ancorada nos 3 V da CR2032; a carga aparece sempre, a saúde só depois deste teste ou do teste na mesa (decisões do líder, 02/09/2026). Comprável por 13 cr OU adquirido na **missão do Volta**. Verbatim do líder: *"esses parametros podem ser testados na mesa de craft ou com um item chamado multimetro"*. É a peça que a ficha do Gus já lista no cinto dele (`docs/narrative/deep/characters/gus-dragon.md`).
 - **Ghost do Volta** = o **tutor** de todo o sistema de energia (baterias, ciclos, degradação, recarga). Casa com o roster (cada análogo ensina sua área; Volta = a pilha).
 
 ### Bateria pirata / genérica
@@ -531,7 +679,7 @@ O mercado negro **não** é o vilão — é resistência ao monopólio-compadrio
 Duas camadas que se combinam:
 - **Reputação (macro, o vendedor):** a *taxa de confiabilidade* dele, **não binária** — um pode ser ~90% honesto, outro ~40%, outro golpista assumido. **Descoberta por:** (a) **experiência própria** (comprou ruim → o jogo lembra que aquele vendedor te passou a perna); (b) **fofoca de NPCs** (comentam quem é de confiança / quem é golpista → dá pra evitar golpe ANTES de cair). Orgânico e social, sem tela de estrelas.
 - **Sinais/preço (micro, o item):** mesmo num vendedor de boa fama, *aquele item* pode ter preço bom demais / sinal sutil de pirata. Caveat emptor — "o que não se vê" mora no bom-demais-pra-ser-verdade.
-- As **ferramentas (voltímetro/Turing) NÃO revelam antes de comprar** (senão matariam o risco) — são diagnóstico/cura **depois** (§11).
+- As **ferramentas (multímetro/Turing) NÃO revelam antes de comprar** (senão matariam o risco): são diagnóstico/cura **depois** (§11).
 
 ---
 
