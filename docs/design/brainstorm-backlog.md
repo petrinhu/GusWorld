@@ -58,7 +58,7 @@ Chamar as **dungeons de "faraday"** (nome do local), já sugerindo o uso da cart
 ## 3. Combate final: cartas de Gaiola de Faraday perdidas
 No **combate final**, os personagens estão SEM as cartas Gaiola de Faraday (perdidas — batalha? gastas? roubo? a definir) e precisam chegar ao chefe final atravessando **áreas sem save**, sob influência de **dispositivos de PEM escondidos** (quebráveis se encontrados) que desativam o save numa área qualquer.
 - **UX/dica canônica:** o jogador observa o MENU DE SAVE pra saber se está sob influência de PEM (save disponível ou não = sinal diegético).
-- Cross-ref: memoria `project_save_dungeon_pem_faraday`, `project_dragon_victory_canon` (clímax).
+- Cross-ref: memoria `project_save_dungeon_pem_faraday`, `docs/narrative/deep/dragon-victory-deep.md` (clímax).
 
 > **CANONIZADO 2026-07-18:** a carta se perde no clímax porque **o Dante instala um VÍRUS nela durante a noite** (é UMA carta — especiais são únicas). Amarra o seed #3 + o arco do traidor Dante + o Dragon Victory (o Gus PERDOA o Dante; a redenção pode ser remover o vírus), e literaliza "magia = software". Esse vírus ESCALOU para o sistema inteiro de cartas modificadas/piratas/infectadas em `docs/design/mecanicas/cartas-hardware-pirataria-energia.md`.
 >

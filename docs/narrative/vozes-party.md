@@ -4,7 +4,7 @@
 >
 > ⚠ **Este arquivo guarda BANTER de caminhada e descanso** (trocas de 4 a 8 falas, não disparadas por evento). As **farpas curtas de par, disparadas por evento de jogo** (cast lento, dano alto, loot, colisão de efeitos) vivem em [`farpas-linguagens.md`](farpas-linguagens.md), aprovadas uma a uma pelo criador em 2026-07-26. Antes de escrever fala nova, **cheque os dois** para não duplicar.
 >
-> **Âncoras:** Pillar 4 (Gus prodígio analítico, 11 anos canônico), `sinopse.md` §3-4, `characters/gus.md`, família Vance (`CHARS.md` §Família do Gus), codinome de combate "Dragon" (`CHARS.md` + `characters/gus.md`, [[project_dragon_victory_canon]]), guia de diálogos (voz por linguagem-âncora).
+> **Âncoras:** Pillar 4 (Gus prodígio analítico, 11 anos canônico), `sinopse.md` §3-4, `characters/gus.md`, família Vance (`CHARS.md` §Família do Gus), codinome de combate "Dragon" (`CHARS.md` + `characters/gus.md`, `docs/narrative/deep/dragon-victory-deep.md`), guia de diálogos (voz por linguagem-âncora).
 
 ## GUS (definido pelo criador)
 

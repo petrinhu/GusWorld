@@ -10,7 +10,7 @@
 
 **Escopo:** expande o Pillar 4 (`pillars.md`, seção "Game over") de 2 níveis (Normal/Hard) pra **4 níveis** (Fácil/Médio/Difícil/Hardcore), cada um com consequência mecânica própria pra morte de Gus. NÃO é escopo do M7-COSTURA (canon já registrado — o M7 mantém o placeholder simples "volta pra cidade"; ver §6).
 
-**Cross-refs:** `docs/design/pillars.md` Pillar 4; `docs/design/mecanicas/economia.md` §3 (Hospital/derrota — base do Médio); memória `project_morte_dificuldade_canon` (decisão original do líder, 2026-07-03); memória `project_dragon_victory_canon` (o clímax que nenhum modo pode furar); item `MODOS-MORTE` no `TODO.md` (hoje só referenciado no roadmap PI10 + no item COMBATE-TEORIA-JOGOS #6, sem linha de tabela própria ainda — sugiro abrir a linha ao canonizar esta spec).
+**Cross-refs:** `docs/design/pillars.md` Pillar 4; `docs/design/mecanicas/economia.md` §3 (Hospital/derrota — base do Médio); memória `project_morte_dificuldade_canon` (decisão original do líder, 2026-07-03); `docs/narrative/deep/dragon-victory-deep.md` (o clímax que nenhum modo pode furar); item `MODOS-MORTE` no `TODO.md` (hoje só referenciado no roadmap PI10 + no item COMBATE-TEORIA-JOGOS #6, sem linha de tabela própria ainda — sugiro abrir a linha ao canonizar esta spec).
 
 ---
 
@@ -122,7 +122,7 @@ O momento do respawn NÃO é uma cutscene — é um **log glitchado mínimo**, f
 
 > `SINAL PERDIDO... RECONECTANDO... LOCALIZAÇÃO: DESCONHECIDA`
 
-**5 amarras** (constraints do `narrative-designer`, protegem a exclusividade do clímax Dragon Victory — memória `project_dragon_victory_canon`):
+**5 amarras** (constraints do `narrative-designer`, protegem a exclusividade do clímax Dragon Victory — `docs/narrative/deep/dragon-victory-deep.md`):
 
 1. **Sem testemunha** — ninguém da party vê o momento do respawn.
 2. **Sem diálogo de reconhecimento** — Gus não comenta/processa emocionalmente na hora (nada de "eu quase morri...").
