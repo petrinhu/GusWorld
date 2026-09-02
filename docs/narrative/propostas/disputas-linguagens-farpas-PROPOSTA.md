@@ -381,7 +381,7 @@ O líder responde **por número**: aprovar, rejeitar ou pedir ajuste. A numeraç
 
 ## 6. Classe sensível: falas novas do Gus (olhar primeiro)
 
-Regra máxima do projeto: tudo que define o Gus original passa pelo líder ([[feedback_gus_original_autorizacao_explicita]]). **10 farpas do delta contêm fala nova dele.** Nenhuma introduz eixo técnico novo: todas comprimem juízo já aprovado nos apartes, e a derivação está declarada.
+Regra máxima do projeto: tudo que define o Gus original passa pelo líder (`GODS_LAWS.md` L-37). **10 farpas do delta contêm fala nova dele.** Nenhuma introduz eixo técnico novo: todas comprimem juízo já aprovado nos apartes, e a derivação está declarada.
 
 | Farpa | Fala nova do Gus | Deriva de | Risco |
 |---|---|---|---|
