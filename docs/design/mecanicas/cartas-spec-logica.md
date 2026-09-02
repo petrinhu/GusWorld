@@ -111,7 +111,8 @@ A lógica abaixo assume que cada **instância** de carta (lembrando: "carta = in
 registrada em `cartas-hardware-pirataria-energia.md` §5 ("Mana e bateria são o mesmo recurso"):
 `BateriaCarta.charge -= ManaCost_da_ação`, e é essa mesma subtração, não duas em paralelo, que
 também conta contra a vazão do turno do ator (`combat.md` §5, `manaMax = 2 +
-contagemPropriaDeTurnos`, cap 8, relido como taxa máxima de saque, não como pool próprio).
+contagemPropriaDeTurnos`, relido como taxa máxima de saque, não como pool próprio; o gate de
+vazão passa a consultar o CCA efetivo da bateria em uso).
 ⚠️ **Redação anterior apagada (L-24 do projeto): dizia "mesmo valor que já sai da mana do ator"**,
 descrevendo bateria e "mana do ator" como dois medidores debitados em paralelo — isso é passado, não
 histórico a guardar, porque mana e carga de bateria são o mesmo recurso e só existe UM lugar de onde
