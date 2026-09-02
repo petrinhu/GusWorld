@@ -14,7 +14,7 @@ Princípio: premiar quem explora **sem punir** quem só quer a história princip
 
 ## Prêmio do 100% = FINAL VERDADEIRO / cena extra jogável
 
-O 100% de conclusão destrava um **final verdadeiro ou uma sequência jogável extra** (não só um compêndio de leitura). É o maior incentivo de completude. Encosta no arco **Dragon Victory** (ver [`project_dragon_victory_canon`] / `docs/narrative/`).
+O 100% de conclusão destrava um **final verdadeiro ou uma sequência jogável extra** (não só um compêndio de leitura). É o maior incentivo de completude. Encosta no arco **Dragon Victory** (ver `docs/narrative/deep/dragon-victory-deep.md` / `docs/narrative/`).
 
 ### ⚠️ Costura pendente (narrative-designer, NÃO decidida aqui)
 
@@ -27,5 +27,5 @@ Isso é decisão de narrativa (impacto no arco + no Dragon Victory) → **brains
 
 ## Cross-ref
 - `docs/narrative/in-world-docs.md` (os discoverables), `docs/narrative/arco-principal.md` (endings), `docs/design/brainstorm-backlog.md` #1 (origem multiversal = miolo da lore profunda), RunaDex (em `docs/design/mecanicas/cartas-hardware-pirataria-energia.md` §13).
-- Memória `project_dragon_victory_canon` (o arco do final).
+- `docs/narrative/deep/dragon-victory-deep.md` (o arco do final).
 - O que conta como "100%": RunaDex completa + sidequests + discoverables — definir a métrica exata quando a produção de conteúdo abrir.

@@ -6,7 +6,7 @@
 >
 > **Função narrativa:** mentor-boticário (fornecedor de antídotos, reagentes, bio-ampolas), guardião da memória do ancestral (âncora o Gus à figura de Pyotor I sem entregar o arco Dragon), voz da paciência e do valor do tempo para o prodígio impaciente, e ponte com o pai ausente (dá notícias do Pyotor atual).
 >
-> **Cross-ref:** `CHARS.md` (família do Gus + linhagem Vance Era 1) · memória `project_dragon_victory_canon` (Pyotor I Draco Vance, Vyrdragon) · memória `project_axiologia_canonica` (eixo libertário-austríaco) · `docs/design/pillars.md` (Pillar 4: adultos são antagonistas ou ausentes, exceto mentores derrotados que o Gus ajuda) · conto-presente `brunus-vetorial-conto.md`.
+> **Cross-ref:** `CHARS.md` (família do Gus + linhagem Vance Era 1) · `docs/narrative/deep/dragon-victory-deep.md` (Pyotor I Draco Vance, Vyrdragon) · memória `project_axiologia_canonica` (eixo libertário-austríaco) · `docs/design/pillars.md` (Pillar 4: adultos são antagonistas ou ausentes, exceto mentores derrotados que o Gus ajuda) · conto-presente `brunus-vetorial-conto.md`.
 >
 
 ---
@@ -106,7 +106,7 @@ A suspeita foi **desfeita por uma análise de complementaridade.** Compararam os
 
 ## Arco no clímax (Dragon Victory), exclusivo do branch do perdão a Dante
 
-> **Precondição:** só ocorre se o Gus perdoa Dante. Quem rejeita o Dante não vê nada disto: a luta final segue normal, sem despertar de linhagem, sem Brunus na arena. Sem versão reduzida no branch sem perdão; a escolha tem peso real. Cross-ref: memória `project_dragon_victory_canon` (seções "Party expandida" e "Transformações da linhagem vs Brunus").
+> **Precondição:** só ocorre se o Gus perdoa Dante. Quem rejeita o Dante não vê nada disto: a luta final segue normal, sem despertar de linhagem, sem Brunus na arena. Sem versão reduzida no branch sem perdão; a escolha tem peso real. Cross-ref: `docs/narrative/deep/dragon-victory-deep.md` (pré-condições e a fronteira entre a cutscene e a arena).
 
 ### A exceção de uma vida
 

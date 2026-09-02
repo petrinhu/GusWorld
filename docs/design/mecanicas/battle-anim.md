@@ -133,7 +133,7 @@ Lista do que o sistema de animacao de combate PRECISA, por papel. Vira o briefin
 Espelha a filosofia data-driven da locomocao (locomotion.md §5): comeca no MINIMO, suaviza por DADOS sem reescrever logica.
 
 - **Minimo pra o slice jogavel:** battle-idle + cast + attack-melee + hit-react, por party-membro e por inimigo do encontro. (`victory`, `KO` e a respiracao do idle entram logo depois.)
-- **Adiciona por dados:** mais quadros de cast/golpe, respiracao additive no battle-idle, signature/ultimate por membro (animation-plan.md; ex. Dragon Victory do Gus, aura cyan->vermelho, memoria `project_dragon_victory_canon`). Nenhuma logica nova: so dados/sprite-sheet a mais.
+- **Adiciona por dados:** mais quadros de cast/golpe, respiracao additive no battle-idle, signature/ultimate por membro (animation-plan.md; ex. Dragon Victory do Gus, aura cyan->vermelho, `docs/narrative/deep/dragon-victory-deep.md`). Nenhuma logica nova: so dados/sprite-sheet a mais.
 - **Hit-react: 1 quadro de sofrimento basta no minimo** (a leitura vem de pose + recuo + floater); suavizar com mais quadros e direcao (light/heavy) e polimento.
 - **Inimigos:** so as anims de combate (battle-idle/cast/attack-melee/hit-react/KO); inimigo NAO precisa de walk/run de overworld nem victory (animation-plan.md ja decide isso).
 
