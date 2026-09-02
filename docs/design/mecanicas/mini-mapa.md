@@ -44,7 +44,7 @@ Baús/tesouros clássicos não existem. Detalhamento canônico (nesta seção, �
   - Regra prática: se um drop **entra numa receita**, é Pool B (craft); senão, é Pool A (vender). Os 3 do mini-mapa são a exceção nomeada do Pool A (usáveis, não vendáveis por padrão).
 - **Quase tudo do Pool A é pra vender.** Os **ÚNICOS itens do Pool A usáveis pela party** são os **3 componentes do mini-mapa: o implante, a VRAM e a skill de marcadores**. Todo o resto do Pool A (demais hardware/código/algoritmo) é ativo só-pra-vender.
 - **Vender/recomprar vale pra implantes E skills.**
-- **Axiologia econômica canon:** *"não se acha dinheiro, se faz dinheiro com esforço e trabalho duro"* — o jogador acha ATIVOS e os converte em Crédito por trabalho (explorar/decifrar/vender). Reforça [[project_axiologia_canonica]].
+- **Axiologia econômica canon:** *"não se acha dinheiro, se faz dinheiro com esforço e trabalho duro"* — o jogador acha ATIVOS e os converte em Crédito por trabalho (explorar/decifrar/vender). Reforça `ESCOPO.md`, princípio 1.
 
 Casa com Pillar 2 (magia = software) e a compilação-no-cast das cartas.
 
