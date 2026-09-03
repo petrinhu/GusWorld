@@ -74,13 +74,13 @@ A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C
 
 ## Estado atual do repositório (25/08/2026)
 
-Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de memória. ⚠️ **Contagem de commit e SHA de remoto envelhecem em horas** — em 25/08/2026 esta seção declarava 16 commits quando havia 83, e um SHA de remoto vencido, porque foi atualizada nas contagens de tabela e não nas de git. **Rode o comando; não cite o número daqui.**
+Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de memória. **Número envelhece; rode o comando, não cite o valor daqui.**
 
 **Git e remoto:**
 
-- `git rev-list --count HEAD`: **83 commits** no branch local `main`.
-- `git ls-remote git@github.com:petrinhu/GusWorld.git main`: `97e2a3954ae70d1bc51c076f411001dfb848136d`.
-- `git rev-list --count origin/main..HEAD`: **12 commits locais ainda NÃO pushados**. O remoto é ancestral do HEAD local. ⚠️ **Este número envelhece a cada commit; meça, não cite daqui.**
+- `git rev-list --count HEAD` responde quantos commits tem o branch local `main`.
+- `git ls-remote git@github.com:petrinhu/GusWorld.git main` responde o SHA do `main` no remoto.
+- `git rev-list --count origin/main..HEAD` responde quantos commits locais ainda não foram pushados.
 - Existe **um** workflow de CI: `.github/workflows/lei-zero.yml` (`LEI ZERO`), nascido no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. Medido: 18 execuções, todas com conclusão `success`, a mais recente no commit `ceee72d`. ⚠️ **Isto não é o CI de build do projeto**: a matriz das cinco plataformas do item `C4` continua por fazer, porque o LEI ZERO verifica só TEXTO, sem compilar nada.
 
 **Código-fonte: não existe.** Confirmado por comando, não por suposição:
