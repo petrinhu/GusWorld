@@ -48,7 +48,7 @@
 | [L-27](#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
 | [L-28](#l-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
 | [L-29](#l-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é |
-| [L-30](#l-30) | escrever, reordenar ou acrescentar item na tabela | Todo item aponta para o documento que o especifica, se existir |
+| [L-30](#l-30) | escrever, reordenar ou acrescentar item na tabela, ou escrever/editar checklist em qualquer outro documento do projeto | Tabela aponta para o documento que a especifica; TODO.md é a única fonte de checklist, o resto aponta de volta pelo ID, sem caixa de estado própria |
 | [L-31](#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
 | [L-33](#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
@@ -547,7 +547,13 @@ Ferramenta: `git-crypt`, **uma chave só**, a simétrica exportada para fora da 
 
 ## L-30
 
-**Data:** 21/08/2026. **Verbatim:** *"quando refizer a tablea ela deve apontar para os documentos equivalentes se existirem"*.
+**Data:** 21/08/2026, ampliada em 03/09/2026 (refundida aqui por ordem da L-68 global, que manda procurar a lei irmã e reunir as duas num texto só em vez de abrir entrada nova para o que é refinamento de uma existente). É o mesmo instrumento, o ponteiro, mudando de sentido: a metade de 21/08/2026 aponta **para fora** (da tabela para o documento); a de 03/09/2026 aponta **para dentro** (de qualquer documento para a tabela). A contagem de leis deste arquivo não muda.
+
+**Verbatim (21/08/2026):** *"quando refizer a tablea ela deve apontar para os documentos equivalentes se existirem"*.
+
+**Verbatim (03/09/2026, duas mensagens em sequência):** *"TODO.md é a única fonte de checklist. Apague qualquer outra"* e *"TODOS os checklists DEVEM APENAS apontar para TODO.md, não criar outros arquivos e seções"*.
+
+### Metade 1 (21/08/2026): a tabela aponta para fora
 
 **Todo item da tabela de pendências aponta para o documento que o especifica, quando esse documento existe.** O ponteiro vai **dentro da coluna `Descrição Técnica`**, porque o schema de dez colunas é contrato e não se altera para acomodar isto.
 
@@ -560,11 +566,23 @@ Ferramenta: `git-crypt`, **uma chave só**, a simétrica exportada para fora da 
 
 **Quando não existe documento, o item diz isso com todas as letras:** `sem documento`. Silêncio não distingue "não há" de "ninguém procurou", e essa distinção é justamente o que a lei quer preservar.
 
-**Por que isto vira lei, e não recomendação:** item sem fonte é convite para o executor reinventar a decisão. Já aconteceu neste projeto: agente derivou spec da prosa de um documento que citava arquivo inexistente, e a derivação virou fato para o agente seguinte. O ponteiro é o que transforma "faça X" em "faça X **como está escrito em Y**".
+### Metade 2 (03/09/2026): qualquer outro documento aponta para dentro
 
-**Aplicação, ao reordenar:** o `--reorder` **não** é ocasião de reescrever descrição, mas **é** ocasião de acrescentar o ponteiro que faltava, porque o documento pode ter nascido depois do item. Ao acrescentar item novo (inclusive ideia do Gus Dragon, L-07), o ponteiro nasce com ele.
+**O `TODO.md` é a ÚNICA fonte de checklist do projeto: não existe segunda.** Qualquer outro documento que precise falar de pendência **aponta** para o `TODO.md`; não duplica contagem, não duplica soma, não duplica percentual, não mantém coluna de status própria, e **não cria arquivo nem seção** para abrigar rastreamento paralelo. A **L-63 global** já proibia `BACKLOG.md` paralelo antes desta ordem; a ordem de 03/09/2026 generaliza a mesma proibição para **qualquer** checklist com estado, em **qualquer** documento do projeto, não só num arquivo rival de tabela.
 
-**Estado em 21/08/2026, medido:** dos 71 itens, **43 já apontam** para lei ou documento e **28 não apontam**. Fechar essa lacuna é parte da reordenação que o líder já combinou.
+**O que conta como checklist paralelo, e o que não conta:**
+
+- **Caixa de marcar** (`- [ ]` / `- [x]`) em documento que não seja o `TODO.md` é rastreamento de estado: logo é checklist paralelo, mesmo com um item só. O conteúdo da linha fica; a marca de estado sai, vira bullet simples.
+- **Continua legítimo** citar o status de UM item **nomeando o ID** (`F4`, `G26`...): isso aponta, não duplica.
+- **Continua legítimo** checklist-gabarito de processo, reutilizável e **sem estado por item**: o `DEPLOY_CHECKLIST.md`, o Definition of Done do `AGILE.md`, o Commit Checklist do `CONTRACT.md`, critério de aceite para o `qa-engineer`. Esses não rastreiam progresso de nenhum item específico; são template aplicado a cada uso, não registro de UM avanço.
+
+**A mecânica que produz a duplicação, medida, não presumida:** no commit `7f4e4f4` (25/08/2026), uma sessão que documentava o fatiamento do `A11` colou no `CLAUDE.md` o retrato da tabela naquele instante (contagem de itens, de ondas, de cada status) como número fixo no texto. Um retrato assim **congela no segundo em que é colado** e diverge a cada commit seguinte da tabela, exatamente o problema que a Metade 1 já resolvia na direção tabela para documento, e que a Metade 2 agora fecha na direção documento para tabela. ⚠️ **Nota de apuração:** o `CLAUDE.md` deste projeto, hoje, **já não tem** esse número fixo (em algum ponto depois de 25/08/2026 ele foi trocado por uma instrução de medir, `grep -cE '^\| [0-9]' TODO.md`), então o exemplo vale como o **mecanismo que a lei previne**, não como violação viva a corrigir agora.
+
+**Por que isto vira lei, e não recomendação:** item sem fonte é convite para o executor reinventar a decisão. Já aconteceu neste projeto: agente derivou spec da prosa de um documento que citava arquivo inexistente, e a derivação virou fato para o agente seguinte. O ponteiro é o que transforma "faça X" em "faça X **como está escrito em Y**", nas duas direções.
+
+**Aplicação, ao reordenar:** o `--reorder` **não** é ocasião de reescrever descrição, mas **é** ocasião de acrescentar o ponteiro que faltava, porque o documento pode ter nascido depois do item. Ao acrescentar item novo (inclusive ideia do Gus Dragon, L-07), o ponteiro nasce com ele. Ao encontrar checklist com caixa de marcar fora do `TODO.md`, a conversão para bullet simples e o ponteiro por ID (quando houver item correspondente) são a mesma operação desta lei, não uma auditoria à parte.
+
+**Estado em 21/08/2026, medido:** dos 71 itens, **43 já apontavam** para lei ou documento e **28 não apontavam**. Fechar essa lacuna foi parte da reordenação que o líder já combinou.
 
 
 ---
