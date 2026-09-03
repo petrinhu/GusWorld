@@ -172,20 +172,20 @@ user fecha decisões macro da rodada
 
 ---
 
-## Status (rodadas)
+## Conteúdo por rodada
 
-| Rodada | Conteúdo | Status |
-|---|---|---|
-| R1 (Eras) | era-1, era-2, era-3, transicoes, cosmologia-origem (5 docs) | ✅ Concluído (2026-05-26) |
-| R2 (Facções) | 6 principais + menores (7 docs) | ✅ Concluído (arquivos presentes no disco) |
-| R3 (Settings) | 8 settings deep (8 docs) | ✅ Concluído (arquivos presentes no disco) |
-| R4 (Characters) | Gus + 6 companions (7 docs) | ✅ Concluído (arquivos presentes no disco) |
-| R5 (Antagonistas + NPCs) | Sterling + Patch-Zero + NPCs antagonistas, pasta `antagonists/` (3 docs) | ✅ Concluído (arquivos presentes no disco) |
-| R6 (Magic) | Glyph/Token + linguagens + nat-mat (3 docs) | ✅ Concluído (arquivos presentes no disco) |
-| R7 (Ontologia) | Tech/cosmologia/leitmotivs (4 docs) | ✅ Concluído (arquivos presentes no disco) |
-| R8 (Stinger) | Sequel hooks + post-credits (2 docs) | ✅ Concluído (arquivos presentes no disco) |
-| R9 (Antologia Vol 2) | 14 contos in-character (14 docs) | ✅ Concluído (arquivos presentes no disco) |
-| R10 (Consolidação livro) | Vol 1 + Vol 2 com capa, prefácio, sumário, glossário, apêndices (`docs/book/`) | ✅ Concluído (arquivos presentes no disco) |
+| Rodada | Conteúdo |
+|---|---|
+| R1 (Eras) | era-1, era-2, era-3, transicoes, cosmologia-origem (5 docs) |
+| R2 (Facções) | 6 principais + menores (7 docs) |
+| R3 (Settings) | 8 settings deep (8 docs) |
+| R4 (Characters) | Gus + 6 companions (7 docs) |
+| R5 (Antagonistas + NPCs) | Sterling + Patch-Zero + NPCs antagonistas, pasta `antagonists/` (3 docs) |
+| R6 (Magic) | Glyph/Token + linguagens + nat-mat (3 docs) |
+| R7 (Ontologia) | Tech/cosmologia/leitmotivs (4 docs) |
+| R8 (Stinger) | Sequel hooks + post-credits (2 docs) |
+| R9 (Antologia Vol 2) | 14 contos in-character (14 docs) |
+| R10 (Consolidação livro) | Vol 1 + Vol 2 com capa, prefácio, sumário, glossário, apêndices (`docs/book/`) |
 
 ---
 
