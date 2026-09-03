@@ -12,7 +12,7 @@
 #meta family universal
 #meta base_type glifo   // //PLAYTEST
 #meta target_shape single   // default do registro; irrelevante — carta nunca é jogada
-#meta mana_cost 0
+#meta charge_cost 0
 #meta ap_cost 1
 #meta power 0
 #meta ignores_weakness_wheel false

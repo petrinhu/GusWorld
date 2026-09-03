@@ -264,7 +264,7 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
    líder ratificando, e nenhum número novo é proposto aqui.
 3. **O limite real de cada turno é o MENOR entre a vazão do turno (a rampa, limitada pelo CCA efetivo
    da bateria) e o que ainda resta na bateria ativa.** Nunca se saca mais do que a bateria tem.
-4. **Deixa de existir subtração dupla.** `cartas-spec-logica.md` §3.1 dizia que o `ManaCost` sai da
+4. **Deixa de existir subtração dupla.** `cartas-spec-logica.md` §3.1 dizia que o `ChargeCost` sai da
    bateria e "o mesmo valor que já sai da mana do ator"; isso descrevia dois medidores em paralelo.
    Agora é **uma subtração só**, da bateria, limitada pela vazão do turno. Redação corrigida no
    próprio `cartas-spec-logica.md` §3.1 (L-24 deste projeto: o que virou passado se apaga, não se
@@ -345,7 +345,7 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
     classe. cada bateria tem sua classe, sao coisas diferentes"*. A CARTA carrega a DEMANDA, em **três
     números soltos, nenhum derivado do outro** ("cada carta declara o próprio pico, independente do
     gasto"): a tensão de pico necessária para acionar o efeito, o gasto de carga/mana por
-    acionamento (que já era o `ManaCost`) e a carga em repouso (o consumo por ficar equipada e ligada
+    acionamento (que já era o `ChargeCost`) e a carga em repouso (o consumo por ficar equipada e ligada
     sem disparar, o "gasto de standby" da passiva, agora campo de toda carta). É essa independência
     que arma a armadilha desenhada pelo líder: uma carta de gasto baixo pode exigir pico alto, e a
     bateria velha e cheia não a aciona. A BATERIA carrega a OFERTA: capacidade (de face e real, ver
@@ -486,7 +486,7 @@ Decisões anteriores do líder, no mesmo assunto, verbatim:
   sai pelo poder."*
 
 **A carta `passiva` (`cartas/_vocabulario.md` §9) nunca tem custo zero de mana/bateria.** O canon
-anterior descrevia a passiva como "ManaCost 0, equip-only" (`cartas-technomagik.md` §2.3), como se
+anterior descrevia a passiva como "ChargeCost 0, equip-only" (`cartas-technomagik.md` §2.3), como se
 ela não consumisse nada além do slot ocupado — essa leitura está revogada por completo; o texto que a
 sustentava foi corrigido nos documentos que a repetiam, sem guardar a redação antiga como histórico
 (L-24 deste projeto). No lugar dela, toda passiva tem **dois gastos distintos**, na mesma moeda

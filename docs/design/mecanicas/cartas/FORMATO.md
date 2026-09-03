@@ -37,7 +37,7 @@ Linha em branco: ignorada. Linha só com comentário: ignorada. Espaço em branc
 Três formas válidas, todas aceitas pelo leitor:
 
 ```
-mana_cost: 6   // kActiveManaCost, //PLAYTEST: mana das ativas/hibridas
+charge_cost: 6   // kActiveChargeCost, //PLAYTEST: mana das ativas/hibridas
 ```
 
 ```
@@ -65,7 +65,7 @@ Bloco implícito no topo do arquivo, antes de qualquer `@`. Uma chave por linha.
 | `family` | sim | `eletrico` \| `bioquimico` \| `sonico` \| `cinetico` \| `criptografico` \| `universal` | `universal` só é válido para carta, nunca para personagem/inimigo (regra herdada da fonte, não deste formato) |
 | `base_type` | sim | `pulso` \| `raiz` \| `eco` \| `fenda` \| `glifo` | tipo diegético; nas 20 especiais sempre `glifo`, marcado `//PLAYTEST` na fonte por não haver convenção fechada |
 | `target_shape` | sim | `self` \| `single` \| `linha` \| `area3x3` \| `grupo` | |
-| `mana_cost` | sim | inteiro ≥ 0 | |
+| `charge_cost` | sim | inteiro ≥ 0 | renomeado de `mana_cost` em 03/09/2026, decisão do líder: mana e carga de bateria são o mesmo recurso desde 02/09/2026 (`cartas-hardware-pirataria-energia.md` §5, "Mana e bateria são o mesmo recurso"), e o nome antigo dizia menos do que a coisa é |
 | `ap_cost` | sim | inteiro ≥ 0 | |
 | `power` | sim | inteiro ≥ 0 | `0` quando a carta não tem dano-base próprio (a maioria das especiais); comentário explica a exceção quando `power` > 0 |
 | `ignores_weakness_wheel` | não (default `false`) | `true` \| `false` | trunfo fora-da-roda; hoje só a Gödel usa `true` |
@@ -127,7 +127,7 @@ Nenhuma dessas falhas é ambígua o bastante para "melhor esforço": um catálog
 #meta family universal
 #meta base_type glifo
 #meta target_shape grupo
-#meta mana_cost 6   // kActiveManaCost, //PLAYTEST: mana das ativas/hibridas
+#meta charge_cost 6   // kActiveChargeCost, //PLAYTEST: mana das ativas/hibridas
 #meta ap_cost 1
 #meta power 0
 #meta ignores_weakness_wheel false
@@ -161,4 +161,4 @@ percent: 30   // kNewtonReflectPercent, //PLAYTEST: mesma fracao da face 2
 
 ## 9. O que este documento decidiu, e contra qual critério
 
-Onde o número fica (`.gw.card`, curto, ao lado do valor) contra onde a prosa de design fica (`.md` por carta, longo, explicando o mecanismo inteiro): o critério usado foi **tamanho + reusabilidade**. Uma frase de uma linha que ancora um número (`kActiveManaCost, //PLAYTEST`) cabe e pertence ao dado, porque é parte do próprio dado (sem ela, o número é órfão). Um parágrafo que explica por que duas faces de uma carta existem, o que cada uma faz, e que decisão do líder ou achado de auditoria motivou a forma atual — isso é ensaio, não anotação, e enche o arquivo de dado de texto que um leitor de máquina jamais precisa. Cada `.gw.card` termina o comentário de cabeçalho apontando para o `.md` irmão (L-30); nenhum arquivo de dado repete o ensaio nem faz o leitor humano caçá-lo.
+Onde o número fica (`.gw.card`, curto, ao lado do valor) contra onde a prosa de design fica (`.md` por carta, longo, explicando o mecanismo inteiro): o critério usado foi **tamanho + reusabilidade**. Uma frase de uma linha que ancora um número (`kActiveChargeCost, //PLAYTEST`) cabe e pertence ao dado, porque é parte do próprio dado (sem ela, o número é órfão). Um parágrafo que explica por que duas faces de uma carta existem, o que cada uma faz, e que decisão do líder ou achado de auditoria motivou a forma atual — isso é ensaio, não anotação, e enche o arquivo de dado de texto que um leitor de máquina jamais precisa. Cada `.gw.card` termina o comentário de cabeçalho apontando para o `.md` irmão (L-30); nenhum arquivo de dado repete o ensaio nem faz o leitor humano caçá-lo.

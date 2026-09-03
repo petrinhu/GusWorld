@@ -2,9 +2,9 @@
 
 > **AVISO (atualizado 2026-07-14, achado PS-Y3):** este rascunho está **SUPERADO LINHA-A-LINHA por `_EFEITOS-ESCOLHIDOS.md`** — os 20 efeitos JÁ foram escolhidos pelo criador (2026-07-12/13), e várias linhas abaixo divergem do efeito real (ex.: Pythagoras aqui = "8/13/21% Sônico", mas o escolhido é "Hipotenusa √(a²+b²)"; Maxwell aqui = só ativa de área, mas o escolhido tem passiva "iluminar áreas escuras"; Volta aqui = passiva de carga, mas o escolhido é leech termodinâmico). **Use este arquivo só como REFERÊNCIA DE FORMATO DE TABELA, nunca de conteúdo.** A fonte de verdade dos efeitos é `_EFEITOS-ESCOLHIDOS.md`; os statlines numéricos finais fecham no playtest, em cima dos efeitos de lá (não daqui).
 >
-> **Arcabouço canônico** (esse sim fechado, ver `cartas-technomagik.md` §2.2/§2.3/§5): baseline comum ManaCost 1/2/3 → Power 3/5/8; especiais em 3 sub-categorias (ATIVA mana~6 / PASSIVA dois gastos, standby + disparo, equip-only (decisão do líder, 02/09/2026) / FORA-DE-COMBATE Faraday+Euler+Menger); os 2 status novos (Sobrecarga 8/5/2, Resfriamento card 4).
+> **Arcabouço canônico** (esse sim fechado, ver `cartas-technomagik.md` §2.2/§2.3/§5): baseline comum ChargeCost 1/2/3 → Power 3/5/8; especiais em 3 sub-categorias (ATIVA mana~6 / PASSIVA dois gastos, standby + disparo, equip-only (decisão do líder, 02/09/2026) / FORA-DE-COMBATE Faraday+Euler+Menger); os 2 status novos (Sobrecarga 8/5/2, Resfriamento card 4).
 
-| # | cardExec- | Família (proposta) | ManaCost | Power / efeito-status | Ignora roda? | Sub-cat | Rationale |
+| # | cardExec- | Família (proposta) | ChargeCost | Power / efeito-status | Ignora roda? | Sub-cat | Rationale |
 |---|---|---|---|---|---|---|---|
 | 1 | Faraday | Utilitário | 0 | anula PEM das dungeons (save) + imunidade Stun/Sobrecarga | Não | **fora-de-combate** | blindagem passiva estrutural |
 | 2 | Maxwell | Elétrico | 6 | Power 13, área (todos) | Não | ativa | onda unificada = burst de área |

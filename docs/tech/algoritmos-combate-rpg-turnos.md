@@ -920,7 +920,7 @@ ACTION FireBolt -> Gus
   critical_target  +0.00  (fact unknown)
   repeat_penalty   -0.08
   pressure_penalty -0.10
-  mana_cost        -0.04
+  charge_cost        -0.04
 TOTAL               0.56
 ```
 

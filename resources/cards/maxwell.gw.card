@@ -14,7 +14,7 @@
 #meta family eletrico
 #meta base_type glifo   // //PLAYTEST
 #meta target_shape grupo
-#meta mana_cost 6   // kActiveManaCost, //PLAYTEST
+#meta charge_cost 6   // kActiveChargeCost, //PLAYTEST
 #meta ap_cost 1
 #meta power 5   // kMaxwellPower, //PLAYTEST — decisão AUTÔNOMA do orquestrador, a confirmar; menor que o Power 8 da Tesla de propósito (não eclipsar o nicho dela)
 #meta ignores_weakness_wheel false

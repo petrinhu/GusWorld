@@ -11,7 +11,7 @@
 #meta family cinetico
 #meta base_type pulso
 #meta target_shape single
-#meta mana_cost 2   // decisão do líder, 02/09/2026: bate mais que a contraparte da família pelo mesmo custo
+#meta charge_cost 2   // decisão do líder, 02/09/2026: bate mais que a contraparte da família pelo mesmo custo
 #meta ap_cost 1
 #meta power 7   // origem não documentada (o maior das 5 comuns — "maior dano direto")
 

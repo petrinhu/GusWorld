@@ -22,7 +22,7 @@
 #meta family universal
 #meta base_type glifo   // por analogia com os outros posse-only; a confirmar
 #meta target_shape single   // irrelevante — passiva, a carta nunca é jogada
-#meta mana_cost 0   // "passiva mana-0", canon
+#meta charge_cost 0   // "passiva mana-0", canon
 #meta ap_cost 0   // passiva não gasta ação
 #meta power 0   // não causa dano; é lente, não arma
 #meta ignores_weakness_wheel false   // ausente no canon; default conservador

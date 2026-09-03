@@ -250,7 +250,7 @@ batalhas, degrada, exige recarga real) e **vazão** (a taxa máxima de descarga 
 | Scan | 1 | 0 |
 | Gambito: Prever | 1 | 0 |
 | Gambito: Reordenar / forçar-recuo | 2 | 0 |
-| Jogar carta | 1 | custo da carta (`ManaCost`) |
+| Jogar carta | 1 | custo da carta (`ChargeCost`) |
 | Flee | 1 | 0 |
 | Passar (encerra turno) | 0 | 0 |
 
@@ -322,7 +322,7 @@ A sintaxe é apresentada na UI exatamente nesse formato (Pillar 2: gramática in
 | `DisplayName` | string (via `tr()`) | nome diegético localizado |
 | `Family` | enum `CardFamily` | uma das 5 famílias |
 | `BaseType` | enum `CardBaseType` | tipo-base (pulso, raiz, eco, fenda, glifo...) |
-| `ManaCost` | int | custo de mana base |
+| `ChargeCost` | int | custo de mana base |
 | `ApCost` | int | custo de AP (padrão 1) |
 | `Power` | int | potência base entrando na fórmula de dano |
 | `TargetShape` | enum `TargetShape` | single / linha / área-3x3 / grupo / self |
@@ -854,7 +854,7 @@ public readonly record struct Card(
     string DisplayName,          // resolvido via tr() na UI
     CardFamily Family,
     CardBaseType BaseType,
-    int ManaCost,
+    int ChargeCost,
     int ApCost,                  // default 1
     int Power,
     TargetShape TargetShape,
