@@ -218,7 +218,7 @@ tempo.**
 
 **"Bateria de internet" é SINAL, não canal de compra duvidoso (decisão do líder, 03/09/2026, por
 `AskUserQuestion`, ratificando a resposta do Gus Dragon na issue 3 do bus, 02/09/2026).** A leitura
-que o líder deu no verbatim acima sobre a expressão "bateria de internet", de que ela descrevia
+que o líder deu em 02/09/2026 sobre a expressão "bateria de internet", de que ela descrevia
 o canal de compra pela rede, junto a vendedores de origem duvidosa, foi superada nesta data.
 Verbatim do Gus Dragon, ao escolher entre as duas opções que lhe foram devolvidas: *"Jeito 1, o 2
 sinto que já foi coberto com as baterias privadas"*. O "Jeito 1" era uma bateria que precisa de
