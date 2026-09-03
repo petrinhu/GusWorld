@@ -547,26 +547,36 @@ multímetro. O sorteio é por exemplar: duas piratas do mesmo lote podem sair di
 > energia de ação]. E pode ser usada em craft de bateria, após refinada para 'agua destilada'.
 > Mesma logica do suco de limao."*
 
-**Desvio depende da qualidade do refino (decisão do líder, 03/09/2026, verbatim: "O desvio dela
-depende da qualidade do refino").** Quanto melhor o refino do suco de limão e da água com gás (os
-dois insumos desta subseção, descritos logo abaixo), mais perto da capacidade de face nasce a
-capacidade real. Isto abre um sistema que ainda não existe: não há, hoje, nenhum eixo de qualidade
-de refino no canon, nem grau, nem número, nem mecanismo de como o refino varia. Ele depende de
-duas decisões do líder que continuam abertas, já registradas mais abaixo nesta subseção ("Não
-decidido, e não inventado aqui"): se o craft exige os dois insumos refinados juntos ou se cada um
-sozinho já basta, e o momento narrativo em que o personagem aprende a filtrar. Nenhum sistema de
-qualidade de refino é desenhado aqui; a decisão só registra que ele vai precisar existir.
+**Três degraus por insumo, dos doze itens de comida do Gus Dragon (`comidas-ingredientes-craft.md`
+§5.5.1, catálogo movido de `economia.md` §5.5 em 2026-08-25, L-33), e o que cada combinação produz
+(decisões do líder, 03/09/2026, a primeira verbatim, a segunda por `AskUserQuestion`).** Cada um dos
+dois insumos desta subseção tem TRÊS níveis de refino, não dois. **Os nomes já canônicos não são
+aposentados**: o líder rejeitou explicitamente a opção de renomeá-los; eles continuam existindo,
+agora como o degrau do meio:
 
-Duas das doze comidas (`comidas-ingredientes-craft.md` §5.5.1, catálogo movido de `economia.md`
-§5.5 em 2026-08-25, L-33) alimentam este sistema por DOIS insumos refinados:
+- **Suco de limão** (comum) → **suco puro de limão** (refinado, nome já canônico) → **suco filtrado
+  várias vezes** (o bom).
+- **Água com gás** (comum) → **água destilada** (refinada, nome já canônico) → **água tridestilada**
+  (a boa).
 
-- **Suco de limão** → refinado em **suco puro de limão**.
-- **Água com gás** → refinada em **água destilada**.
+**O desvio da capacidade real da bateria craftada depende da combinação dos dois insumos usados no
+craft, verbatim do líder:** *"agua comum + suco comum: bateria muito ruim; 1 dos itens bons e o
+outro ruim: bateria ruim/aceitável (rng), os dois itens bons (suco filtrado várias vezes, água
+tridestilada): bateria caseira boa"*. Três resultados nomeados: **muito ruim** (os dois insumos no
+degrau comum), **ruim ou aceitável, por sorteio** (um insumo no degrau bom, o outro não), e **boa**
+(os dois insumos no degrau bom). Uma bateria sempre sai do craft, mesmo com os dois insumos crus:
+refinar um insumo já muda o resultado, sem exigir o outro no mesmo degrau.
 
-**O refino é craft narrativo-gated, não uma bancada aberta desde o início.** "Com o tempo"
-(verbatim do líder) é progressão: o MOMENTO exato em que o personagem aprende a filtrar (marco de
-história, requisito de nível, ou entrega de um mestre do roster) não foi decidido e fica como
-lacuna, ver "Em aberto" abaixo.
+**Em aberto, e não inventado aqui:** os três degraus por insumo dão nove combinações possíveis, e o
+líder deu três resultados nomeados. Como as nove caem nos três (por exemplo, se o degrau
+intermediário de um insumo, combinado com o degrau bom do outro, ainda é "ruim/aceitável" ou já é
+"boa") não foi decidido; é número que vai ao `economy-designer`, com ratificação do líder.
+
+**O refino é craft narrativo-gated, não uma bancada aberta desde o início.** "Com o tempo" (verbatim
+do líder) é progressão. **O momento em que o personagem aprende a filtrar tem a FORMA decidida
+(decisão do líder, 03/09/2026, por `AskUserQuestion`): entrega de um mestre do roster**, ou seja, o
+conhecimento chega pela mão de um personagem do roster de mestres, não por marco de história nem por
+requisito de nível. **QUAL mestre não foi decidido**, e não é inventado aqui; fica para o líder.
 
 **Onde o refino e o craft da bateria acontecem: a MESMA bancada já canônica.** É o terminal RSB de
 bancada fixa das oficinas do mercado negro/ferro-velho (§4, §14), a mesma que já cobre reparo
@@ -624,12 +634,14 @@ ganhando ao trocar pela alternativa caseira sem custo nenhum). O ponto de equil�
 pelo líder nesta rodada.
 
 **Não decidido, e não inventado aqui:**
-- Se o craft exige suco puro de limão E água destilada JUNTOS, ou se cada um sozinho já basta para
-  uma bateria de baixa qualidade (duas receitas paralelas).
-- Capacidade, número de usos, preço de compra do suco puro/água destilada, taxa de sucesso do
-  refino, o momento narrativo em que o personagem "aprende a filtrar", e a probabilidade numérica de
-  cada risco herdado (mentir sobre a carga / morrer cedo / danificar a carta ou vírus): tudo é
-  número de balanceamento (`economy-designer`), nada decidido pelo líder nesta rodada.
+- Como as nove combinações dos três degraus por insumo caem nos três resultados nomeados na decisão
+  de hoje (qual degrau intermediário conta como "bom" para o RNG do meio).
+- Qual mestre do roster entrega o conhecimento de filtrar (a FORMA já está decidida: entrega de um
+  mestre do roster, decisão do líder, 03/09/2026).
+- Capacidade, número de usos, preço de compra de cada degrau de refino, taxa de sucesso do refino, e
+  a probabilidade numérica de cada risco herdado (mentir sobre a carga / morrer cedo / danificar a
+  carta ou vírus): tudo é número de balanceamento (`economy-designer`), nada decidido pelo líder
+  nesta rodada.
 
 ### Bateria de internet: recarga por cobertura de sinal (decisão do Gus Dragon, ratificada pelo líder em 03/09/2026)
 
