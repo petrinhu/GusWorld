@@ -6,7 +6,7 @@
 
 - [`cartas-hardware-pirataria-energia.md`](cartas-hardware-pirataria-energia.md) — o SISTEMA (14 seções): tipos de carta, memória Runa, bateria CR2032, integridade/vírus, conector RSB, mercado negro. Fonte de VERDADE do design; este doc só traduz em structs.
 - [`cartas-numeros-proposta.md`](cartas-numeros-proposta.md) — os NÚMEROS (capacidade de bateria por dificuldade, memória kR/MR, % de contaminação etc.). Este doc referencia constantes por nome, não recopia valores.
-- [`cartas-technomagik.md`](cartas-technomagik.md) — os 3 tiers canônicos (COMUM/ESPECIAL/SUPER), `ManaCost`, `CardTier`/`CardCategory`, taxonomia da carta-catálogo.
+- [`cartas-technomagik.md`](cartas-technomagik.md) — os 3 tiers canônicos (COMUM/ESPECIAL/SUPER), `ChargeCost`, `CardTier`/`CardCategory`, taxonomia da carta-catálogo.
 - [`deck-mao-sistema.md`](deck-mao-sistema.md) — deck ativo/morto, `CardInstance`, invariantes anti-exploit (§7), classe PROTEGIDA (inv.9).
 - Forma-alvo referenciada por este doc (descrição de intenção, código ainda não escrito — ver L-01 em `GODS_LAWS.md`):
   `combat_records.hpp` (`struct Card`, catálogo),
@@ -64,7 +64,7 @@ Um único campo ADITIVO, no fim do struct (mesmo padrão usado por `synergy_stat
 std::optional<std::string> mimics_special_id;
 ```
 
-**Por que catálogo, não instância:** todo exemplar de `cardExec-faraday-fake` finge a MESMA especial, por definição — é um fato do "o que esta carta É", não do "esta cópia específica". Guardar por instância duplicaria a mesma string em cada cópia, sem motivo (mesmo princípio que já rege `CardInstance` não duplicar `mana_cost`/`power` do catálogo).
+**Por que catálogo, não instância:** todo exemplar de `cardExec-faraday-fake` finge a MESMA especial, por definição — é um fato do "o que esta carta É", não do "esta cópia específica". Guardar por instância duplicaria a mesma string em cada cópia, sem motivo (mesmo princípio que já rege `CardInstance` não duplicar `charge_cost`/`power` do catálogo).
 
 ---
 
@@ -167,7 +167,7 @@ struct CardPhysicalState {
     // bateria CHEIA. Carga restante utilizável = capacidade(hardware_class,
     // dificuldade) − battery_charge_deficit, clamp >= 0 (nunca negativo mesmo se a
     // capacidade cair por algum motivo futuro). Cada cast consome
-    // += Card::mana_cost (cartas-numeros-proposta.md §1a: "recurso Y" = ManaCost da
+    // += Card::charge_cost (cartas-numeros-proposta.md §1a: "recurso Y" = ChargeCost da
     // carta, já canônico — nenhum eixo novo). Modelado como DÉFICIT, não como
     // "carga_atual" absoluta, de propósito: o valor-zero (default de struct, e o
     // valor que um save V6 migrado ganha por não ter este campo) significa "bateria

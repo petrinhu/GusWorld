@@ -4,8 +4,8 @@
 
 **Cross-ref (fonte, leia antes):**
 - [`cartas-hardware-pirataria-energia.md`](cartas-hardware-pirataria-energia.md) — o SISTEMA (14 seções), fonte de todo comportamento abaixo.
-- [`cartas-numeros-proposta.md`](cartas-numeros-proposta.md) — os NÚMEROS (drain=ManaCost, capacidades por dificuldade, %contaminação, pesos urandom, timing adware, split Turing). Este doc **não redefine nenhum número**, só referencia por seção.
-- [`cartas-technomagik.md`](cartas-technomagik.md) — taxonomia de carta (COMUM/ESPECIAL/SUPER), ManaCost, `EffectKind`/`TriggerHook` do executor `techMagic`.
+- [`cartas-numeros-proposta.md`](cartas-numeros-proposta.md) — os NÚMEROS (drain=ChargeCost, capacidades por dificuldade, %contaminação, pesos urandom, timing adware, split Turing). Este doc **não redefine nenhum número**, só referencia por seção.
+- [`cartas-technomagik.md`](cartas-technomagik.md) — taxonomia de carta (COMUM/ESPECIAL/SUPER), ChargeCost, `EffectKind`/`TriggerHook` do executor `techMagic`.
 - [`combat.md`](combat.md) §5 (AP/Mana), §9 (status framework), §10 (pipeline de cast + erros de compilação), §16 (event bus).
 - [`deck-mao-sistema.md`](deck-mao-sistema.md) — deck/mão, invariantes anti-exploit, classe protegida (ESPECIAL/SUPER nunca infecta/nunca vai pro deck morto).
 - Memória `reference_techmagic_engine_impl` — estado real de implementação do executor (`techmagic.cpp`, `combat_state_machine.cpp`), padrão pra adicionar `EffectKind` novo.
@@ -45,8 +45,8 @@ ActionSelect: jogador escolhe "jogar carta" (combat.md §3/§10)
         ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ DÉBITO DE RECURSO                                              │
-│  Mana -= ManaCost                     (já existe)              │
-│  NOVO: BateriaCarta -= ManaCost       (§3 deste doc, mesmo nº) │
+│  Mana -= ChargeCost                     (já existe)              │
+│  NOVO: BateriaCarta -= ChargeCost       (§3 deste doc, mesmo nº) │
 └─────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -90,7 +90,7 @@ A lógica abaixo assume que cada **instância** de carta (lembrando: "carta = in
 | Fato precisado pela lógica | Por quê | Onde é lido/escrito |
 |---|---|---|
 | Origem da carta: original (ROM) / homebrew (EPROM) / pirata (clone) | decide capacidade de bateria e % de contaminação (`cartas-numeros` §1a/§3) | leitura no gate de bateria + no roll de contaminação |
-| Carga atual da bateria (unidades, mesma escala do `ManaCost`) | gate de pré-condição (§3) | decrementada a cada cast; incrementada na troca |
+| Carga atual da bateria (unidades, mesma escala do `ChargeCost`) | gate de pré-condição (§3) | decrementada a cada cast; incrementada na troca |
 | Capacidade máxima da bateria | referência do gate + UI (barra de carga) | fixa por origem+dificuldade (`cartas-numeros` §1a), não muda em runtime |
 | SoH (state-of-health) da **bateria física** (0-100%) | degradação por recarga (`cartas-numeros` §1b) | pertence à BATERIA como item (ver nota abaixo), não à carta |
 | `IsInfected` (oculto ao jogador até diagnóstico) | gate de vírus (§4) | setado 1x na aquisição (fora do combate), nunca pelo combate |
@@ -105,18 +105,18 @@ A lógica abaixo assume que cada **instância** de carta (lembrando: "carta = in
 
 ## 3. Energia: bateria CR2032
 
-### 3.1 Consumo por cast (drain = ManaCost, já fechado; subtração única desde 31/08/2026)
+### 3.1 Consumo por cast (drain = ChargeCost, já fechado; subtração única desde 31/08/2026)
 
 **Uma subtração só, da bateria, limitada pela vazão do turno** — decisão do líder, 31/08/2026,
 registrada em `cartas-hardware-pirataria-energia.md` §5 ("Mana e bateria são o mesmo recurso"):
-`BateriaCarta.charge -= ManaCost_da_ação`, e é essa mesma subtração, não duas em paralelo, que
+`BateriaCarta.charge -= ChargeCost_da_ação`, e é essa mesma subtração, não duas em paralelo, que
 também conta contra a vazão do turno do ator (`combat.md` §5, `manaMax = 2 +
 contagemPropriaDeTurnos`, relido como taxa máxima de saque, não como pool próprio; o gate de
 vazão passa a consultar o CCA efetivo da bateria em uso).
 ⚠️ **Redação anterior apagada (L-24 do projeto): dizia "mesmo valor que já sai da mana do ator"**,
 descrevendo bateria e "mana do ator" como dois medidores debitados em paralelo — isso é passado, não
 histórico a guardar, porque mana e carga de bateria são o mesmo recurso e só existe UM lugar de onde
-a carga sai. (`cartas-numeros` §1a, AMB-02 já resolvida: "recurso Y" = `ManaCost`, não um
+a carga sai. (`cartas-numeros` §1a, AMB-02 já resolvida: "recurso Y" = `ChargeCost`, não um
 multiplicador extra.) Regra de Híbridas (Faraday/Maxwell/Newton/von Neumann/John Dee,
 `cartas-technomagik.md` §2.3): a face **passiva** nunca tem custo zero (decisão do líder,
 03/09/2026, `cartas-hardware-pirataria-energia.md` §5, "Passiva tem dois gastos: standby e
@@ -125,8 +125,8 @@ Já a face **ativa**, quando de fato disparada (`OnCast` do lado castável), con
 unidades, 1×/batalha.
 
 ```
-on_card_selected_for_play(card_instance, ap_cost, mana_cost):
-    if card_instance.battery.charge < mana_cost:
+on_card_selected_for_play(card_instance, ap_cost, charge_cost):
+    if card_instance.battery.charge < charge_cost:
         # gate de pré-condição — a carta NUNCA aparece selecionável
         ui.mark_inert(card_instance)          # mesma UX do botão Null-sem-Scan
         return REJECTED                        # não consome AP nem entra no log de combate
@@ -148,7 +148,7 @@ uma bateria entre cartas.
 ### 3.2 Estados da bateria (state machine)
 
 ```
-                 cast (charge -= ManaCost)
+                 cast (charge -= ChargeCost)
         ┌──────────────────────────────────┐
         │                                   ▼
    ┌─────────┐                        ┌─────────┐
@@ -467,9 +467,9 @@ on_urandom_cast(card_instance, caster, ctx):
         return
 
     pool = classify_owned_cards_by_faixa(caster.owner_full_collection, faixa)
-        # fraco   → ManaCost 1 (comuns "Jab")
-        # médio   → ManaCost 2 (comuns "Golpe+status")
-        # forte   → ManaCost 3 (comuns "Assinatura")
+        # fraco   → ChargeCost 1 (comuns "Jab")
+        # médio   → ChargeCost 2 (comuns "Golpe+status")
+        # forte   → ChargeCost 3 (comuns "Assinatura")
         # jackpot → qualquer das 20 ESPECIAIS já possuídas pelo jogador
     if pool.empty():
         log("> urandom: nenhum efeito compatível na coleção — sorteio dissipa.")

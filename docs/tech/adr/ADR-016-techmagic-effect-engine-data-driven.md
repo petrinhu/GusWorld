@@ -206,7 +206,7 @@ dano/status ofensivo direto dos steps 5-7 acima). Entrega `StatusId::BlindagemEM
   nunca a mensagem generica de sucesso). Sitios de BUFF/defesa (Shield do Defend, Always
   das passivas equipadas) **NAO** foram tocados - continuam com `add_status` legado.
 - **F-3, Faraday vira Hibrida:** `master_cards.cpp` - `category: ForaDeCombate ->
-  Hibrida`, `mana_cost: 0 -> kActiveManaCost`, `effects = [{OnCast, ApplyStatus,
+  Hibrida`, `charge_cost: 0 -> kActiveChargeCost`, `effects = [{OnCast, ApplyStatus,
   duration=3, status=BlindagemEM, stack_rule=Refresh, side_filter=AllyOnly}]`. Sujeita ao
   MESMO gate 1x/batalha das outras Ativa/Hibrida (`specials_cast_`). A face
   fora-de-combate (anti-PEM, posse-only, `project_save_dungeon_pem_faraday`) **NAO** foi
@@ -420,7 +420,7 @@ pela FSM checando o STATUS do ator (`index_of_status`), nao pelo mecanismo de ca
 equipadas. `execute_equipped` NUNCA despacha isto.
 
 - **`EffectKind::RevealIntent` (ordinal 9, append-only)**: carta `dee` em
-  `master_cards.cpp` - `Hibrida`/`Universal`/`TargetShape::Self`/mana `kActiveManaCost`
+  `master_cards.cpp` - `Hibrida`/`Universal`/`TargetShape::Self`/mana `kActiveChargeCost`
   (D4), `effects = [OnCast -> RevealIntent, duration=3, status=Scrying,
   stack_rule=Refresh]` (D3).
 - **`StatusId::Scrying` (ordinal 18, append-only)**: buff auto-aplicado no CASTER via
@@ -505,7 +505,7 @@ cadeia divisiva de sempre (`card.power + actor.atk()`, secao 11) - sem tocar em
 `resolve_use_card`, `resolve_targets` nem `estimate_card_damage`.
 
 - **`master_cards.cpp::maxwell`**: `Hibrida`/`Eletrico`/`TargetShape::Grupo`, mana
-  `kActiveManaCost`, `power = kMaxwellPower` (5, `//PLAYTEST` - decisao AUTONOMA do
+  `kActiveChargeCost`, `power = kMaxwellPower` (5, `//PLAYTEST` - decisao AUTONOMA do
   orquestrador: um `power` igual ao do primario da Tesla/Coil-Arc, 8, eclipsaria o nicho
   dela; 5 preserva a diferenca de design entre "burst concentrado decaindo por salto"
   (Tesla) e "dano uniforme mais fraco espalhado em todos os inimigos" (Maxwell)),

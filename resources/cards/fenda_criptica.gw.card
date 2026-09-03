@@ -11,7 +11,7 @@
 #meta family criptografico
 #meta base_type fenda
 #meta target_shape single
-#meta mana_cost 2   // origem não documentada
+#meta charge_cost 2   // origem não documentada
 #meta ap_cost 1
 #meta power 5   // origem não documentada
 

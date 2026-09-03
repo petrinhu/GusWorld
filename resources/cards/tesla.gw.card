@@ -14,7 +14,7 @@
 #meta family eletrico
 #meta base_type glifo   // //PLAYTEST
 #meta target_shape single   // o alvo primário; os saltos são resolvidos pelo efeito, não por target_shape
-#meta mana_cost 6   // kActiveManaCost, //PLAYTEST
+#meta charge_cost 6   // kActiveChargeCost, //PLAYTEST
 #meta ap_cost 1
 #meta power 8   // kTeslaPower, //PLAYTEST — EXCEÇÃO das especiais: a cadeia escala do dano-base do primário
 #meta ignores_weakness_wheel false

@@ -11,7 +11,7 @@
 #meta family bioquimico
 #meta base_type raiz
 #meta target_shape self
-#meta mana_cost 2   // origem não documentada
+#meta charge_cost 2   // origem não documentada
 #meta ap_cost 1
 #meta power 0   // sem dano: o efeito inteiro é a cura por Regen abaixo
 

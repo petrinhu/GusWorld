@@ -11,7 +11,7 @@
 #meta family eletrico
 #meta base_type glifo   // //PLAYTEST: sem convenção fechada de tipo-base para especiais
 #meta target_shape single
-#meta mana_cost 6   // kActiveManaCost, //PLAYTEST: mana das ativas/hibridas
+#meta charge_cost 6   // kActiveChargeCost, //PLAYTEST: mana das ativas/hibridas
 #meta ap_cost 1
 #meta power 0
 #meta ignores_weakness_wheel false

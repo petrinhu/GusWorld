@@ -12,7 +12,7 @@
 #meta family universal
 #meta base_type glifo   // //PLAYTEST
 #meta target_shape single   // default do registro
-#meta mana_cost 0
+#meta charge_cost 0
 #meta ap_cost 1
 #meta power 0
 #meta ignores_weakness_wheel true   // o trunfo ORIGINAL de Gödel: sempre mult 1.0 na roda de fraqueza

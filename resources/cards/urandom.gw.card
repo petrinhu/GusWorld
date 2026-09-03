@@ -26,7 +26,7 @@
 #meta family universal
 #meta base_type glifo   // //PLAYTEST
 #meta target_shape self   // o alvo real (self ou inimigo) é sorteado dentro do branch dedicado, não pelo pipeline normal
-#meta mana_cost 0   // aquisição/preço é fatia futura, fora do escopo do registro
+#meta charge_cost 0   // aquisição/preço é fatia futura, fora do escopo do registro
 #meta ap_cost 1
 #meta power 0
 #meta ignores_weakness_wheel false

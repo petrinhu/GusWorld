@@ -4,7 +4,7 @@
 
 **Método:** nenhum número foi inventado solto — cada um deriva de um número canônico já fechado (ver "Deriva de" em cada tabela). Onde não havia âncora direta, usei a escada numérica já empregada no projeto (`8, 13, 21, 34, 55, 89, 144`) como grade de valores — o padrão de origem continua **velado**, nunca nomeado em texto de jogo.
 
-**Cross-ref:** [`cartas-hardware-pirataria-energia.md`](cartas-hardware-pirataria-energia.md) (o sistema), [`economia.md`](economia.md) (crédito canônico), [`cartas-technomagik.md`](cartas-technomagik.md) §2.2-2.3 (ManaCost/Power), [`deck-mao-sistema.md`](deck-mao-sistema.md) (deck/mão), [`capacitor-item.md`](capacitor-item.md) (item de energia elétrica já desenhado, mesma família conceitual).
+**Cross-ref:** [`cartas-hardware-pirataria-energia.md`](cartas-hardware-pirataria-energia.md) (o sistema), [`economia.md`](economia.md) (crédito canônico), [`cartas-technomagik.md`](cartas-technomagik.md) §2.2-2.3 (ChargeCost/Power), [`deck-mao-sistema.md`](deck-mao-sistema.md) (deck/mão), [`capacitor-item.md`](capacitor-item.md) (item de energia elétrica já desenhado, mesma família conceitual).
 
 ---
 
@@ -13,7 +13,7 @@
 | # | Número | Valor proposto | Deriva de |
 |---|---|---|---|
 | 1a | **Capacidade de bateria — FECHADO PELO LÍDER: escala por dificuldade** (ver §1a e §8.1). **5ª classe `PirataEspecialFalso` fechada pelo `economy-designer` em 2026-07-19 (AMB-DADOS-01).** | Fácil 16/42/68/110/288 · Médio 8/21/34/55/144 · Difícil 4/10/17/27/72 · Hardcore 4/10/17/27/72 (Homebrew/Pirata comum/**Pirata especial falso**/Comum original/Especial) | escada numérica (Médio = original recomendado; Fácil = ×2; Difícil/Hardcore = ÷2). PirataEspecialFalso = 34 no Médio, o degrau que já faltava entre 21 e 55 |
-| 1a | Drain por uso ("recurso Y") | **= ManaCost da carta** (1/2/3/6), não escala por dificuldade | ManaCost canônico (cartas-technomagik §2.2-2.3) |
+| 1a | Drain por uso ("recurso Y") | **= ChargeCost da carta** (1/2/3/6), não escala por dificuldade | ChargeCost canônico (cartas-technomagik §2.2-2.3) |
 | 1b | Degradação por ciclo de recarga | **−13 p.p. de SoH por recarga** | escada numérica |
 | 1b | Piso de descarte (SoH mínimo) | **21% SoH** | escada numérica |
 | 1b | Preço de recarga (base) | **3 cr** | venda NPC de comum (economia.md §8c, 3-5cr) |
@@ -21,7 +21,7 @@
 | 1c | Troca de bateria IN-BATTLE | **2 AP** | Gambito-Reordenar (combat.md, 2 AP) |
 | 2 | Memória — Comum original | **5 MR** | 1 MR por Token-fonte (3 Tokens) arredondado |
 | 2 | Memória — Especial original | **21 MR** | escada numérica |
-| 2 | Memória — Homebrew (EPROM) | **13 kR** (teto) | tamanho de script = 5kR × ManaCost |
+| 2 | Memória — Homebrew (EPROM) | **13 kR** (teto) | tamanho de script = 5kR × ChargeCost |
 | 2 | Ciclos de regravação homebrew antes de queimar | **8 regravações** | escada numérica |
 | 2 | Tempo de upload homebrew | **1 beat narrativo** (gate, não timer) | precedente Hospital (economia.md §3.2) |
 | 3 | Contaminação — Especial (original) | **0%** | canon fixo |
@@ -47,7 +47,7 @@
 
 ### 1a. Capacidade e "recurso Y" (drain premium) — FECHADO PELO LÍDER (2026-07-18): ESCALA POR DIFICULDADE
 
-**Modelo proposto (mantido):** a bateria não guarda "N usos" genéricos — guarda **unidades de carga**, e cada cast consome carga **igual ao `ManaCost` da carta** (1/2/3 para COMUM, ~6 para ESPECIAL, já fixados em `cartas-technomagik.md` §2.2-2.3). Isso implementa "recurso Y drena mais rápido" **sem inventar um eixo novo**: o "efeito premium" já É o ManaCost mais alto. **`ManaCost` não escala por dificuldade** (mantido intacto do canon combat); só a CAPACIDADE da bateria escala. Para as **Híbridas** (Faraday/Maxwell/Newton/von Neumann/John Dee, cartas-technomagik §2.3): a face **passiva** (ManaCost 0, sempre ligada) **não drena carga** — só a face **ativa**, quando disparada, consome as ~6 unidades.
+**Modelo proposto (mantido):** a bateria não guarda "N usos" genéricos — guarda **unidades de carga**, e cada cast consome carga **igual ao `ChargeCost` da carta** (1/2/3 para COMUM, ~6 para ESPECIAL, já fixados em `cartas-technomagik.md` §2.2-2.3). Isso implementa "recurso Y drena mais rápido" **sem inventar um eixo novo**: o "efeito premium" já É o ChargeCost mais alto. **`ChargeCost` não escala por dificuldade** (mantido intacto do canon combat); só a CAPACIDADE da bateria escala. Para as **Híbridas** (Faraday/Maxwell/Newton/von Neumann/John Dee, cartas-technomagik §2.3): a face **passiva** (ChargeCost 0, sempre ligada) **não drena carga** — só a face **ativa**, quando disparada, consome as ~6 unidades.
 
 **Decisão do líder (§8.1): a bateria NÃO é um valor único — escala por dificuldade**, usando as 3 réguas já mapeadas nas opções A/B/C originais (§8.1):
 
@@ -62,9 +62,9 @@
 
 **Racional:** a mesma escada numérica (8/21/55/144) vira o eixo **Médio**; Fácil dobra (relaxa o gerenciamento pro público casual/kids), Difícil corta pela metade (aperta pro público que já busca desafio). **Hardcore usa o mesmo valor do Difícil** (não aperta ainda mais) — o Hardcore já pune por outros vetores (permadeath, save isolado, machine-bind); duplicar o aperto de bateria em cima disso seria punição composta desnecessária.
 
-**Sink de crédito por dificuldade (recalculado):** mesma metodologia do sanity check original — ~180 casts por carta comum ativa ao longo da campanha inteira (ManaCost médio ~2), ~5 comuns ativos na mão, preço médio de recarga **~4,8cr** (meio da faixa 3,6-6cr, §1b, que NÃO escala por dificuldade).
+**Sink de crédito por dificuldade (recalculado):** mesma metodologia do sanity check original — ~180 casts por carta comum ativa ao longo da campanha inteira (ChargeCost médio ~2), ~5 comuns ativos na mão, preço médio de recarga **~4,8cr** (meio da faixa 3,6-6cr, §1b, que NÃO escala por dificuldade).
 
-| Dificuldade | Capacidade comum | Casts/carga (÷ManaCost médio 2) | Trocas por carta (÷180 casts) | Trocas totais (×5 comuns) | **Sink de crédito total (× ~4,8cr)** |
+| Dificuldade | Capacidade comum | Casts/carga (÷ChargeCost médio 2) | Trocas por carta (÷180 casts) | Trocas totais (×5 comuns) | **Sink de crédito total (× ~4,8cr)** |
 |---|---|---|---|---|---|
 | Fácil | 110 | 55 | ~3,3 | ~16 | **~77 cr** |
 | Médio | 55 | 27,5 | ~6,5 | ~33 | **~158 cr** |
@@ -73,7 +73,7 @@
 
 O sink de bateria no Difícil/Hardcore é **~4,2× maior** que no Fácil — quase o mesmo fator (110÷27≈4,1) da própria razão de capacidades, como esperado (a matemática é linear por construção). Isso **soma-se** ao efeito já canônico de "a economia geral é mais magra no Difícil/Hardcore" (economia.md §2.1, Tusk 610→144cr, razão ~4,2× também) — os dois eixos reforçam a mesma mensagem: **dificuldade alta = cada crédito pesa mais, e a bateria cobra mais dele.** Nenhum dos dois eixo domina o outro (mesma ordem de grandeza), evitando que o Difícil vire punitivo-sozinho.
 
-**Nota sobre a ESPECIAL em dificuldades altas:** capacidade/`ManaCost`(~6) = batalhas até esgotar: Fácil 48 batalhas · Médio 24 · Difícil/Hardcore **12 batalhas**. Numa campanha com ~30-40 encontros elite/boss, 12 batalhas é o primeiro perfil em que uma especial MUITO usada (ex.: a Gaiola de Faraday, primeira especial obtida, usada o jogo inteiro — canon §9 do doc-fonte) pode plausivelmente precisar de **1-2 trocas de bateria no Difícil/Hardcore**, reforçando organicamente a nota já canônica ("[a bateria selada] ainda exige cuidado no endgame") exatamente nos modos onde isso deveria doer mais.
+**Nota sobre a ESPECIAL em dificuldades altas:** capacidade/`ChargeCost`(~6) = batalhas até esgotar: Fácil 48 batalhas · Médio 24 · Difícil/Hardcore **12 batalhas**. Numa campanha com ~30-40 encontros elite/boss, 12 batalhas é o primeiro perfil em que uma especial MUITO usada (ex.: a Gaiola de Faraday, primeira especial obtida, usada o jogo inteiro — canon §9 do doc-fonte) pode plausivelmente precisar de **1-2 trocas de bateria no Difícil/Hardcore**, reforçando organicamente a nota já canônica ("[a bateria selada] ainda exige cuidado no endgame") exatamente nos modos onde isso deveria doer mais.
 
 ### 1b. Degradação por ciclo de recarga + preço de recarga
 
@@ -101,7 +101,7 @@ O sink de bateria no Difícil/Hardcore é **~4,2× maior** que no Fácil — qua
 
 **Por que o teto de homebrew é MUITO menor (kR, não MR) mesmo pra copiar a MESMA função:** a ROM original de fábrica é "bloatada" de propósito (diagnóstico, anti-tamper, certificação, redundância — o excesso burocrático-corporativo, sátira do Sterling/DRE já canônica em `project_axiologia_canonica`). Uma cópia homebrew magra tem só o payload funcional puro, sem nenhuma dessas camadas — daí caber em muito menos espaço, ao custo de ser instável (ligação direta com §3, risco de vírus).
 
-- **Fórmula do tamanho do script comum (aplica a homebrew e a original por igual, unidade kR):** `tamanho ≈ 5 kR × ManaCost`. Mana 1 → 5kR · Mana 2 → 10kR · Mana 3 → 15kR.
+- **Fórmula do tamanho do script comum (aplica a homebrew e a original por igual, unidade kR):** `tamanho ≈ 5 kR × ChargeCost`. Mana 1 → 5kR · Mana 2 → 10kR · Mana 3 → 15kR.
 - **Com teto de homebrew = 13kR:** cabe copiar Jab (5kR) e Golpe+status (10kR), **NÃO cabe** copiar Assinatura tier-3 (15kR > 13kR). **Isso é um gate de design deliberado, não um bug:** pirataria/homebrew serve pro básico; o efeito mais forte de cada família continua sendo prestígio de canal legítimo (loja/loot/craft). Reforça a lição Bastiat — "o barato serve pro simples, não pro que importa de verdade".
 - **Ciclos de regravação antes de queimar (canon §3: "regravável, mas desgasta até queimar"):** proponho **8 regravações** por carta homebrew antes do EPROM morrer de vez (vira sucata, só ferro-velho). Eixo INDEPENDENTE da bateria (§1) — um é energia, outro é desgaste de escrita física.
 - **Tempo de upload homebrew ("muito lento"):** proponho **gate narrativo, não timer de espera real** — reusa o padrão já canônico da cura grátis do Hospital (economia.md §3.2: "1 beat narrativo"). Você deixa a carta na bancada do mercado negro (§14 do doc-fonte) e ela fica pronta ao cruzar o próximo beat/nó de mapa. **Zero UI nova** (sem barra de progresso, sem contagem de segundos) — barato pra dev solo e mecanicamente honesto com "muito lento" sem irritar o jogador com espera real. *(Ver AMB-01 abaixo — alternativa de UX existe, é decisão leve.)*
@@ -253,7 +253,7 @@ O líder não escolheu uma opção única: escolheu as **3** ao mesmo tempo, uma
 
 | Opção (registro) | Descrição | Efeito | Onde caiu |
 |---|---|---|---|
-| A — Tensa | capacidades 8/21/55/144, drain = ManaCost | ~30-35 trocas na campanha, ~150-175cr de sink total (era minha recomendação single-valor) | **virou o perfil Médio** |
+| A — Tensa | capacidades 8/21/55/144, drain = ChargeCost | ~30-35 trocas na campanha, ~150-175cr de sink total (era minha recomendação single-valor) | **virou o perfil Médio** |
 | B — Relaxada | dobrar (16/42/110/288) | bateria quase nunca é gargalo | **virou o perfil Fácil** |
 | C — Apertada | metade (4/10/27/72) | trocas ~2× mais frequentes | **virou o perfil Difícil e Hardcore** |
 
@@ -294,8 +294,8 @@ O líder não escolheu A/B/C isolado — escolheu as 3 réguas como uma escada p
 
 - **AMB-01 (UX do upload homebrew):** proposto gate narrativo (1 beat, zero timer real) como default barato. Alternativa: barra de progresso em tempo real (~34 segundos, escada numérica canônica) na tela da bancada, mais "sentida" mas exige UI nova. Recomendo o gate narrativo; líder pode preferir o timer se quiser mais peso sensorial na cena de pirataria.
   - **RESOLVIDO (líder, 2026-07-28): BARRA DE PROGRESSO REAL, ~34s na tela da bancada.** O líder escolheu **contra** a recomendação do `economy-designer`, e o motivo é o que a própria proposta antecipou: **peso sensorial na cena de pirataria**. Esperar de verdade é parte da experiência de subir código pirata; um beat narrativo entregaria a informação sem entregar a espera. ⚠ **CONSEQUÊNCIA REGISTRADA:** isto **exige UI nova** (a barra na tela da bancada), que o gate narrativo não exigiria. Vira requisito da onda que implementar a bancada, não item invisível. O valor 34s é da mesma escada numérica, coerente com o que já está em uso no doc.
-- **AMB-02 (drain de "recurso Y"):** interpretei como = ManaCost da carta (reuso total do número já canônico). Alternativa não escolhida: um multiplicador extra fixo só pra cartas de Controle/DoT (achei redundante — o ManaCost já capta isso, ManaCost 2-3 já é o Control/DoT).
-  - **RESOLVIDO (líder, 2026-07-28): drain = ManaCost da carta.** Confirmada a leitura do `economy-designer`: reusa número que **já é canon**, sem introduzir parâmetro novo, e cartas de Controle/DoT já drenam mais porque já custam mais mana. Nenhum multiplicador extra entra no modelo.
+- **AMB-02 (drain de "recurso Y"):** interpretei como = ChargeCost da carta (reuso total do número já canônico). Alternativa não escolhida: um multiplicador extra fixo só pra cartas de Controle/DoT (achei redundante — o ChargeCost já capta isso, ChargeCost 2-3 já é o Control/DoT).
+  - **RESOLVIDO (líder, 2026-07-28): drain = ChargeCost da carta.** Confirmada a leitura do `economy-designer`: reusa número que **já é canon**, sem introduzir parâmetro novo, e cartas de Controle/DoT já drenam mais porque já custam mais mana. Nenhum multiplicador extra entra no modelo.
 
 ---
 
