@@ -74,8 +74,6 @@ A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C
 
 ## Estado atual do repositório (25/08/2026)
 
-Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de memória. **Número envelhece; rode o comando, não cite o valor daqui.**
-
 **Git e remoto:**
 
 - `git rev-list --count HEAD` responde quantos commits tem o branch local `main`.
@@ -92,10 +90,10 @@ Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de 
 
 **O que existe hoje, fora de código de jogo** (contado por `find`/`ls`):
 
-- **23 arquivos `.md` na raiz** (`ls *.md | wc -l`, inclui este `CLAUDE.md`): os manuais listados em "Autoridade documental" abaixo, mais `GODS_LAWS.md`, `TODO.md`, `inicial.md`, `README.md`, `sinopse.md`, `CHARS.md`, `PLACES.md`.
+- Arquivos `.md` na raiz (`ls *.md | wc -l` responde quantos há; inclui este `CLAUDE.md`): os manuais listados em "Autoridade documental" abaixo, mais `GODS_LAWS.md`, `TODO.md`, `inicial.md`, `README.md`, `sinopse.md`, `CHARS.md`, `PLACES.md`.
 - `LICENSE` (AGPL-3.0), `NOTICE`, `REUSE.toml`, `.gitattributes`, `.gitignore`, `.bigtech-porte` (`porte=bigtech`), `LICENSES/` (textos integrais SPDX).
-- `docs/`: **12 diretórios de primeiro nível** (`art`, `audio`, `book`, `design`, `narrative`, `_processo`, `production`, `qa`, `_secret`, `security`, `specs`, `tech`; medido por `find docs -maxdepth 1 -mindepth 1 -type d | wc -l` — sem o `-mindepth 1` o comando conta o próprio `docs/` e devolve 13) mais `docs/licoes-aprendidas.md` na raiz de `docs/`. `docs/_secret/` é área cifrada por `git-crypt` (L-25) — só o caminho é citável, nunca o conteúdo.
-- `docs/tech/adr/`: **14 ADRs** (`ls docs/tech/adr/ADR-*.md | wc -l`, medido em 28/08/2026), com **11 números ausentes** (`002`, `003`, `008`, `009`, `010`, `011`, `012`, `013`, `014`, `015`, `018`). Eram 25 até 28/08/2026, quando o líder mandou extirpar do corpus toda dependência que a LEI ZERO proíbe — verbatim: *"extirpe essas pragas daqui do projeto!"* — e onze ADRs foram apagados por descreverem, inteiros ou quase, arquitetura ou biblioteca revogadas. ⚠️ **Número de ADR não se reaproveita**, e a linha "números aposentados" no `_INDEX.md` daquele diretório existe para impedir isso.
+- `docs/`: diretórios de primeiro nível (`art`, `audio`, `book`, `design`, `narrative`, `_processo`, `production`, `qa`, `_secret`, `security`, `specs`, `tech`; `find docs -maxdepth 1 -mindepth 1 -type d | wc -l` responde quantos há; sem o `-mindepth 1` o comando conta também o próprio `docs/`, um a mais) mais `docs/licoes-aprendidas.md` na raiz de `docs/`. `docs/_secret/` é área cifrada por `git-crypt` (L-25) — só o caminho é citável, nunca o conteúdo.
+- `docs/tech/adr/`: ADRs (`ls docs/tech/adr/ADR-*.md | wc -l` responde quantos existem), com **11 números ausentes** (`002`, `003`, `008`, `009`, `010`, `011`, `012`, `013`, `014`, `015`, `018`). Eram 25 até 28/08/2026, quando o líder mandou extirpar do corpus toda dependência que a LEI ZERO proíbe — verbatim: *"extirpe essas pragas daqui do projeto!"* — e onze ADRs foram apagados por descreverem, inteiros ou quase, arquitetura ou biblioteca revogadas. ⚠️ **Número de ADR não se reaproveita**, e a linha "números aposentados" no `_INDEX.md` daquele diretório existe para impedir isso.
 - `tools/`: o portão 5 da L-19 (`tools/security/commit_gate.py`, `tools/security/test_commit_gate.py`, `tools/security/termos_proibidos.txt` cifrado, `tools/git-hooks/commit-msg`, `tools/git-hooks/install.py`).
 - `resources/` e `assets/`: existem (`ls` confirma), não inventariados aqui — fora do escopo desta tarefa.
 
@@ -161,7 +159,7 @@ O que roda hoje é o portão 5 da L-19, local:
 
 ## Pendências
 
-A tabela de pendências do projeto está em `TODO.md` na raiz: **126 itens** (`grep -cE '^\| [0-9]' TODO.md`, medido em 29/08/2026), em schema de **10 colunas** (`WSJF`, `ID`, `Onda`, `Grupo`, `Descrição Técnica`, `Prioridade`, `Pré-requisito`, `Dificuldade`, `Status`, `Estado Auditado`, com `WSJF` como primeira coluna, L-30). A coluna `Onda` tem **22 valores distintos** (`0` a `19`, mais `—` para item que não entra em fila de execução: bloqueado sem data, ou prática contínua que por desenho nunca fecha, como o `A11b`).
+A tabela de pendências do projeto está em `TODO.md` na raiz (`grep -cE '^\| [0-9]' TODO.md` responde quantos itens há), em schema de **10 colunas** (`WSJF`, `ID`, `Onda`, `Grupo`, `Descrição Técnica`, `Prioridade`, `Pré-requisito`, `Dificuldade`, `Status`, `Estado Auditado`, com `WSJF` como primeira coluna, L-30). A coluna `Onda` tem **22 valores distintos** (`0` a `19`, mais `—` para item que não entra em fila de execução: bloqueado sem data, ou prática contínua que por desenho nunca fecha, como o `A11b`).
 
 Status medidos linha a linha em 25/08/2026 (excluindo a legenda do cabeçalho, que cita cada status uma vez): **84 `⏳ Pendente`**, **14 `🔍 Pendente verificação`**, **9 `✅ Concluído`**, **1 `🔄 Em andamento`** (o `A11b`). Soma = 108. Não há mais nenhum `🟡 Parcial`: o único era o `A11`, que em 25/08/2026 foi **fatiado em `A11a` e `A11b`** por decisão do líder sob a L-33 — ele misturava o gabarito SPDX, que fecha uma vez, com a prática de aplicá-lo, que nunca fecha, e nessa forma travava o grafo do primeiro commit.
 
