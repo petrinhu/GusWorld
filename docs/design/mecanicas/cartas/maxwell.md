@@ -11,7 +11,7 @@ Dado completo em [`resources/cards/maxwell.gw.card`](../../../../resources/cards
 
 ## Ficha rápida
 
-Família **Elétrico** · categoria **Híbrida** · especial · mana 6 · alvo **Grupo** · poder-base 5.
+Família **Elétrico** · categoria **Híbrida** · especial · mana 6 · alvo **Grupo** · poder-base 5 · face passiva com dois gastos de mana/bateria (standby + disparo, números pendentes; decisão do líder, 03/09/2026, ver `cartas-hardware-pirataria-energia.md` §5).
 
 ## Como funciona
 

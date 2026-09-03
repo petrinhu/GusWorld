@@ -25,3 +25,4 @@ O nome vem da máquina de Turing: "A máquina de Turing resolve QUALQUER problem
 
 - Nenhum número numérico afinável — a carta não tem `@effect` nenhum no legado.
 - A chave `CARD_EXEC_TURING_NAME` resolve para **"Decrypt-All"**.
+- **`mana 0` é decisão registrada do líder, 03/09/2026, por `AskUserQuestion`** (`cartas-hardware-pirataria-energia.md` §5), não herança sem revisão: as cartas Fora de combate são posse-only e não ficam ligadas em nada, então não ganham os dois gastos que a face passiva das Híbridas e das passivas puras carregam.

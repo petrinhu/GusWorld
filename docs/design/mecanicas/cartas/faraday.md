@@ -11,7 +11,7 @@ Dado completo em [`resources/cards/faraday.gw.card`](../../../../resources/cards
 
 ## Ficha rápida
 
-Família **Elétrico** · categoria **Híbrida** · especial · mana 6 · 1×/batalha (face de combate).
+Família **Elétrico** · categoria **Híbrida** · especial · mana 6 · 1×/batalha (face de combate) · face passiva com dois gastos de mana/bateria (standby + disparo, números pendentes; decisão do líder, 03/09/2026, ver `cartas-hardware-pirataria-energia.md` §5).
 
 ## Como funciona
 

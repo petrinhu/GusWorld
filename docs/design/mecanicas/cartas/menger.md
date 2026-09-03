@@ -25,3 +25,4 @@ O nome vem do economista que explicou a origem do dinheiro pela troca direta: "M
 
 - Nenhum número numérico afinável — a carta não tem `@effect` nenhum no legado; a lógica de "valor marginal" e de conversão vive em sistemas de economia fora do registro da carta.
 - A chave `CARD_EXEC_MENGER_NAME` resolve para **"Barter"**.
+- **`mana 0` é decisão registrada do líder, 03/09/2026, por `AskUserQuestion`** (`cartas-hardware-pirataria-energia.md` §5), não herança sem revisão: as cartas Fora de combate são posse-only e não ficam ligadas em nada, então não ganham os dois gastos que a face passiva das Híbridas e das passivas puras carregam.
