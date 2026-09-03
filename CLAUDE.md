@@ -81,7 +81,7 @@ Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de 
 - `git rev-list --count HEAD`: **83 commits** no branch local `main`.
 - `git ls-remote git@github.com:petrinhu/GusWorld.git main`: `97e2a3954ae70d1bc51c076f411001dfb848136d`.
 - `git rev-list --count origin/main..HEAD`: **12 commits locais ainda NÃO pushados**. O remoto é ancestral do HEAD local. ⚠️ **Este número envelhece a cada commit; meça, não cite daqui.**
-- Não há workflow de CI: `find . -path "*/.github/workflows*"` devolve vazio. **Não existe verificação automática configurada ainda** — a L-32 (push só com o GHA verde) ainda não tem o que checar.
+- Existe **um** workflow de CI: `.github/workflows/lei-zero.yml` (`LEI ZERO`), nascido no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. Medido: 18 execuções, todas com conclusão `success`, a mais recente no commit `ceee72d`. ⚠️ **Isto não é o CI de build do projeto**: a matriz das cinco plataformas do item `C4` continua por fazer, porque o LEI ZERO verifica só TEXTO, sem compilar nada.
 
 **Código-fonte: não existe.** Confirmado por comando, não por suposição:
 
@@ -145,7 +145,7 @@ Ao despachar um subagent, **inclua o caminho absoluto do manual no prompt da tas
 
 ## Comandos
 
-**Não há comando de build, teste ou lint a executar hoje.** Confirmado por comando, não por omissão: sem `CMakeLists.txt`, sem `src/`, sem `include/`, sem `tests/`, sem workflow de CI (ver "Estado atual do repositório" acima). A fundação de build nasce como a primeira fatia de código do projeto (L-20), e esta seção é reescrita nesse momento.
+**Não há comando de build, teste ou lint a executar hoje.** Confirmado por comando, não por omissão: sem `CMakeLists.txt`, sem `src/`, sem `include/`, sem `tests/` (ver "Estado atual do repositório" acima). O único workflow existente, `LEI ZERO` (`.github/workflows/lei-zero.yml`), verifica texto e não compila nada; não é o CI de build do projeto, que nasce com a matriz de cinco plataformas do item `C4`. A fundação de build nasce como a primeira fatia de código do projeto (L-20), e esta seção é reescrita nesse momento.
 
 O que roda hoje é o portão 5 da L-19, local:
 
