@@ -31,5 +31,7 @@ Uma missão de **aventura/exploração** (fora do core de combate): o player tem
   - **Nota:** a falha **nunca é permanente** (sempre retry ou só perde bônus) — coerente com acessibilidade e o Pillar 4 (não punir reflexo). Deliberadamente **mais suave** que a escada de morte (que tem permadeath no Hardcore, `project_morte_dificuldade_canon`).
 
 ## Pontos abertos
-- [ ] Números: X minutos, margem de folga, tamanho da rota → `economy-designer`/balance.
-- [ ] Se há missões cronometradas recorrentes ou é um tipo pontual; onde a primeira aparece.
+- Números: X minutos, margem de folga, tamanho da rota → `economy-designer`/balance.
+- Se há missões cronometradas recorrentes ou é um tipo pontual; onde a primeira aparece.
+
+Ponteiro (L-30): `TODO.md` item `F4` (o item que governa este documento inteiro; aceite final ainda não fechado).
