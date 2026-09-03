@@ -738,7 +738,7 @@ Atravessar parede é o bug clássico de jogo (o *clip* de speedrun); num mundo o
 - **O que faz:** fora de batalha, permite ao Gus atravessar blocos, para seguir em frente em masmorra ou lugar específico.
 - **Alcance:** atravessa **somente blocos marcados como atravessáveis pelo designer**, um a um, no desenho da fase. Parede rachada sim; porta trancada não; borda do mapa nunca. Ferramenta de puzzle, não furo de progressão.
 - **Duração:** **não é fixa.** Sai do tipo da carta (original, homebrew ou pirata), do tipo da bateria e da carga dela — exatamente como o princípio canônico da §3 acima já exige de toda carta.
-- **Em aberto (não decidido, não inventar):** o que acontece se a bateria acabar com o Gus dentro da parede, e o uso da carta em batalha. As duas perguntas foram devolvidas ao Gus na issue 3 do bus e aguardam a resposta dele.
+- **Preso na parede e uso em batalha, FECHADOS (líder, 24/08/2026 e 03/09/2026; autoria das opções do Gus Dragon, issue 3 do bus, 21/08/2026):** ficar sem carga, ou sem sinal (ver §5, "Bateria de internet"), dentro da parede cospe o personagem de volta por onde entrou; por dificuldade, Fácil/Médio/Difícil voltam ao começo da sala e só o Hardcore reseta a dungeon inteira. Em batalha a carta não ataca (ou quase nada de dano) e tem 50/50 de bloquear o golpe do oponente. Detalhe completo, incluindo o preço em dano e o teste de aceite do ponto de retorno: `TODO.md` item `F1`.
 - **Sem número, custo, raridade, nome de família ou efeito de batalha atribuídos** — nada disso foi decidido além do que está acima.
 
 ### RunaDex (índice de coleção, estilo Pokédex) — ideia do líder
