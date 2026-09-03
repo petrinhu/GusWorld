@@ -51,7 +51,7 @@ Transcrito de `GODS_LAWS.md` (37 leis, medido em 01/09/2026 por `grep -c "^## L-
 | [L-27](GODS_LAWS.md#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
 | [L-28](GODS_LAWS.md#l-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
 | [L-29](GODS_LAWS.md#l-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é |
-| [L-30](GODS_LAWS.md#l-30) | escrever, reordenar ou acrescentar item na tabela | Todo item aponta para o documento que o especifica, se existir |
+| [L-30](GODS_LAWS.md#l-30) | escrever, reordenar ou acrescentar item na tabela, ou escrever/editar checklist em qualquer outro documento do projeto | Tabela aponta para o documento que a especifica; TODO.md é a única fonte de checklist, o resto aponta de volta pelo ID, sem caixa de estado própria |
 | [L-31](GODS_LAWS.md#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](GODS_LAWS.md#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só com verificação automática e testes verdes |
 | [L-33](GODS_LAWS.md#l-33) | criar unidade nova, escrever documento, teste, commit, item ou asset, **ou revisar fatia** | Atomizar fora do código; monolito é acoplamento, não tamanho; cinco perguntas na revisão |
