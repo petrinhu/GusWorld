@@ -214,9 +214,19 @@ tempo.**
 > perda de carga, *"Toda bateria perde carga com o tempo (2a lei da termodinamica). Baterias
 > originais de qualidade tem isso insensivel e faz parecer na prática que não perde, mas baterias
 > velhas tem queda de carga em pouco tempo, mesmo sem uso."*; classes, *"cada carta tem sua classe.
-> cada bateria tem sua classe, sao coisas diferentes"*; e, sobre a expressão "bateria de internet",
-> *"ELe chama bateria de internet as baterias que são compradas pela internet com vendedores e
-> fornecedores de origem duvidosa, são baterias de baixa qualidade no geral"*.
+> cada bateria tem sua classe, sao coisas diferentes"*.
+
+**"Bateria de internet" é SINAL, não canal de compra duvidoso (decisão do líder, 03/09/2026, por
+`AskUserQuestion`, ratificando a resposta do Gus Dragon na issue 3 do bus, 02/09/2026).** A leitura
+que o líder deu no verbatim acima sobre a expressão "bateria de internet", de que ela descrevia
+o canal de compra pela rede, junto a vendedores de origem duvidosa, foi superada nesta data.
+Verbatim do Gus Dragon, ao escolher entre as duas opções que lhe foram devolvidas: *"Jeito 1, o 2
+sinto que já foi coberto com as baterias privadas"*. O "Jeito 1" era uma bateria que precisa de
+sinal para funcionar e só recarrega onde há cobertura dentro da dungeon; o "Jeito 2", que ele
+recusou, era o canal de compra duvidoso, por já estar coberto pelas baterias "pirata / genérica" e
+"de baixa qualidade (craftada)" que este §5 já descreve, acima. O líder ratificou a escolha do Gus
+no mesmo dia. Regra de recarga por sinal, completa: ver "Bateria de internet: recarga por
+cobertura de sinal", mais abaixo.
 
 **Escala de tensão do jogo (decisão do líder, 02/09/2026):** os volts do jogo são uma escala própria,
 ancorada no nominal de **3 V da CR2032** (§5, cabeçalho). ⚠️ **Os valores 12,6 V, 12,4 V e 12,1 V que
@@ -568,6 +578,29 @@ pelo líder nesta rodada.
   refino, o momento narrativo em que o personagem "aprende a filtrar", e a probabilidade numérica de
   cada risco herdado (mentir sobre a carga / morrer cedo / danificar a carta ou vírus): tudo é
   número de balanceamento (`economy-designer`), nada decidido pelo líder nesta rodada.
+
+### Bateria de internet: recarga por cobertura de sinal (decisão do Gus Dragon, ratificada pelo líder em 03/09/2026)
+
+A bateria que equipa a carta `glitch` (§13) é "de internet": ela só recarrega em área com
+cobertura de sinal dentro da dungeon. Fora dessas áreas ela não recarrega, mesmo pelos canais já
+descritos acima em "Troca e recarga" (cidade, estação, in-battle); a cobertura de sinal é
+pré-condição da recarga desta bateria, não um canal alternativo a eles.
+
+**Não é um quinto tipo de bateria no eixo da compra.** O líder já havia dito, em 02/09/2026, que
+"bateria de internet" não nomeava um tipo à parte na tabela de baterias (§5, "Bateria pirata /
+genérica" e "Bateria de baixa qualidade (craftada)"); a leitura de "internet" como canal de compra
+duvidoso foi superada acima. O que nasce aqui é uma **regra de recarga por zona**, própria da
+bateria desta carta, não um tipo novo na classificação de bateria.
+
+**Fronteira da LEI ZERO (L-06, L-27 deste projeto):** cobertura de sinal como dado de mapa é
+formato de mapa, e formato de mapa é do GlintFx. O que é do GusWorld aqui é a regra de jogo: onde a
+bateria recarrega e o que muda quando não há sinal. Nenhuma etiqueta de bloco, campo de arquivo de
+mapa ou marcação nasce deste parágrafo; se faltar função no GlintFx para isto, o pedido segue pelo
+bus quando o trabalho esbarrar de verdade nela (L-07 deste projeto).
+
+**Não decidido, não inventado aqui:** raio ou desenho da cobertura, taxa de recarga dentro da zona,
+e quantas zonas de sinal existem em cada dungeon. Números e desenho de nível ficam para
+`economy-designer`/`level-designer`.
 
 ## 6. Costuras entre software e hardware
 - **Mod porco** → drena bateria mais rápido (custo do "compilado ruim").
