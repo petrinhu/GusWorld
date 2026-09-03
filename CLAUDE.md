@@ -81,7 +81,7 @@ Todo número abaixo foi medido nesta data, com o comando indicado; nada veio de 
 - `git rev-list --count HEAD` responde quantos commits tem o branch local `main`.
 - `git ls-remote git@github.com:petrinhu/GusWorld.git main` responde o SHA do `main` no remoto.
 - `git rev-list --count origin/main..HEAD` responde quantos commits locais ainda não foram pushados.
-- Existe **um** workflow de CI: `.github/workflows/lei-zero.yml` (`LEI ZERO`), nascido no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. Medido: 18 execuções, todas com conclusão `success`, a mais recente no commit `ceee72d`. ⚠️ **Isto não é o CI de build do projeto**: a matriz das cinco plataformas do item `C4` continua por fazer, porque o LEI ZERO verifica só TEXTO, sem compilar nada.
+- Existe **um** workflow de CI: `.github/workflows/lei-zero.yml` (`LEI ZERO`), nascido no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. `gh run list --workflow=lei-zero.yml` responde quantas execuções há e a conclusão de cada uma. ⚠️ **Isto não é o CI de build do projeto**: a matriz das cinco plataformas do item `C4` continua por fazer, porque o LEI ZERO verifica só TEXTO, sem compilar nada.
 
 **Código-fonte: não existe.** Confirmado por comando, não por suposição:
 
