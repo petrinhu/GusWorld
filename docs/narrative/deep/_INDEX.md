@@ -99,6 +99,8 @@ docs/narrative/deep/
     └── 14-heliaco-vyr-era-1.md
 ```
 
+`docs/book/` (fora desta árvore, área cifrada por `git-crypt`, caminho apontado, conteúdo não citado) reúne a consolidação em livro: Vol 1 + Vol 2, com capa, prefácio, sumário, glossário e apêndices.
+
 ---
 
 ## Convenções autorais (canônicas para deep-lore)
@@ -169,23 +171,6 @@ user fecha decisões macro da rodada
          → user aprova ou pede revisão
             → canon
 ```
-
----
-
-## Conteúdo por rodada
-
-| Rodada | Conteúdo |
-|---|---|
-| R1 (Eras) | era-1, era-2, era-3, transicoes, cosmologia-origem (5 docs) |
-| R2 (Facções) | 6 principais + menores (7 docs) |
-| R3 (Settings) | 8 settings deep (8 docs) |
-| R4 (Characters) | Gus + 6 companions (7 docs) |
-| R5 (Antagonistas + NPCs) | Sterling + Patch-Zero + NPCs antagonistas, pasta `antagonists/` (3 docs) |
-| R6 (Magic) | Glyph/Token + linguagens + nat-mat (3 docs) |
-| R7 (Ontologia) | Tech/cosmologia/leitmotivs (4 docs) |
-| R8 (Stinger) | Sequel hooks + post-credits (2 docs) |
-| R9 (Antologia Vol 2) | 14 contos in-character (14 docs) |
-| R10 (Consolidação livro) | Vol 1 + Vol 2 com capa, prefácio, sumário, glossário, apêndices (`docs/book/`) |
 
 ---
 
