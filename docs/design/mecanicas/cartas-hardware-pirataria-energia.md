@@ -95,7 +95,8 @@ O mesmo raciocínio vale, com um grau a mais de dificuldade, para a **SUPER**: e
 - Um **recurso Y** da carta drena mais rápido (o efeito premium consome mais fundo).
 - **CR2032** = a moeda de lítio, literalmente a bateria de BIOS/placa-mãe ("o coração que guarda o estado") — casa com carta = hardware.
 - **Degradação:** a bateria degrada com uso e ciclos de carga.
-- **Especiais:** bateria **selada / de maior capacidade** — mais confiável (condiz com "especiais protegidas"), mas ainda exige cuidado no endgame (amarra com o clímax sem-save/PEM).
+- **De fábrica (padrão, a CR2032 acima):** capacidade real igual à capacidade de face, sempre; a leitura de carga que o jogador vê é a verdade (decisão do líder, 03/09/2026, ver "Capacidade de face × capacidade real" mais abaixo neste §5).
+- **Especiais:** bateria **selada / de maior capacidade** — mais confiável (condiz com "especiais protegidas"), mas ainda exige cuidado no endgame (amarra com o clímax sem-save/PEM). Capacidade real igual à de face, como a de fábrica; o que a distingue não é desvio de capacidade, é degradar mais devagar (decisão do líder, 03/09/2026, verbatim: *"Real igual à face, mas ela degrada mais devagar"*); a curva de degradação dela é número do `economy-designer`, pendente.
 
 ### Mana e bateria são o mesmo recurso (decisão do líder, 31/08/2026)
 
@@ -180,13 +181,15 @@ mesmo dia (ver "Estoque e vazão", logo abaixo):**
    vazão" abaixo. Não editado: é spec de tela, e a L-27 deste projeto proíbe desenhar interface nesta
    fatia de qualquer forma.
 
-### Estoque, vazão e saúde: as propriedades físicas da bateria (decisões do líder, 31/08/2026 e 02/09/2026)
+### Estoque, vazão e saúde: as propriedades físicas da bateria (decisões do líder, 31/08/2026, 02/09/2026 e 03/09/2026)
 
 **Em 31/08/2026 o líder respondeu a ambiguidade combat.md × bateria levantada acima: não são dois
 medidores, é UM sistema, com propriedades físicas da mesma bateria. Em 02/09/2026 ele deu a essas
 propriedades o vocabulário elétrico definitivo, acrescentou a terceira, a saúde, fundiu a vazão do
 turno com a corrente que a bateria consegue entregar, e fixou que toda bateria perde carga com o
-tempo.**
+tempo. Em 03/09/2026 ele desdobrou a capacidade num par face e real, com faixa de desvio própria
+por tipo de bateria, e fechou que as duas leituras de tensão (OCV e sob carga) são calculadas a
+partir da carga e da saúde, nunca campo guardado à parte.**
 
 > **Decisão do líder, 02/09/2026, verbatim:** *"Sobre a bateria: ela deve ter no POCO as
 > caracteristicas de Tensão de repouso (tensão em circuito aberto / OCV) e Tensão sob carga (tensão
@@ -243,7 +246,8 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
    ativa. Persiste entre batalhas, degrada, exige recarga real. É o que a barra na tela mostra, e
    **a carga aparece sempre** (decisão do líder, 02/09/2026). A leitura que revela o estoque é a
    **tensão de repouso (OCV)**: bateria parada, sem nada puxando corrente. Resumo do líder:
-   *"voltagem parada = carga"*.
+   *"voltagem parada = carga"*. Desde 03/09/2026, a capacidade se desdobra em face e real: ver
+   "Capacidade de face × capacidade real", logo abaixo, nesta mesma seção.
 2. **Vazão (taxa máxima de descarga por turno), que é a capacidade da bateria de entregar corrente
    (decisão do líder, 02/09/2026: "são o mesmo limite").** Por turno, o ator pode sacar até `2 +
    contagemPropriaDeTurnos`, a rampa de `combat.md` §5 relida como taxa, não como orçamento próprio
@@ -342,9 +346,13 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
     acionamento (que já era o `ManaCost`) e a carga em repouso (o consumo por ficar equipada e ligada
     sem disparar, o "gasto de standby" da passiva, agora campo de toda carta). É essa independência
     que arma a armadilha desenhada pelo líder: uma carta de gasto baixo pode exigir pico alto, e a
-    bateria velha e cheia não a aciona. A BATERIA carrega a OFERTA: capacidade, CCA de fábrica,
-    perda de carga com o tempo, carga atual, ciclos, se a saúde já foi medida, e as duas leituras,
-    tensão de repouso e tensão sob carga. **A classe da carta (homebrew, pirata comum, pirata
+    bateria velha e cheia não a aciona. A BATERIA carrega a OFERTA: capacidade (de face e real, ver
+    "Capacidade de face × capacidade real" abaixo), CCA de fábrica, perda de carga com o tempo,
+    carga atual, ciclos, se a saúde já foi medida. As duas leituras, tensão de repouso (OCV) e
+    tensão sob carga, não são campos guardados à parte (decisão do líder, 03/09/2026): são
+    CALCULADAS a partir da carga (SoC) e da saúde (SoH) já armazenadas, porque existe uma fonte de
+    verdade só; é impossível um save ter carga cheia e tensão de bateria vazia ao mesmo tempo, e o
+    validador pode recusar arquivo incoerente com essa regra. **A classe da carta (homebrew, pirata comum, pirata
     especial falso, comum original, especial) e a classe da bateria (os tipos do §5: de fábrica,
     selada das ESPECIAIS, pirata/genérica, de baixa qualidade craftada) são dois eixos
     independentes; capacidade é propriedade da BATERIA, nunca da classe da carta.** Nenhum campo de
@@ -401,6 +409,34 @@ coisa como aberta:
   SoH deixa de ser só preço de recarga e passa a ser a grandeza que decide o teto de vazão de cada
   turno (item 2), se a bateria aguenta o pico de cada efeito (itens 6 e 10) e quanto ela perde
   parada (item 12); as curvas SoH → CCA efetivo e SoH → perda de carga são números novos, pendentes.
+
+### Capacidade de face × capacidade real (decisão do líder, 03/09/2026)
+
+> **Decisão do líder, verbatim:** *"Capacidade nominal de face é a mesma, e nas originais a de
+> face é igual a real. Nas outras, isso muda. A de face é idêntica, mas a real muda já de inicio,
+> varia entre 99%-70% (rng) do valor de face. Isso tem de ser discutido para cada tipo, de acordo
+> com a característica de cada bateria."*
+
+O campo único de capacidade que o item 1 acima descreve (na abertura desta seção) vira DOIS
+campos, para todo tipo de bateria:
+
+1. **Capacidade de face:** o valor anunciado, impresso na bateria. Idêntica em todos os tipos: de
+   fábrica, selada das ESPECIAIS, pirata/genérica e craftada.
+2. **Capacidade real:** o que a bateria de fato entrega. Nasce igual à de face ou abaixo dela,
+   conforme o tipo, sempre desde a origem (fabricação ou craft), nunca por evento posterior. O
+   comportamento de cada tipo está descrito na subseção correspondente dele, mais abaixo neste §5.
+
+**Isto dá causa física à mentira da bateria pirata que este §5 já descrevia, na subseção "Bateria
+pirata / genérica" ("mente sobre a carga").** A pirata não mente só na leitura exibida ao jogador,
+ela É menor do que anuncia, desde a origem. Cuidado, para não reintroduzir campo redundante: isto
+não é uma tensão ou capacidade guardada mentirosa à parte da capacidade real; é a capacidade real
+sendo, ela mesma, menor que a de face, com a leitura exibida ao jogador mostrando a de face. Um
+único campo de capacidade real basta; nenhum campo extra de "capacidade exibida" é necessário.
+
+**Único número autorizado nesta decisão: a faixa de 70% a 99% do valor de face, sorteada (RNG), e
+ela vale especificamente para a pirata/genérica (subseção abaixo), não é faixa padrão dos quatro
+tipos.** Nenhum outro número (curva de degradação da selada, faixa craftada, distribuição exata do
+sorteio) foi dado pelo líder nesta rodada; ficam para o `economy-designer`, com ratificação dele.
 
 ### Cada carta gasta a própria bateria: o fecho do sistema (decisão do líder, 31/08/2026)
 
@@ -492,6 +528,12 @@ ficam para o `economy-designer`, item de INBOX em `TODO.md`.
 ### Bateria pirata / genérica
 Existe: mais barata, mas **mente sobre a carga**, morre cedo, pode **danificar a carta** ou ser vetor de vírus. A fraude do enquadramento no nível do hardware — caveat emptor também nas pilhas.
 
+**Capacidade real sorteada, o jogador não vê (decisão do líder, 03/09/2026, verbatim: "Desvio na
+faixa que o senhor deu, e o jogador não vê").** A capacidade real nasce sorteada entre 70% e 99%
+da capacidade de face, e a bateria continua exibindo a de face como se fosse a real; o jogador só
+descobre medindo (mesa de craft ou multímetro, acima neste §5), o que dá razão de existir ao
+multímetro. O sorteio é por exemplar: duas piratas do mesmo lote podem sair diferentes.
+
 ### Bateria de baixa qualidade (craftada, canon do Gus Dragon, decisão do líder 2026-08-25)
 
 > **Canon pessoal (L-16 de `GODS_LAWS.md`), amarrado ao mesmo eixo do §12 (Bastiat: "o que se vê e
@@ -504,6 +546,16 @@ Existe: mais barata, mas **mente sobre a carga**, morre cedo, pode **danificar a
 > corretamente recursos escassos."* E sobre a água com gás, no mesmo dia: *"[restaura fôlego ou
 > energia de ação]. E pode ser usada em craft de bateria, após refinada para 'agua destilada'.
 > Mesma logica do suco de limao."*
+
+**Desvio depende da qualidade do refino (decisão do líder, 03/09/2026, verbatim: "O desvio dela
+depende da qualidade do refino").** Quanto melhor o refino do suco de limão e da água com gás (os
+dois insumos desta subseção, descritos logo abaixo), mais perto da capacidade de face nasce a
+capacidade real. Isto abre um sistema que ainda não existe: não há, hoje, nenhum eixo de qualidade
+de refino no canon, nem grau, nem número, nem mecanismo de como o refino varia. Ele depende de
+duas decisões do líder que continuam abertas, já registradas mais abaixo nesta subseção ("Não
+decidido, e não inventado aqui"): se o craft exige os dois insumos refinados juntos ou se cada um
+sozinho já basta, e o momento narrativo em que o personagem aprende a filtrar. Nenhum sistema de
+qualidade de refino é desenhado aqui; a decisão só registra que ele vai precisar existir.
 
 Duas das doze comidas (`comidas-ingredientes-craft.md` §5.5.1, catálogo movido de `economia.md`
 §5.5 em 2026-08-25, L-33) alimentam este sistema por DOIS insumos refinados:
