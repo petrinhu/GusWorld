@@ -118,8 +118,11 @@ descrevendo bateria e "mana do ator" como dois medidores debitados em paralelo �
 histórico a guardar, porque mana e carga de bateria são o mesmo recurso e só existe UM lugar de onde
 a carga sai. (`cartas-numeros` §1a, AMB-02 já resolvida: "recurso Y" = `ManaCost`, não um
 multiplicador extra.) Regra de Híbridas (Faraday/Maxwell/Newton/von Neumann/John Dee,
-`cartas-technomagik.md` §2.3): a face **passiva** (`ManaCost=0`, sempre ligada) nunca drena; só a
-face **ativa**, quando de fato disparada (`OnCast` do lado castável), drena as ~6 unidades.
+`cartas-technomagik.md` §2.3): a face **passiva** nunca tem custo zero (decisão do líder,
+03/09/2026, `cartas-hardware-pirataria-energia.md` §5, "Passiva tem dois gastos: standby e
+disparo"); ela drena o gasto de standby, contínuo e menor, enquanto a carta fica equipada e ligada.
+Já a face **ativa**, quando de fato disparada (`OnCast` do lado castável), continua drenando as ~6
+unidades, 1×/batalha.
 
 ```
 on_card_selected_for_play(card_instance, ap_cost, mana_cost):

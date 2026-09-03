@@ -11,7 +11,7 @@ Dado completo em [`resources/cards/dee.gw.card`](../../../../resources/cards/dee
 
 ## Ficha rápida
 
-Família **Universal** · categoria **Híbrida** · especial · mana 6 · alvo **próprio conjurador** · 1×/batalha (face ativa).
+Família **Universal** · categoria **Híbrida** · especial · mana 6 · alvo **próprio conjurador** · 1×/batalha (face ativa) · face passiva com dois gastos de mana/bateria (standby + disparo, números pendentes; decisão do líder, 03/09/2026, ver `cartas-hardware-pirataria-energia.md` §5).
 
 ## Como funciona
 

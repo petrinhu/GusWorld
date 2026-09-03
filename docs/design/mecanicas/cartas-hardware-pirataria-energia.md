@@ -453,10 +453,14 @@ passivas hoje catalogadas (Ada, Hayek, Mises, Planck, Pythagoras), não foram de
 nesta rodada e não são inventados aqui.** Ficam para a fatia seguinte: proposta do `economy-designer`
 e ratificação do líder (item de INBOX aberto em `TODO.md`).
 
-**Em aberto, não decidido, não presumido:** se a mesma regra vale para a **face passiva** das cartas
-Híbridas (Faraday, Maxwell, Newton, von Neumann, John Dee, `cartas-technomagik.md` §2.3) e para as
-cartas **Fora de combate** (Euler, Menger, Turing) — o líder falou de "carta passiva" especificamente;
-estender a regra a essas outras categorias é proposta a submeter a ele, não decisão desta rodada.
+**Decisão do líder, 03/09/2026, por `AskUserQuestion`:** a mesma regra alcança a **face passiva**
+das cartas Híbridas (Faraday, Maxwell, Newton, von Neumann, John Dee, `cartas-technomagik.md` §2.3),
+mas não as cartas **Fora de combate** (Euler, Menger, Turing). A razão que o líder acolheu: a face
+passiva da Híbrida fica LIGADA no personagem enquanto a carta está equipada, exatamente como as
+cinco passivas puras (Ada, Hayek, Mises, Planck, Pythagoras); as três Fora de combate são
+posse-only e não ficam ligadas em nada, então continuam em `mana 0`. Os números do gasto de standby
+e do gasto de disparo de cada Híbrida não foram decididos nesta rodada e não são inventados aqui;
+ficam para o `economy-designer`, item de INBOX em `TODO.md`.
 
 ### Troca e recarga
 - **Cidade:** grátis — abrir inventário, pôr carregada no lugar da usada.
