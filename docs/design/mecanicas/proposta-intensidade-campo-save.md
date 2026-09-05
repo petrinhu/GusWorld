@@ -13,7 +13,7 @@
 - Todas as 13 dungeons têm o campo do PEM. A intensidade é **fraca** ou **total**, nunca ausente (`save-por-local.md` §1.2).
 - **Total:** salva-se só na porta (entrada/saída); carregar reinicia na porta; save manual e autosave desligados fora da porta.
 - **Fraca:** o campo bloqueia só o autosave dentro da dungeon; o save manual continua disponível pelo menos na porta.
-- A percepção de qual intensidade está em vigor é por **sinal diegético no menu de save**, sem tutorial em texto (decisão do líder, 28/08/2026, `save-por-local.md` §3).
+- A percepção de qual intensidade está em vigor soma **sinal diegético no ambiente** (primário) e confirmação no **menu de save**, sem tutorial em texto (decisão do líder, 28/08/2026 e 05/09/2026, `save-por-local.md` §3).
 - **A intensidade é dado do mapa** — atribuída por dungeon, estática por design, não calculada em tempo de jogo a partir do desempenho do jogador. Isto casa direto com o corte `C-06` da L-29 (proibido dificuldade dinâmica adaptativa): a proposta abaixo **não introduz nenhuma adaptação por jogador**, é uma tabela fixa, decidida na mesa de design.
 
 O que falta, e é objeto deste documento: **qual das 13 fica em qual intensidade, e por quê.**
@@ -91,7 +91,7 @@ Nenhuma linha da tabela da Seção 5 se apoia em conteúdo de dungeon que o corp
 
 - **Não acrescenta campo ao save.** A intensidade proposta aqui é um atributo por dungeon, fixo por design, e — como o líder já registrou — pertence ao **dado do mapa**, não ao envelope de save. O save consulta essa informação (via o requisito já descrito em `save-por-local.md` §5 item 1: "a área carregada precisa expor... se aquele lugar é cidade ou dungeon, e, sendo dungeon, se o PEM local está ativo, desativado ou nunca existiu ali"); esta proposta só preenche **qual valor** (fraca/total) cada uma das 13 dungeons carrega nesse campo do mapa, não muda a forma do save nem do formato binário selado (L-18, L-25). O item `D11` continua livre para nascer com o formato já previsto.
 - **Não introduz dificuldade dinâmica.** A tabela da Seção 5 é estática, decidida na mesa de design, sem leitura de desempenho do jogador — respeita o corte `C-06` da L-29.
-- **Não decide a forma do sinal diegético.** Isto já está fechado (menu de save, `save-por-local.md` §3) e fora do escopo deste documento; a proposta só diz qual intensidade cada dungeon carrega, não como o menu a comunica.
+- **Não decide a forma do sinal diegético.** Isto já está fechado (sinal no ambiente, confirmado pelo menu de save, `save-por-local.md` §3) e fora do escopo deste documento; a proposta só diz qual intensidade cada dungeon carrega, não como o ambiente e o menu a comunicam.
 - **Não toca layout sala-a-sala nem conteúdo específico de dungeon** (fora do escopo, `mundo-topologia.md` §10 item 1).
 
 ## 7. O que segue sendo decisão do líder
