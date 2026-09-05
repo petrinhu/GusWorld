@@ -194,6 +194,105 @@ real, registrada aqui como fato — sem conclusão sobre a causa.
 `east.png`, `north.png`, `south.png`, `west.png` (as 4 direções estáticas,
 sem `walk/`).
 
+<!-- INICIO BLOCO GERADO por tools/art/sprites_inventory_gen.py -- NAO EDITAR A MAO ENTRE ESTAS MARCAS -->
+
+### Inventário automático por pasta (gerado por ferramenta, não editar à mão)
+
+Gerado por `python3 tools/art/sprites_inventory_gen.py` em **05/09/2026, 17:29** (America/Recife), lendo `resources/sprites` no disco. Cobre só quatro fatos mecânicos por pasta de nível 1: contagem de arquivos no topo, presença e tamanho de `walk/` e de `anims/` (busca só no nível 1 de cada pasta, como o resto deste documento), e as dimensões distintas de imagem encontradas recursivamente. O que cada pasta *significa* — quem é personagem, quem é pasta especial, o que está pendente de geração — não é fato mecânico e continua na PARTE DE JULGAMENTO, escrito à mão.
+
+Varredura: pastas de nivel 1: 86 encontrados, 86 analisados, 0 falharam. imagens: 888 encontrados, 888 analisados, 0 falharam.
+
+| pasta | arquivos no topo | `walk/` | `anims/` | total recursivo | dimensões distintas (recursivo) |
+|---|---|---|---|---|---|
+| `anaximandro_vyrcatrix` | 1 | não | não | 1 | 2048x2048 (x1) |
+| `anhuera_vanderbist` | 1 | não | não | 1 | 2048x2048 (x1) |
+| `anselmo_boroshova_vance` | 1 | não | não | 1 | 319x548 (x1) |
+| `antoneta_argendia_chevalier` | 4 | não | não | 4 | 180x180 (x4) |
+| `antoneto_chevalier` | 4 | não | não | 4 | 180x180 (x4) |
+| `atelaia_chevalier` | 4 | não | não | 4 | 180x180 (x4) |
+| `atelaiana_sevra_chevalier` | 4 | não | não | 4 | 180x180 (x4) |
+| `bento_requiem` | 4 | sim (24) | sim (181) | 209 | 256x256 (x185), 180x180 (x24) |
+| `berenice_quaresma` | 4 | não | não | 4 | 180x180 (x4) |
+| `casimiro_chevalier` | 4 | não | não | 4 | 180x180 (x4) |
+| `cassandra_ferraz` | 4 | não | não | 4 | 180x180 (x4) |
+| `cassiano_vorto` | 1 | não | não | 1 | 2816x1536 (x1) |
+| `cassiel_ferraz` | 4 | não | não | 4 | 180x180 (x4) |
+| `caua_volt` | 4 | sim (24) | não | 28 | 180x180 (x28) |
+| `dante_grid` | 4 | sim (24) | não | 28 | 180x180 (x28) |
+| `dmitri_chevalier` | 4 | não | não | 4 | 180x180 (x4) |
+| `eufrasia_vanderbist` | 4 | não | não | 4 | 180x180 (x4) |
+| `felicia_tarsila` | 4 | não | não | 4 | 180x180 (x4) |
+| `florin_estopa` | 4 | não | não | 4 | 180x180 (x4) |
+| `gustaf_i_tavus_vance` | 4 | não | não | 4 | 180x180 (x4) |
+| `heitor_cravo` | 4 | não | não | 4 | 180x180 (x4) |
+| `heliaco_vyr` | 1 | não | não | 1 | 1408x768 (x1) |
+| `hilario_murch_senior` | 4 | não | não | 4 | 180x180 (x4) |
+| `hilario_vanderbist` | 4 | não | não | 4 | 180x180 (x4) |
+| `hipolito_ferraz_boroshova` | 4 | não | não | 4 | 180x180 (x4) |
+| `hosvaldo_pinhao` | 4 | não | não | 4 | 180x180 (x4) |
+| `hugo_tirol` | 4 | não | não | 4 | 180x180 (x4) |
+| `hyperion_vyrcatrix` | 4 | não | não | 4 | 180x180 (x4) |
+| `iara_lumen` | 4 | sim (24) | não | 28 | 180x180 (x28) |
+| `icons-m5` | 3 | não | não | 50 | 128x128 (x48), 75x97 (x1) |
+| `inacia_berenger` | 4 | não | não | 4 | 180x180 (x4) |
+| `ines_marcal` | 4 | não | não | 4 | 180x180 (x4) |
+| `jaci_proxy` | 4 | sim (24) | não | 28 | 180x180 (x28) |
+| `joaquim_bartolomeu` | 4 | não | não | 4 | 180x180 (x4) |
+| `lavinia_sevra` | 4 | não | não | 4 | 180x180 (x4) |
+| `lazar_tovrov` | 4 | não | não | 4 | 180x180 (x4) |
+| `lin_torun` | 4 | não | não | 4 | 180x180 (x4) |
+| `linda_siren` | 4 | sim (24) | não | 28 | 180x180 (x28) |
+| `lucio_ostraconis` | 4 | não | não | 4 | 180x180 (x4) |
+| `madalena_argendia_vanderbist` | 4 | não | não | 4 | 180x180 (x4) |
+| `mara_bento` | 4 | não | não | 4 | 180x180 (x4) |
+| `marcela_sivo` | 4 | não | não | 4 | 180x180 (x4) |
+| `mariana_vanderbist` | 1 | não | não | 1 | 2048x2048 (x1) |
+| `marlena_aurora` | 4 | não | não | 4 | 180x180 (x4) |
+| `mateus_penkin` | 4 | não | não | 4 | 180x180 (x4) |
+| `models_frente` | 9 | não | não | 9 | 2048x2048 (x8), 2816x1536 (x1) |
+| `octavia_penedo` | 4 | não | não | 4 | 180x180 (x4) |
+| `olafsson_argendia` | 4 | não | não | 4 | 180x180 (x4) |
+| `olimpia_cardoso` | 4 | não | não | 4 | 180x180 (x4) |
+| `otelo_pancha` | 5 | não | não | 5 | 180x180 (x4), 2048x2048 (x1) |
+| `otilia_pamonha` | 4 | não | não | 4 | 180x180 (x4) |
+| `otilia_vermelha` | 4 | não | não | 4 | 180x180 (x4) |
+| `otmar_neumann` | 4 | não | não | 4 | 180x180 (x4) |
+| `otoniel_rens` | 4 | não | não | 4 | 180x180 (x4) |
+| `padrinho_tiago` | 4 | não | não | 4 | 180x180 (x4) |
+| `patch_zero` | 8 | não | não | 8 | 180x180 (x8) |
+| `patricio_velo` | 4 | não | não | 4 | 180x180 (x4) |
+| `penha_cintra` | 4 | não | não | 4 | 180x180 (x4) |
+| `penha_lirio` | 4 | não | não | 4 | 180x180 (x4) |
+| `personagens_inspirados` | 0 | não | não | 183 | 256x256 (x165), 1032x576 (x2), 2048x2048 (x2), 321x325 (x2), 344x192 (x2), 128x128 (x1), 1792x256 (x1), 1844x2304 (x1), 226x192 (x1), 294x543 (x1), 680x576 (x1) |
+| `praxidice_boroshova_vance` | 4 | não | não | 4 | 180x180 (x4) |
+| `regulo_penkin` | 4 | não | não | 4 | 180x180 (x4) |
+| `rosaria_galp` | 4 | não | não | 4 | 180x180 (x4) |
+| `salomao_tessar_vyrcatrix` | 4 | não | não | 4 | 180x180 (x4) |
+| `sergio_brimber` | 4 | não | não | 4 | 180x180 (x4) |
+| `seu_bertoldo_caim` | 4 | não | não | 4 | 180x180 (x4) |
+| `solane` | 4 | não | não | 4 | 180x180 (x4) |
+| `solange_vix` | 4 | não | não | 4 | 180x180 (x4) |
+| `sonja_murmurio` | 4 | não | não | 4 | 180x180 (x4) |
+| `soraia_vanderbist` | 4 | não | não | 4 | 180x180 (x4) |
+| `talita_boroshova` | 4 | não | não | 4 | 180x180 (x4) |
+| `tamela_brida` | 4 | não | não | 4 | 180x180 (x4) |
+| `tao_berisi` | 4 | não | não | 4 | 180x180 (x4) |
+| `tarsila_atelaia_veronica` | 4 | não | não | 4 | 180x180 (x4) |
+| `tatauin_branca` | 4 | não | não | 4 | 180x180 (x4) |
+| `telemaco_ostraconis` | 4 | não | não | 4 | 180x180 (x4) |
+| `tercio_almagre` | 4 | não | não | 4 | 180x180 (x4) |
+| `theodoro_calveri` | 4 | não | não | 4 | 180x180 (x4) |
+| `vanda_do_cafe` | 4 | não | não | 4 | 180x180 (x4) |
+| `velhusto` | 4 | não | não | 4 | 180x180 (x4) |
+| `veronica_atelaia` | 4 | não | não | 4 | 180x180 (x4) |
+| `vespa_calderon` | 4 | não | não | 4 | 180x180 (x4) |
+| `vitoria_marques` | 4 | não | não | 4 | 180x180 (x4) |
+| `world` | 0 | não | não | 14 | 500x500 (x4), 433x577 (x2), 519x480 (x2), 112x80 (x1), 32x40 (x1), 32x48 (x1), 32x80 (x1), 48x48 (x1), 64x48 (x1) |
+| `yara_ducourt` | 1 | não | não | 1 | 2816x1536 (x1) |
+| `yvanova_argendia` | 4 | não | não | 4 | 180x180 (x4) |
+
+<!-- FIM BLOCO GERADO -->
+
 ---
 
 ## PARTE DE JULGAMENTO
