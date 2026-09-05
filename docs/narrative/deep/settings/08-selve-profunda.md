@@ -80,4 +80,15 @@ Os números canônicos da Profunda, levantados sem cerimônia em ordem de citaç
 
 ---
 
+---
+
+> **Nota de sequência (decisão do líder, 05/09/2026, por `AskUserQuestion`):** o clímax da
+> penetração ritual do Núcleo Mandelbrot (secão 4, evento "Ano 0") descrito neste documento **não é
+> o único evento-clímax da Selve Profunda**. Ele é precedido por um evento distinto e anterior, a
+> dungeon Kola-SG3-12262 (o Espelho de Obsidiana), registrada em
+> `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md` (05/09/2026). **Os dois são sequência:
+> a Kola-SG3-12262 vem primeiro, o ritual do Núcleo Mandelbrot depois. Nenhum dos dois substitui o
+> outro.** Esta nota registra só a ordem entre os dois eventos, por autorização explícita do líder
+> restrita a este ponto; o restante deste documento, aprovado em 19/05/2026, permanece intocado.
+
 **Última revisão:** 2026-05-19. Canônico deep-lore. Não modificar sem aprovação criador supremo.
