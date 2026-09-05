@@ -769,13 +769,13 @@ foram resolvidas por invenção de número**.
 ### 9.7 Assinatura
 
 Este pré-registro só passa a valer com a linha abaixo preenchida pelo líder. Até lá, a
-`PACING-FASE-C-BIS` **não roda**.
+`PACING-FASE-C-BIS` **não roda**. Os cinco pontos abaixo foram aprovados pelo líder:
 
-- [x] **Aprovo §9.2 (tripla do evento raro: teto 1,0 x 10⁻⁴, confiança 95%, N = 300.000, gate irmão p99 <= 20 rodadas no P6).**
-- [x] **Aprovo §9.3 (gates G1 a G6) e as correções pré-declaradas.**
-- [x] **Aprovo §9.4 (gates H1 a H5) e os parâmetros do enrage sob os quais eles são medidos.**
-- [x] **Decido as ambiguidades AMB-01 a AMB-04 (§9.6).**
-- [x] **Confirmo que Q1 a Q5, Q7 e Q8 da spec estão respondidas, ou que o viés do tanque-proxy segue declarado e aceito.**
+- **Aprovo §9.2 (tripla do evento raro: teto 1,0 x 10⁻⁴, confiança 95%, N = 300.000, gate irmão p99 <= 20 rodadas no P6).**
+- **Aprovo §9.3 (gates G1 a G6) e as correções pré-declaradas.**
+- **Aprovo §9.4 (gates H1 a H5) e os parâmetros do enrage sob os quais eles são medidos.**
+- **Decido as ambiguidades AMB-01 a AMB-04 (§9.6).**
+- **Confirmo que Q1 a Q5, Q7 e Q8 da spec estão respondidas, ou que o viés do tanque-proxy segue declarado e aceito.**
 
 Assinado por: petrus (líder, via AskUserQuestion)  Data: 11 / 08 / 2026
 

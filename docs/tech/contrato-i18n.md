@@ -402,24 +402,26 @@ idioma fora do alfabeto latino.**
 
 ## 10. Checklist de aceite para `B9`
 
-O formato que `B9` desenhar só cumpre este contrato se, para os itens abaixo, a resposta for sim:
+O estado deste trabalho vive na tabela de pendências, sob o identificador `B9`; a lista abaixo é
+o critério de aceite dele, não a fila. O formato que `B9` desenhar só cumpre este contrato se,
+para os itens abaixo, a resposta for sim:
 
-- [ ] A lista de locales é lida de um registro de dados, não de um número fixo de campos ou de
+- A lista de locales é lida de um registro de dados, não de um número fixo de campos ou de
       `if`/`switch` por identificador de idioma no código.
-- [ ] Cada locale carrega os campos do §2.2 (identificador, é-referência, cadeia de fallback,
+- Cada locale carrega os campos do §2.2 (identificador, é-referência, cadeia de fallback,
       categorias de plural), mesmo que hoje só dois locales existam e os campos sejam triviais.
-- [ ] O comportamento dos três casos do §3.4 é implementado e é **auditável**: dá para provar, por
+- O comportamento dos três casos do §3.4 é implementado e é **auditável**: dá para provar, por
       teste, que locale ausente cai na referência, que chave vazia sobe a cadeia, e que chave
       inexistente aparece crua com log de erro.
-- [ ] O locale de referência (`pt_br`) é a única entrada cuja completude é exigida em CI (gate de
+- O locale de referência (`pt_br`) é a única entrada cuja completude é exigida em CI (gate de
       paridade estrutural, já citado em `README.md`, e a auditoria de conteúdo vazio é aceitável só
       para locales não-referência).
-- [ ] A chave nunca é o campo que muda quando o idioma muda — só o valor. Nenhuma lógica no
+- A chave nunca é o campo que muda quando o idioma muda — só o valor. Nenhuma lógica no
       formato deriva comportamento do **nome** de uma chave (fora do prefixo de domínio do §4.1,
       que é convenção de organização, não de runtime).
-- [ ] O parser aceita `{arg}` nomeado e o subconjunto ICU de `plural`/`select` do §6.2 (ou a
+- O parser aceita `{arg}` nomeado e o subconjunto ICU de `plural`/`select` do §6.2 (ou a
       alternativa que o líder aprovar no lugar).
-- [ ] Nada do texto do jogador chega em texto puro na distribuição — a fonte fica no repositório,
+- Nada do texto do jogador chega em texto puro na distribuição — a fonte fica no repositório,
       o artefato entregue é o pacote compilado e selado (L-18, L-25), sem exceção para
       locale nenhum, inclusive os que ainda não existem.
 
