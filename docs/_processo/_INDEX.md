@@ -17,6 +17,7 @@ estes documentos dizem por que, com quem, e contra que alternativas.
 | `mineracao-roadmap-todo-antigos.md` | Rodada 1: cortes de escopo e lições; base da L-29 | technical-writer |
 | `mineracao-rodada-2.md` | Rodada 2: design, roster, topologia, save por local | technical-writer |
 | `dossie-pixellab.md` | A API do PixelLab, levantada exaustivamente | applied-ai-engineer |
+| `levantamento-registro-marca.md` | Registro de marca (categorias de Nice, custo, prazo, lacunas); material de apoio à decisão do titular sobre `G31`, não é parecer jurídico | technical-writer |
 | `lente-*.md` | As quatro lentes que geraram a tabela de pendências | quatro agentes |
 
 **Origem:** estes arquivos nasceram no diretório temporário da sessão (`/var/tmp/...`), que é volátil.

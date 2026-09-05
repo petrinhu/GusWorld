@@ -77,6 +77,8 @@ Identidade de marca (nome do jogo, logotipo, trade dress, nomes de personagem) f
 
 **Logo/ícone oficial:** `resources/images/vance_dragon_glyph-alfa.png` é o logo/ícone oficial de GusWorld, por decisão do líder de 01/09/2026 ("esse arquivo será o logo/icone de gusworld"). Cai neste carve-out de marca, não no regime geral de asset com direitos reservados descrito acima.
 
+**Levantamento de apoio (não é norma):** `docs/_processo/levantamento-registro-marca.md` reúne o que já foi apurado sobre registro de marca (categorias de Nice, custo, prazo, lacunas), para o titular decidir quando quiser; a decisão em si continua só dele, como registrado na última linha deste arquivo.
+
 Ver também [NOTICE](NOTICE), que registra este carve-out para o código.
 
 ---
