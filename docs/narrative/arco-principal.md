@@ -2,7 +2,7 @@
 
 > **Status:** Revisão 1 concluída em sessão colaborativa (2026-05-15). Substitui versão prévia (com Iolanda como antagonista) integralmente. **Canônico.**
 >
-> **Escopo:** 4-8h gameplay. 3 atos. 1 antagonista principal (Sterling Locke) + 1 antagonista-sistema (Patch-Zero) + 1 traidor interno (Dante). 1 ending principal com 3 variações knowledge-gated. Foldback narrativo, branching curto e contextual.
+> **Escopo:** fechado e definido por conteúdo, sem número de horas fixado. 3 atos. 1 antagonista principal (Sterling Locke) + 1 antagonista-sistema (Patch-Zero) + 1 traidor interno (Dante). 1 ending principal com 3 variações knowledge-gated. Foldback narrativo, branching curto e contextual.
 >
 > **Cross-ref obrigatório:** `lore-bible.md`, `factions.md`, `characters/sterling-locke.md`, `characters/patch-zero.md`, `characters/party.md`, `comic-reliefs.md`.
 

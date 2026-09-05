@@ -465,7 +465,7 @@ Adicionais cobrem settings com lore canônica em [[lore-bible]] §13 mas sem doc
 
 ### Critério de não-inflação
 
-Foram **rejeitadas** propostas que iriam (a) duplicar foreshadow já adequado, (b) introduzir lore nova sem ancorar em [[lore-bible]] existente, (c) sobrecarregar settings com docs além do scope solo indie G1 (4-8h gameplay). Cada proposta serve a um vetor narrativo específico documentado em lore-bible.
+Foram **rejeitadas** propostas que iriam (a) duplicar foreshadow já adequado, (b) introduzir lore nova sem ancorar em [[lore-bible]] existente, (c) sobrecarregar settings com docs além do scope solo indie G1. Cada proposta serve a um vetor narrativo específico documentado em lore-bible.
 
 ---
 

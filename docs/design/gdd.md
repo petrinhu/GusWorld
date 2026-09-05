@@ -57,7 +57,7 @@ Verb dominante: **decifrar**. Sub-verbos: scanear, compilar, prever.
 
 - **Sessão (30-60min):** atravessar 1-2 nós do bioma atual, resolver 1 puzzle-âncora + 2-3 encontros de combate, ganhar 1-2 cartas novas ou 1 fragmento de upgrade de hardware.
 - **Sessão-a-sessão:** desbloquear nova carta-tipo, novo módulo de hardware (upgrade em 1 dos 3 vértices), nova área (capítulo).
-- **Long-term (4-8h total):** completar 6 capítulos, montar 2-3 decks especializados, decifrar a verdade-âncora da Selve Sombria, enfrentar boss final que exige uso coordenado dos três vértices do hardware.
+- **Long-term (fim da campanha):** completar 6 capítulos, montar 2-3 decks especializados, decifrar a verdade-âncora da Selve Sombria, enfrentar boss final que exige uso coordenado dos três vértices do hardware.
 
 Sem grind: progressão é linear-narrativa, não farmável. Replay opcional via builds alternativas de deck.
 
@@ -101,7 +101,7 @@ Sinergia com 6.1 e 6.2: scan dá input, gambito dá output, deck é a ferramenta
 
 ## 7. Estrutura geral
 
-- **Duração total:** 4-8 horas (campanha principal), +2h se completar todos os puzzles opcionais.
+- **Duração total:** escopo fechado e definido por conteúdo (campanha principal + puzzles opcionais); sem número de horas fixado — a duração se mede quando houver cena jogável.
 - **Capítulos:** 6 (alternando cidade ↔ Selve ↔ cidade ↔ Selve ↔ híbrido-set-piece ↔ boss final).
 - **Biomas:** 2 macro-biomas (Megacidade ciber-gótica, Selve Sombria tecnorgânica); **8 settings de identidade visual/sonora/mecânica distinta** distribuídos entre eles. Detalhe completo: [[pillars]] §Pillar5.
 - **Party:** Gus + **6 companions canônicos**: Cauã "Volt" Berenger, Iara "Lumen" Koslov, Bento "Requiem" Chevalier, Linda "Siren" Neumann, Dante "Grid" Alencar (traidor), Jaci "Proxy" Vanderbist. Em combate: Gus + 2 ativos rotativos. Detalhe: `docs/narrative/characters/party.md`.

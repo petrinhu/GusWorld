@@ -273,7 +273,7 @@ Patch-Zero invade o Diário em momentos canônicos específicos via canal 1 ([[l
 
 ---
 
-## 7. Curvas de progressão (jogo 4-8h)
+## 7. Curvas de progressão (campanha completa)
 
 Estimativas por perfil de player observado em playtests internos hipotéticos (calibragem real Fase 4 QA):
 

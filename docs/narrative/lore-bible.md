@@ -2,7 +2,7 @@
 
 > **Status:** Revisão 1 concluída em sessão colaborativa com criador supremo (2026-05-15). Substitui versão prévia (que tinha Iolanda como antagonista) integralmente. **Canônico.**
 >
-> **Escopo:** RPG turn-based + puzzle + aventura, 4-8h gameplay, solo indie G1. Lore densa o suficiente pra sustentar o arco principal (8 beats macro, 6 arcos companion, climax 2 fases) e três variações de ending knowledge-gated. **Não** é enciclopédia AAA.
+> **Escopo:** RPG turn-based + puzzle + aventura, escopo fechado e definido por conteúdo (sem número de horas fixado), solo indie G1. Lore densa o suficiente pra sustentar o arco principal (8 beats macro, 6 arcos companion, climax 2 fases) e três variações de ending knowledge-gated. **Não** é enciclopédia AAA.
 >
 > **Imutáveis cross-ref:** `sinopse.md`, `docs/design/pillars.md`, `characters/prelore_vilao.md`, `Resources/gusworld/_INDEX.md`.
 >
