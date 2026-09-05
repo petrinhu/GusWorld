@@ -8,8 +8,9 @@
 >
 > **Documento partido em 05/09/2026 (ordem do líder via `AskUserQuestion`, executado pelo
 > `narrative-designer`): esta metade é PÚBLICA — estrutura, cadeia de missão até a party entrar na
-> sala do espelho (beats 1-8), lore de setup e handoff. A revelação central (o que o espelho é, a
-> Era Lendária) e o confronto final (beats 9-12) foram movidos para
+> sala do espelho (beats 1-8), lore de setup e handoff. O nome da Era Lendária é público desde
+> hoje (decisão do líder); o que ficou cifrado é a revelação central (o que aconteceu no fim dela,
+> o sistema de datação, e o que o espelho é) e o confronto final (beats 9-12), movidos para
 > `docs/_secret/dungeons/kola-sg3-12262-desfecho.md`, área cifrada, por revelarem o desfecho da
 > dungeon a quem ainda não jogou. Este documento aponta pra lá pelo caminho, sem citar conteúdo.**
 >
@@ -83,10 +84,14 @@ subsolo do Edifício Vance (`D27`) é uma estrutura **separada**, geograficament
 Metropolitano, área para a qual `docs/design/mundo-topologia.md:47` orça **zero** dungeons. A
 conferência de canon (`docs/_secret/dungeons/conferencia-canon-espelho-obsidiana.md`, secão 6)
 identificou que essa segunda estrutura fica **fora do orçamento fechado de 13** sem que o líder
-tenha decidido se ela conta contra o total, se é uma categoria à parte (como a "Área faraday
-especial" já é, fora da contagem regular), ou se o `mundo-topologia.md` precisa de uma revisão
-numérica. **Isto nunca foi resolvido nas rodadas de decisão seguintes** (verificado: nenhuma das
-secões 10 a 17 da captura-bruta toca o assunto). Fica como lacuna nomeada (secão 6.1).
+tenha decidido se ela conta contra o total, se é uma categoria à parte, ou se o
+`mundo-topologia.md` precisa de uma revisão numérica. **Correção de fato (05/09/2026): a "Área
+faraday especial" NÃO é exemplo de categoria à parte.** Ela está dentro do total de 13, é uma das
+áreas orçadas na própria tabela (`docs/design/mundo-topologia.md:17,26,59-60`). O único precedente
+real de algo fora do cômputo das 13 é o repositório leve do mini-mapa que a Montadora Confluência
+ganha (`docs/design/mundo-topologia.md:57`), explicitamente não-dungeon. **Isto nunca foi resolvido
+nas rodadas de decisão seguintes** (verificado: nenhuma das secões 10 a 17 da captura-bruta toca o
+assunto). Fica como lacuna nomeada (secão 6.1).
 
 ---
 
@@ -107,7 +112,7 @@ dungeon e evitam "por que ninguém achou isso antes":
   encomendada a Helion Tusk e Brunus Vetorial (especificação completa em `D25`), resolve as duas
   impossibilidades térmica/respiratória; a terceira (túnel estável) é resolvida pela geografia do
   parágrafo anterior. Nenhuma das três impossibilidades é contornada por decreto de lore.
-- **O disco de ouro da [REDIGIDO] (a chave da porta) chegou sob o prédio do Gus por acidente
+- **O disco de ouro (a chave da porta) chegou sob o prédio do Gus por acidente
   histórico, não por destino.** A sociedade secreta que preservou o disco perdeu o próprio registro
   de onde ele estava guardado; o Edifício Vance foi erguido sobre a entrada esquecida porque o
   terreno parecia vazio; os operários da construção deixaram um alçapão e não voltaram, porque não
@@ -148,17 +153,19 @@ causal circular entre carta e espelho.
    obrigatório** neste retorno (líder, verbatim, item da captura-bruta). A party encontra uma porta
    com fechadura em forma de disco, do raio de um disco de vinil (LP), com uma inscrição em Sylvarin.
 4. **Tradução da inscrição (bloqueada até `D23`/`D24` existirem).** A inscrição, quando puder ser
-   lida, diz que a chave da porta foi enviada ao espaço em 1977 (calendário antigo) e
-   caiu de volta à Terra entre [REDIGIDO], contendo resumos da humanidade da época. O **conteúdo
-   semântico** da inscrição está fixado aqui; o **texto em Sylvarin** propriamente dito é trabalho
-   separado (`D23`, que depende de `D22` fixar o deslocamento entre calendários — já fixado em área
-   cifrada, `docs/_secret/dungeons/kola-sg3-12262-desfecho.md` secão 2, então `D22`/`D23` não têm
-   mais bloqueio de conteúdo, só de execução).
+   lida, diz que a chave da porta foi enviada ao espaço numa data do calendário antigo e caiu de
+   volta décadas depois, contendo resumos da humanidade da época. O **conteúdo semântico resumido
+   aqui** basta para desenhar a estrutura do puzzle; as datas exatas e o destino do envio, que o
+   texto em Sylvarin precisa nomear, estão fixados em área cifrada
+   (`docs/_secret/dungeons/kola-sg3-12262-desfecho.md` secão 2), por revelarem a mesma descoberta
+   central do desfecho da dungeon. O **texto em Sylvarin** propriamente dito é trabalho separado
+   (`D23`, que depende de `D22` fixar o deslocamento entre calendários — também cifrado, mesma
+   seção). Ver lacuna nomeada na secão 6 sobre o que isso exige de quem executar `D23`/`D24`.
 5. **Interlúdio: a segunda dungeon.** A party precisa sair de novo e buscar outra dungeon,
    inteiramente distinta, escondida sob o **Subsolo do Edifício Vance** (`PLACES.md:84`,
    `CHARS.md` §4), atrás de um alçapão sob o carpete que o próprio Gus nunca notara ao usar o
    espaço todos os dias. Especificação completa dos 8 níveis: `D27`. No fim dela, a party encontra o
-   **disco de ouro da [REDIGIDO]**.
+   **disco de ouro**.
 6. **Passagem obrigatória pela Biblioteca Cintilante.** Antes de voltar à Kola-SG3-12262, a party leva
    o disco de ouro à Biblioteca Cintilante (ambiguidade resolvida pelo líder: é o disco de **ouro**,
    não o de obsidiana, que vai à biblioteca — captura-bruta, item 11). A biblioteca já está
@@ -184,10 +191,12 @@ causal circular entre carta e espelho.
 
 ---
 
-## 4. O calendário e a Era Lendária, e o Espelho como kernel: área cifrada
+## 4. O calendário da Era Lendária, e o Espelho como kernel: área cifrada
 
-O conteúdo desta seção e da seção 5 (o sistema de calendário Era Lendária/deslocamento de [REDIGIDO]
-anos, e a explicação de o que o espelho é e faz) foi movido em 05/09/2026 para
+O nome da Era Lendária é público (seção 0 e handoff apontam para ela por nome). O que fica cifrado
+é o conteúdo desta seção e da seção 5: a notação do calendário antigo, o deslocamento entre as duas
+contagens, o ano em que a era termina, e a explicação de o que o espelho é e faz. Esse conteúdo foi
+movido em 05/09/2026 para
 `docs/_secret/dungeons/kola-sg3-12262-desfecho.md` secões 2 e 3, por revelar a mesma descoberta
 central que os beats 9-12 (secão 3 acima). Não reproduzido aqui pelo mesmo critério: quem ainda não
 jogou não pode saber o que se descobre no fim. `D22` (propagação a `docs/narrative/timeline.md`) e
@@ -198,11 +207,13 @@ documento.
 
 ## 6. Lacunas nomeadas (não decidido, não preenchido por invenção deste documento)
 
-Estas seis pontas seguem em aberto depois de toda a apuração e todas as rodadas de decisão do
+Estas sete pontas seguem em aberto depois de toda a apuração e todas as rodadas de decisão do
 líder já registradas; nenhuma foi resolvida por este documento, por dever da L-13/L-14:
 
 1. **Orçamento da segunda dungeon (8 níveis, `D27`).** Se ela conta contra o total fechado de 13
-   dungeons, se é categoria à parte (como a Área faraday especial já é), ou se o
+   dungeons, se é categoria à parte (o precedente real de algo fora do cômputo é o repositório
+   leve da Montadora Confluência, `docs/design/mundo-topologia.md:57`, explicitamente não-dungeon;
+   a Área faraday especial NÃO é exemplo disso, ela está dentro do total de 13), ou se o
    `mundo-topologia.md` precisa de revisão numérica. Ver secão 1.
 2. **Relação entre esta missão e a missão-capstone de Helion Tusk.** O corpus não diz se a missão
    do espelho acontece antes, depois ou em paralelo à missão-capstone dele
@@ -223,6 +234,12 @@ líder já registradas; nenhuma foi resolvida por este documento, por dever da L
 6. **Motivo de Helion Tusk esconder a própria carta-capstone**, distinto do motivo (já fechado) de
    ele ter apagado o compilador. Ponta própria de `21-helion-tusk.md`, citada aqui só porque a
    secão 3, beat 2, deste documento aproxima os dois personagens pela primeira vez.
+7. **Execução de `D23` (inscrição em Sylvarin) e `D24` (dicionário) precisa de acesso à área
+   cifrada.** Desde 05/09/2026, as datas exatas e o destino do envio que o texto em Sylvarin
+   precisa nomear (beat 4, secão 3) vivem só em `docs/_secret/dungeons/kola-sg3-12262-desfecho.md`
+   secão 2, por recuo de revelação decidido pelo líder. O conteúdo semântico resumido no beat 4
+   basta para desenhar a estrutura do puzzle, mas não basta para escrever a inscrição em si: quem
+   executar `D23`/`D24` sem acesso à cifra não consegue fechar essa peça.
 
 ---
 
@@ -247,12 +264,18 @@ dois eventos jogáveis distintos, na mesma área, em ordem fixa. Esta decisão e
 canon nos dois documentos: aqui, e em `docs/narrative/deep/settings/08-selve-profunda.md` (nota de
 sequência ao final daquele documento, que não altera mais nada do texto já aprovado em 19/05/2026).
 
-**Consequência sinalizada, não resolvida aqui:** com dois eventos feitos à mão confirmados na mesma
-área, o orçamento fechado de `mundo-topologia.md` (uma dungeon para a Selve Profunda, total de 13)
-precisa de decisão do líder sobre se o ritual do Núcleo Mandelbrot conta contra esse total, se é
-categoria à parte, ou se o total precisa de revisão — a mesma pergunta, na mesma forma, já nomeada
-na secão 1 acima para a dungeon de 8 níveis do Vance (`D27`). Ver `docs/design/mundo-topologia.md`;
-o orçamento em si não é alterado por este documento.
+**Consequência resolvida pelo líder em 05/09/2026, por `AskUserQuestion`:** o ritual do Núcleo
+Mandelbrot **não conta contra o total de 13 dungeons**. Ele é cena de clímax de área, categoria que
+`docs/design/mundo-topologia.md` já reservava para os interiores de missão (secão 6 daquele
+documento) e que agora tem critério explícito e um segundo membro (secão 4.2 daquele documento): o
+jogador vive um evento central (a escolha de ending entre três rotas), não navega uma sequência de
+salas com desafios em série, como uma dungeon exige. O orçamento de 1 dungeon para a Selve Profunda
+(a Kola-SG3-12262) fica intacto, e o total de 13 não muda.
+
+**Isto é distinto e não resolve a mesma pergunta ainda em aberto para a dungeon de 8 níveis do
+Vance (`D27`, secão 1/6.1 acima):** aquela é uma dungeon de exploração de verdade (level design
+sala-a-sala), não uma cena de clímax, e por isso não cabe na mesma saída; segue como lacuna
+nomeada, decisão do líder pendente.
 
 ---
 

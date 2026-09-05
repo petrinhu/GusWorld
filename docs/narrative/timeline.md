@@ -29,36 +29,41 @@ Detalhes festividades em [[tradicoes-cultura]].
 
 Cada lado do colapso que fecha a Era Lendária tem sua própria contagem:
 
-- **Contagem antiga**, usada dentro da Era Lendária: marca original do ano (`DC`/`AC`) mais o sufixo de era. Pt-br: **`[ano] [REDIGIDO]`** ([REDIGIDO], Antes da Era Lendária) ou **`[ano] [REDIGIDO]`** para antes de Cristo; inglês: **`[ano] BLA`** (*Before the Legendary Age*). Exemplo do próprio líder, para o ano corrente: "2026 [REDIGIDO]" / "2026 BLA", os dois nomeiam o mesmo ano. Uma forma contraída (`DCEL`/`ACEL`) apareceu numa formulação inicial e foi descartada: a composta é a canônica, por deixar as duas informações (marca do ano, sufixo de era) legíveis em separado.
+- **Contagem antiga**, usada dentro da Era Lendária: tem convenção própria de marca de ano mais sufixo de era. A notação exata está fixada em área cifrada (`docs/_secret/dungeons/kola-sg3-12262-desfecho.md`, seção 2), por revelar a mesma descoberta central do desfecho da dungeon final; aqui fica só o fato de que ela existe e antecede a contagem do GusWorld.
 - **Contagem do GusWorld**, usada depois do colapso: é a que este documento já usa desde a Revisão 1, `-x` antes do ano 0 e `+x` depois. Forma completa, pt-br: **`-x D.E.L.`** / **`+x DEL`** (trocadilho com "deletado", só funciona em pt-br); inglês: **`-x AAL`** / **`+x AAL`** (*After the Age of Legends*). Ninguém fala o sufixo em voz alta, só aparece em texto muito formal, o que mantém o calendário fora do diálogo comum.
 
 A era leva o nome **Era Lendária** (pt-br) / **Age of Legends** (en), abreviada **E.L.** / **A.L.**.
 
 ### O deslocamento entre as duas contagens
 
-| Marco | Contagem antiga | Contagem GusWorld |
-|---|---|---|
-| Fim da Era Lendária | [REDIGIDO] | **-[REDIGIDO] D.E.L.** |
-| Início do trecho já documentado (Era 1) | (não fixado) | **-1.100 D.E.L.** |
-| Presente do jogo | (não fixado) | **0** |
-
-O **ano 0 D.E.L.** cai **[REDIGIDO] anos** depois do fim da Era Lendária. Isso fecha o deslocamento que faltava: toda a datação `-x`/`+x` já usada neste documento (Eras 1 a 3, abaixo) **já é**, por definição, `-x D.E.L.`/`+x DEL`, nenhum ano registrado muda de valor, só ganha a forma formal completa. Entre o fim da Era Lendária e o início da Era 1 correm **[REDIGIDO] anos não documentados** (ver seção seguinte).
+Existe um deslocamento fixo entre a contagem antiga (Era Lendária) e a contagem do GusWorld que
+este documento já usa. O valor exato está fixado em área cifrada
+(`docs/_secret/dungeons/kola-sg3-12262-desfecho.md`, seção 2), por fazer parte da mesma descoberta
+central do desfecho da dungeon final. O que fica público: nenhum ano já registrado neste documento
+(Eras 1 a 3, abaixo) muda de valor por causa desse deslocamento, toda a datação `-x`/`+x` já usada
+aqui **já é**, por definição, `-x D.E.L.`/`+x DEL`, só ganhando a forma formal completa quando
+escrita por extenso. Entre o fim da Era Lendária e o início da Era 1 corre um intervalo não
+documentado, de duração não fixada aqui (ver seção seguinte).
 
 ---
 
 ## Era 0: Era Lendária (pré-história)
 
-> **Janela temporal:** termina no [REDIGIDO] da contagem antiga (= **-[REDIGIDO] D.E.L.**, ver seção anterior). Início não datado: é a era mais antiga que o canon reconhece, anterior a qualquer evento hoje registrado.
+> **Janela temporal:** termina com o colapso que fecha a Era Lendária (ano exato da contagem antiga e equivalência com a contagem do GusWorld em área cifrada, ver seção anterior). Início não datado: é a era mais antiga que o canon reconhece, anterior a qualquer evento hoje registrado.
 >
 > Decisão do líder, 29/08/2026 (matéria-prima em `docs/_secret/dungeons/CAPTURA-BRUTA-kola-espelho-obsidiana.md` §10, área cifrada, canonizada nesta data). **O que esta seção não traz, de propósito:** o conteúdo de missão que revela a era ao jogador (o quê, quando, por qual artefato) permanece na área cifrada do projeto; aqui entra só o esqueleto histórico que a datação do resto deste documento exige.
 
 ### Como termina
 
-A Era Lendária acaba com uma guerra mundial entre nações de orientação coletivista e a reação das nações de orientação liberal, que destrói a infraestrutura tecnológica global: pulsos eletromagnéticos, queda de satélites, armas nucleares, subida temporária do nível dos oceanos, destruição de registros escritos e de computadores. O mundo regride ao feudalismo: guerras por território, e religiões que tratam tecnologia como demoníaca (causa do apocalipse) sob pena capital a quem a usar.
+Conteúdo movido para área cifrada em 05/09/2026
+(`docs/_secret/dungeons/kola-sg3-12262-desfecho.md`, seção 2): descreve o evento que fecha a Era
+Lendária. Não reproduzido aqui pelo mesmo critério do resto desta revelação: revela a natureza do
+mundo antes de o jogador chegar à dungeon final que a descobre.
 
-### O intervalo não documentado (-[REDIGIDO] a -1.100 D.E.L.)
+### O intervalo não documentado (entre o fim da Era Lendária e a Era 1)
 
-**[REDIGIDO] anos** separam o fim da Era Lendária do início do trecho que este documento já cobre (Era 1, Neo-Sylvania, -1.100 D.E.L.). Não é o mesmo período que o Hiato descrito adiante (entre a Era 1 e a Era 2, -700 a -150 D.E.L.): são duas idades sombrias distintas, em escalas de tempo diferentes, sem sobreposição entre elas. Neste intervalo mais antigo e mais longo, a humanidade reconstrói por séculos, trocando o nome das coisas e absorvendo, de forma secreta, conhecimento anterior preservado por achados arqueológicos. **Sem evento documentado**, pelo mesmo desenho do Hiato: intervalo aberto de propósito, não lacuna a preencher agora (L-36 do projeto).
+Um intervalo não documentado, de duração não fixada aqui (o valor exato está na mesma seção
+cifrada acima), separa o fim da Era Lendária do início do trecho que este documento já cobre (Era 1, Neo-Sylvania, -1.100 D.E.L.). Não é o mesmo período que o Hiato descrito adiante (entre a Era 1 e a Era 2, -700 a -150 D.E.L.): são duas idades sombrias distintas, em escalas de tempo diferentes, sem sobreposição entre elas. Neste intervalo mais antigo e mais longo, a humanidade reconstrói por séculos, trocando o nome das coisas e absorvendo, de forma secreta, conhecimento anterior preservado por achados arqueológicos. **Sem evento documentado**, pelo mesmo desenho do Hiato: intervalo aberto de propósito, não lacuna a preencher agora (L-36 do projeto).
 
 ---
 
@@ -249,8 +254,8 @@ Detalhes em cada [[CHARS]].
 
 - **Eventos -3 a 0 são densos por design.** Catalyst macro (Patch-Zero escape) é recente. Mundo está em janela de oportunidade.
 - **Hiato (-700 a -150) é silêncio narrativo deliberado.** Não preencher. O esquecimento é parte do tema.
-- **O intervalo não documentado da Era Lendária (-[REDIGIDO] a -1.100 D.E.L.) não é o Hiato.** São duas idades sombrias distintas, em escalas de tempo diferentes ([REDIGIDO] anos contra 550), e não se sobrepõem. Não confundir ao escrever texto que mencione "idade das trevas" ou "regressão".
-- **A palavra "lendária" já aparecia solta no corpus antes desta revisão**, como adjetivo qualificando a Catedral-Mãe submersa (`sinopse.md`), não como nome de era. Desde esta revisão, "Era Lendária" (maiúsculas, nome próprio) é coisa distinta: a pré-história que termina no [REDIGIDO] da contagem antiga. Checar o contexto antes de assumir que os dois usos são a mesma coisa.
+- **O intervalo não documentado da Era Lendária (entre o fim dela e -1.100 D.E.L.) não é o Hiato.** São duas idades sombrias distintas, em escalas de tempo diferentes (o valor exato do intervalo mais antigo está em área cifrada, ver seção acima; o Hiato dura 550 anos), e não se sobrepõem. Não confundir ao escrever texto que mencione "idade das trevas" ou "regressão".
+- **A palavra "lendária" já aparecia solta no corpus antes desta revisão**, como adjetivo qualificando a Catedral-Mãe submersa (`sinopse.md`), não como nome de era. Desde esta revisão, "Era Lendária" (maiúsculas, nome próprio) é coisa distinta: a pré-história que termina no colapso descrito na seção "Era 0" acima (ano exato da contagem antiga em área cifrada). Checar o contexto antes de assumir que os dois usos são a mesma coisa.
 - **Causa exata da queda Neo-Sylvania não é revelada nem em ending Ouro.** Hipóteses, sim; certeza, não. Reforça "limite do conhecimento" ([[lore-bible]] §8).
 - **Datas de nascimento dos companions são consistentes:** Bento 14, Cauã 13, Dante 13, Iara 12, Linda 12, Gus 11, Jaci 11. Ordem cronológica respeitada.
 
@@ -266,7 +271,8 @@ Detalhes em cada [[CHARS]].
 - Patch-Zero: [[patch-zero]]
 - Arco: [[arco-principal]]
 - Era Lendária e sistema de datação (matéria-prima, área cifrada): `docs/_secret/dungeons/CAPTURA-BRUTA-kola-espelho-obsidiana.md` §§10, 15, 16
-- Cosmologia de origem: [[cosmologia-origem-deep]]. **Tensão não resolvida, sinalizada e não corrigida nesta revisão:** aquele documento fixa que GusWorld é "um ramo inteiro e autossuficiente" de um evento de ramificação (o Transbordamento, ~-800 D.E.L.), "nenhuma delas contém as outras... nenhuma delas é sonho, cópia, ou camada aninhada de qualquer outra" (`cosmologia-origem-deep.md:43`). A Era Lendária desta revisão descreve GusWorld como literalmente a continuação de um mundo anterior que colapsou no [REDIGIDO] da contagem antiga. As duas coisas não foram checadas uma contra a outra pelo líder na mesma decisão; decisão de reconciliação (ou de que convivem sem reconciliar) pertence a ele, não a este documento.
+- Notação do calendário antigo, deslocamento entre contagens e como a Era Lendária termina (canonização derivada, área cifrada): `docs/_secret/dungeons/kola-sg3-12262-desfecho.md` seção 2
+- Cosmologia de origem: [[cosmologia-origem-deep]]. **Tensão resolvida pelo líder em 05/09/2026, por `AskUserQuestion`: convive de propósito, não se reconcilia.** A tensão não está entre o evento de ramificação que produz GusWorld como "um desses ramos, inteiro e autossuficiente" (`cosmologia-origem-deep.md:43`) e a Era Lendária: aquele evento é posterior, e nada impede tempo compartilhado antes dele. A tensão real está entre a origem mítica que a Ordem Recursiva canta e ensina, a Primeira Compilação (`docs/narrative/deep/ontologia/cosmologia-formal-deep.md` §3, linhas 23 a 33), e o fato que a dungeon final revela. A Primeira Compilação é verdadeira só dentro do mundo, o que Cantores-de-Pedras, Cronistas e a Ordem creem, cantam e ensinam como origem do substrato; como fato histórico, ela não corresponde ao que a Era Lendária desta revisão descobre. A decisão de que essa divergência é desenho, não defeito de canon, e de que nenhum agente concilia as duas, está registrada com o mesmo texto em `cosmologia-formal-deep.md` §3 (nota de reconciliação cosmológica).
 
 ---
 
