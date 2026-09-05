@@ -76,7 +76,7 @@
 
 ## T10  -  SQL Injection
 
-**Objetivo:** verificar que as queries SQLite são seguras contra injeção de SQL.
+**Objetivo:** verificar que as queries a banco de dados são seguras contra injeção de SQL.
 
 **Ferramenta:** `sqlmap` + revisão manual de prepared statements.
 
