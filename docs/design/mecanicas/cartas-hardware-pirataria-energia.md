@@ -96,7 +96,7 @@ O mesmo raciocínio vale, com um grau a mais de dificuldade, para a **SUPER**: e
 - A carta tem **X usos** porque tem **bateria**; esgotada, a carta fica inerte até trocar. Diegese para o limite de usos.
 - Um **recurso Y** da carta drena mais rápido (o efeito premium consome mais fundo).
 - **CR2032** = a moeda de lítio, literalmente a bateria de BIOS/placa-mãe ("o coração que guarda o estado") — casa com carta = hardware.
-- **Degradação:** a bateria degrada com uso e ciclos de carga.
+- **Degradação:** a saúde (SoH) da bateria degrada por ciclo de recarga; disparar a carta consome carga (SoC), nunca a saúde diretamente — a degradação por uso não tem número próprio (decisão do líder, 05/09/2026, por `AskUserQuestion`; ver "Estoque, vazão e saúde" abaixo).
 - **De fábrica (padrão, a CR2032 acima):** capacidade real igual à capacidade de face, sempre; a leitura de carga que o jogador vê é a verdade (decisão do líder, 03/09/2026, ver "Capacidade de face × capacidade real" mais abaixo neste §5).
 - **Especiais:** bateria **selada / de maior capacidade** — mais confiável (condiz com "especiais protegidas"), mas ainda exige cuidado no endgame (amarra com o clímax sem-save/PEM). Capacidade real igual à de face, como a de fábrica; o que a distingue não é desvio de capacidade, é degradar mais devagar (decisão do líder, 03/09/2026, verbatim: *"Real igual à face, mas ela degrada mais devagar"*); a curva de degradação dela é número do `economy-designer`, pendente.
 
@@ -129,7 +129,7 @@ pendente, não como texto pronto.
 **Relação com o que já está especificado, sem alterar nada disso:** `cartas-spec-logica.md` §3 já liga
 os dois numericamente — a decisão de hoje confirma que esse acoplamento não é coincidência de número:
 é identidade de substância. **A ambiguidade que esta seção levantava originalmente — se a rampa do
-ator em `combat.md` §5 (`manaMax = 2 + turnos`) e a bateria física da carta eram dois medidores
+ator em `combat.md` §5 (`chargeDrawMax = 2 + turnos`) e a bateria física da carta eram dois medidores
 separados ou o mesmo — foi respondida pelo líder no mesmo dia.** A resposta está na seção "Estoque e
 vazão", logo abaixo.
 
@@ -289,9 +289,11 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
    marcação dos dois elementos, nasce com a camada `present/` e espera o GlintFx.
 6. **Saúde (SoH) e capacidade de entregar corrente (decisão do líder, 02/09/2026):** a terceira
    propriedade, independente do estoque. Toda bateria nasce com um **parâmetro de fábrica, o CCA**
-   (corrente de partida a frio): quantos amperes ela consegue fornecer no pico. O uso e os ciclos de
-   recarga degradam a saúde (a resistência interna sobe), e com ela cai a corrente que a bateria
-   ainda consegue entregar, que é o teto da vazão do item 2. A leitura que revela a saúde é a
+   (corrente de partida a frio): quantos amperes ela consegue fornecer no pico. **Só o ciclo de
+   recarga degrada a saúde** (a resistência interna sobe); disparar a carta consome carga (SoC),
+   nunca saúde diretamente — a degradação por uso não tem número próprio (decisão do líder,
+   05/09/2026, por `AskUserQuestion`). Com a saúde caindo, cai a corrente que a bateria ainda
+   consegue entregar, que é o teto da vazão do item 2. A leitura que revela a saúde é a
    **tensão sob carga (tensão de partida)**: o quanto a tensão cai quando o efeito puxa a corrente
    de pico. Resumo do líder: *"voltagem na partida = capacidade de entregar corrente (saúde /
    resistência interna / CCA)"*. O CCA de cada modelo e a curva de queda por SoH são balanceamento
@@ -318,7 +320,12 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
    mesmas três coisas: SoC, SoH e capacidade de entregar corrente. A mesa, além de medir, executa o
    passo 2 do protocolo (recarregar); o multímetro só mede. Nenhum dos dois revela nada de bateria
    que ainda não é do jogador: a regra do §14 ("as ferramentas NÃO revelam antes de comprar")
-   continua de pé, senão o risco da bateria pirata morreria.
+   continua de pé, senão o risco da bateria pirata morreria. **Os dois só operam fora de combate
+   (decisão do líder, 05/09/2026, por `AskUserQuestion`):** a mesa é bancada fixa (§4), já fora de
+   combate por natureza; o multímetro, item portátil, fica restrito do mesmo jeito — o multímetro
+   NÃO pode ser usado durante o combate, é ferramenta de bancada e exploração. Medir no meio da
+   luta dissolveria a tensão de entrar em combate sem saber a saúde real de uma bateria pirata, que
+   é justamente o risco que este canon comprou.
 10. **O encontro entre os dois POCOs é o mecanismo central, e tem dois resultados (decisões do
     líder, 01/09/2026 e 02/09/2026).** A carta declara o que EXIGE, a bateria declara o que ENTREGA.
     Ao acionar, o jogo confere se a bateria instalada segura, sob a carga que a carta puxa, a tensão
@@ -369,9 +376,12 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
     bateria perde mais à medida que envelhece. Vale também para bateria guardada na mochila ou no
     slot de usadas, não só para a instalada numa carta. **"Com o tempo" é tempo DE JOGO contado,
     nunca o relógio da máquina** (`docs/tech/convencao-formatos-gw.md`, "A mochila registra, não
-    age": degrada por uso e ciclo, nunca por tempo de parede, senão o replay byte a byte da L-17 não
-    fecha). A curva da perda por SoH é número do `economy-designer`; a unidade de tempo de jogo em
-    que ela se aplica é proposta de agente, não decisão do líder (ver "Pontos ABERTOS").
+    age": esta perda de carga é contada em ciclos de jogo — turnos jogados —, nunca em tempo de
+    parede, senão o replay byte a byte da L-17 não fecha). **Esta perda é de CARGA (SoC), não de
+    saúde (SoH): a saúde só cai por ciclo de recarga, nunca por uso nem por tempo parado (decisão
+    do líder, 05/09/2026, por `AskUserQuestion`).** A curva da perda por SoH é número do
+    `economy-designer`; a unidade de tempo de jogo em que ela se aplica é proposta de agente, não
+    decisão do líder (ver "Pontos ABERTOS").
 
 **Leitura que explica o conjunto:** a rampa deixa de ser um orçamento que aparece do nada a cada
 turno e vira o quanto a bateria consegue entregar por vez, e esse quanto tem dono: a saúde da
@@ -524,7 +534,7 @@ ficam para o `economy-designer`, item de INBOX em `TODO.md`.
 - **Carregador solar** — recarrega baterias passivamente (evita depender de estação/compra).
 - **Powerbank** com visor LED de carga própria restante.
 - **Carregador rápido** de bateria.
-- **Multímetro** (item de medição): informa estado de carga (SoC), estado de saúde (SoH) e capacidade de entregar corrente, na escala de volts do jogo ancorada nos 3 V da CR2032; a carga aparece sempre, a saúde só depois deste teste ou do teste na mesa (decisões do líder, 02/09/2026). Comprável por 13 cr OU adquirido na **missão do Volta**. Verbatim do líder: *"esses parametros podem ser testados na mesa de craft ou com um item chamado multimetro"*. É a peça que a ficha do Gus já lista no cinto dele (`docs/narrative/deep/characters/gus-dragon.md`).
+- **Multímetro** (item de medição): informa estado de carga (SoC), estado de saúde (SoH) e capacidade de entregar corrente, na escala de volts do jogo ancorada nos 3 V da CR2032; a carga aparece sempre, a saúde só depois deste teste ou do teste na mesa (decisões do líder, 02/09/2026). Comprável por 13 cr OU adquirido na **missão do Volta**. Verbatim do líder: *"esses parametros podem ser testados na mesa de craft ou com um item chamado multimetro"*. É a peça que a ficha do Gus já lista no cinto dele (`docs/narrative/deep/characters/gus-dragon.md`). **Ferramenta de bancada e exploração, nunca de combate (decisão do líder, 05/09/2026, por `AskUserQuestion`):** o multímetro não pode ser usado durante o combate; ver "Estoque, vazão e saúde", item 9, acima.
 - **Ghost do Volta** = o **tutor** de todo o sistema de energia (baterias, ciclos, degradação, recarga). Casa com o roster (cada análogo ensina sua área; Volta = a pilha).
 
 ### Bateria pirata / genérica
@@ -574,11 +584,44 @@ líder deu três resultados nomeados. Como as nove caem nos três (por exemplo, 
 intermediário de um insumo, combinado com o degrau bom do outro, ainda é "ruim/aceitável" ou já é
 "boa") não foi decidido; é número que vai ao `economy-designer`, com ratificação do líder.
 
+**Craft exige os dois insumos juntos, nunca um sozinho (decisão do líder, 05/09/2026, por
+`AskUserQuestion`).** Fecha a lacuna que esta seção registrava como aberta ("se o craft exige os
+dois insumos refinados juntos ou cada um sozinho já basta"). Verbatim do líder: *"os dois insumos
+refinados juntos... um sozinho não basta"*. Suco de limão e água entram sempre JUNTOS no craft da
+bateria caseira, em qualquer combinação dos três degraus de cada um (acima); nenhum dos dois,
+sozinho, sem o outro presente, já basta para produzir uma bateria. Isto confirma, sem alterar, o
+modelo de nove combinações: os dois insumos sempre estão presentes no craft, variando só o degrau
+de cada um entre si.
+
+**A receita ganha dois materiais sólidos, zinco e cobre (decisão do líder, 05/09/2026, por
+`AskUserQuestion`).** A química real de uma bateria de chumbo-ácido usa chumbo esponjoso na placa
+negativa, dióxido de chumbo na positiva e ácido sulfúrico de eletrólito, com a grade em liga de
+chumbo-antimônio ou chumbo-cálcio — mas suco de limão não é ácido sulfúrico, e o par de eletrodos
+correto para um eletrólito cítrico é o clássico **zinco (negativo) e cobre (positivo)**, o mesmo
+par da pilha voltaica histórica. **O chumbo não entra na receita.** A bateria de baixa qualidade
+craftada passa a exigir QUATRO materiais: suco de limão (refinado), água (refinada), zinco e
+cobre — os dois metais sem degrau próprio, ao contrário dos dois líquidos.
+
+**Consequência de desenho, não de balanceamento (decisão do líder, 05/09/2026): a bateria caseira
+é fraca por FÍSICA, não por decreto de balanceamento.** A química cítrica com o par zinco/cobre
+entrega tensão baixa por natureza — é exatamente essa fraqueza real que a torna "melhor que nada"
+e nunca rival da bateria de fábrica, reforçando a Doutrina do Comedimento (`economia.md` §0) sem
+precisar de penalidade artificial de número.
+
+**Fonte de obtenção do zinco e do cobre: não decidida, e não inventada aqui.** Sucata plausível de
+ferro-velho (fiação de cobre, telha e pilha velha de zinco) é leitura de agente, não decisão do
+líder; nenhuma fonte canônica para estes dois metais foi achada no corpus. Sinalizado para
+confirmação, no mesmo padrão dos demais números marcados `[calcular]`/pendentes neste documento.
+
 **O refino é craft narrativo-gated, não uma bancada aberta desde o início.** "Com o tempo" (verbatim
-do líder) é progressão. **O momento em que o personagem aprende a filtrar tem a FORMA decidida
-(decisão do líder, 03/09/2026, por `AskUserQuestion`): entrega de um mestre do roster**, ou seja, o
-conhecimento chega pela mão de um personagem do roster de mestres, não por marco de história nem por
-requisito de nível. **QUAL mestre não foi decidido**, e não é inventado aqui; fica para o líder.
+do líder) é progressão. **O momento em que o personagem aprende a filtrar tem a FORMA decidida em
+03/09/2026 e o QUEM decidido em 05/09/2026, ambas por `AskUserQuestion`: entrega de um mentor do
+elenco — Brunus "Vetorial" Solveckt.** A forma se amplia de "mestre do roster" para "mentor do
+elenco" porque Brunus não pertence ao roster dos 21 análogos históricos (`docs/design/roster-analogos/`):
+é personagem próprio, boticário-médico-tecnólogo itinerante independente, com botica-laboratório,
+mentor-boticário do Gus para antídotos, reagentes e bio-ampolas (`CHARS.md` linha 86). O encaixe é
+direto: quem filtra e destila no mundo do jogo é o boticário. O que não muda: continua sendo entrega
+por personagem, nunca marco de história nem requisito de nível.
 
 **Onde o refino e o craft da bateria acontecem: a MESMA bancada já canônica.** É o terminal RSB de
 bancada fixa das oficinas do mercado negro/ferro-velho (§4, §14), a mesma que já cobre reparo
@@ -638,8 +681,8 @@ pelo líder nesta rodada.
 **Não decidido, e não inventado aqui:**
 - Como as nove combinações dos três degraus por insumo caem nos três resultados nomeados na decisão
   de hoje (qual degrau intermediário conta como "bom" para o RNG do meio).
-- Qual mestre do roster entrega o conhecimento de filtrar (a FORMA já está decidida: entrega de um
-  mestre do roster, decisão do líder, 03/09/2026).
+- Fonte de obtenção do zinco e do cobre (sucata de ferro-velho é leitura de agente, não decisão do
+  líder — ver acima).
 - Capacidade, número de usos, preço de compra de cada degrau de refino, taxa de sucesso do refino, e
   a probabilidade numérica de cada risco herdado (mentir sobre a carga / morrer cedo / danificar a
   carta ou vírus): tudo é número de balanceamento (`economy-designer`), nada decidido pelo líder
@@ -844,4 +887,4 @@ A bancada onde a cópia é gravada é a mesma do §4 (terminal de bancada fixo, 
 - ✅ **Spec de implementação** (ENTREGUE e APROVADA 2026-07-28: `cartas-spec-dados.md` + `cartas-spec-logica.md`) → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção). Sem item correspondente no `TODO.md` (L-30).
 - ✅ **Canonizado pelo líder em 2026-07-28.** Falta só refletir em `cartas-technomagik.md` e na terminologia (passo de escrita). Era: canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar. Ponteiro (L-30): `TODO.md` item `G27`.
 - **Camada pirata de ESPECIAL/SUPER (§15, decisão do líder 25/08/2026):** canon fechado, números em aberto → `economy-designer` (probabilidade de cada um dos 3 graus de falha, custo em crédito/material do craft, preço da cópia comprada pronta no mercado negro). O mecanismo de entrega da SUPER original ao fim da missão-capstone foi fechado em 03/09/2026 (§15.6): as vinte peças são a chave, a carta está inteira. Registrado no INBOX do `TODO.md` em 03/09/2026; ainda não é item numerado da tabela, e vira item quando a reordenação acontecer.
-- **Bateria de baixa qualidade craftada a partir de lanches refinados (§5, decisão do líder 25/08/2026; herança de risco FECHADA no mesmo dia):** canon fechado no mecanismo (refino gated, bancada compartilhada com reparo/pirataria, trade-off consumir×refinar, rede de segurança, terceira rota de compra, herança dos três riscos da bateria pirata comprada) → `economy-designer` (capacidade/usos, preço de compra do suco puro/água destilada, taxa de sucesso do refino, probabilidade numérica de cada risco herdado). Duas lacunas de desenho, não numéricas, ainda em aberto → líder: se o craft exige os dois insumos refinados juntos ou cada um sozinho já basta; e o momento narrativo em que o personagem "aprende a filtrar". Registrado no INBOX do `TODO.md` em 03/09/2026; ainda não é item numerado da tabela, e vira item quando a reordenação acontecer. O item `G12` cobre só a origem dos insumos (suco de limão e água com gás), não estes números de craft.
+- **Bateria de baixa qualidade craftada a partir de lanches refinados e metais (§5, decisão do líder 25/08/2026, ampliada em 05/09/2026; herança de risco FECHADA em 25/08/2026):** canon fechado no mecanismo (refino gated, bancada compartilhada com reparo/pirataria, trade-off consumir×refinar, rede de segurança, terceira rota de compra, herança dos três riscos da bateria pirata comprada, exigência dos dois insumos líquidos juntos, os dois metais da receita — zinco e cobre —, mentor que entrega o conhecimento de filtrar — Brunus "Vetorial" Solveckt) → `economy-designer` (capacidade/usos, preço de compra do suco puro/água destilada, taxa de sucesso do refino, probabilidade numérica de cada risco herdado). **Uma lacuna de desenho, não numérica, ainda em aberto → líder:** o momento narrativo em que o personagem "aprende a filtrar". **Nova lacuna aberta em 05/09/2026:** a fonte de obtenção do zinco e do cobre (sucata de ferro-velho é leitura de agente, não decisão do líder). Registrado no INBOX do `TODO.md` em 03/09/2026; ainda não é item numerado da tabela, e vira item quando a reordenação acontecer. O item `G12` cobre só a origem dos insumos alimentares (suco de limão e água com gás), não estes números de craft nem os metais.
