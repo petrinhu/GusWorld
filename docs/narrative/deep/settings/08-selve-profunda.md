@@ -91,4 +91,11 @@ Os números canônicos da Profunda, levantados sem cerimônia em ordem de citaç
 > outro.** Esta nota registra só a ordem entre os dois eventos, por autorização explícita do líder
 > restrita a este ponto; o restante deste documento, aprovado em 19/05/2026, permanece intocado.
 
+> **Nota de orçamento (decisão do líder, 05/09/2026, por `AskUserQuestion`):** o ritual do Núcleo
+> Mandelbrot descrito acima não consome slot de dungeon do orçamento fechado de
+> `docs/design/mundo-topologia.md` (13 dungeons no total, 1 orçada para a Selve Profunda, a
+> Kola-SG3-12262). Ele é **cena de clímax de área**, categoria distinta de dungeon de exploração,
+> com critério completo em `docs/design/mundo-topologia.md` §4.2. O orçamento de 1 dungeon para a
+> Selve Profunda e o total de 13 áreas ficam intactos.
+
 **Última revisão:** 2026-05-19. Canônico deep-lore. Não modificar sem aprovação criador supremo.

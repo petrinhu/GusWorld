@@ -55,9 +55,16 @@ Nota: os **Dutos** são "enxuta" de população mas já **densos de enredo** (mi
 | Selve Sombria | 1 | entrada da floresta |
 | Catedrais Neo-Sylvania | 2 | várias catedrais |
 | Montadora Confluência | 0 | lugar de lore/quest, não-dungeon (encontro do Tusk, endgame). A **filial de distância média** ganha +1 **repositório leve** do mini-mapa M3 (VRAM), fora do cômputo das 13 — ver `mini-mapa.md` §0, PS-Y9 |
-| Selve Profunda | 1 | a dungeon final |
+| Selve Profunda | 1 | a dungeon final (Kola-SG3-12262)* |
 | Área faraday especial | 1 | ela mesma é a dungeon-segredo |
 | **Total** | **13** | padrão numérico velado no agregado |
+
+\* A Selve Profunda também hospeda o **ritual do Núcleo Mandelbrot**, clímax do arco Jaci
+(`docs/narrative/deep/settings/08-selve-profunda.md` §4), posterior à Kola-SG3-12262 na mesma área
+(sequência fixada pelo líder, 05/09/2026, `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md`
+§7). **O ritual não consome slot de dungeon**: é cena de clímax de área, categoria definida em §4.2
+(decisão do líder, 05/09/2026, por `AskUserQuestion`). O orçamento de 1 dungeon para a região e o
+total de 13 acima ficam intactos.
 
 Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; ver seed #2 `FARADAY-DUNGEON-ITENS` + `project_save_dungeon_pem_faraday`): **todas** revestidas por gaiola que contém o PEM, com intensidade de restrição de save que varia por dungeon, fraca ou total (decisão do líder, 21/08/2026, ver `docs/design/mecanicas/save-por-local.md` §1.2).
 
@@ -127,6 +134,24 @@ Somadas às **21** lugares secretos do §5, o jogo passa a ter **53 lugares secr
 
 **O que NÃO está decidido:** o que há dentro de cada área secreta, onde cada uma fica dentro da dungeon, e que recompensa dá. Fica para produção, junto do layout fino de cada dungeon (§10, item 1).
 
+## 4.2 Cenas de clímax de área — critério que as separa de dungeon de exploração (decisão do líder, 05/09/2026)
+
+Camada distinta das 13 dungeons (§4) e dos lugares secretos (§5): eventos ou espaços fixos de missão que hospedam **um** momento narrativo central, não uma sequência de salas navegáveis com puzzle/combate em série. Já nomeada em §6 como "espaços-interiores de missão"; esta seção fixa o critério que separa essa categoria de uma dungeon, e por que ela não entra no orçamento fechado de 13: resposta à contradição aparente entre o orçamento de 1 dungeon da Selve Profunda (§4) e o ritual do Núcleo Mandelbrot, clímax daquela área desde maio de 2026 (`docs/narrative/deep/settings/08-selve-profunda.md` §4).
+
+**Critério (decide qual das duas categorias um espaço novo é):**
+
+- **Dungeon de exploração (§4):** o jogador navega uma sequência de espaços conectados, resolve desafios em série (puzzle e/ou combate, com progressão de dificuldade dentro do próprio espaço), level design feito à mão sala a sala: é o item CARO, capado em 13.
+- **Cena de clímax / interior de missão (esta categoria):** o jogador vive um evento central, amarrado a um ponto fixo da progressão narrativa, não repetível nem explorável fora daquele momento, com no máximo um beat de desafio (diálogo, escolha, puzzle único, combate scriptado), nunca uma sequência de salas. O espaço existe para servir a cena, não para ser explorado.
+
+**Membros conhecidos desta categoria, hoje:**
+
+1. Os **20 interiores dos mestres do Codex** (§6, cada um com 1 puzzle + diálogo do Tavus-Eco).
+2. O **ritual do Núcleo Mandelbrot**, clímax do arco Jaci na Selve Profunda (`docs/narrative/deep/settings/08-selve-profunda.md` §4, "Climax na penetração ritual do Núcleo Mandelbrot"; sequência com a Kola-SG3-12262 fixada pelo líder em 05/09/2026, ver `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md` §7). É um evento (a decisão de ending entre três rotas, Bronze/Prata/Ouro), não uma dungeon navegável: cabe no critério acima.
+
+**Efeito no orçamento:** nenhum membro desta categoria consome slot do total fechado de 13 dungeons do §4. A Selve Profunda mantém o orçamento de 1 dungeon (a Kola-SG3-12262) intacto mesmo hospedando também o ritual do Núcleo Mandelbrot: as duas coisas grandes da área não competem pelo mesmo slot porque só uma delas é dungeon.
+
+**O que isto NÃO resolve:** a dungeon de 8 níveis sob o Subsolo do Edifício Vance (`D27`) é uma dungeon de exploração de verdade (level design sala-a-sala, não uma cena única) e continua sem orçamento na área Núcleo Metropolitano (linha 47 acima, 0 dungeons orçadas). Esse é problema distinto, sem saída por este critério: ver `D27` na `TODO.md`.
+
 ## 5. Lugares secretos — gradiente numérico por distância (barato)
 
 Camada por cima das dungeons: **lugares secretos pequenos** (1-2 salas, 1 puzzle/recompensa, tiles reusados, **opcionais**), mais numerosos quanto **mais longe da origem** (gradiente velado 0→1→2→3→5). São o BARATO que enche os ermos de recompensa de exploração sem custar como dungeon. Distribuição também **irregular** por área (não um número limpo por tier — o padrão numérico fica no agregado, não exposto).
@@ -156,7 +181,7 @@ Hubs populados (cheias) têm poucos/zero; os ermos concentram (Zona do Silêncio
 
 **Decisão do criador (2026-07-12):** cada um dos **20 mestres do Codex** (as 20 figuras históricas; Tusk é o capstone à parte) tem sua **área especial própria** — mas na **SUPERFÍCIE**, como **interior de casa / prédio / construção**, **NÃO bloqueante de passagem** (coerente com gdd §7.1). O jogador entra, resolve a missão/puzzle do mestre, encontra o **Tavus-Eco** (o self compilado do mestre) e **ganha a carta** dele (cross-ref `technomagik.md` Tavus-Eco + AMB-24 + `MESTRES-TAVUS-ECO-ENCONTRO` + cartas especiais `cartas-technomagik.md`).
 
-- Camada **distinta** das 13 dungeons e dos lugares secretos: são espaços-interiores de missão, não dungeons de exploração.
+- Camada **distinta** das 13 dungeons e dos lugares secretos: são espaços-interiores de missão, não dungeons de exploração — critério completo e segundo membro da categoria (o ritual do Núcleo Mandelbrot) em §4.2.
 - **Custo:** MÉDIO no agregado (20 interiores), mas cada um é barato (interior + 1 puzzle + diálogo do Tavus-Eco); reusa moldura de puzzle e o mecanismo Tavus-Eco. Escala com o roster já desenhado.
 
 **Mapeamento TEMÁTICO POR CAMPO (criador, 2026-07-12):** cada área vira um "campus" de um campo — coerente, memorável e diegeticamente didático (o jogador aprende o campo pelo lugar). Os 10 mestres com lugar canônico seguem o canon; os 10 sem-lugar foram agrupados por campo. (Fonte da pesquisa de lugar: leitura do roster, 2026-07-12.)
