@@ -173,7 +173,7 @@ está vazia** (`ls -la` mostra só `.` e `..`). O personagem é **canônico**:
 Gargi → Gus), histórico da Era 1 (💀) — morto há muito tempo, não é NPC que anda
 pelo mundo, o que por si só explica a ausência de sprite de caminhada. O nome
 aparece em **14 arquivos** do corpus rastreado, com **43 menções** só em
-`docs/narrative/deep/eras/era-1-pre-codigo.md` §7.7
+`docs/narrative/deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.7
 (`git ls-files -z | xargs -0 /usr/bin/grep -c "Pr[óo]spero"`), e `CHARS.md` linha
 226 descreve ainda a linhagem institucional inteira derivada dele (11 títulos da
 Casa Comercial Vance, transmitidos ao longo de ~720 anos, cada portador com

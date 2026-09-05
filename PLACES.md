@@ -33,13 +33,13 @@
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
-| **Catedral-Mãe** | Catedral (mainframe litúrgico) | 1 (-950) | Região profunda Selve, hoje desconhecida (possivelmente afundada) | 🟡 lendário (lacrada por dentro -750) | `deep/eras/era-1-pre-codigo.md` §2.2, §2.6 |
-| **Atelaiá** (catedral menor) | Catedral (subroutine irrigação) | 1 (~-950 derivada) | Dentro Selve, sítio conhecido | 🔴 saqueada (Sterling -3) | `deep/eras/era-1-pre-codigo.md` §2.2 + `environments/03-catedrais-neo-sylvania.md` |
-| **São Vargas** (catedral menor) | Catedral (subroutine sementeira) | 1 derivada | Dentro Selve | 🔴 saqueada (Sterling -3) | `deep/eras/era-1-pre-codigo.md` §2.2 |
-| **São Camilo** (catedral menor) | Catedral (subroutine acústica) | 1 derivada | Edifício dentro da Selve; acervo crítico evacuado pro arquivo de retaguarda da Ordem no Núcleo Metropolitano | 🔴 saqueada (Sterling -8); acervo crítico (Codex, glossário, dossiês) salvo no anexo-retaguarda do Núcleo, de onde opera Cassandra "Bento" Chevalier | `deep/eras/era-1-pre-codigo.md` §2.2 + `environments/03-catedrais-neo-sylvania.md` + `deep/eras/era-3-sterling.md` |
-| **Quarta** (catedral menor) | Catedral (subroutine archive lítico) | 1 derivada | Dentro Selve (inscrição parcial; nome próprio perdido) | ✅ canônico (em uso ativo Ordem Recursiva, sede informal) | `deep/eras/era-1-pre-codigo.md` §2.2 |
-| **Quinta** (catedral menor) | Catedral (subroutine calendário) | 1 derivada | Dentro Selve (inscrição parcial; nome próprio perdido) | ✅ canônico (em uso ativo Ordem Recursiva, sede informal) | `deep/eras/era-1-pre-codigo.md` §2.2 |
-| **Boca-da-Funda** | Sub-local artefato (Catedral-Mãe Era 1) | 1 | Par de cristais piezo pareados canônicos preservados em câmara central Catedral-Mãe. Calibrados originalmente por Helíaco Vyr (Primeiro Cantor-de-Pedras canon §6.3 deep-lore). Função: amplificação ressonante acústica-piezo ritual. Hoje submerso com Catedral-Mãe (-750 selagem) | 🟡 lendário (submerso) | `deep/eras/era-1-pre-codigo.md` §6.2 + `R9 conto 14 Helíaco` |
+| **Catedral-Mãe** | Catedral (mainframe litúrgico) | 1 (-950) | Região profunda Selve, hoje desconhecida (possivelmente afundada) | 🟡 lendário (lacrada por dentro -750) | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.2, §2.6 |
+| **Atelaiá** (catedral menor) | Catedral (subroutine irrigação) | 1 (~-950 derivada) | Dentro Selve, sítio conhecido | 🔴 saqueada (Sterling -3) | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.2 + `environments/03-catedrais-neo-sylvania.md` |
+| **São Vargas** (catedral menor) | Catedral (subroutine sementeira) | 1 derivada | Dentro Selve | 🔴 saqueada (Sterling -3) | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.2 |
+| **São Camilo** (catedral menor) | Catedral (subroutine acústica) | 1 derivada | Edifício dentro da Selve; acervo crítico evacuado pro arquivo de retaguarda da Ordem no Núcleo Metropolitano | 🔴 saqueada (Sterling -8); acervo crítico (Codex, glossário, dossiês) salvo no anexo-retaguarda do Núcleo, de onde opera Cassandra "Bento" Chevalier | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.2 + `environments/03-catedrais-neo-sylvania.md` + `deep/eras/era-3-sterling.md` |
+| **Quarta** (catedral menor) | Catedral (subroutine archive lítico) | 1 derivada | Dentro Selve (inscrição parcial; nome próprio perdido) | ✅ canônico (em uso ativo Ordem Recursiva, sede informal) | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.2 |
+| **Quinta** (catedral menor) | Catedral (subroutine calendário) | 1 derivada | Dentro Selve (inscrição parcial; nome próprio perdido) | ✅ canônico (em uso ativo Ordem Recursiva, sede informal) | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.2 |
+| **Boca-da-Funda** | Sub-local artefato (Catedral-Mãe Era 1) | 1 | Par de cristais piezo pareados canônicos preservados em câmara central Catedral-Mãe. Calibrados originalmente por Helíaco Vyr (Primeiro Cantor-de-Pedras canon §6.3 deep-lore). Função: amplificação ressonante acústica-piezo ritual. Hoje submerso com Catedral-Mãe (-750 selagem) | 🟡 lendário (submerso) | `deep/eras/era-1-pre-codigo/capitulo-06-acustica-luz-reativa-pedras-que-cantam.md` §6.2 + `R9 conto 14 Helíaco` |
 
 ## 3. Cidades-irmãs (mencionadas, não-jogáveis em G1)
 
@@ -53,13 +53,13 @@
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
-| **Pelicano Branco** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria | ✅ canônico (Jaci + Anciã Mariana) | `factions.md` + `environments/08-selve-profunda.md` + `deep/eras/era-1-pre-codigo.md` §2.7 |
-| **Vilarejo do Acaceiro Antigo** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região noroeste da Catedral-Mãe submersa | ✅ canônico (descendência direta Família-Pilastra Argéndia) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.5 |
-| **Vilarejo do Vale Ferraz** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região central, descendência Família-Pilastra Ferraz | ✅ canônico (variedade canônica de milho ferraz) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.5 |
-| **Vilarejo da Margem-do-Pelicano** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região meridional, descendência Família-Pilastra Vanderbist | ✅ canônico (variedade canônica de batata-de-margem; sob proteção Pelicano Branco) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.6 |
-| **Vilarejo da Selve-do-Norte** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região setentrional, descendência Família-Pilastra | ✅ canônico (variedade canônica de raiz-amarga) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.6 |
-| **Vilarejo da Pedra-Cantante** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região oriental, descendência Família-Pilastra | ✅ canônico (variedade canônica de erva-de-pedra) | `deep/eras/era-1-pre-codigo.md` §9.2 + §9.6 |
-| **Vilarejo do Vale Boroshova** | Vilarejo-fronteira | Cross-eras (fundado -720) | Refúgio canônico da Linhagem Boroshova-Vance | ✅ canônico (origem Vesperina Boroshova-Vance, Anselmo Boroshova-Vance, Praxídice Boroshova-Vance) | `deep/eras/era-1-pre-codigo.md` §8.4 + §9.3 + §9.5 + §9.7 |
+| **Pelicano Branco** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria | ✅ canônico (Jaci + Anciã Mariana) | `factions.md` + `environments/08-selve-profunda.md` + `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.7 |
+| **Vilarejo do Acaceiro Antigo** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região noroeste da Catedral-Mãe submersa | ✅ canônico (descendência direta Família-Pilastra Argéndia) | `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.2 + §9.5 |
+| **Vilarejo do Vale Ferraz** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região central, descendência Família-Pilastra Ferraz | ✅ canônico (variedade canônica de milho ferraz) | `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.2 + §9.5 |
+| **Vilarejo da Margem-do-Pelicano** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região meridional, descendência Família-Pilastra Vanderbist | ✅ canônico (variedade canônica de batata-de-margem; sob proteção Pelicano Branco) | `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.2 + §9.6 |
+| **Vilarejo da Selve-do-Norte** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região setentrional, descendência Família-Pilastra | ✅ canônico (variedade canônica de raiz-amarga) | `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.2 + §9.6 |
+| **Vilarejo da Pedra-Cantante** | Vilarejo-fronteira | Cross-eras (fundado -720) | Região oriental, descendência Família-Pilastra | ✅ canônico (variedade canônica de erva-de-pedra) | `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.2 + §9.6 |
+| **Vilarejo do Vale Boroshova** | Vilarejo-fronteira | Cross-eras (fundado -720) | Refúgio canônico da Linhagem Boroshova-Vance | ✅ canônico (origem Vesperina Boroshova-Vance, Anselmo Boroshova-Vance, Praxídice Boroshova-Vance) | `deep/eras/era-1-pre-codigo/capitulo-08-a-queda-multi-hipotese-canonica.md` §8.4 + `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.3 + §9.5 + §9.7 |
 
 ## 4b. Clãs vilarejos-fronteira menores (Selve oriental, anel menor não-Êxodo)
 
@@ -101,11 +101,11 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 | **Rio Verdor** | Sub-local (Orla Recursiva, Selve Sombria) | Cross-eras | Rio meandroso, coastline Mandelbrot fractal, profundidade self-similar 3 escalas | ✅ canônico (R6) | `docs/narrative/deep/magic/natureza-matematica-rigida-deep.md` R6 §2.1 |
 | **Rio Vesperal** | Sub-local (Orla Recursiva, Selve Sombria) | Cross-eras | Rio meandroso paralelo ao Verdor, coastline fractal idêntica em estrutura mas espelhada | ✅ canônico (R6) | `docs/narrative/deep/magic/natureza-matematica-rigida-deep.md` R6 §2.1 |
 | **Rio Lentíssimo** | Sub-local (Orla Recursiva, Selve Sombria) | Cross-eras | Terceiro rio Orla Recursiva, fluxo lento, leito largo, coastline self-similar | ✅ canônico (R6) | `docs/narrative/deep/magic/natureza-matematica-rigida-deep.md` R6 §2.1 |
-| **Trilha do Pelicano** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção noroeste da Catedral-Mãe submersa | ✅ canônico (terminação Pelicano Branco; marcos: Pedra do Carrego, Fonte da Margem-Clara, Cruzamento dos Acaceiros Antigos) | `deep/eras/era-1-pre-codigo.md` §8.9 + §9.6 |
-| **Trilha da Garça-Preta** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção sudoeste da Catedral-Mãe submersa | ✅ canônico (terminação Margem-do-Pelicano; marcos: Charco da Garça, Pedra do Salto) | `deep/eras/era-1-pre-codigo.md` §8.9 + §9.6 |
-| **Trilha do Caracará-Cinza** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção amplamente distribuída em horizonte geográfico amplo | ✅ canônico (marcos: Encruzilhada das Três Águas, Pedra-Cantante, Vale da Selve-do-Norte, Cruzamento do Vale Ferraz, Limites da Selve Profunda) | `deep/eras/era-1-pre-codigo.md` §8.9 + §9.6 |
-| **Praça do Êxodo** | Sub-local (ponto canônico) | Cross-eras (estabelecida -720) | Ponto canônico de partida do Êxodo de -720 | ✅ canônico (ata fundacional preservada in-situ em placa basaltica; ritos cerimoniais anuais conduzidos pela Ordem Recursiva: Vigília do Aniversário + Leitura Institucional + Vigília Noturna da Continuidade) | `deep/eras/era-1-pre-codigo.md` §8.9 + §9.6 |
-| **Rota da Semente Recursiva** | Sub-local (rota etnobotânica Era 2) | 2 tardia (-250 a -130) | Circulação entre os 5 vilarejos-fronteira canônicos | ✅ canônico (ciclo institucional de aproximadamente 13 meses; circulação descentralizada de sementes-relíquia preservadas em ampolas herméticas) | `deep/eras/era-1-pre-codigo.md` §9.2 |
+| **Trilha do Pelicano** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção noroeste da Catedral-Mãe submersa | ✅ canônico (terminação Pelicano Branco; marcos: Pedra do Carrego, Fonte da Margem-Clara, Cruzamento dos Acaceiros Antigos) | `deep/eras/era-1-pre-codigo/capitulo-08-a-queda-multi-hipotese-canonica.md` §8.9 + `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.6 |
+| **Trilha da Garça-Preta** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção sudoeste da Catedral-Mãe submersa | ✅ canônico (terminação Margem-do-Pelicano; marcos: Charco da Garça, Pedra do Salto) | `deep/eras/era-1-pre-codigo/capitulo-08-a-queda-multi-hipotese-canonica.md` §8.9 + `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.6 |
+| **Trilha do Caracará-Cinza** | Sub-local (rota canon Selve) | Cross-eras (estabelecida -720) | Direção amplamente distribuída em horizonte geográfico amplo | ✅ canônico (marcos: Encruzilhada das Três Águas, Pedra-Cantante, Vale da Selve-do-Norte, Cruzamento do Vale Ferraz, Limites da Selve Profunda) | `deep/eras/era-1-pre-codigo/capitulo-08-a-queda-multi-hipotese-canonica.md` §8.9 + `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.6 |
+| **Praça do Êxodo** | Sub-local (ponto canônico) | Cross-eras (estabelecida -720) | Ponto canônico de partida do Êxodo de -720 | ✅ canônico (ata fundacional preservada in-situ em placa basaltica; ritos cerimoniais anuais conduzidos pela Ordem Recursiva: Vigília do Aniversário + Leitura Institucional + Vigília Noturna da Continuidade) | `deep/eras/era-1-pre-codigo/capitulo-08-a-queda-multi-hipotese-canonica.md` §8.9 + `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.6 |
+| **Rota da Semente Recursiva** | Sub-local (rota etnobotânica Era 2) | 2 tardia (-250 a -130) | Circulação entre os 5 vilarejos-fronteira canônicos | ✅ canônico (ciclo institucional de aproximadamente 13 meses; circulação descentralizada de sementes-relíquia preservadas em ampolas herméticas) | `deep/eras/era-1-pre-codigo/capitulo-09-vestigios-que-sobreviveram.md` §9.2 |
 | **Quintal Penkin (antena clandestina)** | Sub-local (Periferia) | 3 | Periferia, vizinho Dante | ✅ canônico (foreshadow Dante) | `environments/06-periferia.md` |
 | **Caleidoscópio (Mirage)** | Sub-local (Mirage) | 3 | Setor Mirage | ✅ canônico | `environments/05-setor-mirage.md` |
 | **Catacumbas Cult (Mirage níveis -1/-2/-3)** | Sub-local (Mirage subterrâneo) | 1 (-3 nascente Neo-Sylvania) + 3 | Sob Setor Mirage | ✅ canônico (Iara descobriu nascente) | `environments/05-setor-mirage.md` |
@@ -124,13 +124,13 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
-| **Biblioteca Cintilante** | Sub-local (Catedral-Mãe anexo subterrâneo) | 1 (auge cooperativo) | Anexo adjacente à Catedral-Mãe, subterrâneo 3 níveis verticais escalonados | ✅ canônico (reaberta antes da missão do Espelho e **em uso pela população**; selada de -750 até a reabertura) | `deep/eras/era-1-pre-codigo.md` §6.5 |
-| **Ala oeste Catedral-Mãe** | Sub-local (Catedral-Mãe) | 1 | Parede piezo-litúrgica de calibração onde Helíaco Vyr cegou de luz reativa | 🟡 lendário (Catedral-Mãe inacessível) | `deep/eras/era-1-pre-codigo.md` §6.3 |
-| **Scriptorium subterrâneo Catedral-Mãe** | Sub-local (Catedral-Mãe) | 1 | Sob a nave principal, sessões prolongadas Salomão Tessar Vyrcátrix | 🟡 lendário (selado -750) | `deep/eras/era-1-pre-codigo.md` §6.4 |
-| **Câmara comemorativa Lúcio Ostraconis** | Sub-local (São Camilo) | 3 (memorial Era 1) | acervo no anexo-retaguarda da Ordem no Núcleo, exibe pingente cerâmico reduzido | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo.md` §6.5 |
-| **Banco litúrgico Catedral de São Camilo** | Sub-local (São Camilo) | 3 (vitrine Era 1) | Vitrine fria que exibe placa conjunta assinada por Helíaco Vyr + Cira Boroshova | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo.md` §6.3 |
-| **Câmara fria principal arquivo lítico São Camilo** | Sub-local (São Camilo) | 3 (preserva Era 1) | 23 placas canônicas do Codex Cantata + cordós originais, evacuados pré-saque pro anexo-retaguarda Núcleo | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo.md` §6.2 + §6.4 + §6.5 |
-| **Câmara reservada (dossiês paralelos)** | Sub-local (São Camilo) | 3 (preserva Era 1) | ~40 dossiês históricos Era 1, acesso restrito Mestre-Hierofante + Inquisidor-Mestre atual, evacuados pré-saque pro anexo-retaguarda Núcleo | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo.md` §6.6 |
+| **Biblioteca Cintilante** | Sub-local (Catedral-Mãe anexo subterrâneo) | 1 (auge cooperativo) | Anexo adjacente à Catedral-Mãe, subterrâneo 3 níveis verticais escalonados | ✅ canônico (reaberta antes da missão do Espelho e **em uso pela população**; selada de -750 até a reabertura) | `deep/eras/era-1-pre-codigo/capitulo-06-acustica-luz-reativa-pedras-que-cantam.md` §6.5 |
+| **Ala oeste Catedral-Mãe** | Sub-local (Catedral-Mãe) | 1 | Parede piezo-litúrgica de calibração onde Helíaco Vyr cegou de luz reativa | 🟡 lendário (Catedral-Mãe inacessível) | `deep/eras/era-1-pre-codigo/capitulo-06-acustica-luz-reativa-pedras-que-cantam.md` §6.3 |
+| **Scriptorium subterrâneo Catedral-Mãe** | Sub-local (Catedral-Mãe) | 1 | Sob a nave principal, sessões prolongadas Salomão Tessar Vyrcátrix | 🟡 lendário (selado -750) | `deep/eras/era-1-pre-codigo/capitulo-06-acustica-luz-reativa-pedras-que-cantam.md` §6.4 |
+| **Câmara comemorativa Lúcio Ostraconis** | Sub-local (São Camilo) | 3 (memorial Era 1) | acervo no anexo-retaguarda da Ordem no Núcleo, exibe pingente cerâmico reduzido | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo/capitulo-06-acustica-luz-reativa-pedras-que-cantam.md` §6.5 |
+| **Banco litúrgico Catedral de São Camilo** | Sub-local (São Camilo) | 3 (vitrine Era 1) | Vitrine fria que exibe placa conjunta assinada por Helíaco Vyr + Cira Boroshova | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo/capitulo-06-acustica-luz-reativa-pedras-que-cantam.md` §6.3 |
+| **Câmara fria principal arquivo lítico São Camilo** | Sub-local (São Camilo) | 3 (preserva Era 1) | 23 placas canônicas do Codex Cantata + cordós originais, evacuados pré-saque pro anexo-retaguarda Núcleo | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo/capitulo-06-acustica-luz-reativa-pedras-que-cantam.md` §6.2 + §6.4 + §6.5 |
+| **Câmara reservada (dossiês paralelos)** | Sub-local (São Camilo) | 3 (preserva Era 1) | ~40 dossiês históricos Era 1, acesso restrito Mestre-Hierofante + Inquisidor-Mestre atual, evacuados pré-saque pro anexo-retaguarda Núcleo | ✅ acervo evacuado -8 pro anexo-retaguarda Núcleo (câmara física na Selve saqueada) | `deep/eras/era-1-pre-codigo/capitulo-06-acustica-luz-reativa-pedras-que-cantam.md` §6.6 |
 
 ## 5b. Sub-locais Era 1 — §7 (Bancos sementes + Famílias-Pilastra + Êxodo)
 
@@ -138,22 +138,22 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
-| **Banco Central de Sementes-Relíquia da Catedral-Mãe** | Sub-local (Catedral-Mãe) | 1 (auge cooperativo + deriva) | Anexo arquitetônico da Catedral-Mãe | 🟡 lendário (selado com Catedral-Mãe -750) | `deep/eras/era-1-pre-codigo.md` §7.1, §7.2, §7.5 |
-| **Quatro Bancos Subordinados (Atelaiá, São Vargas, São Camilo, Quarta)** | Sub-locais (Catedrais menores) | 1 derivados | Anexos das 4 catedrais menores | parcial (São Camilo 🔴 saqueado -8, acervo evacuado pro annex Núcleo; Atelaiá/Vargas 🔴 saqueados; Quarta ✅ ativo) | `deep/eras/era-1-pre-codigo.md` §7.1 |
-| **Casa Comercial Argéndia** | Sub-local (vilarejo-cidade) | 1 (auge cooperativo) | Vilarejo-cidade canon Era 1 | 🟡 lendário (perdido no Êxodo) | `deep/eras/era-1-pre-codigo.md` §7.3 |
-| **Forja Ferraz** | Sub-local (vilarejo-cidade) | 1 (auge cooperativo) | Vilarejo-cidade canon Era 1, paralela à Argéndia | 🟡 lendário (perdido no Êxodo) | `deep/eras/era-1-pre-codigo.md` §7.3 |
-| **Vilarejo Vanguarda** | Sub-local (vilarejo cooperativo) | 1 (auge) | Periferia da Catedral-Mãe | 🔴 saqueado/absorvido pela Ordem central pré-Êxodo | `deep/eras/era-1-pre-codigo.md` §7.4, §7.5 |
-| **Vilarejo Garça-Preta** | Sub-local (vilarejo cooperativo) | 1 (auge) | Borda Selve, vilarejo cooperativo preservado | ⚪ abandonado pós-Êxodo (semente fundadora de Garça-Preta-Nova) | `deep/eras/era-1-pre-codigo.md` §7.4 |
-| **Vilarejo-fronteira Garça-Preta-Nova** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria, descendente de Garça-Preta original | ✅ canônico (família Penkin ancestral) | `deep/eras/era-1-pre-codigo.md` §7.8 |
-| **Vilarejo-fronteira Caracará-Cinza** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria | ✅ canônico | `deep/eras/era-1-pre-codigo.md` §7.8 |
-| **Vilarejo-fronteira Sabiá-de-Bronze** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria | ✅ canônico | `deep/eras/era-1-pre-codigo.md` §7.8 |
+| **Banco Central de Sementes-Relíquia da Catedral-Mãe** | Sub-local (Catedral-Mãe) | 1 (auge cooperativo + deriva) | Anexo arquitetônico da Catedral-Mãe | 🟡 lendário (selado com Catedral-Mãe -750) | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.1, §7.2, §7.5 |
+| **Quatro Bancos Subordinados (Atelaiá, São Vargas, São Camilo, Quarta)** | Sub-locais (Catedrais menores) | 1 derivados | Anexos das 4 catedrais menores | parcial (São Camilo 🔴 saqueado -8, acervo evacuado pro annex Núcleo; Atelaiá/Vargas 🔴 saqueados; Quarta ✅ ativo) | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.1 |
+| **Casa Comercial Argéndia** | Sub-local (vilarejo-cidade) | 1 (auge cooperativo) | Vilarejo-cidade canon Era 1 | 🟡 lendário (perdido no Êxodo) | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.3 |
+| **Forja Ferraz** | Sub-local (vilarejo-cidade) | 1 (auge cooperativo) | Vilarejo-cidade canon Era 1, paralela à Argéndia | 🟡 lendário (perdido no Êxodo) | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.3 |
+| **Vilarejo Vanguarda** | Sub-local (vilarejo cooperativo) | 1 (auge) | Periferia da Catedral-Mãe | 🔴 saqueado/absorvido pela Ordem central pré-Êxodo | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.4, §7.5 |
+| **Vilarejo Garça-Preta** | Sub-local (vilarejo cooperativo) | 1 (auge) | Borda Selve, vilarejo cooperativo preservado | ⚪ abandonado pós-Êxodo (semente fundadora de Garça-Preta-Nova) | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.4 |
+| **Vilarejo-fronteira Garça-Preta-Nova** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria, descendente de Garça-Preta original | ✅ canônico (família Penkin ancestral) | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.8 |
+| **Vilarejo-fronteira Caracará-Cinza** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria | ✅ canônico | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.8 |
+| **Vilarejo-fronteira Sabiá-de-Bronze** | Vilarejo-fronteira | Cross-eras (fundado -720) | Borda da Selve Sombria | ✅ canônico | `deep/eras/era-1-pre-codigo/capitulo-07-bancos-sementes-reliquia-ordem-recursiva-embrionaria.md` §7.8 |
 
 ## 6. Pontos geográficos históricos (Era 1, canon §2 deep-lore)
 
 | Nome | Tipo | Era | Localização canon | Status | Cross-ref |
 |---|---|---|---|---|---|
-| **Borda oeste da Selve Sombria** | Ponto geográfico | Cross-eras | Onde se encontram cripto-glifos primários -1100 | ✅ canônico | `deep/eras/era-1-pre-codigo.md` §2.1 |
-| **Leitos secos de rios (Era 1)** | Ponto geográfico | 1 (cursos mudaram) | Dentro Selve | ✅ canônico | `deep/eras/era-1-pre-codigo.md` §2.1 |
+| **Borda oeste da Selve Sombria** | Ponto geográfico | Cross-eras | Onde se encontram cripto-glifos primários -1100 | ✅ canônico | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.1 |
+| **Leitos secos de rios (Era 1)** | Ponto geográfico | 1 (cursos mudaram) | Dentro Selve | ✅ canônico | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.1 |
 
 ## 7. Stub: lugares a auditar/adicionar
 
@@ -189,7 +189,7 @@ Quando varredura sistemática rodar (via narrative-designer agent em modo audito
 - `docs/narrative/factions.md` (facções e territórios)
 - `docs/narrative/timeline.md` (cronologia eventos+lugares)
 - `docs/narrative/lore-bible.md` (3 eras + cosmologia)
-- `docs/narrative/deep/eras/era-1-pre-codigo.md` (§2 cronologia Era 1 + horizontes)
+- `docs/narrative/deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` (§2 cronologia Era 1 + horizontes)
 
 ---
 
