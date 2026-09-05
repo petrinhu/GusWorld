@@ -93,16 +93,16 @@ Tabela por arquivo (contexto resumido; linha completa disponível em `git grep -
 
 | Caminho | Linhas | Marcadores | Contexto representativo |
 |---|---|---|---|
-| `docs/tech/adr/ADR-008-repivot-qt-to-_.md` | 1,10,12,13,14,16,21,23,24,25,26,30,32,36,40,41 | 29 | Título: "Re-pivot da camada de plataforma Qt6 -> `__DEP_REMOVIDA__` + motor de UI declarativo + `__DEP_REMOVIDA__`". Corpo inteiro do ADR descreve a dependência (render 2D, gamepad, áudio, ABI portável, ganho sobre Qt6) |
+| `docs/tech/adr/ADR-008-repivot-qt-to-_.md` | 1,10,12,13,14,16,21,23,24,25,26,30,32,36,40,41 | 29 | Título: "Re-pivot da camada de plataforma anterior para a seguinte, mais motor de UI declarativo". Corpo inteiro do ADR descreve a dependência (render 2D, gamepad, áudio, ABI portável, ganho sobre a camada anterior) |
 | `docs/tech/adr/ADR-009-motor-ui-hud-embutido.md` | 1,6,14,30,41,42,45,47 | 9 | Título e corpo: "motor de UI/HUD embutido... sobre `__DEP_REMOVIDA__`, dentro das 4 camadas"; invariante de camada "zero `__DEP_REMOVIDA__`" em `core/`/`domain/` |
 | `docs/tech/adr/ADR-011-m6-audio-onda1-plano.md` | 6,10,24,49,60,65 | 8 | "O ADR-008 já decidiu a biblioteca de áudio (`__DEP_REMOVIDA__`, vendorizada em `third_party/`)"; "inicializar device `__DEP_REMOVIDA__` + mixer/buses mínimo" |
 | `docs/tech/adr/ADR-013-asset-source-vfs-fase1.md` | 6,21,22,25,37,95 | 7 | Caminhos de arquivo hipotéticos: `render2d___DEP_REMOVIDA__.cpp`, `app/src/__DEP_REMOVIDA__window.cpp` (nenhum existe ainda no repo — confirmado, não há `src/`) |
 | `docs/tech/adr/ADR-018-contexto-gl-unico-flash-ctx.md` | 11,15,17,21,23,27 | 26 | Diagnóstico de bug real: "`__DEP_REMOVIDA__Renderer`", "`__DEP_REMOVIDA__GL_CreateContext`", "`__DEP_REMOVIDA__ReconfigureWindow`" — linha 11 sozinha tem 8 marcadores |
-| `docs/tech/adr/ADR-014-dialogue-runtime-poco.md` | 11,56,151 | 3 | "morreu no pivot para C++20 + `__DEP_REMOVIDA__`"; invariante "ZERO Qt, ZERO `__DEP_REMOVIDA__`, ZERO I/O" |
+| `docs/tech/adr/ADR-014-dialogue-runtime-poco.md` | 11,56,151 | 3 | "morreu no pivot para C++20 + `__DEP_REMOVIDA__`"; invariante "ZERO dependência de terceiro, ZERO I/O" |
 | `docs/tech/adr/ADR-019-arquitetura-conteudo-atomica-data-driven.md` | 46,52 | 2 | "warning de `switch` não exaustivo só existia no `__DEP_REMOVIDA__` vendorizado"; "layout `__DEP_REMOVIDA__` + input + loop de render" |
 | `docs/tech/adr/ADR-021-licenciamento-apache-assets-reservados.md` | 161,234 | 2 | "Caça a irmãos do caso `__DEP_REMOVIDA__`"; "THIRD-PARTY-LICENSES.md (...inclusive o caso `__DEP_REMOVIDA__`)" — referência ao CASO, não a uma API específica |
-| `docs/tech/adr/ADR-002-csharp-aot-over-gdscript.md` | 5 | 2 | Dentro do campo Status ("SUPERADO"), cronologia: "...depois de C++20 + `__DEP_REMOVIDA__` (ADR-008...)" — já marcado como registro histórico no próprio doc |
-| `docs/tech/adr/ADR-003-dialogue-library.md` | 5 | 1 | Status: "Superseded by ADR-014 (...no pivot Godot→`__DEP_REMOVIDA__`/ADR-008...)" |
+| o arquivo do `ADR-002` | 5 | 2 | Dentro do campo Status ("SUPERADO"), cronologia: "...depois de C++20 + `__DEP_REMOVIDA__` (ADR-008...)" — já marcado como registro histórico no próprio doc |
+| `docs/tech/adr/ADR-003-dialogue-library.md` | 5 | 1 | Status: "Superseded by ADR-014 (...no pivô da engine anterior para a seguinte, ADR-008...)" |
 | `docs/tech/adr/ADR-005-license-gpl3-assets-ccbysa.md` | 117 | 1 | Ver achado de compliance acima — "o header do `__DEP_REMOVIDA__` vendorizado FORA de `third_party/`" |
 | `docs/tech/adr/ADR-012-m7-paridade-jogavel-plano.md` | 6 | 2 | Cross-ref: "[ADR-008](...) (`__DEP_REMOVIDA__`)" |
 | `docs/tech/adr/ADR-017-action-clock-combat-unificado.md` | 29 | 1 | "Host-drawn, não glintfx/`__DEP_REMOVIDA__`." |
