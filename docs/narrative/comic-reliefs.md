@@ -1006,6 +1006,20 @@ Conquista oculta:
 
 Achievement banner aparece com fundo de quadrados neon piscando.
 
+**Canon mecânico, decidido pelo líder em 30/08/2026 (`G12` do `TODO.md`, Eixo 5 de `docs/_secret/proposta-balanceamento-easter-eggs.md`):**
+
+- **O valor único "100" acima é revogado** (L-24) e substituído por um limiar escalado por dificuldade:
+
+| Dificuldade | Limiar de mortes na mesma cena |
+|---|---|
+| Fácil | 34 |
+| Médio | 55 |
+| Difícil | 89 |
+| Hardcore | 144 |
+
+- Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilibrar.
+- **Pendente, fora de escopo desta atualização:** o título e a dica acima ainda citam o valor único "100"; reescrevê-los é trabalho de `narrative-writer`, tal qual `D33` fez para o Eixo 1.
+
 ---
 
 ### Stardew Valley (2)
@@ -1091,6 +1105,20 @@ Oferece **Token-de-Coragem** (regenera 1 vida ao iniciar combate). Diary:
 
 Mensagem opcional discreta no canto da tela durante carregamento:
 > *"Você é mais forte do que pensa. (Equipe de desenvolvimento.)"*
+
+**Canon mecânico, decidido pelo líder em 30/08/2026 (`G12` do `TODO.md`, Eixo 3 de `docs/_secret/proposta-balanceamento-easter-eggs.md`):**
+
+- O Token-de-Coragem é concedido **uma vez por identidade de cena** (não uma vez por campanha inteira).
+- A cura escala por dificuldade, aplicada como `Regen` só no primeiro turno do combate seguinte:
+
+| Dificuldade | Cura (% do HP-máximo do Gus) |
+|---|---|
+| Fácil | 3% |
+| Médio | 5% |
+| Difícil | 8% |
+| Hardcore | sem Token (0%) |
+
+- **Pendente, fora de escopo desta atualização:** a frase "(regenera 1 vida ao iniciar combate)" acima ainda descreve o efeito fixo antigo; reescrevê-la é trabalho de `narrative-writer`.
 
 ---
 
@@ -2101,7 +2129,7 @@ Isso eu sei fazer.
 | Ato 2 tardio (pós-Cena 4, a partir de ~75%) | 18 (A peça que ainda gira, fase tardia do deslize do Dante) |
 | Ato 2 (fase 2 do retorno do Cauã, ANTES da Cena 15 na cronologia) | 19 (Pra tudo que aguentou, Cauã x Bento, fundação da Cena 15) |
 | Ato 2 (regional) | EE-1, EE-2 (Dutos), EE-5, EE-6 (Selve), EE-8 (fronteira), EE-11, EE-15, EE-19 (Mirage), EE-13, EE-14 (vilarejo Jaci), EE-17 (Catedrais), EE-21, EE-22 (Orla Recursiva) |
-| Cross-ato (conquistas) | EE-4 (cogumelo), EE-9 (100 inimigos), EE-10 (placa hospital), EE-12 (100 mortes mesma cena), EE-16 (diálogo casca azul), EE-18 (encorajador), EE-20 (reunião de emergência) |
+| Cross-ato (conquistas) | EE-4 (cogumelo), EE-9 (100 inimigos), EE-10 (placa hospital), EE-12 (mortes na mesma cena, limiar por dificuldade), EE-16 (diálogo casca azul), EE-18 (encorajador), EE-20 (reunião de emergência) |
 
 ---
 

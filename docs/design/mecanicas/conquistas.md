@@ -96,15 +96,26 @@ Não decido entre as duas (L-14). Pergunta formal em §3. **✅ RESOLVIDO em 30/
 **Dica (asset, citada do corpus):** *"Você morreu 100 vezes na mesma cena. Nós respeitamos isso."*
 **Oculta:** sim ("conquista oculta", texto explícito do corpus).
 
-**Gatilho de domínio:** o contador de derrotas de Gus dentro de uma mesma identidade de cena atinge **100**. Em vocabulário de evento já estabelecido em `combat.md` §16 (`CombatBus`): `CombatEnded(outcome=Defeat, payload)` seguido de `ActorDefeated(gus)` — o avaliador de conquistas incrementa, por identidade de cena, um contador de derrotas.
+**Gatilho de domínio:** o contador de derrotas de Gus dentro de uma mesma identidade de cena atinge o limiar de dificuldade do save (tabela abaixo, não mais um valor único). Em vocabulário de evento já estabelecido em `combat.md` §16 (`CombatBus`): `CombatEnded(outcome=Defeat, payload)` seguido de `ActorDefeated(gus)` — o avaliador de conquistas incrementa, por identidade de cena, um contador de derrotas.
 
-**Estado mínimo a contar:** um mapa `id_cena → contagem de derrotas`, não um único inteiro global — a condição é "100 vezes **na mesma** cena", então derrotas em cenas diferentes não se somam entre si.
+**✅ RESOLVIDO em 30/08/2026** (`G12` do `TODO.md`, Eixo 5 de `docs/_secret/proposta-balanceamento-easter-eggs.md`, `AskUserQuestion`): o valor único de 100 fica revogado (L-24) e substituído por um limiar escalado por dificuldade:
 
-**Destravável mais de uma vez:** não (regra 2 do §0). Uma vez que QUALQUER cena atinja 100, a conquista destrava e não retrava; uma segunda cena atingir 100 depois é no-op (regra 3 do §0).
+| Dificuldade | Limiar de derrotas na mesma cena |
+|---|---|
+| Fácil | 34 |
+| Médio | 55 |
+| Difícil | 89 |
+| Hardcore | 144 |
 
-**Estado inválido:** coberto pela regra 3 do §0. Um caso próprio: se o mesmo evento de derrota for processado duas vezes por um bug de replay/rollback do save (L-25, fase 2, verificação por re-execução), o incremento tem que ser amarrado à identidade do evento de domínio, não à leitura do save — senão o contador infla sem uma derrota real correspondente. Isto não é peculiar desta conquista; é a mesma exigência de determinismo que `D13` já coloca para todo o resto do estado ("mesma semente mais mesma lista de comandos reproduz o estado final byte a byte").
+Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilibrar. **Pendente, fora de escopo desta atualização:** a linha "Dica" acima ainda cita o valor único "100"; reescrevê-la é trabalho de `narrative-writer`, tal qual `D33` fez para o Eixo 1.
 
-⚠️ **Dependência de infraestrutura, não decidida aqui:** "mesma cena" pressupõe uma identidade estável de cena/encontro que **sobreviva a tentativas repetidas**. O `combat.md` já emite `CombatStarted(encounter)`, o que prova que existe um conceito de `encounter` no domínio — mas não está documentado em lugar nenhum se esse identificador é **da instância de combate** (um novo `encounter` a cada tentativa, o que tornaria "100 vezes na mesma cena" incontável, porque cada tentativa teria um id diferente) ou **do local/configuração fixa** que gera a luta (o mesmo `encounter` toda vez que o jogador entra ali, o que é o que esta conquista precisa para funcionar). Busca em `docs/` não encontrou nenhum documento que resolva essa distinção (`scene_id`/`encounter_id`/`room_id` — zero ocorrências fora deste rascunho). Pergunta formal em §3.
+**Estado mínimo a contar:** um mapa `id_cena → contagem de derrotas`, não um único inteiro global, a condição é "N vezes **na mesma** cena", com N dado pela tabela acima, então derrotas em cenas diferentes não se somam entre si.
+
+**Destravável mais de uma vez:** não (regra 2 do §0). Uma vez que QUALQUER cena atinja o limiar da dificuldade do save, a conquista destrava e não retrava; uma segunda cena atingir o limiar depois é no-op (regra 3 do §0).
+
+**Estado inválido:** coberto pela regra 3 do §0. Um caso próprio: se o mesmo evento de derrota for processado duas vezes por um bug de replay/rollback do save (L-25, fase 2, verificação por re-execução), o incremento tem que ser amarrado à identidade do evento de domínio, não à leitura do save, senão o contador infla sem uma derrota real correspondente. Isto não é peculiar desta conquista; é a mesma exigência de determinismo que `D13` já coloca para todo o resto do estado ("mesma semente mais mesma lista de comandos reproduz o estado final byte a byte").
+
+⚠️ **Dependência de infraestrutura, não decidida aqui:** "mesma cena" pressupõe uma identidade estável de cena/encontro que **sobreviva a tentativas repetidas**. O `combat.md` já emite `CombatStarted(encounter)`, o que prova que existe um conceito de `encounter` no domínio, mas não está documentado em lugar nenhum se esse identificador é **da instância de combate** (um novo `encounter` a cada tentativa, o que tornaria o limiar de derrotas na mesma cena incontável, porque cada tentativa teria um id diferente) ou **do local/configuração fixa** que gera a luta (o mesmo `encounter` toda vez que o jogador entra ali, o que é o que esta conquista precisa para funcionar). Busca em `docs/` não encontrou nenhum documento que resolva essa distinção (`scene_id`/`encounter_id`/`room_id`, zero ocorrências fora deste rascunho). Pergunta formal em §3.
 
 ---
 
@@ -124,7 +135,7 @@ Não decido entre as duas (L-14). Pergunta formal em §3. **✅ RESOLVIDO em 30/
 
 **Isto TEM gatilho explícito** (diferente de EE-4/EE-10/EE-16), mas **nunca é enquadrado como "conquista oculta"** com nome e dica de banner, ao contrário de EE-9/EE-12/EE-20 — é descrito como sistema/evento narrativo. Por isso a especificação abaixo cobre o que É derivável, e a seção de perguntas cobre o que não é.
 
-**Gatilho de domínio (derivado, não inventado):** o contador de derrotas de Gus dentro de uma mesma identidade de cena atinge **10** — mesmo mecanismo de `achv_persistent_geometry` (§2.12), limiar diferente (10 em vez de 100).
+**Gatilho de domínio (derivado, não inventado):** o contador de derrotas de Gus dentro de uma mesma identidade de cena atinge **10** — mesmo mecanismo de `achv_persistent_geometry` (§2.12), limiar diferente e fixo em toda dificuldade (o de §2.12 passou a escalar por dificuldade desde 30/08/2026, este continua em 10).
 
 **Estado mínimo a contar:** o mesmo mapa `id_cena → contagem de derrotas` de §2.12 — não é um contador separado; é o MESMO contador lido num limiar mais baixo, o que sugere as duas conquistas compartilham a mesma fonte de estado em vez de duplicá-la.
 
@@ -151,7 +162,18 @@ Não decido entre as duas (L-14). Pergunta formal em §3. **✅ RESOLVIDO em 30/
 
 **Estado inválido:** coberto pela regra 3 do §0. Caso próprio: se o jogador atinge a sequência de 3 erros e SÓ DEPOIS o jogo verifica a condição (ex.: verificação em lote em vez de por evento), o resultado tem que ser o mesmo que verificar erro a erro — destravar no instante do terceiro erro consecutivo, não em algum momento posterior arbitrário.
 
-⚠️ **Dependência de infraestrutura, não plena mas registrada:** o gatilho em si está bem descrito, mas o EE-19 (o minigame do botão vermelho) ainda não tem uma especificação própria de estados (o que conta como "aperta o botão", como o "acerto"/"erro" é resolvido, se há um limite de tentativas por sessão de jogo). Esta seção assume que tal especificação virá a existir e só descreve a fatia que toca a conquista; não é uma segunda pergunta ao líder, porque EE-19 não está entre as sete pedidas neste item — fica registrado para quem especificar o minigame em si.
+⚠️ **Dependência de infraestrutura, não plena mas registrada:** o gatilho em si está bem descrito, mas o EE-19 (o minigame do botão vermelho) ainda não tem uma especificação própria de estados (o que conta como "aperta o botão", como o "acerto"/"erro" é resolvido, se há um limite de tentativas por sessão de jogo). Esta seção assume que tal especificação virá a existir e só descreve a fatia que toca a conquista; não é uma segunda pergunta ao líder, porque EE-19 não está entre as sete pedidas neste item, fica registrado para quem especificar o minigame em si.
+
+**✅ GUARDRAIL FIXADO em 30/08/2026** (`G12` do `TODO.md`, Eixo 4 de `docs/_secret/proposta-balanceamento-easter-eggs.md`, `AskUserQuestion`), para quem especificar EE-19: o número de grades/opções por rodada escala por dificuldade.
+
+| Dificuldade | Grades/opções por rodada |
+|---|---|
+| Fácil | 3 |
+| Médio | 5 |
+| Difícil | 8 |
+| Hardcore | sem valor decidido na fonte, não inventado aqui |
+
+O limiar de "3 erros seguidos" do corpus **não muda**. Nota de argumento, corrigida na própria decisão: mais grades tornam a conquista **mais acessível**, não mais rara, o piso protege a alcançabilidade orgânica (destravar sem grinding deliberado), não a raridade.
 
 ---
 
