@@ -2,6 +2,8 @@
 
 **Status:** os 4 pontos estruturais (§8) foram **FECHADOS PELO LÍDER em 2026-07-18** (bateria escala por dificuldade; vírus homebrew 55% fixo; `urandom` pirata backfire = 1/3 exato, crédito Gus Dragon; desconto pirata×original escala por dificuldade). O restante do documento (números de fundo/derivação) segue **PROPOSTA `//PLAYTEST`** do `economy-designer`, preenchendo os `[calcular]` de [`cartas-hardware-pirataria-energia.md`](cartas-hardware-pirataria-energia.md). Todo número não marcado como FECHADO é **FRAMEWORK**: a PROPORÇÃO/lógica de derivação é o que se fixa agora; o valor exato pode mexer ±10-20% no playtest N=3, sem quebrar a estrutura.
 
+**Atualização 2026-09-05 (decisão do líder):** os três blocos de números acrescentados nesta data (§9, §10 e §11), e a revisão adversarial que os auditou (§12), NÃO avançam para canon, nem por playtest N=3. Verbatim do líder: *"sobre os valores de cartas, baterias etc, guarde e deixe pendente para quando tivermos batalhas no jogo para poder fazer medicoes."* A partir de hoje, a fonte de verdade sobre estes três blocos é a MEDIÇÃO contra combate jogável, nunca a proposta escrita a seguir: o que está registrado em §9-§11 é ponto de partida para calibrar contra dado real quando houver batalha para medir, não valor a copiar direto para o jogo. A revisão do §12 encontrou nove defeitos estruturais nas três propostas, razão adicional, e não a única, para o adiamento.
+
 **Método:** nenhum número foi inventado solto — cada um deriva de um número canônico já fechado (ver "Deriva de" em cada tabela). Onde não havia âncora direta, usei a escada numérica já empregada no projeto (`8, 13, 21, 34, 55, 89, 144`) como grade de valores — o padrão de origem continua **velado**, nunca nomeado em texto de jogo.
 
 **Cross-ref:** [`cartas-hardware-pirataria-energia.md`](cartas-hardware-pirataria-energia.md) (o sistema), [`economia.md`](economia.md) (crédito canônico), [`cartas-technomagik.md`](cartas-technomagik.md) §2.2-2.3 (ChargeCost/Power), [`deck-mao-sistema.md`](deck-mao-sistema.md) (deck/mão), [`capacitor-item.md`](capacitor-item.md) (item de energia elétrica já desenhado, mesma família conceitual).
@@ -290,6 +292,78 @@ O líder não escolheu A/B/C isolado — escolheu as 3 réguas como uma escada p
 
 ---
 
+## 9. Passivas: gasto de standby e disparo das dez cartas (PROPOSTA `//PLAYTEST`, PENDENTE DE MEDIÇÃO, adicionada 2026-09-05)
+
+Cobre o ponto aberto de `cartas-hardware-pirataria-energia.md` §5 ("Passiva tem dois gastos: standby e disparo") e o item `D41` do `TODO.md`: as cinco passivas puras (Ada, Hayek, Mises, Planck, Pythagoras) mais a face passiva das cinco Híbridas (Faraday, Maxwell, Newton, von Neumann, John Dee).
+
+| Carta | Gasto de standby | Gasto de disparo |
+|---|---|---|
+| Ada | 1 | 5 |
+| Hayek | 1 | 2 |
+| Mises | 1 | 2 |
+| Planck | 1 | 3 |
+| Pythagoras | 1 | 8 |
+| Maxwell | 1 | 2 |
+| Newton | 1 | 3 |
+| von Neumann | 1 | 5 |
+| John Dee | 1 | 2 |
+| Faraday | 1 | 3 |
+
+**Racional declarado da proposta:** o gasto de standby é 1 para as dez, sem distinção entre elas; o gasto de disparo segue a escada 2, 3, 5, 8, escolhida pela frequência esperada com que cada carta dispara o próprio gatilho. Nenhum critério de frequência foi anexado carta a carta na proposta. Ver §12, achados 6, 7 e 8, para os furos que a revisão encontrou nesta régua.
+
+## 10. Camada pirata de carta especial e super: craft e mercado negro (PROPOSTA, PENDENTE DE MEDIÇÃO, adicionada 2026-09-05)
+
+Cobre `cartas-hardware-pirataria-energia.md` §15 (craft de cópia pirata de ESPECIAL/SUPER; os três graus de falha já estavam fechados pelo líder em 25/08/2026, ver §15.3 daquele documento) e o item `D42` do `TODO.md`.
+
+| Eixo | Especial | Super |
+|---|---|---|
+| Grau de falha: funciona pior | 53,3% | 53,3% |
+| Grau de falha: faz outra coisa | 33,3% | 33,3% |
+| Grau de falha: só o nome, sem função | 13,3% | 13,3% |
+| Craft na bancada | 150 cr + 1 componente raro | 400 cr + 1 componente de chefe |
+| Comprada pronta no mercado negro | 233 cr | 610 cr |
+
+**Racional declarado da proposta:** os três graus de falha usam a mesma distribuição para os dois níveis; o preço de mercado negro seria "uma vez e meia" o custo de craft. Ver §12, achado 1: a conta não fecha, e a origem real dos dois preços de mercado negro é outra.
+
+## 11. Bateria caseira: capacidade, refino e riscos (PROPOSTA, PENDENTE DE MEDIÇÃO, adicionada 2026-09-05)
+
+Cobre `cartas-hardware-pirataria-energia.md` §5, subseção "Bateria de baixa qualidade (craftada, canon do Gus Dragon)" (mecanismo, herança de risco e a escada de três degraus por insumo já fechados pelo líder; a exigência dos dois insumos juntos e o mentor que ensina a filtrar fecharam em 05/09/2026), e o item `D43` do `TODO.md`.
+
+- **Capacidade, no perfil Médio (mesma régua de dificuldade do §1a):** muito ruim 3; ruim ou aceitável, por sorteio, 5; boa 8.
+- **Refino:** degrau do meio 13; degrau bom 21; taxa de sucesso do refino 89%.
+- **Riscos herdados da bateria pirata comprada (subseção "Bateria pirata / genérica", já fechada):** perda de 21 pontos de saúde do personagem por recarga malsucedida; 13% de chance de estrago na bateria pirata comprada contra 8% na bateria caseira.
+- **Matriz das nove combinações** dos três degraus por insumo (suco de limão x água, cada um em comum, refinado ou bom): a proposta preenche a matriz a partir dos três cantos que o próprio líder fixou (os dois insumos no degrau comum = muito ruim; um bom e o outro não = ruim ou aceitável por sorteio; os dois no degrau bom = boa).
+
+**Nota sobre a matriz:** o líder fixou três resultados nomeados, um para cada um de três cantos das nove combinações; a proposta preencheu as seis restantes por extrapolação própria, não por decisão nova dele. Ver §12, achado 5: duas dessas seis ficaram sem regra que a proposta, de fato, tenha decidido.
+
+## 12. Revisão adversarial de 2026-09-05: por que estes números não viram canon
+
+A revisão que auditou §9-§11 encontrou nove defeitos, cada um registrado abaixo como propriedade da PROPOSTA, não como correção a aplicar agora (a correção espera medição, ver o aviso no topo deste documento). Nenhum destes achados revoga o que o líder já fechou (as três decisões estruturais da bateria caseira, os três graus de falha do §15.3, o mecanismo dos dois gastos da passiva): eles atacam só os NÚMEROS que o `economy-designer` anexou por cima desse canon já fechado.
+
+1. **O multiplicador declarado não gera os números publicados (§10).** A proposta diz que o preço de mercado negro é "uma vez e meia" o custo de craft: 150 x 1,5 = 225 e 400 x 1,5 = 600, não 233 e 610. Os dois valores publicados (233 e 610) são degraus da escada de recompensa por dificuldade que já é canon em outro lugar do jogo (`docs/design/roster-analogos/21-helion-tusk.md:199`, "Fácil 610 / Médio 377 / Difícil 233 / Hardcore 144 cr"), não o resultado da fórmula anunciada.
+
+2. **O piso de comparação da bateria caseira não existe mais.** O valor usado, na proposta, como referência da capacidade do pior tipo comprado remonta à tabela de capacidade de bateria do §1a deste mesmo documento, indexada por CLASSE DE CARTA (Homebrew, Pirata comum, Pirata especial falso, Comum original, Especial). O líder separou os dois eixos em 02/09/2026 (`cartas-hardware-pirataria-energia.md:364-367`: "capacidade é propriedade da BATERIA, nunca da classe da carta"), e nenhuma tabela nova de capacidade por TIPO DE BATERIA foi fechada depois disso. A régua contra a qual a bateria caseira se compara está, portanto, vencida.
+
+3. **O número de degradação por recarga colide com o sentido que ele já tem.** O valor 21, usado na proposta como perda de saúde do personagem por recarga malsucedida, é no canon já fechado o LIMIAR em que a bateria (não o personagem) é considerada morta (§1b deste documento e `cartas-hardware-pirataria-energia.md:99`, piso de descarte 21% SoH). O mesmo documento de energia registra, em decisão do líder de 05/09/2026, que "a degradação por uso não tem número próprio" (`cartas-hardware-pirataria-energia.md:99` e `:294`). A proposta atribuiu número a algo que o canon, no mesmo dia, decidiu não ter número ainda, e reaproveitou um valor com significado já ocupado.
+
+4. **A equivalência entre os dois níveis de pirataria (especial e super) é inferência não confirmada.** A fonte (`cartas-hardware-pirataria-energia.md:865`) marca textualmente esta extensão como inferência por simetria, "sinalizado no relatório para confirmação", não como decisão fechada do líder. A proposta do §10 tratou os mesmos três graus de falha para os dois níveis como premissa firme, sem carregar a ressalva.
+
+5. **Duas das nove combinações do craft da bateria caseira ficaram sem regra.** Os três cantos que o líder fixou (os dois insumos no degrau comum, um bom e o outro não, os dois no degrau bom) não cobrem os casos em que um insumo está no degrau comum e o outro no degrau do meio, nas duas ordens. A proposta do §11 apresenta a matriz como preenchida; o próprio doc-fonte já registrava isto como não decidido (`cartas-hardware-pirataria-energia.md:698-700`).
+
+6. **A régua declarada da escada de disparo não fecha para duas cartas.** A proposta do §9 diz precificar só por frequência esperada do gatilho, mas duas cartas de frequência muito diferente entre si receberam o mesmo valor de disparo. A revisão não nomeou o par; registro aqui, como observação factual da própria tabela do §9, que quatro das dez cartas (Hayek, Mises, Maxwell, John Dee) dividem o mesmo valor (2), o conjunto onde a colisão apontada mais provavelmente mora.
+
+7. **Uma carta foi precificada como se o gatilho fosse raro quando ele é escolha do jogador, sem sorteio nenhum, e portanto repetível à vontade por quem jogar focando nela.** A revisão não nomeou a carta; registro aqui, como observação factual e não como fato confirmado, que Pythagoras recebe o maior valor da escada (8), o perfil mais coerente com tratamento de gatilho raro, e por isso a candidata mais provável ao achado.
+
+8. **Falta a unidade de cobrança do gasto de manter (standby).** A proposta do §9 não diz se o gasto de standby é cobrado por turno, por batalha, ou se corre também fora de combate. Sem essa unidade, o número 1 de standby não é verificável contra nenhuma capacidade de bateria (§1a, §11).
+
+9. **Uma das dez cartas do §9 não tem face de combate sequer desenhada, e outra tem conceito mas nenhuma implementação; a proposta tratou as duas como equivalentes às demais oito.** Precificar gasto de disparo para uma face que ainda não existe em spec de combate (`cartas-technomagik.md` §2.3, `_EFEITOS-ESCOLHIDOS.md`) antecipa um número sobre um comportamento que o canon ainda não fechou.
+
+> **Decisão do líder, 2026-09-05, verbatim:** *"sobre os valores de cartas, baterias etc, guarde e deixe pendente para quando tivermos batalhas no jogo para poder fazer medicoes."*
+
+**O que isto fixa, sem inventar número novo:** as três propostas de §9-§11 ficam registradas como PONTO DE PARTIDA, não como canon. Quando existir combate jogável, a calibração parte da MEDIÇÃO contra o jogo real, usando estas propostas só como primeira hipótese de forma (a escada de valores, os três graus de falha, a estrutura da matriz de craft), nunca como número a copiar direto. Os nove achados acima não são bugs a corrigir agora: são a lista do que a próxima rodada de balanceamento, feita com dado medido, precisa resolver de fato, em vez de arbitrar de novo no papel.
+
+---
+
 ## Ambiguidades registradas
 
 - **AMB-01 (UX do upload homebrew):** proposto gate narrativo (1 beat, zero timer real) como default barato. Alternativa: barra de progresso em tempo real (~34 segundos, escada numérica canônica) na tela da bancada, mais "sentida" mas exige UI nova. Recomendo o gate narrativo; líder pode preferir o timer se quiser mais peso sensorial na cena de pirataria.
@@ -300,3 +374,5 @@ O líder não escolheu A/B/C isolado — escolheu as 3 réguas como uma escada p
 ---
 
 **Última revisão:** 2026-07-18 — **rodada 2: os 4 pontos estruturais do §8 fechados pelo líder** (bateria e desconto pirata×original agora escalam por dificuldade; vírus homebrew confirmado 55% fixo; `urandom` pirata reponderada pro backfire = 1/3 exato, decisão/crédito do Gus Dragon). Revisão anterior (rodada 1, mesma data): proposta inicial completa do `economy-designer`, preenchendo todos os `[calcular]` de `cartas-hardware-pirataria-energia.md`. **Próximo passo:** canonização formal — refletir estes números de volta no doc-fonte (`cartas-hardware-pirataria-energia.md`) e em `cartas-technomagik.md` quando o líder confirmar que não há mais ajuste pendente.
+
+**Rodada 3, 2026-09-05: três propostas novas registradas (§9 gastos de standby/disparo das dez passivas, §10 craft e mercado negro da pirataria de ESPECIAL/SUPER, §11 bateria caseira), a revisão adversarial que auditou as três e achou nove defeitos (§12), e a decisão do líder de adiar todo o balanceamento numérico deste documento para depois de existir combate jogável para medir.** Os itens `D41`, `D42` e `D43` do `TODO.md` seguem bloqueados por essa decisão, apontando para cá. Nenhum número desta rodada, nem os das rodadas anteriores, vira canon nem é copiado para o jogo antes da medição. Próximo passo: nenhum, até existir combate jogável; quando existir, a calibração parte do dado medido, usando §1-§11 como hipótese de forma, nunca como valor pronto.
