@@ -109,7 +109,7 @@ Para isso, ele precisa de uma chave de descriptografia que mapeie a Selve como �
 
 - **Latim corporativo ocasional.** Tons como *ad astra*, *de jure*, *fait accompli*, *modus operandi* aparecem sem ostentação, naturalmente integrados.
 - **Vocabulário técnico de alto nível.** "Runtime", "abstração", "encapsulamento", "deprecar" usados como verbos cotidianos.
-- **Eufemismo corporativo refinado.** Nunca diz "matar"; diz "deprecar". Nunca "expropriar"; diz "reabsorver". Nunca "vírus"; diz "comportamento emergente inesperado" (referência direta `comic-reliefs.md` cena 6).
+- **Eufemismo corporativo refinado.** Nunca diz "matar"; diz "deprecar". Nunca "expropriar"; diz "reabsorver". Nunca "vírus"; diz "comportamento emergente inesperado" (referência direta `comic-reliefs/cena-06-bug-declarado-feature.md`).
 
 ### Sintaxe
 

@@ -240,7 +240,7 @@ O documento `arco-principal.md` (canônico, Revisão 1) já contém um rascunho 
 
 **Recomendação estrutural (não decisão):** após aprovação deste esqueleto pelo criador, `arco-principal.md` §Ato 1 Setup precisa de uma passada de sincronização (fora do escopo deste documento) para alinhar os sub-beats "Catalyst" e "Recrutamento Companion #1" à nova decisão. Até lá, este documento (`gus-abertura.md`) é a fonte mais recente para a abertura; `arco-principal.md` §Ato 1 Setup fica marcado como defasado nesse trecho específico, sem prejuízo do resto do documento (que segue canônico).
 
-> **RESOLVIDO (2026-07-12):** a sincronização foi APLICADA no `arco-principal.md` + `caua-volt.md` (via `narrative-designer`, verificada; commit `6d51ca1`) conforme as decisões da §13.9. Resíduos posteriores fechados: `comic-reliefs.md` cenas 3/10 verificadas limpas, cena 4 sincronizada; spec do Cauã (vault) verificada limpa; **calibragem do gatilho Dante** = após 3 de 5 recrutamentos (~60%; não conta o retorno do Cauã), propagada por `arco-principal.md` + `comic-reliefs.md`. `arco-principal.md` §Ato 1 deixa de estar defasado.
+> **RESOLVIDO (2026-07-12):** a sincronização foi APLICADA no `arco-principal.md` + `caua-volt.md` (via `narrative-designer`, verificada; commit `6d51ca1`) conforme as decisões da §13.9. Resíduos posteriores fechados: `comic-reliefs/cena-03-funciona-no-meu-drive.md` e `comic-reliefs/cena-10-nao-e-magia-e-cache.md` verificadas limpas, `comic-reliefs/cena-04-force-push.md` sincronizada; spec do Cauã (vault) verificada limpa; **calibragem do gatilho Dante** = após 3 de 5 recrutamentos (~60%; não conta o retorno do Cauã), propagada por `arco-principal.md` + `comic-reliefs.md`. `arco-principal.md` §Ato 1 deixa de estar defasado.
 
 ---
 

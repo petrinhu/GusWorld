@@ -43,7 +43,7 @@ Três quarteirões a leste da oficina atual. Galpão maior, vazio, parcialmente 
 
 Aqui era a **cooperativa familiar Alencar** destruída em -8 ([[timeline]]). Hoje, FIR usa como depósito de reaproveitamento (ironia direta). Dante não passa em frente. Faz desvio. NPCs do bairro respeitam o desvio.
 
-Acesso: portão lacrado oficialmente; cadeado violável com hack rápido (sub-quest Knowledge média). Interior: prateleiras quase vazias, restos de bancadas Era 2 cortados pela metade, marca de óleo no piso onde ficava a bancada principal de Salviano (marca permanente, óleo penetrou no cimento). Em arco Dante setup (cena `comic-reliefs.md` 4 contexto), Gus pode visitar a sós. Encontra: caixa de zinco escondida atrás de prateleira, **idêntica à da Inácia Berenger** (mesmo modelo Era 2, mesma fabricante). Vazia. Subtexto: Edilma escondeu papéis aqui em algum momento; alguém retirou. (Knowledge alta + sub-quest cruzada: Edilma confirma silenciosamente; Vorto retirou pessoalmente em -5.)
+Acesso: portão lacrado oficialmente; cadeado violável com hack rápido (sub-quest Knowledge média). Interior: prateleiras quase vazias, restos de bancadas Era 2 cortados pela metade, marca de óleo no piso onde ficava a bancada principal de Salviano (marca permanente, óleo penetrou no cimento). Em arco Dante setup (cena 4, `comic-reliefs/cena-04-force-push.md`, contexto), Gus pode visitar a sós. Encontra: caixa de zinco escondida atrás de prateleira, **idêntica à da Inácia Berenger** (mesmo modelo Era 2, mesma fabricante). Vazia. Subtexto: Edilma escondeu papéis aqui em algum momento; alguém retirou. (Knowledge alta + sub-quest cruzada: Edilma confirma silenciosamente; Vorto retirou pessoalmente em -5.)
 
 ### 2.3 Praça do Compilador
 

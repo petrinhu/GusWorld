@@ -129,7 +129,7 @@ Total de sub-beats internos: 6 slots × 4 (Kishōtenketsu) = **24 sub-beats** + 
 
 ### Estado inicial do mundo
 
-GusWorld City funciona aparentemente. Janelarum trava periodicamente, mas as pessoas convivem (`comic-reliefs.md` cena 11). Holografia Sterling Corp está em todo poste no Setor Mirage. Anel Verde tem checkpoints federais. A Selve está aparentemente calma. Gus tem 11 anos e mora num apartamento modesto no Núcleo Metropolitano.
+GusWorld City funciona aparentemente. Janelarum trava periodicamente, mas as pessoas convivem (`comic-reliefs/cena-11-janelarum-travou-de-novo.md`). Holografia Sterling Corp está em todo poste no Setor Mirage. Anel Verde tem checkpoints federais. A Selve está aparentemente calma. Gus tem 11 anos e mora num apartamento modesto no Núcleo Metropolitano.
 
 ### Setup (1-1.5h gameplay)
 
@@ -141,7 +141,7 @@ GusWorld City funciona aparentemente. Janelarum trava periodicamente, mas as pes
 | **Mãe** | Gargi pode pedir pra Gus não ir, recontextualizado em torno da preocupação com o **Brunus** (não com uma anomalia). Não é briga; é cuidado contido. Beat curto e opcional (cf. `gus-abertura.md` §6, §9). A família Vance permanece base segura; ninguém dela é ferido ou ameaçado. |
 | **Recrutamento Companion #1** | **Fixo: Cauã "Volt"**, recrutado ainda na abertura via a missão solo "O Mistério dos Aparatos" (Distritos Inferiores → Dutos Infernais). Investigação solo (aparatos possuídos → scan + triangulação → fragmento antigo espalhado pela catadora Doralice → descida aos Dutos → aparato da Era 1 ainda ligado → puzzle cooperativo de roteamento de energia). Cauã aparece hostil, rivais viram aliados resolvendo o aparato juntos. Ver `gus-abertura.md` §13. Não há mais escolha de qual companion vem primeiro (ver Branching foldback #1). |
 | **Foreshadow Sterling** | **Não dispara no Ato 1.** Adiado para o Ato 2, na primeira visita ao Setor Mirage (Arco Iara), preservando a associação Sterling↔Setor Mirage. O trajeto fixo da abertura não passa por lá. |
-| **Foreshadow Dante** | Independente de ordem, cena 4 de `comic-reliefs.md` ("Force Push") **não dispara ainda**. Dispara em ato 2 após **3 RECRUTAMENTOS completos** (~60%); conta só os 5 recrutamentos, o retorno de aprofundamento do Cauã NÃO conta pro gatilho (ver "Foreshadow Dante: timing detalhado"). |
+| **Foreshadow Dante** | Independente de ordem, cena 4 de `comic-reliefs/cena-04-force-push.md` ("Force Push") **não dispara ainda**. Dispara em ato 2 após **3 RECRUTAMENTOS completos** (~60%); conta só os 5 recrutamentos, o retorno de aprofundamento do Cauã NÃO conta pro gatilho (ver "Foreshadow Dante: timing detalhado"). |
 | **Break into Two** | O cruzamento de limiar acontece dentro da própria missão de abertura (Distritos Inferiores → descida aos Dutos Infernais). O Ato 1 fecha quando Cauã se junta à party ao fim da missão. Câmera muda de paleta, trilha muda de chave. Ato 2 começa. |
 
 ---
@@ -166,21 +166,21 @@ Os 6 slots são **5 arcos de recrutamento** (Iara, Bento, Linda, Dante, Jaci) + 
 **Nota estrutural:** o Cauã já entrou na party na abertura (missão solo "O Mistério dos Aparatos", `gus-abertura.md` §13). Este slot de Ato 2 **não é recrutamento**; é o retorno aos Dutos que aprofunda o companion já conhecido e paga o gancho velado da Subestação 7 plantado na abertura (`gus-abertura.md` §13.6). Segue o mesmo esqueleto Kishōtenketsu dos arcos de recrutamento.
 
 - **Ki:** Disputa interna dos runners juvenis dos Dutos: a facção paciente do Cauã (defesa) contra a facção radical (ataque aberto à FIR). A FIR ameaça inundar os túneis com efluente industrial. O Cauã, agora com o Gus ao lado, volta para conter os dois fogos.
-- **Sho:** Gus + Cauã navegam os Dutos mais fundo. Combate vertical (os pulsos EMP do Cauã interagem com os pistões hidráulicos do setting). Plantam call-back de `comic-reliefs.md` cena 3 ("Funciona no meu Drive"). Conjuro novo destravado aqui: **Pulso EM Concêntrico**.
+- **Sho:** Gus + Cauã navegam os Dutos mais fundo. Combate vertical (os pulsos EMP do Cauã interagem com os pistões hidráulicos do setting). Plantam call-back de `comic-reliefs/cena-03-funciona-no-meu-drive.md` ("Funciona no meu Drive"). Conjuro novo destravado aqui: **Pulso EM Concêntrico**.
 - **Ten:** Descobrem laboratório FIR escondido nos Dutos, estudando frequências da Matriz Ortodôntica do Gus (sem saber que é dele). **Sterling Corp pediu à FIR que replicasse a tecnologia.** Aqui paga o payoff da **Subestação 7**: passando pelos destroços, o Cauã enfim conta o que o lugar significa (o irmão, Davi Berenger), fechando a semente plantada em silêncio na abertura. Cena Sterling: holograma elogiando "iniciativa da Federação" enquanto o Cauã ouve, congelado.
-- **Ketsu:** Combate. Destruição do laboratório FIR. O Cauã **não se junta aqui** (já é da party desde a abertura); o que fecha é a disputa dos runners resolvida e o luto pelo irmão amadurecido. Cena cômica `comic-reliefs.md` 10 ("Não é magia, é cache") pode disparar aqui.
+- **Ketsu:** Combate. Destruição do laboratório FIR. O Cauã **não se junta aqui** (já é da party desde a abertura); o que fecha é a disputa dos runners resolvida e o luto pelo irmão amadurecido. Cena cômica `comic-reliefs/cena-10-nao-e-magia-e-cache.md` ("Não é magia, é cache") pode disparar aqui.
 
 #### Arco Iara (Setor Mirage)
 
 - **Ki:** Iara é desertora do Cult Mirage. Cult planeja festival de "atualização sensorial" patrocinado por Sterling Corp (na verdade, instalação massiva de monitoramento via holografia). Iara quer sabotar.
-- **Sho:** Infiltração ofuscamento. Gus aprende com Iara como Óxido funciona (`comic-reliefs.md` cena 5, "Expressão Regular" pode disparar). Conjuro novo: **Decoy Lumen**.
+- **Sho:** Infiltração ofuscamento. Gus aprende com Iara como Óxido funciona (`comic-reliefs/cena-05-expressao-regular.md`, "Expressão Regular" pode disparar). Conjuro novo: **Decoy Lumen**.
 - **Ten:** No núcleo do Cult Mirage, descobrem terminal direto com Sterling Corp. Sterling aparece em pessoa por holograma de alta fidelidade (primeira aparição "íntima" no jogo). Diz à Iara: "Você acha que está sabotando, mas está apenas alimentando o sistema com escolha. Cada negação é uma instrução que ele lê."
 - **Ketsu:** Combate. Sabotagem parcialmente bem-sucedida (festival cancelado, mas Sterling colheu dados). Iara se junta. Sentimento: vitória amarga.
 
 #### Arco Bento (Catedrais de Neo-Sylvania)
 
 - **Ki:** Bento é o herdeiro próximo da Ordem Recursiva. Outros mestres da Ordem propõem **negociar com Sterling Corp** (aceitar parceria comercial pra "modernizar" as catedrais). Bento se opõe. Rachadura interna.
-- **Sho:** Gus + Bento exploram catedrais profundas. Confronto pillar 2 visual: Asmódico vs C-Arcane (`comic-reliefs.md` cena 2 dispara). Conjuro novo: **Cronômetro Ressonante**. Gus descobre cripto-glifos Neo-Sylvania que conectam com Patch-Zero (canal 4, bug visual em vitrais).
+- **Sho:** Gus + Bento exploram catedrais profundas. Confronto pillar 2 visual: Asmódico vs C-Arcane (`comic-reliefs/cena-02-tabulacoes-vs-espacos.md` dispara). Conjuro novo: **Cronômetro Ressonante**. Gus descobre cripto-glifos Neo-Sylvania que conectam com Patch-Zero (canal 4, bug visual em vitrais).
 - **Ten:** Mestres pró-Sterling tentam entregar uma catedral menor a engenheiros corporativos. Patch-Zero **estava lá**, dormente. Sterling Corp acorda sem querer. Cena Sterling: ele assiste o desastre por câmera, satisfeito ("teste útil"). Mestres pró-Sterling morrem off-screen (estilizado, compilação erro coletiva; P4).
 - **Ketsu:** Combate contra Patch-Zero localizado (primeira manifestação canal 3: persona dialogável). Bento se junta. Ordem Recursiva oficialmente toma posição: contra Sterling.
 
@@ -194,13 +194,13 @@ Os 6 slots são **5 arcos de recrutamento** (Iara, Bento, Linda, Dante, Jaci) + 
 #### Arco Dante (Periferia Industrial): arco do traidor
 
 - **Ki:** Dante mantém oficina independente na Periferia Industrial. Vive em rivalidade com FIR (publicamente). Aceita fazer manutenção da Matriz Ortodôntica do Gus de graça ("você me ajudou na contagem semana passada"). Gus confia.
-- **Sho:** Mini-quest pré-recrutamento: Gus + Dante neutralizam patrulha FIR. Dante mostra habilidade técnica excepcional (instalação rápida de torres modulares). Cena cômica plant: `comic-reliefs.md` cena 4 NÃO dispara ainda. Foreshadow visual: expressão de Dante já tem 1-2 micro-momentos frios.
+- **Sho:** Mini-quest pré-recrutamento: Gus + Dante neutralizam patrulha FIR. Dante mostra habilidade técnica excepcional (instalação rápida de torres modulares). Cena cômica plant: `comic-reliefs/cena-04-force-push.md` NÃO dispara ainda. Foreshadow visual: expressão de Dante já tem 1-2 micro-momentos frios.
 - **Ten:** Reveal aparente: FIR é vassala Sterling. Dante "descobre" isso junto com Gus (encenação; ele sempre soube). Indignação fingida. Cena Sterling: holograma diz que "talentos individuais da Periferia merecem reconhecimento corporativo".
 - **Ketsu:** Combate contra unidade FIR-Sterling. Dante se junta. Conjuro novo (técnico): **Torre Modular Anti-Aérea** (suporte tático). **A partir deste arco, telemetria do Gus começa a ser espelhada para Sterling Corp.** Sem que jogador saiba ainda.
 
 #### Arco Jaci (fronteira-Selve / vilarejo do Pelicano Branco)
 
-- **Ki:** Jaci é farmacêutica jovem do vilarejo do Pelicano Branco (fronteira-Selve; EE-14 em `comic-reliefs.md`). Vilarejo é alvo de "saneamento ecológico" Sterling Corp (eufemismo: extração de bio-amostras forçada). Jaci precisa sintetizar antídoto para um surto que **a Sterling Corp causou clandestinamente** (vetor 4 do Patch-Zero, escape do laboratório).
+- **Ki:** Jaci é farmacêutica jovem do vilarejo do Pelicano Branco (fronteira-Selve; EE-14 em `comic-reliefs/homenagens-diegeticas.md`). Vilarejo é alvo de "saneamento ecológico" Sterling Corp (eufemismo: extração de bio-amostras forçada). Jaci precisa sintetizar antídoto para um surto que **a Sterling Corp causou clandestinamente** (vetor 4 do Patch-Zero, escape do laboratório).
 - **Sho:** Gus + Jaci entram na Orla Recursiva colhendo sementes-relíquia. Tutorial Selve (bestiário, padrões fractais, scan via óculos). Conjuro novo: **Antídoto Sintético** + **Bio-Sutura Rápida**.
 - **Ten:** No coração da Orla, encontram **Patch-Zero canal 3** (boss arena dialogável). Patch-Zero oferece a Jaci: "eu paro o surto se você me deixar passar pelo vilarejo." Jaci recusa horrorizada. Sterling Corp aparece via holograma drone, oferece "ajuda" pra debelar o surto (cobrando o vilarejo como propriedade).
 - **Ketsu:** Combate Patch-Zero local (instância pequena). Jaci se junta. Antídoto sintetizado. Vilarejo salvo, mas Patch-Zero escapou para zona mais profunda da Selve.
@@ -237,7 +237,7 @@ Dante é traidor canônico desde o ato 1. **Antes do jogo começar**, Sterling j
 | **Narrativo (comportamento)** | Expressão facial progressivamente mais fria. Manchas de graxa migram para mãos limpas (recebe upgrade Sterling). | Spec visual Dante |
 | **Narrativo (ambient)** | Pontos discretos: Dante "atrasa" durante manutenções, espelha terminal por 2 segundos antes de fechar. | Após 3 recrutamentos (~60%) |
 | **Mecânico (degradação stats Gus)** | Após o gatilho da traição (3 recrutamentos), stats do Gus passam a ter **flutuação anormal**: -2% precisão, -1% mestria de carta. Telemetria comprometida. Visível no Diário do Gus subseção "Diagnóstico de Hardware". | Capítulos finais ato 2 e ato 3 |
-| **Narrativo (cena planted)** | `comic-reliefs.md` cena 4 ("Force Push") dispara **automaticamente** após 3 recrutamentos (~60%). Foreshadow forte. | Auto-trigger (3 recrutamentos) |
+| **Narrativo (cena planted)** | `comic-reliefs/cena-04-force-push.md` ("Force Push") dispara **automaticamente** após 3 recrutamentos (~60%). Foreshadow forte. | Auto-trigger (3 recrutamentos) |
 | **Narrativo (Diário entry Patch-Zero)** | Patch-Zero comenta enigmaticamente em entry late ato 2: "alguém perto de você não compila. interpretam por você." | Após 75% |
 
 Reveal contextualiza retroativamente tudo. Player que prestou atenção: "ah." Player que não prestou: jogo permite re-leitura via Diário do Gus (Knowledge Progression destrava re-leitura cronológica do arco Dante).
@@ -376,7 +376,7 @@ Toda decisão narrativa deve ter expressão mecânica.
 | Patch-Zero é antagonista-sistema | Manifestação multi-canal afeta UI, Diário, áudio (não só combate) |
 | Dante traidor | Stats Gus degradam visivelmente após o gatilho (3 recrutamentos): sinal mecânico real |
 | Companions imortais | HP=0 = incapacitado, vai pra hospital. Não há morte de companion na campanha. |
-| Foreshadow honesto | Cena 4 `comic-reliefs.md` planta sinal antes do reveal (Chekhov) |
+| Foreshadow honesto | Cena 4 `comic-reliefs/cena-04-force-push.md` planta sinal antes do reveal (Chekhov) |
 | Ending knowledge-gated | Sem moral-meter visível; jogador é recompensado por entender |
 
 **Dissonâncias intencionais:** zero deliberadas neste arco. Toda mecânica reforça a narrativa.
@@ -388,10 +388,10 @@ Toda decisão narrativa deve ter expressão mecânica.
 | # | Setup | Payoff | Tipo | Quando setup | Quando payoff |
 |---|---|---|---|---|---|
 | 1 | Holograma Sterling em todo poste Setor Mirage | Sterling antagonista revelado em arco Iara | Visual | Ato 2 (1ª visita ao Setor Mirage; adiado do Ato 1) | Ato 2 (Arco Iara) |
-| 2 | Janelarum trava (`comic-reliefs.md` 11) | Apex-Data Systems caiu de modo similar; reveal Sterling backstory | Diálogo | Ato 1 | Ato 2 (qualquer arco) |
+| 2 | Janelarum trava (`comic-reliefs/cena-11-janelarum-travou-de-novo.md`) | Apex-Data Systems caiu de modo similar; reveal Sterling backstory | Diálogo | Ato 1 | Ato 2 (qualquer arco) |
 | 3 | Dante manutenção gratuita | Rootkit Sterling instalado | Mecânico + diálogo | Ato 2 (Arco Dante) | Ato 3 (reveal) |
 | 4 | Stats Gus degradam após 3 recrutamentos | Comprovação rootkit ativo | Mecânico (UI Diário) | Ato 2 mid | Ato 3 (reveal) |
-| 5 | `comic-reliefs.md` cena 4 "Force Push" | Dante despreza histórico = traidor | Diálogo cômico | Auto-trigger (3 recrutamentos) | Ato 3 (reveal) |
+| 5 | `comic-reliefs/cena-04-force-push.md` "Force Push" | Dante despreza histórico = traidor | Diálogo cômico | Auto-trigger (3 recrutamentos) | Ato 3 (reveal) |
 | 6 | Ruído/padrão sutil e **não-nomeado** no aparato da Era 1 (missão solo de abertura, `gus-abertura.md` §13.3 passo 6). Distinto do gancho velado da "força antiga" (Patch-Zero ≠ segredo de origem) | Patch-Zero consciência alien | Texto/log | Ato 1 (missão de abertura) | Ato 2 + 3 |
 | 7 | Áudio sussurrante em Polis-Vermelha (Linda rádio) | Patch-Zero global, infecção transcontinental | Áudio | Ato 2 (Arco Linda) | Ato 3 |
 | 8 | Cripto-glifos Neo-Sylvania | Lore profunda; Gus ativa partes desconhecidas | Visual | Ato 2 (Arco Bento) | Ato 3 / pós-jogo |

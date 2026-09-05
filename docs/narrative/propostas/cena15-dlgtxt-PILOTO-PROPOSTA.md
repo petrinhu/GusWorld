@@ -8,7 +8,7 @@
 >
 > **Escopo:** **apenas a Cena 15**, como piloto de formato e de registro de narração. As Cenas 16, 17, 18 e 19 **não** foram convertidas e não devem ser até este formato ser aprovado.
 >
-> **Fonte:** `docs/narrative/comic-reliefs.md`, Cena 15 "Pergunta amanhã", transcrita **sem alterar nenhuma fala**. A única reescrita de texto está declarada no item DLG-09 e é de narração, não de fala.
+> **Fonte:** `docs/narrative/comic-reliefs/cena-15-pergunta-amanha.md`, Cena 15 "Pergunta amanhã", transcrita **sem alterar nenhuma fala**. A única reescrita de texto está declarada no item DLG-09 e é de narração, não de fala.
 >
 > **Formato:** só aspas, zero travessão, zero em-dash.
 
@@ -85,8 +85,8 @@ Numeração dos nós com **dois dígitos** (`n01`, não `n1`), porque estas cena
 // cena15_m1_pergunta.dlg.txt
 //
 // Cena 15 "Pergunta amanha", Movimento 1: a pergunta.
-// Fonte canonica: docs/narrative/comic-reliefs.md, Cena 15 (nenhuma fala alterada).
-// Forma-jogo da cena; a forma-livro continua sendo a prosa do comic-reliefs.md
+// Fonte canonica: docs/narrative/comic-reliefs/cena-15-pergunta-amanha.md, Cena 15 (nenhuma fala alterada).
+// Forma-jogo da cena; a forma-livro continua sendo a prosa do comic-reliefs/cena-15-pergunta-amanha.md
 // (comic-reliefs.md, "Como estas cenas chegam ao jogador").
 //
 // REGISTRO: warm nas falas (humanos, caixa quente + retrato); terminal na
@@ -257,7 +257,7 @@ on_enter: cena15.m1_done=true
 // cena15_m2_intervalo.dlg.txt
 //
 // Cena 15 "Pergunta amanha", Movimento 2: o intervalo.
-// Fonte canonica: docs/narrative/comic-reliefs.md, Cena 15 (nenhuma fala alterada).
+// Fonte canonica: docs/narrative/comic-reliefs/cena-15-pergunta-amanha.md, Cena 15 (nenhuma fala alterada).
 //
 // GATILHO: falar com o Bento na Catedral de Neo-Sylvania com cena15.m1_done escrita.
 //
@@ -455,7 +455,7 @@ on_enter: cena15.m2_done=true
 // cena15_m3_coda.dlg.txt
 //
 // Cena 15 "Pergunta amanha", Movimento 3: a coda.
-// Fonte canonica: docs/narrative/comic-reliefs.md, Cena 15 (nenhuma fala alterada).
+// Fonte canonica: docs/narrative/comic-reliefs/cena-15-pergunta-amanha.md, Cena 15 (nenhuma fala alterada).
 //
 // GATILHO: voltar ao caixote nos Dutos DEPOIS do payoff em combate. O payoff em si
 // ("Compila e roda." / "Essa aqui compilou mesmo.") sao DUAS BARKS de combate, nao
@@ -638,7 +638,7 @@ O gate (`tools/i18n_parity.py`, via `tools/check.sh`) compara os dois catálogos
 | `pt_br.md` | 19 | +65 | **84** |
 | `en_intl.md` | 19 | +65 | **84** |
 
-**As 65 entram nos dois arquivos, na mesma ordem, no mesmo commit.** Sugiro uma sub-seção própria no catálogo (`### Cena 15 (comic-reliefs)`) nos dois, pra o bloco ficar localizável quando as outras quatro cenas vierem.
+**As 65 entram nos dois arquivos, na mesma ordem, no mesmo commit.** Sugiro uma sub-seção própria no catálogo (`### Cena 15 (comic-reliefs/cena-15-pergunta-amanha.md)`) nos dois, pra o bloco ficar localizável quando as outras quatro cenas vierem.
 
 **As duas barks de combate (DLG-10) NÃO estão nessa contagem**, porque não sei em que catálogo o sistema de barks vive. Se elas forem para o mesmo catálogo, o total vira 86 em cada, e continua empatado.
 

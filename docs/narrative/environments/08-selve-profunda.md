@@ -137,7 +137,7 @@ Hook de diálogo: pode levar o Gus a três pontos altos da Selve onde a Cúpula 
 
 Sobrinho distante de Iremar Berenger (ancestral comum com [[caua-volt|Cauã]] cinco gerações antes), criou-se no vilarejo do Tucano-Cinza ao norte. Visita Pelicano Branco a cada quatro meses para trocar scripts com Jaci. Mais inquieto que Jaci, gosta de experimentar scripts agressivos, falha mais, aprende mais rápido em alguns vetores, esquece detalhes em outros. Inveja levemente a precisão da Jaci; respeita a vantagem dela. Trata Mariana como avó honorária.
 
-Hook de diálogo: oferece a Gus competição amigável de síntese Pythia: cada um sintetiza antídoto contra a mesma toxina em tempo limitado. Vivendel termina primeiro mas com efeito colateral leve. Jaci, se presente, comenta "perdão de ponto-e-vírgula", referência canônica ([[comic-reliefs]] cena 2). Vivendel ri da própria pressa. Recompensa: token Pythia composto. Vivendel pode aparecer em sub-quest pós-recrutamento Jaci como referência de respaldo regional.
+Hook de diálogo: oferece a Gus competição amigável de síntese Pythia: cada um sintetiza antídoto contra a mesma toxina em tempo limitado. Vivendel termina primeiro mas com efeito colateral leve. Jaci, se presente, comenta "perdão de ponto-e-vírgula", referência canônica ([[comic-reliefs/cena-02-tabulacoes-vs-espacos|comic-reliefs cena 2]]). Vivendel ri da própria pressa. Recompensa: token Pythia composto. Vivendel pode aparecer em sub-quest pós-recrutamento Jaci como referência de respaldo regional.
 
 #### Mestre Hugo Tirol (55), Ordem Recursiva, decifrador cripto-glífico
 

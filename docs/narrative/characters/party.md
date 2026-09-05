@@ -85,7 +85,7 @@
 | **Óxido** | Iara, Linda | Segurança opaca, três bits decidem, elegância arquitetural. |
 | **Pythia** | Cauã, Jaci | Rápida de escrever, perdão de erros, sintaxe limpa, "Pythia te abraça". |
 
-Cross-ref: `comic-reliefs.md` (cenas 2, 5, 7, 8, 9, 10).
+Cross-ref: `comic-reliefs/cena-02-tabulacoes-vs-espacos.md` (Cena 2), `comic-reliefs/cena-05-expressao-regular.md` (Cena 5), `comic-reliefs/cena-07-tomo-da-pilha-sobrecarregada.md` (Cena 7), `comic-reliefs/cena-08-comentarios-em-latim.md` (Cena 8), `comic-reliefs/cena-09-off-by-one.md` (Cena 9), `comic-reliefs/cena-10-nao-e-magia-e-cache.md` (Cena 10).
 
 ---
 

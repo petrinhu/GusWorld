@@ -571,9 +571,9 @@ Vai andando. Essa praça já viu gente demais sair, e não voltar do jeito que f
 ---
 
 
-### Cena 15 (comic-reliefs), forma-jogo
+### Cena 15 (comic-reliefs/cena-15-pergunta-amanha.md), forma-jogo
 
-> Convertida da prosa de `docs/narrative/comic-reliefs.md` (Cena 15) em 2026-07-28.
+> Convertida da prosa de `docs/narrative/comic-reliefs/cena-15-pergunta-amanha.md` (Cena 15) em 2026-07-28.
 > Falas no registro `warm`; narração no registro `terminal`, speaker `terminal`.
 > Três arquivos em `resources/dialogues/`: `cena15_m1_pergunta`, `cena15_m2_intervalo`, `cena15_m3_coda`.
 

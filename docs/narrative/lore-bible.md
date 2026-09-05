@@ -71,7 +71,7 @@ A reconstrução. Há cerca de 150 anos antes do jogo, a civilização atual eme
   - **Pythia** (Cauã, Jaci): linguagem rápida de escrever, interpretada, ideal para protótipos e bio-hacking. Compila menos, escreve mais (escreve rápido, roda devagar: o trade honesto).
 - A **Federação Industrial de Reciclagem** (FIR) emergiu nesse período como esforço cooperativo de aproveitamento de hardware antigo. Vermelha de boa-fé no começo. Capturada por interesses corporativos depois.
 - Cidades cresceram em torno dos sítios Neo-Sylvania melhor preservados. **GusWorld City** é a maior dessas cidades; outras três grandes existem nesta região do mundo (ver §10).
-- Tom geral da Era 2: pragmatismo cooperativo, código aberto, conhecimento compartilhado. O **Tomo da Pilha Sobrecarregada** (referenciado em `comic-reliefs.md` cena 7) data dessa era: documentação coletiva de soluções, mantida por séculos.
+- Tom geral da Era 2: pragmatismo cooperativo, código aberto, conhecimento compartilhado. O **Tomo da Pilha Sobrecarregada** (referenciado em `comic-reliefs/cena-07-tomo-da-pilha-sobrecarregada.md`) data dessa era: documentação coletiva de soluções, mantida por séculos.
 
 **A Era 2 era estável.** Não perfeita, mas estável. O Sistema funcionava.
 
@@ -88,7 +88,7 @@ Nos 25 anos seguintes, Sterling:
 3. Canibalizou três conglomerados (**Apex-Data Systems**, **Nexus-Cloud Conglomerate**, **Core-Synth Bio-Tech**), levando-os à falência calculada e extraindo seus ativos críticos.
 4. Consolidou tudo em **Sterling Corp** (sede: Cúpula Sterling, ato 3).
 5. Subordinou a FIR como vassala (ela ainda finge cooperativa; é cartel mafioso lavando ativos pra Sterling).
-6. Lançou hardware de consumo agressivo: Janelarum (sistema operacional comercial frágil que vende serviços de manutenção; ver `comic-reliefs.md` cena 11), terminais públicos, infraestrutura privatizada de rede.
+6. Lançou hardware de consumo agressivo: Janelarum (sistema operacional comercial frágil que vende serviços de manutenção; ver `comic-reliefs/cena-11-janelarum-travou-de-novo.md`), terminais públicos, infraestrutura privatizada de rede.
 7. Iniciou a operação **GRE (Global Runtime Environment)**: envelopar a Selve Sombria em uma máquina virtual interpretada, transformando ecossistemas em variáveis editáveis por linha de comando.
 
 A Era 3 está só na metade. O Sistema ainda funciona aparentemente. Mas a Selve já mostra sinais: anomalias inexplicáveis, fauna se comportando fora do padrão fractal, ruído estranho na rede.
@@ -148,7 +148,7 @@ Ecossistema sobrevivente da Era 1. Auto-organizado em padrões matemáticos. Hos
 | 2 | **Pântano de Markov** | Cadeias estocásticas, transições probabilísticas | Brejo, névoa, criaturas que mudam estado | Meio-jogo, primeiros bosses-vírus |
 | 3 | **Núcleo Mandelbrot** | Fractais aninhados infinitos | Clareira geometricamente impossível, paisagem não-euclidiana suave | Climax-âncora do Patch-Zero |
 
-Jaci nasceu numa aldeia da fronteira-Selve (vilarejo do Pelicano Branco, EE-14 em `comic-reliefs.md`). Ela navega esses três terrenos como quem caminha em casa.
+Jaci nasceu numa aldeia da fronteira-Selve (vilarejo do Pelicano Branco, EE-14 em `comic-reliefs/homenagens-diegeticas.md`). Ela navega esses três terrenos como quem caminha em casa.
 
 ### 6.2 Ecologia algorítmica (regras imutáveis)
 
@@ -282,7 +282,7 @@ Asmódico é **a linguagem analógica de Neo-Sylvania**. Roda em relojoaria de l
 - Cada habilidade tem ciclo próprio (cronômetro físico no peitoral; ver spec Bento).
 - Não é flexível como C-Arcane. É **previsível, rígido e firme**.
 
-**Justificativa de pillar:** relógio mecânico é state machine, só substrato diferente. Asmódico segue Pillar 2 ("sistema formal computável"); apenas opera em latão e mola em vez de silício. Drama interno party: Asmódico é tese rival ao C-Arcane do Gus. Atrito narrativo (ver `comic-reliefs.md` cena 2, "Tabulações vs Espaços" e cena 8, "Comentários em Latim").
+**Justificativa de pillar:** relógio mecânico é state machine, só substrato diferente. Asmódico segue Pillar 2 ("sistema formal computável"); apenas opera em latão e mola em vez de silício. Drama interno party: Asmódico é tese rival ao C-Arcane do Gus. Atrito narrativo (ver `comic-reliefs/cena-02-tabulacoes-vs-espacos.md`, "Tabulações vs Espaços", e `comic-reliefs/cena-08-comentarios-em-latim.md`, "Comentários em Latim").
 
 ### 7.10 Glossário terminológico (sem "runa")
 
@@ -362,7 +362,7 @@ Em zonas infectadas, o shader Perlin que rege flora/fauna **glitcha visualmente*
 
 ### 8.4 Relação com Sterling
 
-Sterling **liberou Patch-Zero achando que controlava**. Quando percebeu que não controla, tentou contenção massiva. Falhou. Agora finge publicamente que Patch-Zero não existe ("comportamentos emergentes inesperados"; ver `comic-reliefs.md` cena 6).
+Sterling **liberou Patch-Zero achando que controlava**. Quando percebeu que não controla, tentou contenção massiva. Falhou. Agora finge publicamente que Patch-Zero não existe ("comportamentos emergentes inesperados"; ver `comic-reliefs/cena-06-bug-declarado-feature.md`).
 
 Patch-Zero **odeia** Sterling especificamente. Sterling tentou capturar e domesticar; Patch-Zero não esquece. Em diálogos com Gus, Patch-Zero refere a Sterling como "o que tentou nos enjaular". Plural deliberado.
 
@@ -442,7 +442,7 @@ Hospital cobra crédito por cura rápida (Pillar 4 / hospital + economia). Cura 
 
 ### 11.5 Tabus e honra
 
-- **Histórico apagado é tabu** entre tradicionalistas (Ordem Recursiva, Underground): "histórico é como a gente sabe pra onde a coisa vai" (citação de Gus em `comic-reliefs.md` cena 4; foreshadow Dante).
+- **Histórico apagado é tabu** entre tradicionalistas (Ordem Recursiva, Underground): "histórico é como a gente sabe pra onde a coisa vai" (citação de Gus em `comic-reliefs/cena-04-force-push.md`; foreshadow Dante).
 - **Honrar o substrato** é virtude técnica: bom programador respeita o hardware. Mau programador (paradigma Sterling) trata hardware como descartável.
 - **Quebrar contrato com a Selve** (entrar sem respeito, extrair sem dar) é desonra entre pesquisadores éticos. Sterling Corp violou esse contrato sistematicamente.
 
@@ -559,7 +559,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 ### Runners juvenis dos Dutos (grupo Cauã)
 
 - **Cauã** (13), líder informal. Já canônico.
-- **Tao Berisi** (12), segundo Cauã. Especialista navegação vertical. Comutador-Antigo de jogos ([[comic-reliefs]] EE-16).
+- **Tao Berisi** (12), segundo Cauã. Especialista navegação vertical. Comutador-Antigo de jogos ([[comic-reliefs/homenagens-diegeticas|comic-reliefs EE-16]]).
 - **Inês Marçal** (11), pequena, ágil, conhecedora dos Dutos profundos. Salva por Cauã em -3.
 - **Bel Galvão** (14), mais velha do grupo. Treina os menores em combate básico.
 - **Pirilampo** (apelido, 13), sem nome formal conhecido (órfão registrado). Especialista em improvisar luz com baterias descartadas.
@@ -567,7 +567,7 @@ Personagens secundários canônicos com peso narrativo no arco principal ou side
 ### Aldeias-fronteira Pelicano Branco (NPCs secundários)
 
 - **Anciã Mariana Vanderbist** (89), já listada.
-- **Bito Caldeira** (60), prefeito informal vilarejo ([[comic-reliefs]] EE-14).
+- **Bito Caldeira** (60), prefeito informal vilarejo ([[comic-reliefs/homenagens-diegeticas|comic-reliefs EE-14]]).
 - **Helena Sirinhaém** (50), herborista júnior. Aliada Jaci.
 - **Solane Vanderbist** (8), primo distante Jaci. Criança do vilarejo. Aparece em sub-quest plantio.
 
@@ -622,7 +622,7 @@ Cumprimentos variam por setting (Cidade: "Compila bem"; Catedrais: "A engrenagem
 - **Sterling spec narrativa:** `docs/narrative/characters/sterling-locke.md`
 - **Patch-Zero spec narrativa:** `docs/narrative/characters/patch-zero.md`
 - **Party:** `docs/narrative/characters/party.md`
-- **Alívios cômicos canônicos:** `docs/narrative/comic-reliefs.md`
+- **Alívios cômicos canônicos:** `docs/narrative/comic-reliefs.md` (índice; cenas e catálogo em `docs/narrative/comic-reliefs/`)
 - **Timeline cronológica:** [[timeline]]
 - **Documentos in-world descobríveis:** [[in-world-docs]]
 - **Tradições e cultura detalhadas:** [[tradicoes-cultura]]

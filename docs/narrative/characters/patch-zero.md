@@ -207,7 +207,7 @@ Propostas a Gus são **manobras táticas**: usar Gus contra Sterling, depois con
 
 ### Sterling NÃO é aliado de Patch-Zero
 
-Sterling fingiu publicamente que Patch-Zero não existe ("comportamentos emergentes inesperados"; ver `comic-reliefs.md` cena 6). Privadamente, Sterling tenta contenção massiva. Falha.
+Sterling fingiu publicamente que Patch-Zero não existe ("comportamentos emergentes inesperados"; ver `comic-reliefs/cena-06-bug-declarado-feature.md`). Privadamente, Sterling tenta contenção massiva. Falha.
 
 **Sterling teme Patch-Zero.** Único momento em todo o jogo em que Sterling demonstra algo próximo de emoção genuína: privado, ato 2, sussurrando a Vorto da FIR: "*patch* extrapolou. reabsorção é prioridade. não publicidade."
 

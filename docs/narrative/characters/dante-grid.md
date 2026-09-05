@@ -21,7 +21,7 @@
   - **Vocabulário:** técnico-prático. Frases curtas operacionais ("pode mexer aí", "passa o estilete", "tá pronto"). Pouco lirismo.
   - **Sintaxe:** declarativa, contida. Raramente pergunta. Quando pergunta, é tática.
   - **Tic:** olha para o lado durante 1 segundo antes de afirmar algo importante (foreshadow: tá conferindo se Sterling concorda).
-  - **Linguagem-âncora cômica (publicamente):** **Asmódico**. Despreza histórico ("histórico é peso morto", Cena 4 `comic-reliefs.md`). **Mas é foreshadow:** Asmódico verdadeiro venera histórico. Dante usa o vocabulário sem o ethos. **Late game (~75%):** Dante começa a defender C-Arcane sem perceber. [[bento-requiem]] percebe (intuição). Player atento percebe.
+  - **Linguagem-âncora cômica (publicamente):** **Asmódico**. Despreza histórico ("histórico é peso morto", Cena 4 `comic-reliefs/cena-04-force-push.md`). **Mas é foreshadow:** Asmódico verdadeiro venera histórico. Dante usa o vocabulário sem o ethos. **Late game (~75%):** Dante começa a defender C-Arcane sem perceber. [[bento-requiem]] percebe (intuição). Player atento percebe.
 
 ---
 
@@ -60,7 +60,7 @@ Dante segue **a estrutura aparente**, mas cada beat é cobertura para a operaç�
 
 ## Mini-quest pré-recrutamento
 
-Gus + Dante neutralizam patrulha FIR. Dante demonstra habilidade técnica. Cena `comic-reliefs.md` 4 ("Force Push") NÃO dispara ainda (auto-trigger após 3 arcos completos = 50%, ato 2 mid).
+Gus + Dante neutralizam patrulha FIR. Dante demonstra habilidade técnica. Cena 4 `comic-reliefs/cena-04-force-push.md` ("Force Push") NÃO dispara ainda (auto-trigger após 3 arcos completos = 50%, ato 2 mid).
 
 ## Mini-quest pós-recrutamento (crise + reflexão)
 
@@ -76,7 +76,7 @@ Destrava: **upgrade dedos modulares** (capacidade de hack rápido em terminais; 
 
 ## Conflito intra-party específico
 
-- **vs [[gus]]:** linguagem (Asmódico aparente vs C-Arcane). Sutil. **Cena 4 `comic-reliefs.md` é a chave**: Dante despreza "histórico"; Gus contrapõe "histórico é como a gente sabe pra onde a coisa vai." Player atento marca.
+- **vs [[gus]]:** linguagem (Asmódico aparente vs C-Arcane). Sutil. **Cena 4 `comic-reliefs/cena-04-force-push.md` é a chave**: Dante despreza "histórico"; Gus contrapõe "histórico é como a gente sabe pra onde a coisa vai." Player atento marca.
 - **vs [[bento-requiem]]:** **conflito principal**. Bento desconfia desde o início (intuição Asmódico). Dante usa terminologia Asmódico mas viola ethos (force push). Bento não articula até late game. Fricção crescente.
 - **vs [[jaci-proxy]]:** Jaci é o oposto de Dante (orgânica, honesta, biológica). Dante a evita levemente. Player atento percebe.
 - **vs [[caua-volt]]:** parceria operacional pragmática. Cauã não tem antena pra detectar duplicidade ainda.
@@ -120,7 +120,7 @@ Rootkit progride em ondas:
 |---|---|
 | Pré-recrutamento manutenção | ~5% (instalação básica) |
 | Pós-recrutamento manutenção | ~50% (instalação intermediária) |
-| Cena `comic-reliefs.md` 4 (auto após 3 arcos = 50% jogo) | ~80% (instalação avançada) |
+| Cena 4 `comic-reliefs/cena-04-force-push.md` (auto após 3 arcos = 50% jogo) | ~80% (instalação avançada) |
 | Pós-arco 4 (~50% jogo) | 100% (instalação completa). **Stats começam a degradar visivelmente.** |
 | Pós-reveal climax | Removido durante combate mini-boss (puzzle in-combat) |
 

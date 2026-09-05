@@ -76,12 +76,12 @@ Sterling Corp comprou o evento principal há 8 anos. Mudanças:
 
 ### Origem
 
-Homenagem coletiva à Pilha Sobrecarregada (Tomo da Pilha Sobrecarregada surgido ~ano -100; ver [[lore-bible]] §11.2 e [[comic-reliefs]] cena 7). Mantida pela comunidade técnica desde então sem captura corporativa significativa (Sterling tentou; população resistiu por trivialização: "não tem ROI suficiente").
+Homenagem coletiva à Pilha Sobrecarregada (Tomo da Pilha Sobrecarregada surgido ~ano -100; ver [[lore-bible]] §11.2 e [[comic-reliefs/cena-07-tomo-da-pilha-sobrecarregada|comic-reliefs cena 7]]). Mantida pela comunidade técnica desde então sem captura corporativa significativa (Sterling tentou; população resistiu por trivialização: "não tem ROI suficiente").
 
 ### Tradições
 
 - **Praça aberta:** principal praça do Núcleo Metropolitano (Praça da Compilação) vira mercado de problemas e soluções. Bancadas improvisadas. Pessoas trazem problemas técnicos não-resolvidos do ano. Outras pessoas resolvem na hora.
-- **Resposta cerimonial:** o problema mais bobo do ano é eleito por aclamação. Quem trouxe ganha **Selo da Pergunta Pequena** (medalha simbólica de latão; orgulho irônico). [[comic-reliefs]] cena 7 ressoa.
+- **Resposta cerimonial:** o problema mais bobo do ano é eleito por aclamação. Quem trouxe ganha **Selo da Pergunta Pequena** (medalha simbólica de latão; orgulho irônico). [[comic-reliefs/cena-07-tomo-da-pilha-sobrecarregada|comic-reliefs cena 7]] ressoa.
 - **Comida cerimonial:** **café-de-neurônio** (café forte com canela e gengibre, coquetel "anti-burnout") + **biscoito-de-loop** (biscoito em formato infinito; massa enrolada sobre si).
 - **Vigília de manutenção:** voluntários técnicos consertam terminais públicos de pessoas que não podem pagar manutenção. Toda a noite. Sem cobrança.
 
@@ -157,7 +157,7 @@ Festividade do vilarejo do Pelicano Branco e aldeias-fronteira Selve. Pré-Era 2
 
 ### No jogo
 
-- Sub-quest opcional arco Jaci: Gus participa do plantio. Recompensa: **Cristal-de-Colheita** (Token raro de cura; ver [[comic-reliefs]] EE-13).
+- Sub-quest opcional arco Jaci: Gus participa do plantio. Recompensa: **Cristal-de-Colheita** (Token raro de cura; ver [[comic-reliefs/homenagens-diegeticas|comic-reliefs EE-13]]).
 - Cena emocional contida: Jaci e Mariana plantam semente em nome de Lia (mãe morta). Gus presente. Silêncio. (Pillar 4: sem catarse explosiva.)
 - Trigger ambient ato 2 se cronologia o permite. Pode aparecer como flashback narrativo em ending Ouro.
 
@@ -309,7 +309,7 @@ Costumes não-festivos do dia a dia em GusWorld. Apareciam em ambient, dialogue 
 
 ### Gestos canônicos
 
-- **Sinal do compilador:** cruz no peito sobre o cronômetro/coração. Mestres Asmódicos. Bento ([[comic-reliefs]] cena 1).
+- **Sinal do compilador:** cruz no peito sobre o cronômetro/coração. Mestres Asmódicos. Bento ([[comic-reliefs/cena-01-sexta-feira-cinco-da-tarde|comic-reliefs cena 1]]).
 - **Mão aberta sobre coração:** Pelicano Branco. Reverência ao plantio.
 - **Dois dedos na orelha:** Underground. Sinaliza "estou escutando" silenciosamente.
 - **Mão fechada batendo levemente no antebraço esquerdo:** Cauã + runners juvenis dos Dutos. Saudação peer.
@@ -348,7 +348,7 @@ Costumes não-festivos do dia a dia em GusWorld. Apareciam em ambient, dialogue 
 
 ### Tabus e etiqueta
 
-- **Não force-push (Asmódico):** apagar histórico sem consulta. Considerado heresia (Bento, [[comic-reliefs]] cena 4). Em sociedade geral: vergonhoso entre técnicos.
+- **Não force-push (Asmódico):** apagar histórico sem consulta. Considerado heresia (Bento, [[comic-reliefs/cena-04-force-push|comic-reliefs cena 4]]). Em sociedade geral: vergonhoso entre técnicos.
 - **Não pisar em cripto-glifo Neo-Sylvania:** se estiver visível, contorne. Cidadania urbana ainda mantém parcialmente.
 - **Não falar alto na Zona do Silêncio:** óbvio em retrospectiva. Visitantes que erram são silenciados com dois dedos na orelha (gesto + olhar).
 - **Não tocar no cronômetro mecânico de um mestre Asmódico:** instrumento pessoal. Tocar sem permissão = ofensa séria.

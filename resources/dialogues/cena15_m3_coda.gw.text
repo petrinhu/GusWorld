@@ -1,7 +1,7 @@
 // cena15_m3_coda.gw.text
 //
 // Cena 15 "Pergunta amanha", Movimento 3: a coda.
-// Fonte canonica: docs/narrative/comic-reliefs.md, Cena 15 (nenhuma fala alterada).
+// Fonte canonica: docs/narrative/comic-reliefs/cena-15-pergunta-amanha.md, Cena 15 (nenhuma fala alterada).
 //
 // GATILHO: voltar ao caixote nos Dutos DEPOIS do payoff em combate. O payoff em si
 // ("Compila e roda." / "Essa aqui compilou mesmo.") sao DUAS BARKS de combate, nao

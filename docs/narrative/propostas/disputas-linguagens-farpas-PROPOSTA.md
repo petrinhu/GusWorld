@@ -34,7 +34,7 @@ Legenda de volume: **FARTO** = mais material do que uma onda consegue usar · **
 
 | Par | Volume | Onde já existe | Natureza do que existe |
 |---|---|---|---|
-| **Gus x Bento** | **FARTO** | `vozes-party.md:467-536` (banter B1 a B6); `gus-apartes-c-arcane.md:175-195` (A13 a A16); revides R-04 (`:375`) e R-05 (`:391`); `comic-reliefs.md` Cenas 2 e 8 | 6 trocas fechadas + 4 apartes + 2 revides + 2 cenas. **É o par melhor servido do jogo inteiro.** |
+| **Gus x Bento** | **FARTO** | `vozes-party.md:467-536` (banter B1 a B6); `gus-apartes-c-arcane.md:175-195` (A13 a A16); revides R-04 (`:375`) e R-05 (`:391`); `comic-reliefs/cena-02-tabulacoes-vs-espacos.md` e `comic-reliefs/cena-08-comentarios-em-latim.md` | 6 trocas fechadas + 4 apartes + 2 revides + 2 cenas. **É o par melhor servido do jogo inteiro.** |
 | **Gus x Cauã** | **FARTO** | `vozes-party.md:117-179` (B1 a B6); `gus-apartes-c-arcane.md:44-75` (A1 a A6); revides R-01 (`:307`) e R-03 (`:353`); Cenas 1, 3 e 10 | 6 trocas + 6 apartes + 2 revides + 3 cenas |
 | **Gus x Iara** | **FARTO** | apartes A7 a A12 (`:78-108`) e o lote 2 inteiro A22 a A29 (`:112-171`); revides R-06 (`:415`), R-09, R-10, R-12; `vozes-party.md:653-689`; Cena 5 | 14 apartes + 4 revides + 1 cena. Atenção: `vozes-party.md:653-689` **não é disputa de linguagem**, é o jogo de leitura ("o código que ela não decifra"). |
 | **Gus x Linda** | **SERVIDO** | apartes A9, A11, A23, A25, A27, A29; revides R-07, R-11, R-13; A30 (`:659`, o gato e o peixe); `vozes-party.md:873-889`; Cena 6 | 6 apartes + 3 revides + o diálogo A30 |

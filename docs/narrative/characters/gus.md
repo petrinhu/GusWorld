@@ -57,12 +57,12 @@ Não aplicável a Gus diretamente (protagonista). Cada arco companion gera "upgr
 
 Atrita com **todos**, em alternância. Conflitos linguísticos contínuos:
 
-- vs [[bento-requiem]] (Asmódico): Cenas 2 e 8 de `comic-reliefs.md`.
-- vs [[dante-grid]] (Asmódico no início, foreshadow): Cena 4 `comic-reliefs.md`.
-- vs [[iara-lumen]] (Óxido): Cena 5 `comic-reliefs.md`.
-- vs [[caua-volt]] (Pythia): Cenas 3, 7, 10 `comic-reliefs.md`.
-- vs [[jaci-proxy]] (Pythia): Cena 9 `comic-reliefs.md`.
-- vs [[linda-siren]]: menos linguístico, mais filosófico (Cena 6 `comic-reliefs.md`).
+- vs [[bento-requiem]] (Asmódico): `comic-reliefs/cena-02-tabulacoes-vs-espacos.md` e `comic-reliefs/cena-08-comentarios-em-latim.md`.
+- vs [[dante-grid]] (Asmódico no início, foreshadow): Cena 4 `comic-reliefs/cena-04-force-push.md`.
+- vs [[iara-lumen]] (Óxido): Cena 5 `comic-reliefs/cena-05-expressao-regular.md`.
+- vs [[caua-volt]] (Pythia): `comic-reliefs/cena-03-funciona-no-meu-drive.md`, `comic-reliefs/cena-07-tomo-da-pilha-sobrecarregada.md` e `comic-reliefs/cena-10-nao-e-magia-e-cache.md`.
+- vs [[jaci-proxy]] (Pythia): Cena 9 `comic-reliefs/cena-09-off-by-one.md`.
+- vs [[linda-siren]]: menos linguístico, mais filosófico (Cena 6 `comic-reliefs/cena-06-bug-declarado-feature.md`).
 
 ---
 
@@ -206,7 +206,7 @@ Professora distribui exercício: combinar 2 tokens. Gus levanta a mão: "posso f
 
 ### Aos 8 anos, na horta da avó **Belinor Vance** (interior, antes da morte da avó)
 
-Gargi leva Gus para visitar a mãe dela no interior (Belinor morre meses depois; última visita). Avó mostra a horta. Gus pergunta: "como você sabe quando plantar?" Belinor responde: "eu olho o céu, sinto o vento, e arrisco." Gus pergunta: "e se errar?" Belinor: "errei muito. ainda planto." Gus fica em silêncio o resto da visita. À noite, no quarto improvisado, escreve no caderno: "lógica = arriscar com método". *Importa porque:* origem do que vai virar a tese central dele ("manutenção é eterna"). Avó morre semanas depois sem que Gus consiga voltar; ele guarda a frase. Referência [[comic-reliefs]] EE-13 ("toda lógica começa numa horta").
+Gargi leva Gus para visitar a mãe dela no interior (Belinor morre meses depois; última visita). Avó mostra a horta. Gus pergunta: "como você sabe quando plantar?" Belinor responde: "eu olho o céu, sinto o vento, e arrisco." Gus pergunta: "e se errar?" Belinor: "errei muito. ainda planto." Gus fica em silêncio o resto da visita. À noite, no quarto improvisado, escreve no caderno: "lógica = arriscar com método". *Importa porque:* origem do que vai virar a tese central dele ("manutenção é eterna"). Avó morre semanas depois sem que Gus consiga voltar; ele guarda a frase. Referência [[comic-reliefs/homenagens-diegeticas|comic-reliefs EE-13]] ("toda lógica começa numa horta").
 
 ### Aos 9 anos, recebe primeiro Tavus-Drive de uso (dia do aniversário)
 

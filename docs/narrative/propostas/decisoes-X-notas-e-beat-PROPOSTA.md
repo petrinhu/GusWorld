@@ -165,8 +165,8 @@ Ou seja: o shuffle bag de barks do Cauã precisa de **um flag de estado**, não 
 
 | # | Item | Natureza |
 |---|---|---|
-| **N-01a** | Nota mínima no payoff da Cena 7: acrescentar "de ergonomia" | edição de 1 palavra em `comic-reliefs.md` |
-| **N-01b** | Nota completa no payoff da Cena 7 (**recomendada**; escolher uma, não as duas) | edição de 1 frase em `comic-reliefs.md` |
+| **N-01a** | Nota mínima no payoff da Cena 7: acrescentar "de ergonomia" | edição de 1 palavra em `comic-reliefs/cena-07-tomo-da-pilha-sobrecarregada.md` |
+| **N-01b** | Nota completa no payoff da Cena 7 (**recomendada**; escolher uma, não as duas) | edição de 1 frase em `comic-reliefs/cena-07-tomo-da-pilha-sobrecarregada.md` |
 | **N-02** | Nota de leitura depois do `*Resultado*` do B2 do Cauã | edição de 1 parágrafo em `vozes-party.md` |
 | **N-02b** | *(opcional)* duplicar a mesma frase como bullet no §6 "Não fazer" do Cauã | edição adicional em `vozes-party.md` |
 | **B-01** | Colocação do beat: dentro da mini-quest posterior do Cauã (crise + reflexão) | decisão de desenho |

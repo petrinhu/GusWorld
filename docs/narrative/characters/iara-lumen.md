@@ -18,7 +18,7 @@
   - **Vocabulário:** termos de filmagem, holografia, manipulação de imagem. Latim ocasional misturado.
   - **Sintaxe:** frases longas elegantes, com pausas calculadas. Quase poesia.
   - **Tic:** termina frases sussurrando levemente, como se sempre estivesse meio escondida.
-  - **Linguagem-âncora cômica:** **Óxido**. Defende elegância opaca. "Quatro caracteres fazem o trabalho de oitenta linhas em C-Arcane" (Cena 5 `comic-reliefs.md`). Vs Pythia: "Pythia é poesia. Óxido é arquitetura."
+  - **Linguagem-âncora cômica:** **Óxido**. Defende elegância opaca. "Quatro caracteres fazem o trabalho de oitenta linhas em C-Arcane" (Cena 5 `comic-reliefs/cena-05-expressao-regular.md`). Vs Pythia: "Pythia é poesia. Óxido é arquitetura."
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|
 | **Chamado** | Cult Mirage planeja festival "atualização sensorial" patrocinado Sterling. Iara quer sabotar mas precisa parceiro técnico. |
 | **Recusa** | Recusa [[gus]] como "criança honesta demais pra esse trabalho". |
-| **Mentor** | Gus prova competência via leitura de regex Óxido (Cena 5 `comic-reliefs.md` aproximada). Iara aceita parceria. |
+| **Mentor** | Gus prova competência via leitura de regex Óxido (Cena 5 `comic-reliefs/cena-05-expressao-regular.md` aproximada). Iara aceita parceria. |
 | **Prova** | Infiltração no núcleo do Cult. Confronto Sterling holograma alta fidelidade (manipulação filosófica). Iara quase cede ("você acha que recusa, apenas alimenta"); Gus a ancora. |
 | **Retorno** | Iara junta-se à party. Conjuro novo: **Decoy Lumen**. Reveal: facção artista existe internamente; futuro arco pós-recrutamento. |
 

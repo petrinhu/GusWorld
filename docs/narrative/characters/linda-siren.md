@@ -63,7 +63,7 @@ Destrava: **upgrade fones industriais** (modo "ressonância seletiva": Linda pod
 
 ## Conflito intra-party específico
 
-- **vs [[gus]]:** filosófico mais que linguístico. Cena 6 `comic-reliefs.md` ("Bug declarado Feature"). Linda capta rápido como Sterling distorce realidade via linguagem; Gus reconhece valor.
+- **vs [[gus]]:** filosófico mais que linguístico. Cena 6 `comic-reliefs/cena-06-bug-declarado-feature.md` ("Bug declarado Feature"). Linda capta rápido como Sterling distorce realidade via linguagem; Gus reconhece valor.
 - **vs [[caua-volt]]:** **conflito principal**. Ruído incidental vs noise-canceling. Aproximação via arco Linda (Cauã percebe peso do som). Cena cômica reservada (`comic-reliefs.md` pode adicionar).
 - **vs [[iara-lumen]]:** desprezo mútuo inicial (Underground vs Cult Mirage). Aliança operacional gradual.
 - **vs [[bento-requiem]]:** aliança natural (tradição + underground compartilham antitese a Sterling).

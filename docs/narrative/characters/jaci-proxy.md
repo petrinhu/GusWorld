@@ -17,8 +17,8 @@
 - **Voice:**
   - **Vocabulário:** científico misturado com nomes de plantas. Refere doenças por sintoma específico, não por nome ("o que mexe na linfa", "o que aperta o pulmão").
   - **Sintaxe:** frases médias, suaves. Cadência maternal apesar da idade.
-  - **Tic:** organiza/conta ampolas o tempo todo (Cena 9 `comic-reliefs.md`, off-by-one). Pequena obsessão de ordem.
-  - **Linguagem-âncora cômica:** **Pythia**. Compartilha com [[caua-volt]]. Defende leitura, perdão de erros menores. "Pythia te entende. Pythia perdoa o ponto-e-vírgula esquecido." Cena 2 `comic-reliefs.md` (alia-se a Gus contra Bento).
+  - **Tic:** organiza/conta ampolas o tempo todo (Cena 9 `comic-reliefs/cena-09-off-by-one.md`, off-by-one). Pequena obsessão de ordem.
+  - **Linguagem-âncora cômica:** **Pythia**. Compartilha com [[caua-volt]]. Defende leitura, perdão de erros menores. "Pythia te entende. Pythia perdoa o ponto-e-vírgula esquecido." Cena 2 `comic-reliefs/cena-02-tabulacoes-vs-espacos.md` (alia-se a Gus contra Bento).
 
 ---
 
@@ -63,7 +63,7 @@ Destrava: **upgrade ampolas pneumáticas** (capacidade de buffar 2 aliados simul
 
 ## Conflito intra-party específico
 
-- **vs [[gus]]:** linguagem (Pythia vs C-Arcane). Cena 9 `comic-reliefs.md` (off-by-one). Aliança natural (Cena 2 `comic-reliefs.md`).
+- **vs [[gus]]:** linguagem (Pythia vs C-Arcane). Cena 9 `comic-reliefs/cena-09-off-by-one.md` (off-by-one). Aliança natural (Cena 2 `comic-reliefs/cena-02-tabulacoes-vs-espacos.md`).
 - **vs [[bento-requiem]]:** linguístico (Pythia vs Asmódico). Cena 2 referência. Aproximação por respeito mútuo a "substrato vivo": Asmódico respeita matéria; Pythia respeita corpo.
 - **vs [[iara-lumen]]:** **conflito principal sub-temático**. Iara opera por ilusão; Jaci por verdade orgânica. Tensão filosófica. Resolvem em ato 2: Iara salva Jaci de armadilha com decoy holográfico; Jaci aceita que ilusão pode servir vida. Aliança fundada em ação.
 - **vs [[dante-grid]]:** Jaci evita Dante sem articular por quê (sub-consciente lê algo errado no corpo dele, bio-leitura). Dante a evita também. Distância mútua.
@@ -100,7 +100,7 @@ Jaci estava em viagem com Mariana ao Vilarejo do Pelicano Roxo (oeste; 2 dias de
 
 ### Aos 6 anos, primeira vez sintetiza antídoto sozinha
 
-Mariana coloca os ingredientes na bancada. "Faz." Jaci hesita. Mariana: "se errar, eu te avisar." Jaci começa. Erra dosagem de uma raiz. Mariana segura. "Aqui. Conta de novo." Jaci conta: tinha posto 11 gotas em vez de 10. Refaz. Antídoto pronto. Mariana sorri. "Você vai contar a vida inteira. Vai contar errado às vezes. Vai aprender a recontar." *Importa porque:* origem da farmacêutica. Origem do "off-by-one" de [[comic-reliefs]] cena 9, vem de longe. Mariana pré-empacotou a metáfora: contar é cuidar.
+Mariana coloca os ingredientes na bancada. "Faz." Jaci hesita. Mariana: "se errar, eu te avisar." Jaci começa. Erra dosagem de uma raiz. Mariana segura. "Aqui. Conta de novo." Jaci conta: tinha posto 11 gotas em vez de 10. Refaz. Antídoto pronto. Mariana sorri. "Você vai contar a vida inteira. Vai contar errado às vezes. Vai aprender a recontar." *Importa porque:* origem da farmacêutica. Origem do "off-by-one" de [[comic-reliefs/cena-09-off-by-one|comic-reliefs cena 9]], vem de longe. Mariana pré-empacotou a metáfora: contar é cuidar.
 
 ### Aos 8 anos, primeira vez vê fauna corrompida na Selve Profunda
 

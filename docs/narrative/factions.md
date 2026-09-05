@@ -207,7 +207,7 @@ Cor institucional: latão oxidado + preto-titânio + branco-osso.
 
 ### Tradições internas
 
-- **Sinal do compilador:** cruz no peito sobre o cronômetro mecânico. Mestres + aprendizes. Bento ([[comic-reliefs]] cena 1).
+- **Sinal do compilador:** cruz no peito sobre o cronômetro mecânico. Mestres + aprendizes. Bento ([[comic-reliefs/cena-01-sexta-feira-cinco-da-tarde|comic-reliefs cena 1]]).
 - **Cumprimento canônico:** "A engrenagem te guie." / "E a tua também."
 - **Pão-de-engrenagem:** alimento cerimonial em Vigílias e aniversários ([[tradicoes-cultura]] §3, §9).
 - **Sincronização ritual dos cronômetros:** todos os cronômetros mecânicos pessoais dos mestres são sincronizados ritualmente uma vez por ano (Vigília Neo-Sylvania). Cronômetro fora de sincronia indica "negligência ou apostasia".
@@ -388,7 +388,7 @@ Cor institucional: verde-ciano biolúmen + marrom-húmus + branco-fungo.
 #### Vilarejo do Pelicano Branco
 
 - **Anciã Mariana Vanderbist** (89): já listada.
-- **Bito Caldeira** (60): prefeito informal vilarejo ([[comic-reliefs]] EE-14). Decisões coletivas passam por ele formalmente; substância vem da Anciã.
+- **Bito Caldeira** (60): prefeito informal vilarejo ([[comic-reliefs/homenagens-diegeticas|comic-reliefs EE-14]]). Decisões coletivas passam por ele formalmente; substância vem da Anciã.
 - **Helena Sirinhaém** (50): herborista júnior. Aliada Jaci. Trabalha em paralelo, especializada em antídotos respiratórios.
 - **Bem-Te-Vi Caldeira** (35): filho do Bito. Mantém comércio do vilarejo. Pacifista declarado.
 - **Solane Vanderbist** (8): primo distante Jaci. Criança do vilarejo. Aparece em sub-quest plantio.
@@ -655,7 +655,7 @@ Sobrevivência cooperativa em terreno hostil. Sem manifesto. Lealdade horizontal
 ### NPCs secundários nomeados
 
 - **Cauã "Volt" Berenger** (13): líder informal. Já canônico.
-- **Tao Berisi** (12): segundo Cauã. Especialista navegação vertical. Comutador-Antigo de jogos ([[comic-reliefs]] EE-16).
+- **Tao Berisi** (12): segundo Cauã. Especialista navegação vertical. Comutador-Antigo de jogos ([[comic-reliefs/homenagens-diegeticas|comic-reliefs EE-16]]).
 - **Inês Marçal** (11): pequena, ágil, conhecedora dos Dutos profundos. Salva por Cauã em -3 (incidente que cimentou relação).
 - **Bel Galvão** (14): mais velha do grupo. Treina os menores em combate básico. Voz mais firme do grupo após Cauã.
 - **Pirilampo** (apelido, 13): sem nome formal conhecido (órfão registrado). Especialista em improvisar luz com baterias descartadas. Apelido vem do tic de iluminar a si mesmo no escuro.

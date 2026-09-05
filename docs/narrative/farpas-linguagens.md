@@ -19,9 +19,9 @@ Consequência: **Pythia (Cauã e Jaci) perde no eixo da execução, sempre.** A 
 | Requisito | Aplica a | O que o sistema de barks precisa saber |
 |---|---|---|
 | **Elenco** | F11 a F22 (pares Cauã × Iara e Jaci × Linda) | Só disparam com o **Gus FORA do grupo ativo**. Sem o Gus na sala os dois chegam sozinhos a conclusões que favorecem o ausente, e é isso que faz o par existir em vez de virar plateia. |
-| **Estado do bordão** | F02, F13 | Ficam melhores **depois** do payoff da [Cena 15](comic-reliefs.md) (o bordão do Cauã tem três estados, ver `CAUA-BORDAO-3-ESTADOS` no `TODO.md`). |
-| **Eco pós-cena (trava dura)** | **F11, F12, F13** | Estas três **vivem dentro da [Cena 16](comic-reliefs.md) quase palavra por palavra**. Só podem disparar **DEPOIS de a cena ter acontecido**. Antes disso, o jogador ouviria a troca fora de contexto e a cena chegaria depois soando repetida. Decisão do criador, 2026-07-27. |
-| **Eco pós-cena (trava dura)** | **F17, F18, F19, F21** | Mesma situação com a [Cena 17](comic-reliefs.md), que contém **quatro das seis** farpas do par Jaci x Linda. Só disparam depois da cena. Livres desde o começo: apenas F20 e F22. |
+| **Estado do bordão** | F02, F13 | Ficam melhores **depois** do payoff da [Cena 15](comic-reliefs/cena-15-pergunta-amanha.md) (o bordão do Cauã tem três estados, ver `CAUA-BORDAO-3-ESTADOS` no `TODO.md`). |
+| **Eco pós-cena (trava dura)** | **F11, F12, F13** | Estas três **vivem dentro da [Cena 16](comic-reliefs/cena-16-ela-esta-pensando.md) quase palavra por palavra**. Só podem disparar **DEPOIS de a cena ter acontecido**. Antes disso, o jogador ouviria a troca fora de contexto e a cena chegaria depois soando repetida. Decisão do criador, 2026-07-27. |
+| **Eco pós-cena (trava dura)** | **F17, F18, F19, F21** | Mesma situação com a [Cena 17](comic-reliefs/cena-17-pra-frente-e-pra-tras.md), que contém **quatro das seis** farpas do par Jaci x Linda. Só disparam depois da cena. Livres desde o começo: apenas F20 e F22. |
 | **Versão por idioma** | F09 | A fala pt-br e a inglesa usam **pares de termos diferentes**, não tradução. Ver a nota na própria farpa e a seção 11 do [guia de diálogos](guia-dialogos.md). |
 
 ---

@@ -41,7 +41,7 @@ Convenções de colunas:
 
 | F### | Cat. | Plant (resumo curto) | Tipo Diário | Entry ID Diário | Knowledge gate 2ª-passada | Sticky note | Notas |
 |---|---|---|---|---|---|---|---|
-| F001 | DAN | Cena 4 `comic-reliefs` "Force Push" (desprezo histórico) | Manuscrito + Ficha | M-018 + F-DAN-04 | Auto-trigger 50% campanha | **Vermelha** (pós-reveal) | Manuscrito curto de Gus pós-cena registra estranhamento sem nomear. Ficha Dante double-layer atualiza após reveal climax Etapa 1. |
+| F001 | DAN | Cena 4 `comic-reliefs/cena-04-force-push.md` "Force Push" (desprezo histórico) | Manuscrito + Ficha | M-018 + F-DAN-04 | Auto-trigger 50% campanha | **Vermelha** (pós-reveal) | Manuscrito curto de Gus pós-cena registra estranhamento sem nomear. Ficha Dante double-layer atualiza após reveal climax Etapa 1. |
 | F002 | DAN | Terminal extra leste Oficina Alencar, porta ofuscada, cabo subindo teto | Manuscrito + Mapa | M-031 + MAP-06-04 | Knowledge média (visual) / alta (decifragem cabo Óxido) | **Vermelha** | Gus marca local em mapa Periferia (scan óculos). Manuscrito pós-investigação Knowledge alta. |
 | F003 | DAN | Antena clandestina segunda quintal Penkin (banda telemetria) | Manuscrito + Mapa | M-031 + MAP-06-05 | Knowledge média (óculos táticos) | **Vermelha** | Gus registra anomalia de transmissão; cross-link com F002 destrava sticky note. |
 | F004 | DAN | Mateus Penkin: "caminhão FIR quinta às 4 da manhã encosta no Alencar" | Manuscrito | M-022 | n/a (dito explicitamente) | **Vermelha** (Knowledge média) | Entry curta voice Gus + transcrição direta NPC fofoqueiro. |
@@ -86,8 +86,8 @@ Convenções de colunas:
 | F### | Cat. | Plant (resumo curto) | Tipo Diário | Entry ID Diário | Knowledge gate 2ª-passada | Sticky note | Notas |
 |---|---|---|---|---|---|---|---|
 | F030 | STE | Holograma Sterling em todo poste do Setor Mirage ato 1 | Manuscrito + Ficha-Sterling | M-008 + F-STE-01 | n/a (visual) | n/a (Knowledge alta destrava cross-link com F042) | Entry primeira menção; ficha Sterling stub no 1º hologram visto. |
-| F031 | STE/E3 | Janelarum trava periodicamente (cena 11 `comic-reliefs`) | Manuscrito | M-012 | Knowledge baixa | **Cinza-prateado** (Knowledge média) | Cross-link com Doc 5 (F036) destrava +3 Mecânico-meta. |
-| F032 | STE | Cena 6 `comic-reliefs` "Bug declarado feature" (propaganda Sterling) | Manuscrito | M-014 | n/a (explícito) | **Cinza-prateado** | Linda fala F103 referenciada na entry. |
+| F031 | STE/E3 | Janelarum trava periodicamente (cena 11 `comic-reliefs/cena-11-janelarum-travou-de-novo.md`) | Manuscrito | M-012 | Knowledge baixa | **Cinza-prateado** (Knowledge média) | Cross-link com Doc 5 (F036) destrava +3 Mecânico-meta. |
+| F032 | STE | Cena 6 `comic-reliefs/cena-06-bug-declarado-feature.md` "Bug declarado feature" (propaganda Sterling) | Manuscrito | M-014 | n/a (explícito) | **Cinza-prateado** | Linda fala F103 referenciada na entry. |
 | F033 | STE | Tela LED Sterling travada em loop toda Periferia | **AMBIENT ONLY** | n/a | n/a | n/a | Ambient mood; Gus não anota toda tela travada. |
 | F034 | STE | Cartaz "FREQUÊNCIAS LIMPAS PARA UM AMANHÃ CLARO, Sterling Sigma" rasgado pelo Underground | Mapa + Manuscrito leve | MAP-07-03 + M-019 (passing) | n/a | **Cinza-prateado** (cross-link com F046 destrava Ouro hint) | Marcador de mapa Zona do Silêncio. |
 | F035 | STE | Doc 1 in-world: *Tratado sobre a Supremacia do Script* | Pickup | P-DOC01 | n/a (frag) / Cúpula interior ato 3 (versão completa) | **Cinza-prateado** | Espelha [[in-world-docs]] §Doc 1. Versão completa gate Ouro implícito (Cúpula interior). |
@@ -209,7 +209,7 @@ Convenções de colunas:
 | F062 | E1/STE | Cripto-glifos espiralados em 12 pilares da Nave Principal Catedrais | Mapa + Pickup leve | MAP-03-06 + P-GLIF-05 | Knowledge baixa (visual) / alta (decifragem) | **Verde** + **Cinza-prateado** | Matemática Era 1 resiste à interpretação DRE. |
 | F066 | E2 | Placa latão "EUCALYPTUS-FRACTALIS-7 / -78" Trilha dos Pioneiros (Selve) | Mapa + Pickup leve | MAP-08-09 + P-OBJ-13 | Knowledge baixa | **Verde** | Era 2 catalogou via parceria Berenger-Vanderbist. |
 | F067 | E2 | Placa latão "À PRIMEIRA LINHA QUE COMPILOU, OBRIGADO" no chafariz seco Praça do Compilador | Mapa + Pickup leve | MAP-06-10 + P-OBJ-14 | n/a | **Verde** | Comunidade pré-Sterling cooperativa. |
-| F068 | E2 | Tomo da Pilha Sobrecarregada em sebo aberto Praça do Compilador | Pickup | P-DOC-TPS | n/a (cena 7 `comic-reliefs`) | **Verde** | Documentação coletiva Era 2 continua aberta. |
+| F068 | E2 | Tomo da Pilha Sobrecarregada em sebo aberto Praça do Compilador | Pickup | P-DOC-TPS | n/a (cena 7 `comic-reliefs/cena-07-tomo-da-pilha-sobrecarregada.md`) | **Verde** | Documentação coletiva Era 2 continua aberta. |
 | F069 | E1/E2 | Engrenagem-mestre de dentes em razão recorrente, 950 anos, altar Catedral Principal | Mapa + Pickup leve | MAP-03-07 + P-OBJ-15 | n/a (visual) | **Verde** | Pillar 2 ao vivo. |
 | F106 | E3/DAN | Festival do Reaproveitamento FIR cínico (novembro), cartazes cobrindo pichações cooperativas | Glossário cultural + Mapa | M-glossario-festivais + MAP-06-11 | n/a | **Verde** (Era 2 sob) + **Cinza-prateado** + **Vermelha** | Era 3 sobrepõe Era 2 ritualmente. |
 | F107 | E2 | Pichação "AINDA SOMOS NÓS" repintada semanalmente no Galpão Cooperativo abandonado | Mapa + Manuscrito leve | MAP-06-12 + M-023 | n/a (visual) | **Verde** | Periferia resiste passivamente. |
@@ -220,7 +220,7 @@ Convenções de colunas:
 |---|---|---|---|---|---|---|---|
 | F013 | MEC/DAN | Stats Gus degradam (mapeado §2.1) | (ver §2.1 F013) | n/a | n/a | n/a | Cross-ref. |
 | F100 | END | 3 caminhos visíveis do limite externo Núcleo Mandelbrot Interno | Mapa | MAP-08-10 (Núcleo Mandelbrot) | n/a (visual) / decisão Knowledge | **Azul** | Endings visualizados no espaço. |
-| F103 | COM-LIN/STE/theme | Cena pública: "Linda, você está pensando como Sterling." / "Que horror." | Manuscrito | M-014 (mesma entry cena 6 `comic-reliefs`) | n/a | **Amarela** + **Cinza-prateado** | Theme afirmado. |
+| F103 | COM-LIN/STE/theme | Cena pública: "Linda, você está pensando como Sterling." / "Que horror." | Manuscrito | M-014 (mesma entry cena 6 `comic-reliefs/cena-06-bug-declarado-feature.md`) | n/a | **Amarela** + **Cinza-prateado** | Theme afirmado. |
 | F105 | DAN/END | Hook 3 pós-créditos: voz Dante (ou alguém que poderia ser), "não pedi pra você confiar..." | Manuscrito (entry pós-créditos ambíguo) | M-EPI-HOOK3 | n/a (pós-créditos universal) | **Vermelha** + **Azul** | Pillar 4 contém ambiguidade. |
 | F115 | DAN/END | Sub-Diretora Vitória Marquês (FIR) começa a temer Sterling em ato 2 | Ficha-Vitória + Manuscrito | F-NPC-29 + M-040 | Ouro | **Amarela** + **Cinza-prateado** + **Azul** | Sidequest Ouro destrava aproximação. |
 

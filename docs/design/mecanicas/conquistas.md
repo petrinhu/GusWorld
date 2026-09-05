@@ -5,9 +5,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Conquistas (GusWorld) — especificação `.gw.achv`
 
-> **Origem:** item `D18` do `TODO.md`. Formaliza, em blueprint estrutural (não em prosa final — este documento é arquitetura, a redação de banner/copy cabe a `narrative-writer` quando `present/` nascer), as **sete conquistas cross-ato** listadas na tabela "Distribuição expandida pelos atos" de `docs/narrative/comic-reliefs.md`: EE-4, EE-9, EE-10, EE-12, EE-16, EE-18, EE-20.
+> **Origem:** item `D18` do `TODO.md`. Formaliza, em blueprint estrutural (não em prosa final — este documento é arquitetura, a redação de banner/copy cabe a `narrative-writer` quando `present/` nascer), as **sete conquistas cross-ato** listadas na tabela "Distribuição expandida pelos atos" de `docs/narrative/comic-reliefs.md` e detalhadas em `docs/narrative/comic-reliefs/homenagens-diegeticas.md`: EE-4, EE-9, EE-10, EE-12, EE-16, EE-18, EE-20.
 >
-> **Ponteiros (L-30):** `docs/narrative/comic-reliefs.md` (linhas 918-1093, seção "Homenagens diégeticas", e linha 2088, tabela "Distribuição expandida pelos atos") · `docs/tech/convencao-formatos-gw.md` (definição de `.gw.achv` e das duas naturezas da conquista, linhas 89-114).
+> **Ponteiros (L-30):** `docs/narrative/comic-reliefs/homenagens-diegeticas.md` (catálogo EE-N) e `docs/narrative/comic-reliefs.md` (tabela "Distribuição expandida pelos atos") · `docs/tech/convencao-formatos-gw.md` (definição de `.gw.achv` e das duas naturezas da conquista, linhas 89-114).
 >
 > **Fora de escopo aqui, por lei:** a apresentação do banner de conquista (texto na tela, animação, som) é `present/`, bloqueada pelo GlintFx e ainda inexistente (L-06, L-27). Este documento especifica só o **gatilho de domínio** — a condição verificável na camada de regra — e o **estado mínimo** que o save precisa registrar. Nomear, redigir dica final e desenhar a UI do banner são etapas posteriores, de outros agentes.
 
@@ -25,7 +25,7 @@ Antes de especificar cada conquista, três invariantes já fixados em `convencao
 
 Essas três regras respondem, de uma vez, à pergunta "e se o gatilho ocorrer com o jogo em estado inválido (destravamento duplicado)?" para as sete conquistas. Onde uma conquista tiver um estado inválido **próprio**, além deste, ele está descrito na seção dela.
 
-**Nomenclatura (L-22):** identificador em inglês, `snake_case`, prefixo `achv_`. Nome de exibição e dica são prosa/asset (direitos reservados, L-08); o `id` e a condição de destravar são regra (código, AGPL). Os nomes de exibição abaixo são os que já existem em `comic-reliefs.md` — citados, não inventados; onde não existem, isso está marcado.
+**Nomenclatura (L-22):** identificador em inglês, `snake_case`, prefixo `achv_`. Nome de exibição e dica são prosa/asset (direitos reservados, L-08); o `id` e a condição de destravar são regra (código, AGPL). Os nomes de exibição abaixo são os que já existem em `comic-reliefs/homenagens-diegeticas.md` — citados, não inventados; onde não existem, isso está marcado.
 
 ---
 
@@ -49,9 +49,9 @@ Três das sete (EE-4, EE-10, EE-16) não têm condição de destravar em lugar n
 
 ### 2.4 — `achv_recovery_mushroom` (EE-4, "O Cogumelo-Recuperador") — LACUNA
 
-**O que o corpus diz** (`comic-reliefs.md`, EE-4): item raro, dropável em zonas de bioma misto no final do Ato 2. Usar = +1 vida extra ao Gus (revive automático se HP=0 na próxima batalha). Isto é especificação de **item** (`.gw.item` ou `.gw.card`, a decidir por quem especificar o item em si), não de conquista: **não há, em lugar nenhum do texto, um nome de conquista, uma dica de conquista, nem uma condição de destravar** ligada a este item.
+**O que o corpus diz** (`comic-reliefs/homenagens-diegeticas.md`, EE-4): item raro, dropável em zonas de bioma misto no final do Ato 2. Usar = +1 vida extra ao Gus (revive automático se HP=0 na próxima batalha). Isto é especificação de **item** (`.gw.item` ou `.gw.card`, a decidir por quem especificar o item em si), não de conquista: **não há, em lugar nenhum do texto, um nome de conquista, uma dica de conquista, nem uma condição de destravar** ligada a este item.
 
-**Por que aparece na lista mesmo assim:** `comic-reliefs.md` linha 2088 cita "EE-4 (cogumelo)" na linha "Cross-ato (conquistas)" da tabela de distribuição. A cena EE-4 em si nunca usa a palavra "conquista" — ela está na seção "Homenagens diégeticas" ao lado de EE-3 (Encanador), que é puro flavor sem qualquer gatilho de sistema.
+**Por que aparece na lista mesmo assim:** `comic-reliefs.md` cita "EE-4 (cogumelo)" na linha "Cross-ato (conquistas)" da tabela de distribuição. A cena EE-4 em si nunca usa a palavra "conquista" — ela está em `docs/narrative/comic-reliefs/homenagens-diegeticas.md` ao lado de EE-3 (Encanador), que é puro flavor sem qualquer gatilho de sistema.
 
 **O que eu NÃO faço:** inventar que existe uma conquista "achou o cogumelo" ou "usou o cogumelo pra reviver". Nenhuma das duas está no corpus. Levo a decisão ao líder em §3.
 
@@ -84,7 +84,7 @@ Não decido entre as duas (L-14). Pergunta formal em §3. **✅ RESOLVIDO em 30/
 
 ### 2.10 — `achv_hospital_plaque` (EE-10, "A Placa do Hospital") — LACUNA
 
-**O que o corpus diz** (`comic-reliefs.md`, EE-10): placa de flavor na entrada do hospital, com a letra miúda de piada sobre doação acelerar a cura. É texto ambiental estático (o mesmo tipo de conteúdo de EE-3, EE-5, EE-13, EE-14, EE-17, EE-21, EE-22 — nenhuma delas é conquista). **Não há gatilho, nem contador, nem nome ou dica de conquista** associados a ela em nenhum lugar do texto.
+**O que o corpus diz** (`comic-reliefs/homenagens-diegeticas.md`, EE-10): placa de flavor na entrada do hospital, com a letra miúda de piada sobre doação acelerar a cura. É texto ambiental estático (o mesmo tipo de conteúdo de EE-3, EE-5, EE-13, EE-14, EE-17, EE-21, EE-22 — nenhuma delas é conquista). **Não há gatilho, nem contador, nem nome ou dica de conquista** associados a ela em nenhum lugar do texto.
 
 **Por que aparece na lista mesmo assim:** mesma situação do EE-4 — citada na linha "Cross-ato (conquistas)" de `comic-reliefs.md` sem que a cena original a trate como sistema.
 
@@ -123,7 +123,7 @@ Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilib
 
 ### 2.16 — `achv_blue_shell` (EE-16, "Casca Azul") — LACUNA
 
-**O que o corpus diz** (`comic-reliefs.md`, EE-16): diálogo casual entre Cauã e Linda durante descanso, sobre uma corrida perdida no minigame de EE-15 por causa de uma casca azul. É cena de humor (mesma família das Cenas 1-14, 16-19 do documento), não um sistema com condição de destravar. **Não há nome de conquista, dica, nem gatilho** em nenhum lugar do texto — nem mesmo a palavra "conquista".
+**O que o corpus diz** (`comic-reliefs/homenagens-diegeticas.md`, EE-16): diálogo casual entre Cauã e Linda durante descanso, sobre uma corrida perdida no minigame de EE-15 por causa de uma casca azul. É cena de humor (mesma família das Cenas 1-14, 16-19 do documento), não um sistema com condição de destravar. **Não há nome de conquista, dica, nem gatilho** em nenhum lugar do texto — nem mesmo a palavra "conquista".
 
 **Por que aparece na lista mesmo assim:** citada na linha "Cross-ato (conquistas)" de `comic-reliefs.md`, junto das outras seis, sem que o texto da cena a trate como tal.
 
@@ -133,7 +133,7 @@ Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilib
 
 ### 2.18 — `achv_encourager` (EE-18, "O Encorajador") — parcial
 
-**O que o corpus diz** (`comic-reliefs.md`, EE-18): "Sistema oculto: se Gus morre 10 vezes na mesma cena específica, NPC aparece no save ou hospital" com uma fala de encorajamento, oferece **Token-de-Coragem** (texto original do corpus: regenera 1 vida ao iniciar combate) e grava uma entrada de Diário. Há também uma mensagem opcional de carregamento. **✅ RESOLVIDO em 30/08/2026** (`G12` do `TODO.md`, Eixo 3 de `docs/_secret/proposta-balanceamento-easter-eggs.md`): o efeito fixo de 1 vida foi substituído por cura percentual escalada por dificuldade, sem Token no Hardcore — magnitude completa adiante nesta seção, na linha "Destravável mais de uma vez".
+**O que o corpus diz** (`comic-reliefs/homenagens-diegeticas.md`, EE-18): "Sistema oculto: se Gus morre 10 vezes na mesma cena específica, NPC aparece no save ou hospital" com uma fala de encorajamento, oferece **Token-de-Coragem** (texto original do corpus: regenera 1 vida ao iniciar combate) e grava uma entrada de Diário. Há também uma mensagem opcional de carregamento. **✅ RESOLVIDO em 30/08/2026** (`G12` do `TODO.md`, Eixo 3 de `docs/_secret/proposta-balanceamento-easter-eggs.md`): o efeito fixo de 1 vida foi substituído por cura percentual escalada por dificuldade, sem Token no Hardcore — magnitude completa adiante nesta seção, na linha "Destravável mais de uma vez".
 
 **Isto TEM gatilho explícito** (diferente de EE-4/EE-10/EE-16), mas **nunca é enquadrado como "conquista oculta"** com nome e dica de banner, ao contrário de EE-9/EE-12/EE-20 — é descrito como sistema/evento narrativo. Por isso a especificação abaixo cobre o que É derivável, e a seção de perguntas cobre o que não é.
 
@@ -146,7 +146,7 @@ Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilib
 **Estado inválido:** mesma regra 3 do §0 para o aspecto conquista; para o aspecto sistema de suporte (entrega de item), a idempotência também deveria valer por cena — entrar na cena pela 11ª vez sem sair não deveria entregar um segundo Token-de-Coragem.
 
 ⚠️ **Dependência de infraestrutura:** mesma lacuna de identidade de cena do §2.12.
-⚠️ **Dependência de catálogo:** "Token-de-Coragem" não existe em nenhum arquivo `.gw.item`/`.gw.card` hoje (busca no repositório inteiro retorna só esta única menção, em `comic-reliefs.md`). A entrega deste efeito depende de o item ser especificado em outro lugar antes de existir de fato.
+⚠️ **Dependência de catálogo:** "Token-de-Coragem" não existe em nenhum arquivo `.gw.item`/`.gw.card` hoje (busca no repositório inteiro retorna só esta única menção, em `comic-reliefs/homenagens-diegeticas.md`). A entrega deste efeito depende de o item ser especificado em outro lugar antes de existir de fato.
 
 ---
 
@@ -195,7 +195,7 @@ Nenhuma das sete abaixo foi decidida por mim (L-14). Cada uma referencia a seç�
 
 ## 4. Cross-refs
 
-- `docs/narrative/comic-reliefs.md` — fonte das sete cenas/itens e da tabela de distribuição.
+- `docs/narrative/comic-reliefs/homenagens-diegeticas.md` — fonte das sete cenas/itens · `docs/narrative/comic-reliefs.md` — tabela de distribuição.
 - `docs/tech/convencao-formatos-gw.md` — definição do `.gw.achv`, as duas naturezas da conquista, o que o save guarda.
 - `docs/narrative/diary/entries-fichas-bestiary.md` — sistema de Bestiário citado no gatilho de EE-9 e na tensão numérica da pergunta 3.
 - `docs/design/mecanicas/combat.md` §16 — vocabulário de evento (`CombatBus`, `CombatStarted(encounter)`, `ActorDefeated`, `CombatEnded`) usado para derivar os gatilhos de EE-12 e EE-18.

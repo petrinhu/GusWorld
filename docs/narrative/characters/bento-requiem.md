@@ -17,9 +17,9 @@
 - **Goal:** preservar a Ordem Recursiva e o legado Neo-Sylvania contra Sterling Corp.
 - **Aparência:** endomorfo robusto, armadura gótica titânio + latão envelhecido, escudo-catedral, cronômetro mecânico no peito.
 - **Voice:**
-  - **Vocabulário:** arcaizante. Usa "vossa mercê" formal raríssimo (não chega a ser pastiche; só pinceladas). Latim litúrgico ocasional (Cena 8 `comic-reliefs.md`).
+  - **Vocabulário:** arcaizante. Usa "vossa mercê" formal raríssimo (não chega a ser pastiche; só pinceladas). Latim litúrgico ocasional (Cena 8 `comic-reliefs/cena-08-comentarios-em-latim.md`).
   - **Sintaxe:** frases longas, formais, com cláusulas subordinadas. Pausa antes de respostas importantes (Cena 2: longa pausa antes de responder Gus sobre espaços).
-  - **Tic:** **faz o sinal do compilador no peito** (cruz sobre o cronômetro mecânico) quando algo importante acontece. Cena 1 `comic-reliefs.md`.
+  - **Tic:** **faz o sinal do compilador no peito** (cruz sobre o cronômetro mecânico) quando algo importante acontece. Cena 1 `comic-reliefs/cena-01-sexta-feira-cinco-da-tarde.md`.
   - **Linguagem-âncora cômica:** **Asmódico**. Defende tradição. Cenas 2 (Tabulações vs Espaços) e 8 (Comentários em Latim).
 
 ---
@@ -41,7 +41,7 @@
 |---|---|
 | **Chamado** | Facção pró-modernização da Ordem aceita parceria Sterling. Mestre-Hierofante apoia Bento contra ela. |
 | **Recusa** | Bento hesita: brigar contra mestres mais velhos viola tradição. Conflito interno. |
-| **Mentor** | [[gus]] aparece como aliado externo improvável. Os dois discutem (Cena 2 `comic-reliefs.md`). Mestre-Hierofante intervém calmamente: "tradição que não admite o novo morre velha." |
+| **Mentor** | [[gus]] aparece como aliado externo improvável. Os dois discutem (Cena 2 `comic-reliefs/cena-02-tabulacoes-vs-espacos.md`). Mestre-Hierofante intervém calmamente: "tradição que não admite o novo morre velha." |
 | **Prova** | Desastre Patch-Zero na catedral menor (mestres pró-Sterling mortos off-screen, P4). Bento confronta Patch-Zero canal 3 ("limite do conhecimento"). Cripto-glifos lidos. |
 | **Retorno** | Bento junta-se à party. Conjuro novo: **Cronômetro Ressonante**. Ordem Recursiva oficialmente toma posição anti-Sterling. |
 
@@ -65,9 +65,9 @@ Destrava: **upgrade escudo-catedral** (modo "barreira gravitacional aliada" em c
 
 ## Conflito intra-party específico
 
-- **vs [[gus]]:** linguagem (Asmódico vs C-Arcane). Cenas 1, 2, 8 `comic-reliefs.md`.
+- **vs [[gus]]:** linguagem (Asmódico vs C-Arcane). Cena 1 (`comic-reliefs/cena-01-sexta-feira-cinco-da-tarde.md`), Cena 2 (`comic-reliefs/cena-02-tabulacoes-vs-espacos.md`), Cena 8 (`comic-reliefs/cena-08-comentarios-em-latim.md`).
 - **vs [[caua-volt]]:** filosófico-temperamental. Cauã é puro impulso; Bento é puro cálculo lento. Cauã acha Bento "lento demais"; Bento acha Cauã "rápido demais para ser preciso". Aproximação durante combate: Bento bloqueia, Cauã contra-ataca. Equipe sólida.
-- **vs [[dante-grid]]:** **conflito principal** (foreshadow). Bento desconfia de Dante desde o início (intuição treinada de mestre Asmódico para detectar inconsistência). Não consegue articular por quê. Cena 4 `comic-reliefs.md` foreshadow (force-push = heresia Asmódico) é referência interna de Bento ao desconforto.
+- **vs [[dante-grid]]:** **conflito principal** (foreshadow). Bento desconfia de Dante desde o início (intuição treinada de mestre Asmódico para detectar inconsistência). Não consegue articular por quê. Cena 4 `comic-reliefs/cena-04-force-push.md` foreshadow (force-push = heresia Asmódico) é referência interna de Bento ao desconforto.
 - **vs [[linda-siren]]:** aliança natural (ambos rejeitam estetização superficial; tradição vs underground compartilham antitese a Cult Mirage). Cena cômica reservada se inventada futuramente.
 
 ---

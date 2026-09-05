@@ -334,7 +334,7 @@ Pillar 1 protege contra grind degenerativo. **O sistema literalmente não respon
 Cross-reference manual é o trigger mais "exigente" do sistema. Player abre 2 entries em janelas comparativas no Diário (UI permite split-view, [[ui-spec]] §4 detalha). Se as 2 entries têm relação canônica registrada (`cross_ref_pairs` no save schema), Knowledge Mecânico-meta + 2 pontos.
 
 Pares canônicos exemplo (lista completa em [[foreshadow-links]] §3):
-- Doc 5 (Apex-Data audit) ↔ Cena 11 `comic-reliefs` (Janelarum trava). Pattern: engenharia de colapso Sterling.
+- Doc 5 (Apex-Data audit) ↔ Cena 11 `comic-reliefs/cena-11-janelarum-travou-de-novo.md` (Janelarum trava). Pattern: engenharia de colapso Sterling.
 - Doc 13 (bilhete Davi) ↔ Doc 9 (diário queimado Davi). Pattern: Davi sabia que era alvo.
 - F074 (caixa zinco Inácia) ↔ F021 (caixa zinco Galpão Cooperativo). Pattern: Vorto retirou docs.
 - F019 (placa "ALENCAR & FILHOS" riscada) ↔ F129 (ferro solda "S.A." preservado). Pattern: Dante apaga simbolicamente mas preserva materialmente.

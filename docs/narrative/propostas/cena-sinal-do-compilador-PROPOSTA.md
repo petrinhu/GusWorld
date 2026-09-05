@@ -10,7 +10,7 @@
 >
 > **Origem:** recomendação C04 (`disputas-linguagens-cenas-PROPOSTA.md`), aceita pelo criador com **outro ângulo**: o gancho original (X-01, o bordão) foi consumido pela Cena 15, cujo Movimento 2 já é o Cauã atravessando a Catedral pra perguntar "você falou que a minha nem compila". Esta cena é outro assunto e **não reencena aquela conversa**.
 >
-> **O ângulo:** o Bento faz o sinal **"pra tudo que aguentou"** (fala dele, canonizada na Cena 18, `comic-reliefs.md:1700`). O Cauã é o garoto da gambiarra dos Dutos, que segura um bloco inteiro há anos com cabo remendado. **Pela régua do próprio Bento, a gambiarra que ele despreza é exatamente algo que aguentou.** Ele teria que benzê-la.
+> **O ângulo:** o Bento faz o sinal **"pra tudo que aguentou"** (fala dele, canonizada na Cena 18, `comic-reliefs/cena-18-a-peca-que-ainda-gira.md`). O Cauã é o garoto da gambiarra dos Dutos, que segura um bloco inteiro há anos com cabo remendado. **Pela régua do próprio Bento, a gambiarra que ele despreza é exatamente algo que aguentou.** Ele teria que benzê-la.
 >
 > **Formato:** só aspas, zero travessão, zero em-dash.
 
