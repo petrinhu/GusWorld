@@ -1,12 +1,12 @@
 # Timeline Cronológica (GusWorld)
 
-> **Status:** Revisão 1 (2026-05-15). Doc novo. **Canônico (expansão Bloco G).**
+> **Status:** Revisão 2 (2026-09-05). **Canônico.** Revisão 1 (2026-05-15) era doc novo (expansão Bloco G); esta revisão acrescenta a pré-história (Era Lendária) e o sistema de datação de duas contagens, decisão do líder de 29/08/2026.
 >
-> **Escopo:** três eras estruturais do mundo (Pré-Código / Era do Compilador / Era Sterling). Eventos-chave com consequência narrativa rastreável. Não enciclopédia; cronologia funcional que sustenta arco e lore.
+> **Escopo:** pré-história (Era Lendária) mais três eras estruturais do mundo GusWorld (Pré-Código / Era do Compilador / Era Sterling). Eventos-chave com consequência narrativa rastreável. Não enciclopédia; cronologia funcional que sustenta arco e lore.
 >
 > **Imutáveis cross-ref:** [[lore-bible]] §3, [[factions]], [[prelore_vilao]], [[arco-principal]].
 >
-> **Convenção:** **ano 0 = presente do jogo** (início do [[arco-principal|ato 1]]). Ano negativo = passado. Ano positivo = futuro (só aparece em hooks pós-créditos).
+> **Convenção:** **ano 0 = presente do jogo** (início do [[arco-principal|ato 1]]). Ano negativo = passado. Ano positivo = futuro (só aparece em hooks pós-créditos). Forma completa do ano, pt-br: **`-x D.E.L.`** / **`+x DEL`**; inglês: **`-x AAL`** / **`+x AAL`** (ver "Sistema de datação: duas contagens" abaixo). Ninguém fala o sufixo em voz alta, ele só aparece em texto muito formal, e é por isso que todo o resto deste documento continua escrevendo só `-x`/`+x`.
 
 ---
 
@@ -20,6 +20,45 @@ A Era do Compilador adotou calendário solar de **12 meses de 30-31 dias**, herd
 - **Dia das Sementes:** 22 de junho (solstício de inverno). Pelicano Branco celebra plantio do ciclo seguinte.
 
 Detalhes festividades em [[tradicoes-cultura]].
+
+---
+
+## Sistema de datação: duas contagens
+
+> Decisão do líder, 29/08/2026 (matéria-prima em `docs/_secret/dungeons/CAPTURA-BRUTA-kola-espelho-obsidiana.md` §§15-16, área cifrada, canonizada nesta data). Resolve como datar a Era Lendária (seção seguinte) sem renumerar nada do que este documento já usa.
+
+Cada lado do colapso que fecha a Era Lendária tem sua própria contagem:
+
+- **Contagem antiga**, usada dentro da Era Lendária: marca original do ano (`DC`/`AC`) mais o sufixo de era. Pt-br: **`[ano] [REDIGIDO]`** ([REDIGIDO], Antes da Era Lendária) ou **`[ano] [REDIGIDO]`** para antes de Cristo; inglês: **`[ano] BLA`** (*Before the Legendary Age*). Exemplo do próprio líder, para o ano corrente: "2026 [REDIGIDO]" / "2026 BLA", os dois nomeiam o mesmo ano. Uma forma contraída (`DCEL`/`ACEL`) apareceu numa formulação inicial e foi descartada: a composta é a canônica, por deixar as duas informações (marca do ano, sufixo de era) legíveis em separado.
+- **Contagem do GusWorld**, usada depois do colapso: é a que este documento já usa desde a Revisão 1, `-x` antes do ano 0 e `+x` depois. Forma completa, pt-br: **`-x D.E.L.`** / **`+x DEL`** (trocadilho com "deletado", só funciona em pt-br); inglês: **`-x AAL`** / **`+x AAL`** (*After the Age of Legends*). Ninguém fala o sufixo em voz alta, só aparece em texto muito formal, o que mantém o calendário fora do diálogo comum.
+
+A era leva o nome **Era Lendária** (pt-br) / **Age of Legends** (en), abreviada **E.L.** / **A.L.**.
+
+### O deslocamento entre as duas contagens
+
+| Marco | Contagem antiga | Contagem GusWorld |
+|---|---|---|
+| Fim da Era Lendária | [REDIGIDO] | **-[REDIGIDO] D.E.L.** |
+| Início do trecho já documentado (Era 1) | (não fixado) | **-1.100 D.E.L.** |
+| Presente do jogo | (não fixado) | **0** |
+
+O **ano 0 D.E.L.** cai **[REDIGIDO] anos** depois do fim da Era Lendária. Isso fecha o deslocamento que faltava: toda a datação `-x`/`+x` já usada neste documento (Eras 1 a 3, abaixo) **já é**, por definição, `-x D.E.L.`/`+x DEL`, nenhum ano registrado muda de valor, só ganha a forma formal completa. Entre o fim da Era Lendária e o início da Era 1 correm **[REDIGIDO] anos não documentados** (ver seção seguinte).
+
+---
+
+## Era 0: Era Lendária (pré-história)
+
+> **Janela temporal:** termina no [REDIGIDO] da contagem antiga (= **-[REDIGIDO] D.E.L.**, ver seção anterior). Início não datado: é a era mais antiga que o canon reconhece, anterior a qualquer evento hoje registrado.
+>
+> Decisão do líder, 29/08/2026 (matéria-prima em `docs/_secret/dungeons/CAPTURA-BRUTA-kola-espelho-obsidiana.md` §10, área cifrada, canonizada nesta data). **O que esta seção não traz, de propósito:** o conteúdo de missão que revela a era ao jogador (o quê, quando, por qual artefato) permanece na área cifrada do projeto; aqui entra só o esqueleto histórico que a datação do resto deste documento exige.
+
+### Como termina
+
+A Era Lendária acaba com uma guerra mundial entre nações de orientação coletivista e a reação das nações de orientação liberal, que destrói a infraestrutura tecnológica global: pulsos eletromagnéticos, queda de satélites, armas nucleares, subida temporária do nível dos oceanos, destruição de registros escritos e de computadores. O mundo regride ao feudalismo: guerras por território, e religiões que tratam tecnologia como demoníaca (causa do apocalipse) sob pena capital a quem a usar.
+
+### O intervalo não documentado (-[REDIGIDO] a -1.100 D.E.L.)
+
+**[REDIGIDO] anos** separam o fim da Era Lendária do início do trecho que este documento já cobre (Era 1, Neo-Sylvania, -1.100 D.E.L.). Não é o mesmo período que o Hiato descrito adiante (entre a Era 1 e a Era 2, -700 a -150 D.E.L.): são duas idades sombrias distintas, em escalas de tempo diferentes, sem sobreposição entre elas. Neste intervalo mais antigo e mais longo, a humanidade reconstrói por séculos, trocando o nome das coisas e absorvendo, de forma secreta, conhecimento anterior preservado por achados arqueológicos. **Sem evento documentado**, pelo mesmo desenho do Hiato: intervalo aberto de propósito, não lacuna a preencher agora (L-36 do projeto).
 
 ---
 
@@ -210,6 +249,8 @@ Detalhes em cada [[CHARS]].
 
 - **Eventos -3 a 0 são densos por design.** Catalyst macro (Patch-Zero escape) é recente. Mundo está em janela de oportunidade.
 - **Hiato (-700 a -150) é silêncio narrativo deliberado.** Não preencher. O esquecimento é parte do tema.
+- **O intervalo não documentado da Era Lendária (-[REDIGIDO] a -1.100 D.E.L.) não é o Hiato.** São duas idades sombrias distintas, em escalas de tempo diferentes ([REDIGIDO] anos contra 550), e não se sobrepõem. Não confundir ao escrever texto que mencione "idade das trevas" ou "regressão".
+- **A palavra "lendária" já aparecia solta no corpus antes desta revisão**, como adjetivo qualificando a Catedral-Mãe submersa (`sinopse.md`), não como nome de era. Desde esta revisão, "Era Lendária" (maiúsculas, nome próprio) é coisa distinta: a pré-história que termina no [REDIGIDO] da contagem antiga. Checar o contexto antes de assumir que os dois usos são a mesma coisa.
 - **Causa exata da queda Neo-Sylvania não é revelada nem em ending Ouro.** Hipóteses, sim; certeza, não. Reforça "limite do conhecimento" ([[lore-bible]] §8).
 - **Datas de nascimento dos companions são consistentes:** Bento 14, Cauã 13, Dante 13, Iara 12, Linda 12, Gus 11, Jaci 11. Ordem cronológica respeitada.
 
@@ -224,7 +265,9 @@ Detalhes em cada [[CHARS]].
 - Sterling backstory integral: [[prelore_vilao]]
 - Patch-Zero: [[patch-zero]]
 - Arco: [[arco-principal]]
+- Era Lendária e sistema de datação (matéria-prima, área cifrada): `docs/_secret/dungeons/CAPTURA-BRUTA-kola-espelho-obsidiana.md` §§10, 15, 16
+- Cosmologia de origem: [[cosmologia-origem-deep]]. **Tensão não resolvida, sinalizada e não corrigida nesta revisão:** aquele documento fixa que GusWorld é "um ramo inteiro e autossuficiente" de um evento de ramificação (o Transbordamento, ~-800 D.E.L.), "nenhuma delas contém as outras... nenhuma delas é sonho, cópia, ou camada aninhada de qualquer outra" (`cosmologia-origem-deep.md:43`). A Era Lendária desta revisão descreve GusWorld como literalmente a continuação de um mundo anterior que colapsou no [REDIGIDO] da contagem antiga. As duas coisas não foram checadas uma contra a outra pelo líder na mesma decisão; decisão de reconciliação (ou de que convivem sem reconciliar) pertence a ele, não a este documento.
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (expansão Bloco G). Atualizações exigem aprovação do criador supremo.
+**Última revisão:** 2026-09-05. Canônico. Acrescenta a pré-história (Era Lendária) e o sistema de datação de duas contagens, decisão do líder de 29/08/2026. Atualizações exigem aprovação do criador supremo.
