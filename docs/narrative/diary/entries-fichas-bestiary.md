@@ -31,7 +31,7 @@ Bestiary segue mesma regra: HP, ataque visto, padrão de movimento são técnica
 | **NPCs ambientais nomeados** | 24 (catalogados §3) | Conversa significativa | Sub-quest associada |
 | **Facções (perfis)** | 7 (6 facções + Dutos como comunidade) | 1º contato direto | Knowledge alta + arco da facção |
 
-Total catalogável: **41 fichas únicas**. Bestiary: **~22 inimigos turn-based** (5-7 cidade, 5-7 Selve, 5-7 cross-settings, 3-5 bosses incluindo Sterling 2 fases + Patch-Zero condicional).
+Total catalogável: **41 fichas únicas**. Bestiary: **19 inimigos turn-based** medidos em §5 (5 cidade, 5 Selve, 6 cross-settings, 3 bosses incluindo Sterling 2 fases + Patch-Zero condicional), corrigindo a estimativa "~22" desta linha, nunca conferida contra o corpo real de §5, à luz da tensão numérica de `docs/design/mecanicas/conquistas.md` §2.9 (ver nota em §5).
 
 ---
 
@@ -573,16 +573,21 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 
 ---
 
-## §5. Bestiary: Catálogo turn-based (~22 inimigos)
+## §5. Bestiary: Catálogo turn-based (19 espécies medidas)
 
-Cada entry de bestiary tem progressão de 4 páginas conforme Knowledge:
+Cada entry de bestiary progride em **5 estágios de documentação por espécie**, decisão do líder (`G12`/Eixo 2 de `docs/_secret/proposta-balanceamento-easter-eggs.md`, 30/08/2026), o conceito que dá lastro ao limiar de 100 do `achv_byte_collector` (`docs/design/mecanicas/conquistas.md` §2.9). Cada estágio é um evento de domínio (`BestiaryEntryDocumented(foe_id, stage)`) que o avaliador de conquistas soma ao contador cumulativo:
 
-1. **Stub (1 página, pós-1º combate):** silhueta esboçada, HP visível observado, 1 ataque visto.
-2. **Página 2 (~3 combates):** padrão de movimento, 2-3 ataques completos, sugestão de fraqueza.
-3. **Página 3 (~6 combates):** fraqueza confirmada, loot esperado, telegrafia decifrada.
-4. **Página 4 (Knowledge alta):** exploit avançado, **companion-counter sugerido**, lore (origem) cross-ref Bloco I.
+| Estágio | O que o jogador faz para avançar | O que a entry revela |
+|---|---|---|
+| **1. Avistamento** | Vê a espécie no mundo, antes de qualquer combate contra ela | Silhueta esboçada, sem stats, mesma convenção do "?" das Fichas em Knowledge baixa |
+| **2. Primeiro combate** | Sobrevive ao 1º combate contra a espécie (vitória ou fuga, não precisa vencer) | HP visível observado, 1 ataque visto: era a antiga "página 1/Stub" |
+| **3. Análise completa** | ~3-6 combates adicionais contra a mesma espécie | Padrão de movimento, todos os ataques catalogados, telegrafia decifrada: funde as antigas páginas 2 e 3, exceto a fraqueza |
+| **4. Fraqueza descoberta** | Explora a fraqueza sugerida com sucesso ao menos uma vez | Fraqueza confirmada, deixa de ser hipótese |
+| **5. Item de drop identificado** | Recebe o loot da espécie ao menos uma vez | Loot catalogado, exploit avançado, **companion-counter sugerido**, lore (origem) cross-ref Bloco I: era a antiga "página 4" |
 
-Patch-Zero é exceção: páginas glitcham permanentemente. Stats nunca "estabilizam".
+**Exceção (glitch), herdada do desenho anterior:** Patch-Zero (§5.4) e a Anomalia Glitch (§5.2) **travam no estágio 2** e nunca avançam a 3, 4 ou 5; a entry glitcha permanentemente em vez de estabilizar, exatamente como as duas linhas de tabela já descrevem ("não estabiliza nunca", "nenhuma fraqueza catalogada"). As outras 17 espécies completam os 5 estágios normalmente.
+
+⚠️ **Tensão numérica a levar ao líder, não resolvida aqui (mesma família da tensão já registrada em `conquistas.md` §2.9, que este parágrafo atualiza com o número medido):** este documento cataloga **19 espécies** (§5.1: 5, §5.2: 5, §5.3: 6, §5.4: 3, contadas por linha de tabela/subseção de §5, não pela estimativa "~22" que o sumário do topo carregava até esta revisão). Com 17 espécies completando os 5 estágios e 2 travando no estágio 2, o total de eventos de documentação possíveis no jogo inteiro é **89**, mesmo documentando tudo, abaixo do limiar de 100 que o líder decidiu manter. Não decido a resolução (L-14 global, L-29 do projeto): as leituras que ficam de pé, já que o limiar está mantido, são (a) crescer o catálogo em 2-3 espécies novas, ou (b) o contador do achievement somar também eventos de reencontro além do primeiro por estágio (ex.: cada "Análise completa" reafirmada em combates extras soma de novo). Devolvo a escolha entre as duas, e a decisão sobre as 2 espécies-glitch permanecerem travadas em 2 mesmo nesse cenário, para o líder.
 
 ### 5.1 Inimigos da Cidade (5)
 
