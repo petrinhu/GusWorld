@@ -240,6 +240,24 @@ O termo "veneno" não introduz um status novo: é o nome coloquial já usado par
 |---|---|---|
 | Elétrico | Stun, Sobrecarga térmica | **BlindagemEM** (3º status do Elétrico, buff de imunidade) |
 
+### 5.7 SigKill (efeito de interrupção do loop de reanimação, carta do Pântano de Markov, decisão do líder de 05/09/2026, item `G28` do `TODO.md`)
+
+- **Categoria:** efeito condicional de desfecho (não é dano, não é CC; não entra em nenhuma das classes anteriores desta seção).
+- **Família origem:** Sônico (é o **3º status do Sônico**, junto de Disrupt e Silence; a identidade mecânica do Sônico ("controle de área, interrupção", `combat.md` §6) é o motivo do encaixe: a marca é literalmente um sinal que interrompe um processo, não um dano nem um controle de turno).
+- **Efeito:** marca o alvo por uma janela de turnos. Se o alvo chegar a HP 0 enquanto a marca está ativa, o resolvedor trata a queda como morte real (removido do relógio de ação, `combat.md` §3/§4.2), em vez de disparar a rotina de reanimação que os zumbis do Pântano de Markov usam para se levantar de novo (`docs/narrative/environments/02-selve-sombria.md` §11). Se a janela expirar antes do alvo cair, a marca dissipa sem nenhum outro efeito: não causa dano, não reduz stat, não impede ação. Contra qualquer inimigo que já morre normalmente a HP 0 (a esmagadora maioria do jogo), o `SigKill` não muda nada: só interage com a exceção de reanimação do Pântano de Markov, hoje o único caso conhecido.
+- **Duração:** proposta **3 turnos do próprio alvo**, `StackRule = Refresh` (reaplicar renova a janela, não empilha). Marcado como calibrável quando houver cena jogada do Pântano de Markov (nível design, playtest), não fechado com número definitivo hoje.
+- **Custo (`ChargeCost`):** **3**, ancorado no teto da faixa COMUM já fechada em §2.2 acima ("Dano single-target forte" e "Control" ocupam 2-3; 3 é o topo desse degrau, um abaixo do território ESPECIAL ~6). Justificativa da ancoragem: o efeito não causa dano nem tira turno no momento em que é aplicado (pode desperdiçar, se a janela expirar sem a queda acontecer), então um custo baixo destruiria a decisão de quando aplicá-lo; o teto do comum preserva a tensão sem empurrar a carta para o patamar de trunfo de mestre.
+- **Alcance base:** alvo único. Cada zumbi carrega a própria rotina travada (`docs/narrative/environments/02-selve-sombria.md` §11: "os zumbis são a cadeia que parou de transitar", propriedade individual de cada um).
+- **Modificador Stream, aceito com preço agravado só nesta carta** (decisão do líder, 05/09/2026, `AskUserQuestion`): a regra geral de `combat.md` §8 fica intacta, nenhuma exceção de elegibilidade nasce, esta carta aceita os 3 modificadores como qualquer outra. A compensação entra no preço: nesta carta, `Stream` custa **+3**, não o **+2** padrão da tabela geral. Com o modificador, o custo total sobe para **6**, o mesmo patamar que o jogo já usa para "gasta quase todo o pool do turno" (`ChargeCost` ~6 das ESPECIAIS ativas, §2.3 acima). Ancoragem: como o efeito não tem diminishing return por alvo (cada zumbi acertado vale o mesmo tanto de "resolvido de vez", ao contrário de dano, onde overkill é desperdiçado), o valor marginal de acertar vários de uma vez é alto o bastante para justificar cobrar pela versão em área quase como se fosse uma segunda carta premium, em vez do incremento fixo que as outras cartas cobram. **O valor exato do agravamento (+3, em vez de manter os +2 padrão) é proposta a calibrar em playtest, não uma ancoragem matemática fechada**: a âncora real é o patamar de chegada (total 6, o teto já consagrado do jogo), não o incremento em si.
+- **Carta que traz o efeito:** carta COMUM nova, família Sônico, `base_type` `eco` (a sintaxe `eco.sônico`, `combat.md` §7, já é a combinação canônica da família). Nome de trabalho em pt-br: **"Eco de Encerramento"**. O nome final em Sylvarin (`cardExec-[efeito]`, §8 abaixo) não é fixado aqui — fica para quem cunha o léxico (`docs/narrative/lingua/02-lexico-semente.md`).
+- **Diegese:** a rotina de decomposição-reanimação do zumbi trata o dano normal como um erro recuperável, um sinal que ela intercepta e da qual se recupera reiniciando o próprio loop. O `SigKill` é o sinal que nenhuma rotina pode capturar nem ignorar: o processo termina, sem chance de handler.
+
+### 5.8 Mapa família → status (atualizado, pós-SigKill)
+
+| Família | Status existentes | Status novo |
+|---|---|---|
+| Sônico | Disrupt, Silence | **SigKill** (3º status do Sônico, efeito de interrupção de desfecho) |
+
 ---
 
 ## 6. Dano: fórmula não muda
@@ -250,6 +268,8 @@ A fórmula de dano canônica (combat.md §11, cadeia divisiva UseCard + sorteio 
 - **Resfriamento:** o `+SPD` usa o mesmo mecanismo aditivo de Haste (combat.md §9: `SPD ±= Magnitude`, recomputa fila). O desconto de mana na 1ª carta do turno é um efeito novo de categoria (redução de `ChargeCost`), não uma alteração da fórmula de dano em si.
 
 Nenhum fator novo entra em `multFraqueza`, `multMod`, `multCombo`, `multExpose` ou `multAmbiente` (combat.md §11) por causa deste documento — **exceção pontual:** o status `NullProof` (Gödel/Null-Proof, §9, ADR-016 Balde B PR3) INTERCEPTA `multFraqueza` no início da cadeia, ANTES do curto-circuito de imunidade: se o atacante porta o status e o multiplicador calculado é `< 1.0` (Resistente OU Imune), o resolvedor força `multFraqueza = 1.0` e consome o status. Não é um fator multiplicativo a mais na cadeia — é uma reescrita condicional do próprio `multFraqueza` antes dele entrar na fórmula, mesma família mecânica do trunfo `IgnoresWeaknessWheel` já existente (que também reescreve `multFraqueza` para 1.0, incondicionalmente).
+
+O `SigKill` (§5.7) não toca a cadeia de dano nenhuma: não é um fator de `combat.md` §11, é uma reescrita condicional da resolução de HP 0 (`combat.md` §3/§4.2, "ator que chega a HP 0 é resolvido conforme regra de morte/incapacitação"), na mesma família de "flag que reescreve uma regra do motor" que o `NullProof` já usa, só que aplicada ao desfecho da queda, não ao cálculo do dano que a causa.
 
 ---
 
