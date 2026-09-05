@@ -1,6 +1,6 @@
 # Plano de Playtest — Vertical Slice
 **Status:** Proposta para ratificação. Sprint solo 2026-06-04. F2-QA.4/F2-D.7.
-**Cross-ref:** gdd.md §8, onboarding-vs.md §7/§8, plano_vs.md M.3.
+**Cross-ref:** gdd.md §8, onboarding-vs.md §7/§8.
 
 **Convenção:** pt-br. Termos de game-dev no original (time-to-fun, telemetria, facilitador, gargalo, gate, telegraph). Sem em-dash.
 
@@ -65,7 +65,7 @@ A telemetria dá **quando**; o facilitador registra **por quê** travou (§5). O
 
 ## 5. Roteiro de observação (observar, NÃO perguntar durante)
 
-Regra de ouro (GDD §8 / onboarding §8): durante a run, **não interferir, não ensinar, não perguntar**. Intervenção verbal do facilitador = run falha (plano_vs.md M.3). Registrar por degrau (folha de observação):
+Regra de ouro (GDD §8 / onboarding §8): durante a run, **não interferir, não ensinar, não perguntar**. Intervenção verbal do facilitador = run falha. Registrar por degrau (folha de observação):
 
 - **Trava (>30s parado sem ação significativa)** em qualquer degrau -> marcar o degrau. Esse é o gargalo do onboarding.
 - **Pede ajuda verbal** ("e agora?", "o que eu faço?") -> marcar degrau + transcrever a frase.
@@ -94,7 +94,7 @@ Só DEPOIS de encerrada a run (nunca durante):
 
 ## 8. Cadência e registro
 
-- **Gate de disparo:** rodar quando **F2-M.3** estiver pronto para teste, ou seja, M.1 fechado (VS coeso, save/load) + onboarding diegético D.6 implementado + build M.4 distribuível. NÃO exige arte final (placeholder-first, plano_vs.md §2).
+- **Gate de disparo:** rodar quando **F2-M.3** estiver pronto para teste, ou seja, M.1 fechado (VS coeso, save/load) + onboarding diegético D.6 implementado + build M.4 distribuível. NÃO exige arte final (placeholder-first).
 - **Quantas sessões:** 1 rodada de 3 sessões (1 por testador) por iteração de onboarding. Se a hipótese falhar (§6) e o onboarding for refeito, **nova rodada de 3** após o ajuste. Repetir até 3/3 dentro do alvo.
 - **Registro:** CSV por sessão em `docs/qa/runs/`; 1 nota-resumo por rodada em `docs/qa/playtest_results_<data>.md` (time-to-fun de cada um, degrau-gargalo se houver, veredito pass/refazer, decisão de ajuste). Vídeo OBS opcional anexado/linkado, não obrigatório.
 
