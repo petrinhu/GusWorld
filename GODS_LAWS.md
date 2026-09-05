@@ -64,7 +64,7 @@
 
 **Data:** 21/08/2026. **Verbatim:** *"ja tentei fazer esse jogo uma vez com o claude, mas tive vários problemas e estou fazendo DO ZERO tudo com relacao ao codigo, sempre assentado sobre GlintFx"*.
 
-O **código** do GusWorld nasce sem herança. O repositório não tem nenhum commit e não existe uma linha de código. O `GusEngine/` citado no corpus, o protótipo em Godot e C#, e qualquer árvore anterior **não são base, não são referência, não são canon**.
+O **código** do GusWorld nasce sem herança. O repositório não tem nenhum commit e não existe uma linha de código. O `GusEngine/` citado no corpus, o protótipo em a engine anterior e C#, e qualquer árvore anterior **não são base, não são referência, não são canon**.
 
 **O que isto NÃO alcança:** o corpus de documentação, lore e design em `docs/` e `resources/` **continua valendo** e é o insumo do projeto. Esta lei é sobre código.
 
@@ -227,8 +227,8 @@ Diante de qualquer dúvida, bifurcação ou consequência não escrita, apresent
 
 - ~~`docs/design/pillars.md:27` diz *"Cel-shaded 3D low-poly"*, contra a L-02.~~ **RESOLVIDO, conferido em 23/08/2026:** a linha 27 hoje diz *"Não é fotorrealista. Pixel-art 2D, paleta restrita"*, e a expressão "Cel-shaded" não existe mais em lugar nenhum do arquivo. A citação fica como registro de por que a L-02 precisou existir.
 - `docs/design/mecanicas/core-loop-exploracao.md:95`, decisão DA-1, canônica, diz *"Câmera e navegação no overworld: 3/4 orbital + controle direto [...] Coerente com '3D real'"*. **Resolvido pela L-26, e conferido em 23/08/2026:** a perspectiva é 3/4 top-down fixa, e "orbital" e "3D real" **já foram apagados** — a linha 95 hoje diz *"3/4 top-down fixa + controle direto"*, e "orbital" tem zero ocorrências no arquivo.
-- `docs/narrative/diary/knowledge-gates.md:376` (a citação dizia 380; a linha escorregou, corrigida em 23/08/2026), o único esquema de save do corpus, se declara escrito para o stack Godot e GDScript. **Parcialmente resolvido:** a nota de stack já está no arquivo e marca o que sobrevive e o que muda; **segue bloqueando** a re-derivação técnica do esquema.
-- `docs/design/producao/*` se declaram canônicos mas descrevem pipeline Godot e C# aposentado.
+- `docs/narrative/diary/knowledge-gates.md:376` (a citação dizia 380; a linha escorregou, corrigida em 23/08/2026), o único esquema de save do corpus, se declara escrito para o stack a engine anterior e a linguagem de script da engine anterior. **Parcialmente resolvido:** a nota de stack já está no arquivo e marca o que sobrevive e o que muda; **segue bloqueando** a re-derivação técnica do esquema.
+- `docs/design/producao/*` se declaram canônicos mas descrevem pipeline a engine anterior e C# aposentado.
 - ~~`docs/design/mecanicas/modos-morte.md:3` se declarava *"PROPOSTA — spec fechada pelo `lead-game-designer`, aguardando canonização do criador supremo (líder)"*, enquanto `docs/design/pillars.md:136` já apontava para ele como *"detalhe canônico"*. O documento era a fonte da contradição, não a vítima dela.~~ **Contradição identificada em 25/08/2026, fora da varredura de 21/08, e RESOLVIDA no mesmo dia por ordem do líder:** o desenho já era canon desde 24/08/2026 pelo item `G3` do `TODO.md`, que preservou §1 a §5 e revogou o §6. O bloco de status foi reescrito, o §4 deixou de se declarar não aplicado (a atualização do Pilar 4 é de **10/07/2026**, commit `1ebd2734` do projeto anterior, medido e não suposto), e o corpo trocou **cinco** ponteiros de `ADR-014` — que é o runtime de diálogo — pelo `ADR-015`, que é o de segurança de save. **Segue aberto e é do líder:** as sete sinalizações do §5, que a canonização do desenho não decidiu.
 
 **Aplicação:** a lista acima não é exaustiva, e não vira licença para ignorar o que não está nela. Contradição nova encontrada entra aqui.

@@ -191,7 +191,7 @@ A L-24 manda apagar o revogado, com uma única exceção: *"texto cuja remoção
 
 ### PODE apagar (história morta sem efeito, mediante ordem do líder, L-14)
 
-1. **A regra de fronteira dos arquivos Godot `.tscn`/`.tres` (linhas 140-153).** Ela mesma se declara histórica e diz não alcançar nenhum arquivo do repositório atual. A licença dos arquivos antigos vive no repo/tag antigos, não nesta prosa. Apagável sem efeito jurídico.
+1. **A regra de fronteira dos arquivos a engine anterior `.tscn`/`.tres` (linhas 140-153).** Ela mesma se declara histórica e diz não alcançar nenhum arquivo do repositório atual. A licença dos arquivos antigos vive no repo/tag antigos, não nesta prosa. Apagável sem efeito jurídico.
 2. **A seção "Código = Apache License 2.0" (linhas 21-37) e o `NOTICE` atual inteiro.** Estão **errados** para este repositório (L-08 manda AGPL) e nada foi publicado daqui sob Apache: substituí-los não toca direito de ninguém. Não é nem "apagar história", é corrigir um documento que descreve um regime que nunca vigorou nesta obra.
 3. **As referências a arquivos inexistentes** (`ADR-005`, `ADR-021`, `LICENSE`, `THIRD-PARTY-LICENSES.md`, `docs/tech/ai-assets-provenance.md`): trocar por menção datada sem link, ou remover, conforme o líder decidir o destino das citações órfãs (pendência já registrada em `GODS_LAWS.md:396`).
 
@@ -223,7 +223,7 @@ Mesmo gate pré-commit da L-15 (`.gitignore`/`.gitattributes`): depois do primei
 3. **Saídas:** A) fatiar (mecânica compilada sob AGPL, texto de sabor em pacote selado reservado) — recomendo; B) catálogo todo AGPL — mais simples, cede o texto das cartas ao copyleft; C) catálogo todo fora do executável — reserva máxima, revisa a fase 2 da L-25; D) tudo dentro com exceção declarada — frágil, não recomendo.
 4. **Hoje ninguém pode processar ninguém** (o líder é titular das duas pontas), mas a primeira contribuição externa ao GlintFx muda isso. O desenho deve nascer correto, não escorado na titularidade única.
 5. **NOTICE e ASSETS-LICENSE estão errados** (dizem Apache) e o repo não tem os arquivos que eles citam. A seção 8 lista o kit completo pré-primeiro-commit.
-6. **L-24:** Zona 1, Zonas 2/3, marca e permissão de fã não se apagam (direito concedido ou regime vigente); regra Godot e seção Apache são apagáveis/substituíveis mediante ordem do líder.
+6. **L-24:** Zona 1, Zonas 2/3, marca e permissão de fã não se apagam (direito concedido ou regime vigente); regra a engine anterior e seção Apache são apagáveis/substituíveis mediante ordem do líder.
 
 ## 10. Onde o advogado humano é necessário de verdade
 

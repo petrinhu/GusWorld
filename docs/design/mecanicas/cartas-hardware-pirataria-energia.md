@@ -608,10 +608,27 @@ entrega tensão baixa por natureza — é exatamente essa fraqueza real que a to
 e nunca rival da bateria de fábrica, reforçando a Doutrina do Comedimento (`economia.md` §0) sem
 precisar de penalidade artificial de número.
 
-**Fonte de obtenção do zinco e do cobre: não decidida, e não inventada aqui.** Sucata plausível de
-ferro-velho (fiação de cobre, telha e pilha velha de zinco) é leitura de agente, não decisão do
-líder; nenhuma fonte canônica para estes dois metais foi achada no corpus. Sinalizado para
-confirmação, no mesmo padrão dos demais números marcados `[calcular]`/pendentes neste documento.
+**Fonte de obtenção do zinco e do cobre: sucata do ferro-velho como fonte principal, loja e
+negociação como rota alternativa (decisão do líder, 05/09/2026, por `AskUserQuestion`).** Fecha a
+lacuna que este parágrafo registrava como não decidida.
+
+- **Fonte principal, o ferro-velho:** cobre da fiação recuperada e zinco de peça galvanizada ou
+  pilha velha desmontada, no mesmo ecossistema de sucata já canônico do §14 — os **Ferrovelhos**
+  (Periferia Industrial), com a tríade FIR (monopólio-compadrio, caro) × **Sucata Honesta**
+  (comércio livre honesto) × mercado negro (barato/livre/arriscado). Comprar na Sucata Honesta
+  custa crédito na hora; catar custa tempo e corre o risco do vendedor desonesto vender metal
+  ruim: o mesmo trade-off da lição de Bastiat já canônica no §12 ("o que se vê e o que não se
+  vê").
+- **Rota alternativa, loja e negociação:** pelo mesmo canal comercial que o líder já abriu para o
+  suco puro de limão (acima, "Terceira rota"), para o craft da bateria caseira não virar gargalo
+  de farm caso o ferro-velho esteja distante ou indisponível no momento.
+
+O catálogo de ingredientes de `economia.md` §7.8 já lista dois materiais no mesmo espírito (família
+eletrônico): "Fio Condutor" (drop Elétrico/Metal) e "Capacitor Sucateado" (drop Periferia ou
+compra) — o zinco e o cobre da bateria caseira seguem a mesma lógica de fonte dupla (drop de sucata
+ou compra), sem precisar entrar como as mesmas entradas do catálogo. A Doutrina do Comedimento
+(`economia.md` §0) segue valendo: nenhuma das duas rotas dá o metal de graça e sem esforço ou sem
+custo em crédito.
 
 **O refino é craft narrativo-gated, não uma bancada aberta desde o início.** "Com o tempo" (verbatim
 do líder) é progressão. **O momento em que o personagem aprende a filtrar tem a FORMA decidida em
@@ -681,8 +698,6 @@ pelo líder nesta rodada.
 **Não decidido, e não inventado aqui:**
 - Como as nove combinações dos três degraus por insumo caem nos três resultados nomeados na decisão
   de hoje (qual degrau intermediário conta como "bom" para o RNG do meio).
-- Fonte de obtenção do zinco e do cobre (sucata de ferro-velho é leitura de agente, não decisão do
-  líder — ver acima).
 - Capacidade, número de usos, preço de compra de cada degrau de refino, taxa de sucesso do refino, e
   a probabilidade numérica de cada risco herdado (mentir sobre a carga / morrer cedo / danificar a
   carta ou vírus): tudo é número de balanceamento (`economy-designer`), nada decidido pelo líder

@@ -185,6 +185,6 @@ Nota: há empate triplo em 26 (posições 6-8) e empate triplo em 24 (posições
 - Não vi na lista bruta um item explícito para **editar `docs/design/pillars.md:27`** ("Cel-shaded 3D low-poly" contra L-02), citado na própria L-13 como contradição que bloqueia trabalho dependente. B4 lista sete pontas soltas mas nenhuma delas parece ser esta linha específica de `pillars.md`.
 - Também não vi item explícito para a contradição de `docs/design/mecanicas/core-loop-exploracao.md:95` (DA-1, câmera orbital), que a própria L-13 diz estar "resolvida pela L-26" mas com o texto revogado ainda por apagar (a L-24 exige apagar, não arquivar).
 - Não vi item para **atualizar o `CONTRACT.md` §5.1**, que a L-22 diz estar substituído (função em pt-br, `m_`, ALL_CAPS revogados), mas o texto revogado em si precisa ser apagado do `CONTRACT.md` por força da L-24.
-- Não vi item para **re-derivar o esquema de save** hoje descrito em `docs/narrative/diary/knowledge-gates.md:380` para Godot/GDScript (apontado pela própria L-13 como precisando de re-derivação).
+- Não vi item para **re-derivar o esquema de save** hoje descrito em `docs/narrative/diary/knowledge-gates.md:380` para a engine anterior/a linguagem de script da engine anterior (apontado pela própria L-13 como precisando de re-derivação).
 
 Estas quatro observações são só sinalização; não estimei esforço nem CoD para elas porque não são itens da lista bruta que recebi e a instrução veda criar item novo.

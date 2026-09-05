@@ -42,36 +42,18 @@ Ordenado do mais crítico (o que um agente leria e obedeceria por engano, com ma
 
 ---
 
-### A.2 - CONTRACT.md §12.1: seção inteira "C++ / Qt (Mandatory)"
+### A.2 - CONTRACT.md §12.1: seção inteira de regras de linguagem, marcada "Mandatory"
 
-Texto exato, `CONTRACT.md:767-793` (trecho representativo; a seção é maior):
+O `CONTRACT.md`, por volta das linhas 767 a 793, traz uma seção de regras específicas de linguagem escrita para a camada de plataforma anterior, hoje aposentada. **O texto dela não se transcreve aqui, por ordem do líder: nenhum nome de dependência de terceiro volta ao corpus.** O que a seção manda, em resumo e sem nomes: fixa um padrão de C++ anterior ao vigente, e obriga o uso do modelo de propriedade, do mecanismo de sinais entre camadas, das primitivas de thread, de banco de dados e de rede daquela camada, mais um sistema de tema próprio.
 
-```
-## 12. Language-Specific Rules
+**Por que é crítico:** o rótulo **"Mandatory"** está escrito no próprio cabeçalho. Um agente implementador que não tenha lido `GODS_LAWS.md` pode concluir que aquela camada é obrigatória no GusWorld. Isso violaria ao mesmo tempo:
 
-### 12.1 C++ / Qt *(Mandatory)*
+- **Lei Zero** (GODS_LAWS.md:1): "O GusWorld liga em exatamente duas coisas: o GlintFx e o sistema operacional" - aquela camada seria uma terceira coisa, proibida por construção.
+- **L-03**: o padrão de C++ que a seção fixa contradiz o C++23.
+- **L-05**: o mecanismo de sinais daquela camada seria um framework paralelo de comunicação entre camadas, o oposto de "ou liga direto no GlintFx, ou não existe".
+- **L-17**: a arquitetura de 5 camadas (`present/app/domain/content/core`) não tem lugar para as primitivas de thread, banco e rede daquela camada - o jogo não tem rede nem banco.
 
-**Version:** C++20 minimum. Qt 6.x.
-...
-**Qt Specifics:**
-- MUST use Qt parent-child ownership for widgets (parent deletes children).
-- MUST use signals/slots for cross-layer communication (Observer pattern built-in).
-- MUST NOT call network, file I/O, or database from the UI thread.
-- MUST use `QThread` + `moveToThread()` or `QtConcurrent` for background work.
-- MUST use `Qt::QueuedConnection` when emitting across threads.
-- MUST use `QSqlQuery` with `bindValue()` - NEVER string concatenation for SQL.
-- MUST check `QNetworkReply::error()` before reading response data.
-- MUST handle all `QFile::open()` failures.
-- Theme/style: MUST use QSS via central theme system, NEVER `setStyleSheet()`...
-```
-
-**Por que é crítico:** o rótulo **"Mandatory"** está escrito no próprio cabeçalho. Um agente implementador que não tenha lido `GODS_LAWS.md` (ou que leia CONTRACT.md depois e "misture tudo", exatamente o risco que motivou a L-24) pode concluir que Qt é obrigatório no GusWorld. Isso violaria simultaneamente:
-- **Lei Zero** (GODS_LAWS.md:1): "O GusWorld liga em exatamente duas coisas: o GlintFx e o sistema operacional" - Qt é uma terceira coisa, proibida por construção.
-- **L-03**: "Version: C++20 minimum" contradiz C++23.
-- **L-05**: sinais/slots do Qt seriam um framework paralelo de comunicação entre camadas, o oposto de "ou liga direto no GlintFx, ou não existe".
-- **L-17**: a arquitetura de 5 camadas (`present/app/domain/content/core`) não tem lugar para `QThread`, `QSqlQuery` ou `QNetworkReply` - o jogo é single-player offline sem rede nem banco de dados (confirmado por `docs/design/pillars.md:33-34`, anti-pillar "Não é IAP", "Não é always-online").
-
-**Ação proposta:** apagar a seção `12.1` inteira e, se o líder quiser uma seção C++/GlintFx no lugar, escrevê-la do zero alinhada a L-17.
+**Ação proposta:** apagar a seção `12.1` inteira e, se o líder quiser uma seção de C++ mais GlintFx no lugar, escrevê-la do zero alinhada a L-17.
 
 ---
 
@@ -90,16 +72,16 @@ Texto exato, `CONTRACT.md:317-340` (trecho):
 │  INFRASTRUCTURE / DATA                  │  HTTP, SQL, file system, APIs
 └─────────────────────────────────────────┘
 ...
-[ ] No domain entity imports Qt network/SQL/widget modules?
+[ ] No domain entity imports platform network/SQL/widget modules?
 ```
 
-**Lei que revoga:** `L-17` (GODS_LAWS.md:209-244) define **cinco** camadas nomeadas e ordenadas diferentemente - `present/ → app/ → domain/ → content/ → core/` - com gate de CI específico (`#include <glintfx/` só em `present/`), e nenhuma camada "Infrastructure/Data" genérica de HTTP/SQL (o jogo não tem rede nem banco). O checklist final (`CONTRACT.md:352`) ainda cita "Qt network/SQL/widget modules" nominalmente, reforçando a incompatibilidade.
+**Lei que revoga:** `L-17` (GODS_LAWS.md:209-244) define **cinco** camadas nomeadas e ordenadas diferentemente - `present/ → app/ → domain/ → content/ → core/` - com gate de CI específico (`#include <glintfx/` só em `present/`), e nenhuma camada "Infrastructure/Data" genérica de HTTP/SQL (o jogo não tem rede nem banco). O checklist final (`CONTRACT.md:352`) ainda cita os módulos de rede, banco e widget daquela camada nominalmente, reforçando a incompatibilidade.
 
 **Ação proposta:** apagar `CONTRACT.md:317-359` (seção 5 inteira, "Architecture Layers" + checklist) e substituir por remissão a L-17, ou por uma versão reescrita das 5 camadas.
 
 ---
 
-### A.4 - TESTES.md T1: ferramenta QtTest + meta de 70% de cobertura
+### A.4 - TESTES.md T1: ferramenta um módulo da camada de plataforma anterior + meta de 70% de cobertura
 
 **A meta de cobertura já foi apontada pelo coordenador.** Texto exato, `TESTES.md:47-49`:
 
@@ -108,16 +90,16 @@ Texto exato, `CONTRACT.md:317-340` (trecho):
 
 **Objetivo:** verificar que cada módulo se comporta conforme especificado de forma isolada.
 
-**Ferramenta:** QtTest (embutido no Qt6) ou Google Test.
+**Ferramenta:** o framework de teste embutido na camada de plataforma anterior, ou Google Test.
 
 **Critério de aprovação:** 0 falhas. Cobertura mínima de 70% nos módulos críticos.
 ```
 
 **Duas revogações no mesmo parágrafo:**
-- "Ferramenta: QtTest (embutido no Qt6)" - revogado pela **Lei Zero** + **L-05** (Qt não liga no projeto; framework de teste teria que ser o que o GlintFx já usa ou Google Test puro, sem o Qt).
+- "Ferramenta: o framework de teste embutido na camada de plataforma anterior" - revogado pela **Lei Zero** + **L-05** (aquela camada não liga no projeto; framework de teste teria que ser o que o GlintFx já usa ou Google Test puro, sem a camada anterior).
 - "Cobertura mínima de 70% nos módulos críticos" - revogado por **L-19** (GODS_LAWS.md:281): "**Sem meta numérica de cobertura.** Com TDD estrito, todo código de comportamento nasce de um teste que falhou, então cobertura é consequência, não alvo."
 
-**Ação proposta:** reescrever T1 removendo a menção a QtTest e a meta de 70%, alinhando ao ciclo vermelho/verde/refatorar de L-19 e aos quatro portões (zero warning, ASan/UBSan, clang-tidy/cppcheck, gitleaks).
+**Ação proposta:** reescrever T1 removendo a menção a um módulo da camada de plataforma anterior e a meta de 70%, alinhando ao ciclo vermelho/verde/refatorar de L-19 e aos quatro portões (zero warning, ASan/UBSan, clang-tidy/cppcheck, gitleaks).
 
 ---
 
@@ -135,7 +117,7 @@ E `docs/design/producao/ci-build-plan.md:70,76`:
 
 **Por que é crítico:** um agente que monte o CI usando este documento como fonte configuraria **1 plataforma** (Fedora) como gate único e adiaria Windows/Arch/CachyOS - o oposto direto de L-20, e bem no início do projeto, quando a fundação de CI é a primeira fatia (L-20: "a partir do primeiro módulo de verdade, não há mais essa saída").
 
-**Nota de sobreposição com Grupo B:** este documento já se autodeclara "escrito sobre o stack Godot/C# aposentado" (`ci-build-plan.md:6`, nota de stack), mas a decisão de gate-em-1-distro **não está dentro dessa ressalva** - é apresentada como "Decisões canônicas" agnósticas de stack, então trato como Grupo A pleno, não como bloco histórico já neutralizado.
+**Nota de sobreposição com Grupo B:** este documento já se autodeclara "escrito sobre o stack a engine anterior/C# aposentado" (`ci-build-plan.md:6`, nota de stack), mas a decisão de gate-em-1-distro **não está dentro dessa ressalva** - é apresentada como "Decisões canônicas" agnósticas de stack, então trato como Grupo A pleno, não como bloco histórico já neutralizado.
 
 **Ação proposta:** reescrever a seção de "Decisões canônicas" e a tabela de plataformas para refletir a matriz de cinco alvos desde o primeiro commit (L-20), com decisão do líder sobre se o "gate" muda de conceito ou se as cinco entradas viram gate conjunto.
 
@@ -262,7 +244,7 @@ Por `L-24`, tudo neste grupo é candidato a apagamento total (não arquivamento)
 
 ```
 docs/art/style-guide.md:220: <details>
-docs/art/style-guide.md:221: <summary>Histórico — spec 3D (era Godot, superada)</summary>
+docs/art/style-guide.md:221: <summary>Histórico — spec 3D (era a engine anterior, superada)</summary>
 docs/art/style-guide.md:344: </details>
 ```
 
@@ -283,7 +265,7 @@ docs/art/style-guide.md:344: </details>
 | `docs/specs/character-spec-linda-siren.md` | 25-58 | 34 linhas |
 | `docs/specs/character-spec-sterling-locke.md` | 29-69 | 41 linhas |
 
-**Conteúdo de cada bloco:** o mesmo padrão - "Histórico - spec 3D (era Godot, superada)" com prompt de geração de imagem 3D (Midjourney/Stable Diffusion), proporção de mesh, budget de tris.
+**Conteúdo de cada bloco:** o mesmo padrão - "Histórico - spec 3D (era a engine anterior, superada)" com prompt de geração de imagem 3D (Midjourney/Stable Diffusion), proporção de mesh, budget de tris.
 
 **Nuance [INFERÊNCIA]:** diferente do bloco B.1 (puramente descritivo de pipeline técnico), estes blocos contêm o **prompt textual de cada personagem** (silhueta, traço de identidade, cor-marca), que pode ter valor de referência para reconstruir o prompt PixelLab 2D equivalente (a própria `docs/specs/_INDEX.md:9` diz que a spec 2D detalhada ainda não foi escrita). Apagar sem antes extrair os traços de identidade (não-3D) para algum lugar pode custar retrabalho. Registro isso como consideração para o líder, não como recomendação de manter.
 
@@ -306,9 +288,9 @@ Texto exato:
 
 Diferente de B.1-B.3 (blocos colapsáveis com tag HTML), estes são parágrafos de aviso no início do documento, não escondidos, mas explicitamente rotulados como nota sobre stack aposentado:
 
-- `docs/design/producao/plano_vs.md:5` - "**NOTA DE STACK (2026-06-23, pós-ADR-008).** Este plano foi escrito sobre o stack Godot 4 + C# .NET 8 AOT, depois aposentado [...]"
-- `docs/design/producao/ci-build-plan.md:6` - mesmo padrão, sobre export templates Godot e PoC AOT.
-- `docs/design/producao/art-spike-protocol.md:6` - mesmo padrão, sobre import Godot + material toon.
+- `docs/design/producao/plano_vs.md:5` - "**NOTA DE STACK (2026-06-23, pós-ADR-008).** Este plano foi escrito sobre o stack a engine anterior 4 + C# .NET 8 AOT, depois aposentado [...]"
+- `docs/design/producao/ci-build-plan.md:6` - mesmo padrão, sobre export templates a engine anterior e PoC AOT.
+- `docs/design/producao/art-spike-protocol.md:6` - mesmo padrão, sobre import a engine anterior + material toon.
 
 **Nuance:** diferente do Grupo A (onde as "Decisões canônicas" dentro destes mesmos arquivos seguem valendo e contradizem lei nova), estas notas específicas **já se autodeclaram históricas** - a diferença de A.5 é que A.5 mira a tabela de plataformas (que NÃO está dentro da nota, e contradiz lei nova), enquanto aqui miro só o parágrafo da nota em si (que já é auto-descrito como morto).
 
@@ -318,7 +300,7 @@ Diferente de B.1-B.3 (blocos colapsáveis com tag HTML), estes são parágrafos 
 
 Texto exato (célula de tabela):
 
-> "**DA-2** | Lib/sistema de diálogo | **OBSOLETO (pós-ADR-008).** A escolha original era DialogueManager (addon Godot 4, MIT) [...] O blueprint de diálogo deste doc segue válido [...] Ver ROADMAP.md."
+> "**DA-2** | Lib/sistema de diálogo | **OBSOLETO (pós-ADR-008).** A escolha original era DialogueManager (addon a engine anterior 4, MIT) [...] O blueprint de diálogo deste doc segue válido [...] Ver ROADMAP.md."
 
 **Ação proposta:** apagar a célula "OBSOLETO" e sua justificativa, mantendo a linha da tabela vazia ou com nota curta "decisão de lib de diálogo: N/A na engine atual", já que o blueprint (regra em si) segue válido segundo o próprio texto.
 
@@ -326,16 +308,16 @@ Texto exato (célula de tabela):
 
 Texto exato (início):
 
-> "> **Nota de stack (2026-06-23, pós-ADR-008).** Esta seção descreve a integração no vocabulário do protótipo **C# + Godot** (signals, `CombatManager` como 'ponte Node', `game/tools/TestCombatIntegration.cs`), que morre no M8. No motor **C++20 + `__DEP_REMOVIDA__`** o equivalente é [...]"
+> "> **Nota de stack (2026-06-23, pós-ADR-008).** Esta seção descreve a integração no vocabulário do protótipo **C# + a engine anterior** (signals, `CombatManager` como 'ponte Node', `game/tools/TestCombatIntegration.cs`), que morre no M8. No motor **C++20 + `__DEP_REMOVIDA__`** o equivalente é [...]"
 
 **Ação proposta:** apagar o parágrafo. **Ressalva:** a segunda metade do parágrafo (o que o motor C++ atual faz) tem conteúdo técnico não-histórico (o contrato de acumular `StatusEffectChange` numa lista drenável) que pode valer a pena preservar reescrito, fora do enquadramento "nota de stack" - decisão do líder.
 
-### B.7 - `ASSETS-LICENSE.md:140-154`: "Regra de fronteira (histórica): arquivos de cena Godot (.tscn / .tres)" (15 linhas)
+### B.7 - `ASSETS-LICENSE.md:140-154`: "Regra de fronteira (histórica): arquivos de cena a engine anterior (.tscn / .tres)" (15 linhas)
 
 Texto exato do título e da nota:
 
-> "## Regra de fronteira (histórica): arquivos de cena Godot (.tscn / .tres)
-> > **Nota (2026-07-22):** o stack Godot/C# foi decommissionado no marco M8; arquivos `.tscn` e `.tres` não existem mais no repositório [...]; não se aplica a nenhum arquivo do repositório atual."
+> "## Regra de fronteira (histórica): arquivos de cena a engine anterior (.tscn / .tres)
+> > **Nota (2026-07-22):** o stack a engine anterior/C# foi decommissionado no marco M8; arquivos `.tscn` e `.tres` não existem mais no repositório [...]; não se aplica a nenhum arquivo do repositório atual."
 
 **Ação proposta:** apagar as 15 linhas (140-154) inteiras.
 
@@ -409,7 +391,7 @@ Agrupado por alvo inexistente. Confirmei a não-existência de cada alvo com `fi
 
 **Ação proposta:** apagar ou reescrever a citação do loader (já que é C# e o projeto agora é C++23/GlintFx), mantendo o formato de arquivo (`## CHAVE_UPPER_SNAKE`) como está até o líder decidir se strings de tradução também vão para o envelope binário de L-25 (ver item A.12).
 
-### C.5 - `.tscn` / `.tres` (arquivos de cena Godot)
+### C.5 - `.tscn` / `.tres` (arquivos de cena a engine anterior)
 
 **Confirmado inexistente:** `find . -iname "*.tscn" -o -iname "*.tres"` vazio.
 
@@ -439,7 +421,7 @@ Agrupado por alvo inexistente. Confirmei a não-existência de cada alvo com `fi
 
 **Ocorrências:** `docs/design/card-frame-spec.md:7-8` (`mockups/16-moldura-cartas.html`, `17-moldura-cores-dominio.html`) e `docs/design/mecanicas/terminal-estetica.md:30` (`docs/design/mockups/11-terminal-glitch-glyphs.html`).
 
-**Nota [INFERÊNCIA]:** estas citações a arquivos HTML de mockup são diferentes das outras deste grupo - **não** são resíduo do stack Godot antigo, parecem ser referência a um mockup de UI que foi feito em algum momento (provavelmente numa sessão de chat, não versionado) e nunca chegou a virar arquivo no repositório. Não necessariamente "fantasma da era anterior", pode ser "nunca commitado".
+**Nota [INFERÊNCIA]:** estas citações a arquivos HTML de mockup são diferentes das outras deste grupo - **não** são resíduo do stack a engine anterior antigo, parecem ser referência a um mockup de UI que foi feito em algum momento (provavelmente numa sessão de chat, não versionado) e nunca chegou a virar arquivo no repositório. Não necessariamente "fantasma da era anterior", pode ser "nunca commitado".
 
 **Ação proposta:** não apagar; perguntar ao líder se os mockups existem em algum lugar (histórico de chat, máquina local) e podem ser recuperados/versionados, ou se a citação deve ser removida por não haver mais o artefato.
 
@@ -465,7 +447,7 @@ Texto exato (`:41-49`):
 
 Texto exato:
 
-> "**Histórico:** o código foi GPLv3 até 2026-07-31, e AGPL-3.0 antes disso. Fontes C# (`.cs`) e scripts GDScript (`.gd`) da era Godot não existem mais no repositório atual [...] mas **continuavam cobertos pela GPLv3 enquanto existiram**; esta seção não remove nem enfraquece aquela cobertura retroativa. A rotação para Apache License 2.0 (ADR-021) não retroage: releases já publicadas sob GPLv3/AGPL-3.0 permanecem naquela licença para quem já as recebeu."
+> "**Histórico:** o código foi GPLv3 até 2026-07-31, e AGPL-3.0 antes disso. Fontes C# (`.cs`) e scripts a linguagem de script da engine anterior (`.gd`) da era a engine anterior não existem mais no repositório atual [...] mas **continuavam cobertos pela GPLv3 enquanto existiram**; esta seção não remove nem enfraquece aquela cobertura retroativa. A rotação para Apache License 2.0 (ADR-021) não retroage: releases já publicadas sob GPLv3/AGPL-3.0 permanecem naquela licença para quem já as recebeu."
 
 **Por que é arriscado apagar:** mesmo raciocínio de D.1 - se código sob GPLv3/AGPL-3.0 já foi distribuído (era anterior), essa distribuição gerou direito para quem recebeu, independente de qualquer mudança de licença posterior (inclusive a mudança que o Grupo A.6 propõe, de Apache para AGPL-3.0-or-later). **Nuance:** a PARTE que diz "A rotação para Apache License 2.0" ficará desatualizada assim que A.6 for aplicado (não vai mais existir rotação para Apache, e sim para AGPL direto) - mas a cláusula de fundo (releases antigas mantêm a licença que tinham) precisa sobreviver reescrita, não apagada.
 
