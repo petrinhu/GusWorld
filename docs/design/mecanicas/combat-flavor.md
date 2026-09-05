@@ -122,7 +122,7 @@ Isto e irmao da regua dos apartes ([`gus-apartes-c-arcane.md`](../../narrative/g
 
 **A "regua-mestre" antiga tambem morreu:** *"CC/heal = rapida sempre, senao chega tarde e e carta desperdicada"*. Ela **colide com a lei** e perde. `Tavusa-Trava` (Stun, Pythia) e **LENTA**, e isso e **custo ACEITO e INTENCIONAL** pelo lider: um Stun que chega tarde e **exatamente a licao** de que interpretado te trai na hora H. Idem `Tavusa-Overclock` (recarga de recurso que chega tarde vale menos). **Watchlist do N=3, nao bug.** Remedio permitido: duracao do status ou casas de espera. Nunca a velocidade.
 
-**Gus = compilador universal** (poliglota, usa qualquer linguagem). **Frase comica do Gus:** o Gus solta uma fala engracada de vez em quando durante o cast / nas disputas de linguagem (defende C-Arcane; ver comic-reliefs C.4) e os apartes atrelados a cartas especificas ([`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md)); conteudo do narrative-writer, densidade baixa (nem todo cast).
+**Gus = compilador universal** (poliglota, usa qualquer linguagem). **Frase comica do Gus:** o Gus solta uma fala engracada de vez em quando durante o cast / nas disputas de linguagem (defende C-Arcane; ver [`characters/party.md`](../../narrative/characters/party.md), secao "Matriz de linguagens-ancora") e os apartes atrelados a cartas especificas ([`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md)); conteudo do narrative-writer, densidade baixa (nem todo cast).
 
 ### 2.5 Ressalva: o `>>>` do prompt do Caua NAO e afirmacao de velocidade
 
