@@ -917,8 +917,8 @@ Gus pode pular em cima de um rato pequeno tipo cogumelo-com-pernas. Rato vira pa
 
 **EE-4: O Cogumelo-Recuperador**
 
-Item raro dropável em zonas de bioma misto (final ato 2): cogumelo verde brilhante. Usar = +1 vida extra ao Gus (revive automático se HP=0 na próxima batalha). Descrição no Diário:
-> *"O Cogumelo-Recuperador. Lendário. Item raro. Existe um meme antigo que diz: 'A vida é sua. Mas o cogumelo te dá outra.'"*
+Item raro: chocolate 80% cacau em formato de cogumelo, embrulhado em papel alumínio colorido no padrão de um cogumelo natural. Cai de um inimigo-mestre do bioma misto (final do Ato 2) que não renasce depois de abatido, com taxa de drop escalada por dificuldade, de 89% no Fácil a 0% no Hardcore. Usar = +1 vida extra ao Gus (revive automático se HP=0 na próxima batalha). O papel alumínio não se joga fora: vira ingrediente de crafting. Descrição no Diário:
+> *"O Cogumelo-Recuperador. Lendário. Item raro. Cacau por dentro, folha metálica por fora, e um meme antigo por baixo dos dois: 'A vida é sua. Mas o cogumelo te dá outra.' Guarda o papel. Ele ainda serve pra alguma coisa."*
 
 **Canon mecânico, decidido pelo líder em 30/08/2026 (`G12` do `TODO.md`, Eixo 1 de `docs/_secret/proposta-balanceamento-easter-eggs.md`):**
 
@@ -934,7 +934,7 @@ Item raro dropável em zonas de bioma misto (final ato 2): cogumelo verde brilha
 | Hardcore | 0% |
 
 - **Hardcore fica em 0%**, preservando a exclusividade do kernel-panic puzzle como única segunda chance daquele modo (`docs/design/mecanicas/modos-morte.md` §2.3a: "a chance é ÚNICA por run").
-- **Pendente, fora de escopo desta atualização:** a dica de Diário acima ainda descreve o cogumelo pela versão antiga (não menciona chocolate nem papel alumínio); reescrevê-la é trabalho de `narrative-writer`, item `D33` do `TODO.md`.
+- **✅ REESCRITO em 05/09/2026 (`D33` do `TODO.md`):** a descrição do item e a dica de Diário acima já refletem a composição de chocolate e papel alumínio, a fonte de drop por inimigo-mestre sem respawn e a taxa por dificuldade. Ainda em aberto, fora de escopo desta reescrita de prosa: o nome do inimigo-mestre do bioma misto (linha "Fonte do drop" acima) e o design do craft que usa o papel alumínio como insumo.
 
 ---
 
@@ -998,10 +998,10 @@ Em letras pequenas embaixo: *"P.S.: A cura gratuita demora. Doações aceleram o
 
 Mini-game opcional no Setor Mirage: Iara desafia Gus a um puzzle de avoidance ritmado. Avatar = cubo neon ciano. Spike pontiagudo magenta no caminho. Trilha eletrônica acelera. Vencer 3 leveis seguidos dá **Token-de-Sincronia** (efeito timing input bonus extendido).
 
-**EE-12: "Você morreu 100 vezes na mesma tela"**
+**EE-12: "Você morreu de novo nesta tela"**
 
 Conquista oculta:
-> **"Persistência Geométrica: Você morreu 100 vezes na mesma cena.
+> **"Persistência Geométrica: Você morreu na mesma cena mais vezes do que a sua dificuldade tem paciência para contar.
 >  Nós respeitamos isso."**
 
 Achievement banner aparece com fundo de quadrados neon piscando.
@@ -1018,7 +1018,7 @@ Achievement banner aparece com fundo de quadrados neon piscando.
 | Hardcore | 144 |
 
 - Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilibrar.
-- **Pendente, fora de escopo desta atualização:** o título e a dica acima ainda citam o valor único "100"; reescrevê-los é trabalho de `narrative-writer`, tal qual `D33` fez para o Eixo 1.
+- **✅ REESCRITO em 05/09/2026:** o título e a dica acima já não citam o valor único "100", tal qual `D33` fez para o Eixo 1.
 
 ---
 
@@ -1100,7 +1100,7 @@ Sistema oculto: se Gus morre 10 vezes na mesma cena específica, NPC aparece no 
 > "Respira. Você consegue.
 >  Não é fraqueza pedir ajuda."
 
-Oferece **Token-de-Coragem** (regenera 1 vida ao iniciar combate). Diary:
+Oferece **Token-de-Coragem** (recupera parte da vida máxima do Gus no início do combate seguinte, mais nas dificuldades mais fáceis e ausente no Hardcore). Diary:
 > *"Algumas montanhas se escalam aos poucos. Algumas batalhas se vencem ao admitir derrota."*
 
 Mensagem opcional discreta no canto da tela durante carregamento:
@@ -1118,7 +1118,7 @@ Mensagem opcional discreta no canto da tela durante carregamento:
 | Difícil | 8% |
 | Hardcore | sem Token (0%) |
 
-- **Pendente, fora de escopo desta atualização:** a frase "(regenera 1 vida ao iniciar combate)" acima ainda descreve o efeito fixo antigo; reescrevê-la é trabalho de `narrative-writer`.
+- **✅ REESCRITO em 05/09/2026:** a frase acima já descreve o efeito percentual escalado por dificuldade, sem o item no Hardcore, e não mais o efeito fixo antigo.
 
 ---
 

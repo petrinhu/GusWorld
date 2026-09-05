@@ -95,7 +95,7 @@ Não decido entre as duas (L-14). Pergunta formal em §3. **✅ RESOLVIDO em 30/
 ### 2.12 — `achv_persistent_geometry` (EE-12, "Persistência Geométrica")
 
 **Nome (asset, citado do corpus):** "Persistência Geométrica".
-**Dica (asset, citada do corpus):** *"Você morreu 100 vezes na mesma cena. Nós respeitamos isso."*
+**Dica (asset, citada do corpus):** *"Você morreu na mesma cena mais vezes do que a sua dificuldade tem paciência para contar. Nós respeitamos isso."*
 **Oculta:** sim ("conquista oculta", texto explícito do corpus).
 
 **Gatilho de domínio:** o contador de derrotas de Gus dentro de uma mesma identidade de cena atinge o limiar de dificuldade do save (tabela abaixo, não mais um valor único). Em vocabulário de evento já estabelecido em `combat.md` §16 (`CombatBus`): `CombatEnded(outcome=Defeat, payload)` seguido de `ActorDefeated(gus)` — o avaliador de conquistas incrementa, por identidade de cena, um contador de derrotas.
@@ -109,7 +109,7 @@ Não decido entre as duas (L-14). Pergunta formal em §3. **✅ RESOLVIDO em 30/
 | Difícil | 89 |
 | Hardcore | 144 |
 
-Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilibrar. **Pendente, fora de escopo desta atualização:** a linha "Dica" acima ainda cita o valor único "100"; reescrevê-la é trabalho de `narrative-writer`, tal qual `D33` fez para o Eixo 1.
+Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilibrar.
 
 **Estado mínimo a contar:** um mapa `id_cena → contagem de derrotas`, não um único inteiro global, a condição é "N vezes **na mesma** cena", com N dado pela tabela acima, então derrotas em cenas diferentes não se somam entre si.
 
