@@ -36,7 +36,7 @@ Camada **complementar e não-substitutiva**. Cada doc deep:
 docs/narrative/deep/
 ├── _INDEX.md                            # este doc
 ├── eras/                                # 3 eras + transições + cosmologia-origem
-│   ├── era-1-pre-codigo.md              # Neo-Sylvania, §§1-10 (maior doc da camada, ~318k pal)
+│   ├── era-1-pre-codigo.md              # Neo-Sylvania: virou índice curto em 05/09/2026 (D35), abre para os dez capítulos §1-10 em era-1-pre-codigo/ (o texto grande mudou de lugar; o bloco continua o maior da camada)
 │   ├── era-2-boom-tecnico.md            # Era do Compilador
 │   ├── era-3-sterling.md                # Era Sterling presente
 │   ├── transicoes-entre-eras.md         # Quedas, hiatos, restos
