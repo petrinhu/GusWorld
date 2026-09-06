@@ -98,20 +98,14 @@ como eletrodo, ao lado do zinco — o grafite completa o par que a química cít
 sem inaugurar receita paralela. Detalhe completo, incluindo a contagem final de materiais:
 `cartas-hardware-pirataria-energia.md` §5, "Bateria de baixa qualidade (craftada)".
 
-**Fonte do grafite: um lugar só, e isso é dependência de progressão real, registrada aqui como
-fato.** Diferente de zinco e cobre (duas rotas cada: ferro-velho e loja/negociação), o grafite só
-existe como subproduto do traje desta dungeon (seção 1: reverte o CO2 respirado em carbono) — sem
-rota alternativa de compra ou drop conhecida. A Kola-SG3-12262 é dungeon de Ato 3
-(`kola-sg3-12262-espelho-obsidiana.md`), então o grafite só entra no inventário da party depois de
-alcançar e descer a essa dungeon ao menos uma vez com o traje ligado.
-
-**Sinalizado para o líder, não decidido aqui:** se a receita da bateria caseira passa a EXIGIR
-grafite sempre (travando essa variante de craft até o Ato 3) ou se continua funcionando com os
-quatro materiais anteriores (sem grafite) para quem ainda não fez a dungeon, com o grafite entrando
-como upgrade opcional de resultado quando disponível. A diferença importa porque a bateria caseira
-é hoje framed como rede de segurança de INÍCIO de jogo (`cartas-hardware-pirataria-energia.md` §5,
-"melhor que nada pra quem tá sem bateria nenhuma no inventário") — se o quinto material vira
-obrigatório, essa rede de segurança deixa de existir antes do Ato 3.
+**O traje é só mais uma fonte de grafite, e o grafite é material obrigatório da receita (decisão do
+líder, 06/09/2026, verbatim: "grafite não é raro. pode ser refinado de carvão, reciclado de
+baterias velhas inutilizadas, retirado de lápis... É apenas mais uma forma de obter grafite").**
+Grafite tem múltiplas fontes já desde o início de jogo, então a bateria caseira continua rede de
+segurança de início (`cartas-hardware-pirataria-energia.md` §5, "melhor que nada pra quem tá sem
+bateria nenhuma no inventário") sem depender da Kola-SG3-12262, dungeon de Ato 3
+(`kola-sg3-12262-espelho-obsidiana.md`). Lista de fontes e o que já existe delas no corpus:
+`cartas-hardware-pirataria-energia.md` §5, "Bateria de baixa qualidade (craftada)".
 
 ## 6. Nenhuma altura, nenhuma verticalidade de câmera, nenhuma coordenada Z (L-26)
 
@@ -162,8 +156,8 @@ tem item próprio na tabela de pendências, `D30` — editar os três agora seri
 
 - Balanço de quanto o campo ligado drena de Estamina vs. de carga de bateria (seção 4): número do
   `economy-designer`.
-- Grafite obrigatório ou opcional na receita da bateria caseira, e a dependência de progressão que
-  isso cria até o Ato 3 (seção 5): decisão do líder, depois número do `economy-designer`.
+- Quantidade de grafite por lote de cada fonte (carvão, bateria velha, lápis, traje) e taxa de
+  refino: número do `economy-designer`.
 - Propagação a `CHARS.md`, ao hub da dungeon e à área secreta B (seção 7): escopo de `D30`.
 - Redação em prosa da cena do powerbank (seção 3): `narrative-writer`, com a nota de tom já
   registrada.

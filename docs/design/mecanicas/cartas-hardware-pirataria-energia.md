@@ -581,14 +581,26 @@ sozinho, sem o outro presente, já basta para produzir uma bateria. Isto confirm
 modelo de nove combinações: os dois insumos sempre estão presentes no craft, variando só o degrau
 de cada um entre si.
 
-**A receita ganha dois materiais sólidos, zinco e cobre (decisão do líder, 05/09/2026, por
-`AskUserQuestion`).** A química real de uma bateria de chumbo-ácido usa chumbo esponjoso na placa
-negativa, dióxido de chumbo na positiva e ácido sulfúrico de eletrólito, com a grade em liga de
-chumbo-antimônio ou chumbo-cálcio — mas suco de limão não é ácido sulfúrico, e o par de eletrodos
-correto para um eletrólito cítrico é o clássico **zinco (negativo) e cobre (positivo)**, o mesmo
-par da pilha voltaica histórica. **O chumbo não entra na receita.** A bateria de baixa qualidade
-craftada passa a exigir QUATRO materiais: suco de limão (refinado), água (refinada), zinco e
-cobre — os dois metais sem degrau próprio, ao contrário dos dois líquidos.
+**A receita tem três materiais sólidos, zinco, cobre e grafite (decisões do líder, 05/09/2026 e
+06/09/2026, ambas por `AskUserQuestion`).** A química real de uma bateria de chumbo-ácido usa chumbo
+esponjoso na placa negativa, dióxido de chumbo na positiva e ácido sulfúrico de eletrólito, com a
+grade em liga de chumbo-antimônio ou chumbo-cálcio — mas suco de limão não é ácido sulfúrico, e o
+par de eletrodos correto para um eletrólito cítrico é o clássico **zinco (negativo) e cobre
+(positivo)**, o mesmo par da pilha voltaica histórica. **O chumbo não entra na receita.** O
+**grafite** entra pela mesma física: a pilha comum de zinco-carbono usa exatamente um bastão de
+grafite como eletrodo, ao lado do zinco — o grafite completa esse par real. **Grafite é material
+comum, com várias fontes (decisão do líder, 06/09/2026, verbatim: "grafite não é raro. pode ser
+refinado de carvão, reciclado de baterias velhas inutilizadas, retirado de lápis... É apenas mais
+uma forma de obter grafite"):** refino de carvão, reciclagem de bateria velha inutilizada — a
+mesma bateria morta (SoH abaixo de 21%) que este §5 já manda "vender/reciclar no ferro-velho" mais
+acima —, retirada de lápis, e o traje da descida à Kola-SG3-12262
+(`docs/design/dungeons/traje-descida-kola.md` §1 e §5), que é só mais uma via, não a única. **Lista
+não fechada** — o líder disse "pode ser", não "só pode ser"; outras fontes cabem, sem que nenhum
+agente as invente por conta própria. Carvão e lápis ainda não existem como item de catálogo em
+nenhum documento deste corpus (varredura em `docs/design/` e `docs/narrative/`, zero ocorrência
+como item craftável); nascem quando alguém precisar deles, não aqui. A bateria de baixa qualidade
+craftada tem, junto dos dois insumos líquidos, três materiais sólidos — zinco, cobre e grafite —,
+sem degrau próprio, todos obrigatórios.
 
 **Consequência de desenho, não de balanceamento (decisão do líder, 05/09/2026): a bateria caseira
 é fraca por FÍSICA, não por decreto de balanceamento.** A química cítrica com o par zinco/cobre
@@ -887,4 +899,4 @@ A bancada onde a cópia é gravada é a mesma do §4 (terminal de bancada fixo, 
 - ✅ **Spec de implementação** (ENTREGUE e APROVADA 2026-07-28: `cartas-spec-dados.md` + `cartas-spec-logica.md`) → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção). Sem item correspondente no `TODO.md` (L-30).
 - ✅ **Canonizado pelo líder em 2026-07-28.** Falta só refletir em `cartas-technomagik.md` e na terminologia (passo de escrita). Era: canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar. Ponteiro (L-30): `TODO.md` item `G27`.
 - **Camada pirata de ESPECIAL/SUPER (§15, decisão do líder 25/08/2026):** canon fechado, números em aberto → `economy-designer` (probabilidade de cada um dos 3 graus de falha, custo em crédito/material do craft, preço da cópia comprada pronta no mercado negro) — item `D42` do `TODO.md`. O mecanismo de entrega da SUPER original ao fim da missão-capstone foi fechado em 03/09/2026 (§15.6): as vinte peças são a chave, a carta está inteira.
-- **Bateria de baixa qualidade craftada a partir de lanches refinados e metais (§5, decisão do líder 25/08/2026, ampliada em 05/09/2026; herança de risco FECHADA em 25/08/2026):** canon fechado no mecanismo (refino gated, bancada compartilhada com reparo/pirataria, trade-off consumir×refinar, rede de segurança, terceira rota de compra, herança dos três riscos da bateria pirata comprada, exigência dos dois insumos líquidos juntos, os dois metais da receita — zinco e cobre —, mentor que entrega o conhecimento de filtrar — Brunus "Vetorial" Solveckt) → `economy-designer` (capacidade/usos, preço de compra do suco puro/água destilada, taxa de sucesso do refino, probabilidade numérica de cada risco herdado) — item `D43` do `TODO.md`. **Não sobrou lacuna de desenho:** o momento narrativo em que o personagem "aprende a filtrar" já está fechado acima (§5, mentor Brunus "Vetorial" Solveckt), e a fonte de obtenção do zinco e do cobre também já está fechada acima (§5, ferro-velho como fonte principal, loja e negociação como rota alternativa, decisão do líder de 05/09/2026) — item `G32` do `TODO.md`. O item `G12` cobre só a origem dos insumos alimentares (suco de limão e água com gás), não estes números de craft nem os metais.
+- **Bateria de baixa qualidade craftada a partir de lanches refinados e materiais sólidos (§5, decisão do líder 25/08/2026, ampliada em 05/09/2026 e 06/09/2026; herança de risco FECHADA em 25/08/2026):** canon fechado no mecanismo (refino gated, bancada compartilhada com reparo/pirataria, trade-off consumir×refinar, rede de segurança, terceira rota de compra, herança dos três riscos da bateria pirata comprada, exigência dos dois insumos líquidos juntos, os três materiais sólidos da receita — zinco, cobre e grafite —, mentor que entrega o conhecimento de filtrar — Brunus "Vetorial" Solveckt) → `economy-designer` (capacidade/usos, preço de compra do suco puro/água destilada, taxa de sucesso do refino, probabilidade numérica de cada risco herdado, quantidade de grafite por fonte e taxa de refino do carvão) — item `D43` do `TODO.md`. **Não sobrou lacuna de desenho sobre o mentor, sobre a fonte de zinco/cobre nem sobre a fonte de grafite:** o momento narrativo em que o personagem "aprende a filtrar" já está fechado acima (§5, mentor Brunus "Vetorial" Solveckt), a fonte de obtenção do zinco e do cobre também já está fechada acima (§5, ferro-velho como fonte principal, loja e negociação como rota alternativa, decisão do líder de 05/09/2026) — item `G32` do `TODO.md` —, e a fonte do grafite tem quatro vias abertas e não fechadas (carvão refinado, bateria velha reciclada, lápis, traje da Kola-SG3-12262), lista propositalmente não fechada pelo líder. O item `G12` cobre só a origem dos insumos alimentares (suco de limão e água com gás), não estes números de craft nem os materiais sólidos.
