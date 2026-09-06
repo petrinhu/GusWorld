@@ -240,8 +240,7 @@ Mensagem opcional discreta no canto da tela durante carregamento:
 | Difícil | 8% |
 | Hardcore | sem Token (0%) |
 
-- **✅ REESCRITO em 05/09/2026:** a frase acima já descreve o efeito percentual escalado por dificuldade, sem o item no Hardcore, e não mais o efeito fixo antigo.
-- **✅ REESCRITO em 05/09/2026 (decisão nova do líder, mesmo dia):** o gatilho deixa de ser "morrer 10 vezes na mesma cena" (gatilho por desempenho, que o corte `C-06` da L-29 proíbe) e passa a ser a dificuldade escolhida no save, sem exceção ao corte. A escala de cura por dificuldade acima continua valendo; só o que dispara a concessão mudou. Detalhe e a lacuna que sobra (o instante exato do disparo dentro da cena) em `docs/design/mecanicas/conquistas.md` §2.18.
+- O gatilho é a dificuldade escolhida no save, sem exceção ao corte `C-06` (L-29), que proíbe qualquer gatilho por desempenho do jogador. O instante exato, dentro da cena, em que a dificuldade do save dispara a concessão fica pendente: detalhe em `docs/design/mecanicas/conquistas.md` §2.18.
 
 ---
 
