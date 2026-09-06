@@ -50,26 +50,22 @@ Carta-capstone, a mais cara e a mais poderosa do Codex. O efeito precisa literal
 
 ## 4. A missão-capstone
 
-> **NOTA DE RECONCILIAÇÃO (2026-07-12):** o fluxo beat-a-beat completo da missão foi refeito pelo criador e vive agora na seção **"Canon de missão (revisado 2026-07-12, supera o canon de 2026-07-09)"** ao final deste documento. Os pontos abaixo (gate, localização, puzzle-de-puzzles, beat final) permanecem como REGISTRO HISTÓRICO do primeiro design (2026-07-09) e ficam marcados inline onde o fluxo novo altera algo. Resumo do que muda: (1) a missão passa a **começar cedo** (via o antagonista Vitório Cardoso, na história principal), não fica invisível até as 20 cartas; (2) o puzzle final ("Câmara do Fecho de Abóbada") vira o **puzzle de encaixe dos 20 nós numa bancada emprestada do Tusk**, não mais 20 estações espalhadas por uma dungeon na Forja do Vértice; (3) a carta 21 é **forjada**, não encontrada solta numa câmara **(SUPERADO 25/08/2026: decisão do líder reverteu este ponto, a SUPER nunca foi forjada, é carta original, e a missão volta a ser sobre ACHÁ-LA; ver a nota de correção no início da seção "Canon de missão" mais abaixo)**; (4) a Forja do Vértice deixa de ser um dungeon jogável em G1: vira lore pura, mencionada/foreshadowed (fragmento velado Nível 2), nunca visitada.
+> **NOTA DE RECONCILIAÇÃO (2026-07-12):** o fluxo beat-a-beat completo da missão foi refeito pelo criador e vive agora na seção **"Canon de missão (revisado 2026-07-12, supera o canon de 2026-07-09)"** ao final deste documento. Os pontos abaixo (gate, localização, puzzle-de-puzzles, beat final) ficam marcados inline onde o fluxo novo altera algo, sem reter o texto do design substituído. Resumo do que muda: (1) a missão passa a **começar cedo** (via o antagonista Vitório Cardoso, na história principal), não fica invisível até as 20 cartas; (2) o puzzle final ("Câmara do Fecho de Abóbada") vira o **puzzle de encaixe dos 20 nós numa bancada emprestada do Tusk**, não mais 20 estações espalhadas por uma dungeon na Forja do Vértice; (3) a carta 21 é **forjada**, não encontrada solta numa câmara **(SUPERADO 25/08/2026: decisão do líder reverteu este ponto, a SUPER nunca foi forjada, é carta original, e a missão volta a ser sobre ACHÁ-LA; ver a nota de correção no início da seção "Canon de missão" mais abaixo)**; (4) a Forja do Vértice deixa de ser um dungeon jogável em G1: vira lore pura, mencionada/foreshadowed (fragmento velado Nível 2), nunca visitada.
 
 **Gate de entrada (fiel ao pedido "Master Sword do BOTW"):** o marcador de missão da Forja do Vértice fica **invisível no mapa e ausente do diário até o jogador ter as 20 outras cartas do roster**. Sugestão de UX diegética: ao entrar a 20ª carta no Codex, o diário do Gus reorganiza sozinho as 20 entradas antigas numa página nova que sintetiza a localização (visualmente, algo como um mapa rabiscado que só faz sentido com as 20 peças sobrepostas, literalizando "juntar o feixe inteiro" da dica de Faraday). Reforço de gate: sem a carta Gaiola de Faraday equipada, a interferência de campo ao redor da Forja do Vértice impede a leitura dos óculos táticos, então a missão pede não só as 20 cartas coletadas mas ao menos uma delas (Faraday) ativa no momento de entrar.
 
 **A localização:** a Forja do Vértice, na região mais profunda da Selve Profunda, erguida sobre o epicentro submerso da Catedral-Mãe (item 2). Área nova, de exploração pesada, condizente com conteúdo de pós-jogo/fim de jogo.
 
-**O puzzle à altura da carta, "a Câmara do Fecho de Abóbada" (SUPERADO 2026-07-12, ver nota acima; a mecânica de 20-peças-simultâneas sobrevive, mas remapeada pra "puzzle de encaixe dos 20 nós" numa bancada emprestada do Tusk, não numa dungeon na Forja):** o design proposto não é um puzzle único, é um **puzzle-de-puzzles**, a câmara final da Forja tem 20 estações de ressonância dispostas ao redor de um vão central (o "fecho de abóbada", a pedra-chave que fecha um arco, imagem arquitetural literal pro conceito de "capstone"). Cada estação exige, em miniatura, o mesmo tipo de raciocínio do puzzle de descoberta daquele análogo específico, por exemplo:
+**O puzzle "de encaixe dos 20 nós" (mecânica original proposta em 2026-07-09, remapeada em 2026-07-12 — canon vigente em "O clímax" abaixo, fora da Forja):** não é um puzzle único, é um **puzzle-de-puzzles** de 20 estações/peças. Cada uma exige, em miniatura, o mesmo tipo de raciocínio do puzzle de descoberta daquele análogo específico, por exemplo:
 - a estação Faraday só fica estável com a Gaiola de Faraday ativa (senão, ela "queima" e reinicia o quebra-cabeça daquela estação);
 - a estação Euler pede reconectar um pequeno grafo de pontes sem repetir travessia (eco direto do puzzle de descoberta dele);
 - a estação Mandelbrot pede achar, num zoom progressivo pelos óculos táticos, o menor recorte que já contém o padrão inteiro;
 - a estação Bastiat só revela a armadilha escondida (que desativa a estação se não for vista antes de ativar) se a carta dele estiver equipada;
 - as estações Hayek/Menger/Mises formam um trio: só se resolvem se o jogador NÃO tentar controlar as três ao mesmo tempo, e sim deixar cada uma reagir à anterior, um pequeno eco jogável de ordem espontânea sem comando central.
 
-Todas as 20 estações precisam estar simultaneamente resolvidas, não em sequência, pra que o fecho de abóbada aceite a chave e abra. É o puzzle mais longo e mais exigente do jogo, mas cada peça individual reaproveita uma mecânica que o jogador já aprendeu ganhando a carta correspondente, então a dificuldade é de orquestração e memória, não de mecânica nova e desconhecida. Isso mantém a promessa de "puzzle à altura", sem pedir do jogador nenhuma habilidade que os 20 análogos não tenham ensinado antes.
+Todas as 20 precisam estar simultaneamente resolvidas, não em sequência. É o puzzle mais longo e mais exigente do jogo, mas cada peça individual reaproveita uma mecânica que o jogador já aprendeu ganhando a carta correspondente, então a dificuldade é de orquestração e memória, não de mecânica nova e desconhecida.
 
-**O que há atrás do fecho de abóbada (beat aberto, proposta com alternativa; SUPERADO 2026-07-12: não há mais "atrás do fecho de abóbada" jogável; ver o beat "Tusk achado dormindo" no fluxo novo, que substitui este beat de encerramento):**
-- **(a) recomendado:** Helion Tusk não está mais lá. A câmara guarda uma máquina inacabada e um registro/autômato-testamento dele, sinal de que ele tentou, com pura engenharia e sem saber o que estava tocando, romper a mesma fronteira que Helíaco Vyr rompeu em Era 1, e sumiu no processo. Ecoa, sem repetir, a linha de `cosmologia-origem-deep.md` §3 ("ficar, para um vetor de conectividade daquela magnitude, não é o mesmo que morrer num só lugar. É distribuir-se por todos."). O jogador recebe a carta, um fragmento curto e ambíguo de lore de endgame (não confirma nada, preserva a camada de mito/verdade do canon), e a sensação de ter alcançado o fim de uma trilha que ninguém mais no mundo sabe que existe.
-- **(b) alternativa:** Helion Tusk continua vivo, isolado havia anos na própria Forja, e aparece brevemente, tom taciturno de gênio recluso, entrega a carta com poucas palavras e não explica o porquê do lugar. Mais simples de escrever, menos payoff de endgame.
-
-Recomendo (a) pelo fechamento temático mais forte com o resto do roster e com o Transbordamento, mas ambas ficam registradas pra decisão do criador/narrative-designer.
+**O que há atrás do fecho de abóbada:** beat de encerramento SUPERADO em 2026-07-12; substituído pelo beat "Tusk achado dormindo" (ver "Fluxo da missão", beat 8, acima).
 
 **Opcionalidade (reforço explícito do pedido):** a missão NÃO é necessária pra zerar o jogo. É ajuda grande (a carta mais poderosa do Codex) e o fechamento narrativo mais raro do jogo, no mesmo papel que a Master Sword ocupa em Breath of the Wild: quem chega lá joga o resto com uma vantagem real; quem não chega termina o jogo inteiro sem nunca saber que aquilo existia.
 
@@ -122,7 +118,7 @@ Cada uma das 20 entradas de diário já grava, em vocabulário do próprio domí
 
 ## Canon de missão (revisado 2026-07-12, supera o canon de 2026-07-09)
 
-> **STATUS: PROPOSTA** (herda o status do topo do documento). O fluxo abaixo é o registro fiel das decisões do criador em 2026-07-12 e SUPERA o "Canon de missão (criador, 2026-07-09)" preservado na subseção histórica ao final. **Nomes próprios RESOLVIDOS em 2026-07-12** (ver seção "Nomes propostos: Vitório Cardoso e a Montadora Confluência (RESOLVIDO)" ao final deste documento): o antagonista é **Vitório Cardoso** e a montadora é a **Montadora Confluência**. Redação em prosa final desta missão é etapa seguinte, via `narrative-writer`; o que segue é REGISTRO DE DESIGN (beats, gates, estados), não prosa.
+> **STATUS: PROPOSTA** (herda o status do topo do documento). O fluxo abaixo é o registro fiel das decisões do criador em 2026-07-12 e SUPERA o "Canon de missão (criador, 2026-07-09)", cujo texto foi removido deste documento ao final (seção mantida só como nota de que houve substituição). **Nomes próprios RESOLVIDOS em 2026-07-12** (ver seção "Nomes propostos: Vitório Cardoso e a Montadora Confluência (RESOLVIDO)" ao final deste documento): o antagonista é **Vitório Cardoso** e a montadora é a **Montadora Confluência**. Redação em prosa final desta missão é etapa seguinte, via `narrative-writer`; o que segue é REGISTRO DE DESIGN (beats, gates, estados), não prosa.
 >
 > **CORREÇÃO 25/08/2026 (decisão do líder, verbatim, supera o "ritual de forja" descrito abaixo):** "Super não é forjada. Ela é carta original. Quem tenta forjar copia sempre vai sair algo de pior qualidade ou com efeitos diferentes ou sem nada. A original foi criada em asmódico puro, com compilador próprio que se perdeu ao longo dos tempos. As melhores cartas piratas nao alcancam nem 20% de fidelidade, pois RE é impossivel, já que a carta não está disponível para ninguém tentar fazer RE e entender os mecanismos." A SUPER passa a ser **ACHADA**, não forjada nem entregue: a missão-capstone é chegar até ela, não criá-la (ver canon já corrigido em `cartas-technomagik.md` §2.1/§2.4). **As 20 ESPECIAIS seguem sendo pré-requisito duro**, mas de **ACESSO** à missão-capstone, não de matéria-prima de um ritual de criação. Os beats abaixo que descreviam "ritual de forja"/"a party forja a carta numa bancada" foram corrigidos nesta rodada, marcados inline.
 >
@@ -200,7 +196,7 @@ Dinheiro por dificuldade em escada numérica canônica, mesmo peso relativo: **F
 
 ### Nomes pendentes de aprovação (RESOLVIDO 2026-07-12)
 
-Ver seção dedicada mais abaixo neste documento ("Nomes propostos: Vitório Cardoso e a Montadora Confluência (RESOLVIDO)"), que preserva o histórico das opções consideradas. O antagonista é **Vitório Cardoso** e a montadora é a **Montadora Confluência**; o fluxo acima já usa os nomes finais.
+Ver seção dedicada mais abaixo neste documento ("Nomes propostos: Vitório Cardoso e a Montadora Confluência (RESOLVIDO)"). O antagonista é **Vitório Cardoso** e a montadora é a **Montadora Confluência**; o fluxo acima já usa os nomes finais.
 
 ### Reconciliação com o canon de 2026-07-09 (3 pontas soltas)
 
@@ -212,42 +208,20 @@ Ver seção dedicada mais abaixo neste documento ("Nomes propostos: Vitório Car
 
 ---
 
-## Canon de missão (criador, 2026-07-09; HISTÓRICO, superado pela revisão acima)
+## Canon de missão (criador, 2026-07-09; SUPERADO pela revisão acima)
 
-**Nome canonico da carta: "A Carta Perdida de Tusk".** Efeito = C "Consorcio" (passiva potencia as 20 outras cartas + ativa suprema rara).
-
-**A carta NAO esta com o Tusk** (difere de TODAS as outras: as dos outros 20 sao entregues DIRETAMENTE pelo proprio personagem, apos a missao que leva ate ele). Fluxo da carta do Tusk:
-1. UNLOCK: so depois de recolher as 20 outras cartas.
-2. Missao para CHEGAR ao Tusk: passa por sub-missoes menores de PUZZLE e de LUTA.
-3. Primeiro encontro: a party FALA com o Tusk (a missao de falar com ele fica liberada).
-4. A carta e ENCONTRADA depois de falar com ele (nao entregue por ele; a party vai atras dela).
-5. Reencontro: o Tusk SOME (muito ocupado, vive saindo de lugar). Missao "Em Busca do Mega-Empresario": a party percorre as EMPRESAS de que ele e dono.
-6. Ele e achado DORMINDO na linha de montagem de uma de suas empresas, no comeco da manha: a **montadora de carros tecnologicos eletricos magicos flutuantes inovadores**.
-
-(A ordenacao fina entre "encontrar a carta" e "reencontrar o Tusk dormindo" fica a afinar com o narrative-designer; os beats do criador estao registrados fielmente aqui.)
+O design original de 2026-07-09 foi substituído pelo fluxo em "Canon de missão (revisado 2026-07-12...)" acima; o beat a beat vigente está em "Fluxo da missão (beat a beat)".
 
 ---
 
 ## Nomes propostos: Vitório Cardoso e a Montadora Confluência (RESOLVIDO 2026-07-12)
 
-> **RESOLVIDO pelo criador em 2026-07-12:** o antagonista é **Vitório Cardoso**, nome final fora das 3 opções abaixo; o criador optou por ancorar o sobrenome na família **Cardoso** já canônica (`CHARS.md` §8b, Mestre-Sementeira-Fundadora Olímpia Cardoso, ramo coletivista das Famílias-Pilastra de Polis-Vermelha, má-evolução), em vez de qualquer um dos 3 candidatos originais. A montadora é a **Montadora Confluência**, opção 1 da lista original, confirmada sem alteração. As listas de candidatos abaixo ficam preservadas como registro histórico do processo de decisão, não como opções ainda em aberto.
+> **RESOLVIDO pelo criador em 2026-07-12:** o antagonista é **Vitório Cardoso**; o criador optou por ancorar o sobrenome na família **Cardoso** já canônica (`CHARS.md` §8b, Mestre-Sementeira-Fundadora Olímpia Cardoso, ramo coletivista das Famílias-Pilastra de Polis-Vermelha, má-evolução), em vez de qualquer candidato previamente avaliado. A montadora é a **Montadora Confluência**. As demais opções avaliadas para cada nome foram descartadas e não aparecem mais aqui.
 
-### Candidatos para o antagonista (histórico; nenhum escolhido, decisão final foi Vitório Cardoso)
+### Antagonista
 
-O antagonista não é um análogo histórico real (não segue a "regra de nomes" de figuras reais do item 1-6 deste documento); é uma figura original do canon, então os candidatos seguiam só o padrão de sonoridade já usado no roster de personagens GusWorld (nomes próprios portugueses comuns + sobrenomes de sonoridade variada, sem ecoar nenhum político real vivo ou morto).
+O nome final é **Vitório Cardoso** — nenhuma das opções avaliadas antes da decisão foi escolhida (o antagonista não segue a "regra de nomes" de figuras reais do item 1-6 deste documento; é figura original do canon).
 
-1. **Osvaldo Tarkiv**: primeiro nome português comum + sobrenome de sonoridade eslava, ecoando a mesma família sonora já usada pra contatos de Polis-Vermelha/Cidades-Gêmeas no canon existente (Lazar Tovrov, Otília Vermelha). Prós: reforça a origem estrangeira do personagem sem precisar de exposição; distingue-se claramente da party (nomes mais "ocidentais": Berenger, Koslov, Chevalier). Contras: mais um sobrenome eslavo-soante no elenco (risco de saturação sonora com Tovrov/Koslov já existentes).
-2. **Remígio Vantor**: primeiro nome português incomum (registro cerimonial, soa "de palco") + sobrenome inventado neutro, sem ecoar nenhuma etnia específica do canon. Prós: nome memorável e teatral, condizente com um orador de praça pública; risco zero de colisão com nomes existentes. Contras: sobrenome "Vantor" é neologismo puro, menos ancorado culturalmente que os outros dois candidatos.
-3. **Heitor Sarno**: primeiro nome português muito comum + sobrenome de sonoridade ítalo-mediterrânea, registro "homem do povo" (o oposto do tom técnico-recluso do Tusk). Prós: reforça por contraste sonoro a diferença entre os dois (Heitor Sarno soa "de todo mundo", Tusk soa técnico/estrangeiro); fácil de pronunciar e lembrar. Contras: é o mais "genérico" dos três, menos marcado como estrangeiro/exilado.
+### Montadora
 
-Recomendação de leitura na época (não decisão): **opção 1 (Osvaldo Tarkiv)** amarrava melhor com o canon já existente de Polis-Vermelha/Cidades-Gêmeas (sonoridade eslava recorrente nesses contatos). **Decisão final do criador (2026-07-12): nenhuma das 3 opções acima, o nome escolhido foi Vitório Cardoso** (ver nota de resolução no topo desta seção).
-
-### Candidatos para a montadora (RESOLVIDO: opção 1 escolhida)
-
-Segue o padrão de nomenclatura de `PLACES.md` (tipo + qualificador: "Mercado da Sucata Honesta", "Oficina Alencar", "Estação Pythia Bio sucateada").
-
-1. **Montadora Confluência**: nome temático, ecoa "consórcio"/"vértice" sem repetir a palavra "Vértice" da Forja (evita spoiler literal). Prós: reforça o tema de convergência do capstone sem entregar a conexão; soa como nome de empresa real. Contras: um pouco abstrato pra um local descoberto cedo na jornada de descoberta.
-2. **Estaleiro da Borda-Funda**: nome geográfico-descritivo, seguindo o mesmo padrão de sub-locais já canônicos por localização ("Borda oeste da Selve Sombria"). Prós: baixíssimo risco (puramente descritivo, sem carga temática que possa colidir com decisões futuras); fácil de posicionar no mapa mentalmente. Contras: menos memorável, não participa do jogo de eco temático do resto do roster.
-3. **Montadora Vértice-Sul**: foreshadow direto e explícito da Forja do Vértice (mesma palavra-raiz, qualificador geográfico). Prós: máxima força de foreshadow, recompensa jogador atento que reconecta os dois nomes depois. Contras: risco de entregar a conexão cedo demais pra quem presta atenção, enfraquecendo a revelação de endgame da Forja.
-
-Recomendação de leitura na época (não decisão): **opção 1 (Montadora Confluência)** equilibra eco temático com discrição; **opção 2** era a mais segura se o criador preferisse zero risco de spoiler. **Decisão final do criador (2026-07-12): opção 1, Montadora Confluência**, confirmada.
+Segue o padrão de nomenclatura de `PLACES.md` (tipo + qualificador: "Mercado da Sucata Honesta", "Oficina Alencar", "Estação Pythia Bio sucateada"). O nome final é **Montadora Confluência**: nome temático, ecoa "consórcio"/"vértice" sem repetir a palavra "Vértice" da Forja (evita spoiler literal), reforça o tema de convergência do capstone sem entregar a conexão, soa como nome de empresa real. As demais opções avaliadas foram descartadas.

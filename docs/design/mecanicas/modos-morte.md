@@ -1,6 +1,6 @@
 # Modos de Morte (MODOS-MORTE) — sistema de fail-state escalonado por dificuldade
 
-**Status:** CANÔNICO em §1 a §5, por decisão do líder em 24/08/2026 (`TODO.md`, item `G3`): "do desenho antigo dos modos de morte sobrevive todo o design (§1 a §5 de `docs/design/mecanicas/modos-morte.md`: os quatro modos, dificuldade fixa por save, quebra-cabeça de última chance no Hardcore, três marcos do Difícil, enquadramento narrativo, e as sete sinalizações abertas do §5)". ⚠️ **Ressalva de contagem, decidida pelo líder em 25/08/2026:** o `G3` conta sete, mas duas delas já estavam fechadas dentro do §5 quando ele foi escrito; **as abertas são CINCO**, e a lista está logo abaixo. O §6 (plano de implementação) foi REVOGADO pela mesma decisão; o texto continua no documento, marcado como revogado, porque a ORDEM das fases ali descrita (Fácil primeiro, Hardcore por último) segue válida como raciocínio, mesmo com os nomes e as dependências mortos (ver aviso dentro do §6).
+**Status:** CANÔNICO em §1 a §5, por decisão do líder em 24/08/2026 (`TODO.md`, item `G3`): "do desenho antigo dos modos de morte sobrevive todo o design (§1 a §5 de `docs/design/mecanicas/modos-morte.md`: os quatro modos, dificuldade fixa por save, quebra-cabeça de última chance no Hardcore, três marcos do Difícil, enquadramento narrativo, e as sete sinalizações abertas do §5)". ⚠️ **Ressalva de contagem, decidida pelo líder em 25/08/2026:** o `G3` conta sete, mas duas delas já estavam fechadas dentro do §5 quando ele foi escrito; **as abertas são CINCO**, e a lista está logo abaixo. O §6 (plano de implementação) foi REVOGADO pela mesma decisão; o texto do plano foi apagado, e só sobrevive a ORDEM das fases como raciocínio (Fácil primeiro, Hardcore por último — ver aviso dentro do §6).
 
 **Nada aqui está implementado.** Canonizar o design não é o mesmo que construir: não existe uma linha de código de jogo neste projeto (confirmado em `CLAUDE.md`, seção "Estado atual do repositório"). O plano de implementação vivo, que vai substituir o §6 revogado, ainda não foi escrito: nasce como item novo da tabela, re-derivado sobre a espinha de cinco camadas (L-17), quando a onda do núcleo de regra chegar.
 
@@ -229,7 +229,7 @@ Trecho hoje vigente em `pillars.md` (citado sem alteração):
 
 ## §5. Sinalizações novas pro líder (não decidido sozinho)
 
-1. ~~Unlock do Hardcore via `profile.json`~~ — **REJEITADO pelo líder** (flag soft/editável furaria a integridade do Hardcore). Rework: unlock mora dentro da âncora selada+machine-bound (§2.3b). A opção da âncora é a que recomendo, mas **ainda é um ponto que volta pro líder confirmar** (não é 100% fechado — só a alternativa "morre com o profile.json" que foi descartada com certeza).
+1. **REJEITADO pelo líder**: a proposta original de mecanismo de unlock do Hardcore (flag soft/editável furaria a integridade do Hardcore). Rework: unlock mora dentro da âncora selada+machine-bound (§2.3b). A opção da âncora é a que recomendo, mas **ainda é um ponto que volta pro líder confirmar** (não é 100% fechado).
 2. ~~A contradição do kernel-panic-puzzle~~ — **RESOLVIDA 2026-07-10**: líder aprovou a opção (a), puzzle mantido como última chance (§2.3a, §4).
 3. **Locais reais de respawn do Difícil** ("dentro da Selve Sombria" / "casa destruída") não existem ainda como cena/coordenada — dependem do `level-designer`. Até lá, a implementação do dispatcher pode usar um respawn-point placeholder por `EnemyKind` (mesma filosofia do placeholder do M7), e o líder decide quando essa dívida entra na fila do level-designer.
 4. **O gatilho "Dormir" (Marco 2, §2.4), PARCIALMENTE FECHADO pelo líder em 25/08/2026.** A proposta original desta sinalização (deixar "Dormir" cair no mesmo "beat narrativo" genérico que já destrava cura grátis, `economia.md` §3.2, até existir mecânica de sono dedicada) **não foi aceita**: o líder decidiu que dormir é **mecânica própria**, não beat narrativo. Razão do desenho: dormir é o Marco 2 desta mesma escada de recuperação (§2.4: 5% no respawn, 34% ao voltar à cidade, **89% ao dormir**, 100% no Hospital ou por beat narrativo). Se dormir fosse beat narrativo, os Marcos 2 e 3 colapsariam no mesmo gatilho (o mesmo problema que esta sinalização já apontava) e a escada perderia um degrau.
@@ -247,27 +247,7 @@ Trecho hoje vigente em `pillars.md` (citado sem alteração):
 >
 > **O que SOBREVIVE e continua canon:** tudo de §1 a §5 — os quatro modos, a dificuldade fixa por save, o quebra-cabeça de última chance no Hardcore, os três marcos de recuperação do Difícil, o enquadramento narrativo do despertar, e as sete sinalizações abertas do §5.
 >
-> **O que morre:** apenas o plano de fases abaixo. Ele será **re-derivado** sobre a arquitetura de cinco camadas (L-17) por agente especialista, como item próprio da tabela, quando a onda do núcleo de regra chegar. Fica aqui, e não é apagado, porque ainda é o registro de como o problema foi fatiado uma vez — a **ordem** das fases (Fácil primeiro, Hardcore por último) continua sendo raciocínio válido; o que não vale são os nomes e as dependências.
-
-
-**Fase 0 — pode entrar já, zero dependência nova de conteúdo:**
-- `DifficultyLevel` enum + campo `SaveData.difficulty` (+ `difficult_recovery_stage`), schema V5 aditivo + migrator V4→V5 (default `Medio`).
-- Tela de seleção de dificuldade (`DifficultyMenuState` + GlintFx + loop) encaixada no fluxo de Novo Jogo — Aviso #1 (legenda) + Aviso #2 (splash confirmar/cancelar).
-- `EnemyKind` enum + campo `EnemyTemplate.kind` (aditivo, default `Creature`) — dado puro, sem consumidor ainda.
-- **Fácil** funcional ponta-a-ponta: reload do último save no `CombatOutcome::Defeat` — reusa 100% o save I/O já existente (M2 ✅). É literalmente a substituição mais barata do placeholder do M7 pra saves marcados Fácil.
-
-**Fase 1 — dispatcher central (depende só da Fase 0):**
-- No `CombatOutcome::Defeat` com alvo Gus, ramifica por `SaveData.difficulty`. `Facil` já fica 100% operacional aqui (reusa Fase 0). `Medio`/`Dificil`/`Hardcore` ficam com stub/TODO explícito até as fases seguintes.
-
-**Fase 2 — Médio (depende do motor de Hospital/dívida ser codado):**
-- Hoje `economia.md` §3.1/§3.3 é canon de DESIGN, não há código do Hospital ainda. Médio só liga de verdade quando essa implementação existir (fora do escopo desta spec — é o pré-requisito natural do Médio).
-
-**Fase 3 — Difícil (depende da Fase 1 + level design):**
-- `difficult_recovery_stage` + os 3 marcos (§2.4) — Marco "voltar à cidade" e "cura completa" já têm gatilhos análogos no motor (beats narrativos, §3.2 economia.md); "Dormir" precisa da decisão do §5 item 4.
-- Locais reais de respawn (§5 item 3) — bloqueia o polish final, mas o dispatcher pode nascer com placeholder.
-
-**Fase 4 — Hardcore, mecanismo real + unlock (depende do fim-de-jogo existir):**
-- Só é exercitável de ponta-a-ponta quando o jogo tiver um final jogável (bem à frente no roadmap) — o unlock (bit dentro da âncora selada, §2.3b) dispara na vitória do Difícil. Escopo desta fase, TODO explícito pro `security-engineer` (não pro `lead-game-designer`, não decido crypto): formato da âncora out-of-band + o bit de unlock + mecanismo por SO, derivação da chave de machine-binding, cifra AEAD (primitiva vinda do GlintFx — L-25), quais bytes do envelope contam como "selo/cabeçalho" pro wipe por trechos, e a implementação do kernel-panic puzzle em si (§2.3a, mini-jogo de UI — trabalho de `gameplay_engineer`/`frontend`, não crypto). Até lá, o design (§2.3) já está fechado o bastante pra esses sub-specs começarem assim que a Fase 4 entrar em pauta — não precisa esperar o resto da implementação.
+> **O que morre:** apenas o plano de fases abaixo. Ele será **re-derivado** sobre a arquitetura de cinco camadas (L-17) por agente especialista, como item próprio da tabela, quando a onda do núcleo de regra chegar. A **ordem** das fases (Fácil primeiro, Hardcore por último) continua sendo raciocínio válido; o que não vale são os nomes e as dependências do projeto anterior.
 
 ---
 

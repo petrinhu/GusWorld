@@ -194,31 +194,11 @@ este estudo é sobre a mira de encontro comum.
 > impressa a cada 1% do lote** (144 atualizações por lote, ~1.000 no estudo inteiro). Mesma
 > informação, com frequência que cabe na tela.
 
-### Análise original da proposta (mantida por registro)
+### Nota sobre a proposta original de N
 
-O líder pediu 200 por lote. Resposta honesta sobre poder estatístico, em linguagem de
-ensaio clínico:
-
-- **200 lutas por braço-lote detectam com segurança diferenças GRANDES**: em taxa de
-  vitória, uma diferença de uns 10 a 15 pontos percentuais entre dois braços aparece de
-  forma confiável (com 200 por braço, a margem de erro de uma proporção fica em torno de
-  ±7 pontos no pior caso). Para médias (duração em rodadas, espalhamento de dano), 200 é
-  mais que confortável: a média estabiliza com margem pequena.
-- **200 NÃO detecta diferença fina** (uns 5 pontos percentuais) nem mede bem **evento
-  raro** (ex.: party wipe a ~5% de frequência): nessas zonas dois braços podem parecer
-  iguais sendo diferentes.
-- **Custo de rodar mais é desprezível:** a FSM headless resolve uma luta em menos de 1 ms
-  (§19.6). O estudo inteiro (7 lotes × 6 braços × 200 = 8.400 lutas) roda em segundos.
-
-**Proposta: 200 é o padrão, como pedido, com uma regra de escalonamento pré-declarada**
-(para não virar pesca de resultado): se, na métrica decisória de um lote, dois braços
-terminarem estatisticamente empatados mas com diferença que MUDARIA a decisão de design,
-esse par re-roda com 1.000 lutas, e só ele. Não inflo por segurança: 200 basta para a
-maioria das leituras que queremos.
-
-Nota de transparência sobre a contagem: cada lote tem 6 braços, então "lote de 200" vira
-1.200 lutas por lote (200 por braço). A linha de progresso no terminal segue o formato do
-líder: `lote [x] de [7], simulação [n] de [1200]`.
+A proposta original (N=200 por braço-lote, com regra de escalonamento por empate) foi
+**substituída** pela decisão do líder de 2026-08-01 acima (N=240.000 por braço; ver "Piso
+de relevância" para a regra de empate vigente).
 
 ---
 

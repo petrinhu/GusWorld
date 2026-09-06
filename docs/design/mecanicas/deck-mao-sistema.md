@@ -134,7 +134,7 @@ Todos afináveis no playtest N=3. O parecer completo (faucets×sinks, riscos-mes
 | Venda de comum | NPC **3-5** / loja **4-6 cr** | |
 | Achado na grama (pity) | teto **13** encontros + **taxa-base ~10-15%/encontro** | pity = rede de segurança, não relógio |
 
-**Supersessão:** o canon antigo "deck de **15 em campo**" (`cartas-technomagik` §2.1, modelo de camada única) fica SUPERADO pela estrutura bolsa→mão (§4): a **mão-loadout (~5)** é o que fica "em campo" por batalha; o "15" não é mais um número do sistema.
+**Supersessão:** o canon antigo de deck-em-campo (`cartas-technomagik` §2.1, modelo de camada única) fica SUPERADO pela estrutura bolsa→mão (§4): a **mão-loadout (~5)** é o que fica "em campo" por batalha.
 
 **Riscos-mestres a vigiar no N=3 (do parecer):** (1) perda permanente de especial por bolsa cheia — RESOLVIDO por §7 inv.9; (2) reconciliação comum/especial — RESOLVIDA pela evolução de pillar 2026-07-16; (3) mão que cresce sem teto — RESOLVIDA pelo cap do stat mental acima.
 

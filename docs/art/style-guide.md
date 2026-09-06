@@ -172,7 +172,7 @@ A linguagem de cor/forma/movimento por família é **agnóstica de dimensão** e
 
 - **Não é PBR.** Zero metallic/roughness workflow. Quem propor texture realista é redirecionado. Vigente.
 - **Não é cel-shaded anime 3D.** **Vigente:** paleta restrita, não anime AAA — não Genshin, não BoTW. A formulação antiga do princípio falava em silhueta low-poly e foi **apagada sob a L-24**, por ser 3D.
-- **SUPERADO — "Não é pixel art".** O texto original dizia "a leitura é pixel-art-like, mas geometria é 3D real". Isso está **contradito pelo pivô de arte**: o jogo AGORA É pixel-art de verdade (via PixelLab), não mais 3D com leitura pixel-art-like. A seção "Histórico" que guardava o texto original já não existe; sob a L-24, a citação órfã foi apagada e a afirmação acima permanece.
+- **SUPERADO — "Não é pixel art".** O princípio original tratava a leitura como pixel-art-like sobre geometria 3D real. Isso está **contradito pelo pivô de arte**: o jogo AGORA É pixel-art de verdade (via PixelLab), não mais 3D com leitura pixel-art-like.
 - **Não é fotorrealista cyberpunk.** A cidade é estilizada gótica neon, não Cyberpunk 2077. Vigente.
 - **É chibi-SD canônico, NÃO realista, com tom analítico/gótico, não fofo/kawaii.** O princípio de proporção/tom é vigente; a formulação exata em pixel-grid é pendência de spec 2D (ver §3.2).
 - **Não é gore.** Sangue, vísceras, dismemberment proibidos. Inimigos derrotados "compilam erro" + dissolvem em partículas. Vigente.

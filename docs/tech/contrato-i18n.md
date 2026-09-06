@@ -16,10 +16,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > verdade quando o terceiro idioma chegar, não só o segundo.
 >
 > **Contexto de canon que motivou este documento:** em 25/08/2026 o líder alterou o corte `C-09`
-> da `GODS_LAWS.md` L-29. Antes: conteúdo só em pt-br, tradução depois do lançamento. Agora:
-> **pt-br e inglês na 1.0**, estrutura pronta para os idiomas que vierem depois. Medido nesta
-> data: `resources/translations/en_intl.md` tem 1.650 palavras contra 2.833 de `pt_br.md`; só o
-> Diário do jogo (`docs/narrative/diary/`, 8 arquivos) são 54.772 palavras.
+> da `GODS_LAWS.md` L-29, passando a exigir **pt-br e inglês na 1.0**, estrutura pronta para os
+> idiomas que vierem depois. Medido nesta data: `resources/translations/en_intl.md` tem 1.650
+> palavras contra 2.833 de `pt_br.md`; só o Diário do jogo (`docs/narrative/diary/`, 8 arquivos)
+> são 54.772 palavras.
 >
 > **O que este documento NÃO é:** ele não desenha o formato de arquivo fonte nem o pacote binário
 > selado — isso é trabalho do `B9` (`docs/tech/convencao-formatos-gw.md`, tipo `.gw.text`), que

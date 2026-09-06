@@ -56,7 +56,7 @@ Ao falhar, sorteia-se aleatoriamente uma frase do acervo (paragrafo 3), do canal
 >
 > **Se o playtest doer:** o remedio e **Power / mana / duracao de status / casas de espera na fila**. **Nunca a velocidade.** A velocidade e premissa; o balance trabalha em volta dela.
 >
-> **Historico:** a clausula "AFINIDADE, nao exclusividade" que ocupava este paragrafo (2026-07-16) foi **SUPERADA e removida** em 2026-07-17. Ela era a **causa-raiz** de uma atribuicao de velocidade que INVERTIA o eixo. Ver §2.4.
+> A clausula anterior deste paragrafo (2026-07-16) foi **removida** em 2026-07-17: era a **causa-raiz** de uma atribuicao de velocidade que INVERTIA o eixo. Ver §2.4.
 
 As linguagens do canon parodiam linguagens reais; o nome (parecido com o original) TELEGRAFA o tipo da carta. Camada de legibilidade dupla: quem programa reconhece, o leigo aprende pela cor/icone. O eixo Compilacao (Gus, disciplina) vs Interpretacao (Sterling, controle) ja e canonico em [`arco-principal.md`](../../narrative/arco-principal.md).
 

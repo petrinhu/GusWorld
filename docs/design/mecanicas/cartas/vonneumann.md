@@ -24,7 +24,7 @@ Duas faces no mesmo cast:
 
 O nome vem da autorreplicação: "von Neumann imaginou uma máquina que se copia sozinha. Sua jogada virou dado, e pôde ser lida outra vez" (`_EFEITOS-ESCOLHIDOS.md`). O efeito escolhido (Lote 4) já nascia com duas descobertas reais do mestre numa carta só: o "Construtor Universal" (a máquina autorreplicante) e o "Molde Fiel" (clonar um aliado por N turnos, com stats reduzidos na concepção original — na implementação real, virou reaplicação parcial de dano via status, não uma unidade extra na fila).
 
-O mecanismo de clone **não** adiciona um ator novo à fila de combate — o comentário-fonte de `bruno.gw.card` (a carta irmã) registra explicitamente que essa era a decisão original ("entidade-Objeto", um 4º ator), superada por uma versão mais simples orientada a status: reaplicar o último golpe do próprio portador, sem entidade nova nenhuma. A vantagem prática dessa mudança é não mexer no tamanho fixo da party (3, canon deste projeto).
+O mecanismo de clone **não** adiciona um ator novo à fila de combate — o comentário-fonte de `bruno.gw.card` (a carta irmã) registra explicitamente que a decisão original criava um 4º ator, superada por uma versão mais simples orientada a status: reaplicar o último golpe do próprio portador, sem entidade nova nenhuma. A vantagem prática dessa mudança é não mexer no tamanho fixo da party (3, canon deste projeto).
 
 ## Pontas soltas
 

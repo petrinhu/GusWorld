@@ -136,7 +136,7 @@ Secundárias (não bloqueantes): "would play again" ≥70%, taxa de conclusão d
 - Multiplayer / co-op / PvP.
 - Open-world / mundo persistente.
 - **Crafting profundo, o corte foi REVOGADO pelo líder** (`C-03` da L-29, `GODS_LAWS.md`, 25/08/2026; a regra antiga bania crafting, inclusive profundo, e foi apagada sob a L-24). Detalhe em "Crafting de cartas", algumas linhas abaixo.
-- ~~Sistema econômico de cidade.~~ **Deixou de ser corte em 28/08/2026, por decisão do líder:** o `C-03` era composto e a revogação alcança as **duas** metades, o crafting **e a economia complexa**. **Não existe mais corte de economia**, e a dúvida que este item registrava está encerrada. Isso **remove a proibição, não cria a feature**: a economia canônica hoje segue sendo a do Hospital (`docs/design/mecanicas/economia.md`, crédito, dívida, curva Fibonacci) e economia de cidade é conteúdo a especificar, não algo que o escopo já prometa.
+- **Sistema econômico de cidade deixou de ser corte em 28/08/2026, por decisão do líder:** o `C-03` era composto e a revogação alcança as **duas** metades, o crafting **e a economia complexa**. **Não existe mais corte de economia**, e a dúvida que este item registrava está encerrada. Isso **remove a proibição, não cria a feature**: a economia canônica hoje segue sendo a do Hospital (`docs/design/mecanicas/economia.md`, crédito, dívida, curva Fibonacci) e economia de cidade é conteúdo a especificar, não algo que o escopo já prometa.
 - Romance / morality system / múltiplos finais (1 final + variantes mínimas).
 - Voice acting (apenas texto).
 - Mocap / cutscenes pré-renderizadas (usar in-engine).

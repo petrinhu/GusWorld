@@ -21,7 +21,7 @@ Ecoa a última ação de dano de **qualquer** aliado nesta rodada, a 50% do valo
 
 O nome vem direto da geometria: "um fractal repete a mesma forma cada vez menor, sem fim" (`_EFEITOS-ESCOLHIDOS.md`, frase pedagógica de "Fractal-Echo") — o eco a 50% é a "forma cada vez menor" do fractal, uma repetição diminuída da ação original.
 
-A janela de memória ("nesta rodada", não "neste turno") não foi óbvia de definir: `_EFEITOS-ESCOLHIDOS.md` AMB-01 registra que a redação original dizia "repete a última ação da party **neste turno**", ambígua num combate por-turno-de-ator (cada ator tem seu próprio turno dentro de uma rodada). O líder decidiu por "nesta rodada" — uma janela do tamanho de "1 turno de 1 ator" tornaria o Mandelbrot quase sempre um no-op, já que ele mesmo precisa gastar seu turno para conjurar, e "o turno anterior" seria quase sempre de outro ator. A memória usada (a última ação de dano de qualquer aliado, zerada na fronteira da rodada) é a mesma primitiva que o Pitágoras já usa para o combo cross-ator.
+A janela de memória ("nesta rodada", não "neste turno") não foi óbvia de definir: `_EFEITOS-ESCOLHIDOS.md` AMB-01 registra que a redação original era ambígua num combate por-turno-de-ator (cada ator tem seu próprio turno dentro de uma rodada). O líder decidiu por "nesta rodada" — uma janela do tamanho de "1 turno de 1 ator" tornaria o Mandelbrot quase sempre um no-op, já que ele mesmo precisa gastar seu turno para conjurar, e "o turno anterior" seria quase sempre de outro ator. A memória usada (a última ação de dano de qualquer aliado, zerada na fronteira da rodada) é a mesma primitiva que o Pitágoras já usa para o combo cross-ator.
 
 ## Pontas soltas
 

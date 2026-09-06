@@ -12,7 +12,7 @@
 >
 > **Se o playtest N=3 acusar problema:** o remédio é mexer em **Power / mana / duração de status / quantas casas a lenta anda na fila**, nunca na velocidade. A velocidade é premissa, o resto se ajusta em volta dela.
 >
-> **Histórico:** a atribuição anterior (2026-07-17, "8 exceções") **INVERTIA o eixo** e foi SUSPENSA e refeita com o líder. Ver §"Correção do framework" no fim do doc.
+> A atribuição anterior (2026-07-17, "8 exceções") **INVERTIA o eixo** e foi SUSPENSA e refeita com o líder. Ver §"Correção do framework" no fim do doc.
 
 ## Fundamentos (do canon)
 - **Comuns NÃO passam pelo executor techMagic (ADR-016)**, isso é exclusivo de ESPECIAL/SUPER. Comuns usam o record-base de carta (`combat.md §7`, `StatusApplied`) + a fórmula divisiva §11 + `StatusId` já existentes. **Zero EffectKind novo.**
@@ -424,11 +424,9 @@ O jogador **espera** que o jab seja rápido. O Cauã **jura** que a Pythia dele 
 
 ### A cláusula que abriu a porta
 
-`combat-flavor.md` §2, "Amarração FECHADA (decisão do criador 2026-07-16)", diz **verbatim**:
+`combat-flavor.md` §2, "Amarração FECHADA (decisão do criador 2026-07-16)", tratava a linguagem/velocidade como **afinidade** da carta com o personagem (não exclusividade), autorizando velocidade diferente da linguagem-âncora sempre que o role/balance pedisse.
 
-> "a linguagem/velocidade e **propriedade da CARTA**, com **AFINIDADE (nao exclusividade)** a linguagem-ancora comica do personagem (...) mas ele PODE ter cartas de outra velocidade **quando o role/balance pede**"
-
-**Por que isso produziu o erro:** a cláusula rebaixa a linguagem a **tendência estética** e promove **role/balance** a critério que **vence** a linguagem. Traduzindo o que ela autoriza: *"se o balance pedir, faça a carta interpretada ser rápida."* Foi obedecendo a isso que:
+**Por que isso produziu o erro:** a cláusula rebaixava a linguagem a **tendência estética** e promovia **role/balance** a critério que **vencia** a linguagem. Na prática, permitia fazer a carta interpretada ser rápida sempre que o balance pedisse. Foi obedecendo a isso que:
 
 1. o arquétipo virou lei ("Finalizador = LENTA sempre", "Jab = RÁPIDA sempre"), acima da linguagem;
 2. quando arquétipo e linguagem colidiram, **a linguagem cedeu** (era só "afinidade", afinal);

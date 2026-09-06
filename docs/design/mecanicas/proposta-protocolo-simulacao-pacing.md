@@ -728,13 +728,10 @@ analítica. Declarar no relatório que a condição foi conferida na data da run
    passou a rodar os cenários de parede/provocação (P2, P7, P7b, P7c, P7d) com o Bento
    real, não mais com proxy (`pacing_sim::third_member_spec`; P1/P3/P3B/P6 seguem com a
    Jaci, e P4/P5 também, por estarem fora da grade da C-bis e já medidos assim nas Fases
-   A/A-bis/B). Texto original da pré-condição, mantido por registro: *toda conta de tanque
-   da spec usa a Jaci (Def 10, HP 55) como PROXY, porque o Bento não tem statline em
-   `combat.md` §17 e não está na party de referência do estudo; se a intenção é que o Bento
-   seja o provocador canônico, o statline dele precisa existir ANTES da C-bis, senão a
-   simulação valida um tanque que o jogo não tem, e as faixas de G1 e G4 terão de ser
-   reconferidas com a Def dele em vez de herdadas.* **A ressalva final foi FECHADA em
-   2026-08-12**, antes do run oficial: reconferência registrada em
+   A/A-bis/B). Antes deste statline existir, a spec usava a Jaci como proxy de tanque, com a
+   ressalva de que as faixas de G1 e G4 precisariam ser reconferidas quando o Bento tivesse
+   statline próprio. **A ressalva final foi FECHADA em 2026-08-12**, antes do run oficial:
+   reconferência registrada em
    `spec-provocar-soft-enrage-criterio-cap.md` §8 (Caetano/CTO, em modo autônomo delegado
    pelo líder — decisão autônoma, a confirmar retroativamente, e só coube em modo autônomo
    porque CONFIRMA as faixas). Resultado: **nenhuma faixa muda** — G1 segue 70-85% (topo

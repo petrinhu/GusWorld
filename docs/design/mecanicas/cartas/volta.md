@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 **Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 31/08/2026. **Owner:** `technical-writer`; mecânica de recurso fechada por decisão do líder (dado herdado do projeto anterior via L-01 está revogado, ver abaixo).
 
-Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/volta.gw.card). ⚠️ **Esse arquivo ainda carrega o número e o gatilho revogados** (`percent: 50`, `trigger: OnDamageDealt`) — atualizá-lo é fatia própria, fora deste documento (dado de carta, não canon de design).
+Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/volta.gw.card). ⚠️ **Esse arquivo ainda carrega o número e o gatilho revogados** — atualizá-lo é fatia própria, fora deste documento (dado de carta, não canon de design).
 
 ## Ficha rápida
 
@@ -25,7 +25,7 @@ Especificação fechada pelo líder em 31/08/2026, por `AskUserQuestion`, verbat
 
 Vale notar a garantia que já valia antes e continua valendo: este leech **não fura a regra de "sem carry-over de mana"** do jogo — é dreno do inimigo, não retenção da própria mana não-gasta (um design anterior, descartado, propunha "mana não-gasta vira Shield"; esse caminho segue morto).
 
-**Revogado em 31/08/2026, por decisão do líder:** a leitura anterior descrita aqui — gatilho `OnDamageDealt → Leech`, drenando uma fração do **DANO CAUSADO**, e a constante `kVoltaLeechPercent = 50` — está morta. O dreno é sobre a **energia do alvo**, em porcentagem, nunca sobre o dano.
+**Revogado em 31/08/2026, por decisão do líder:** a leitura anterior deste efeito, que drenava uma fração do dano causado, está morta. O dreno é sobre a **energia do alvo**, em porcentagem, nunca sobre o dano.
 
 **Segunda correção do líder, 31/08/2026, verbatim:** *"A carta de volta é uma vez por bateria. Ela drena a bateria toda. Se tiver outra bateria, pode usar novamente."* Isto substitui a leitura de **1×/batalha** que a Ficha Rápida registrava até aqui (herdada do código do projeto anterior como regra geral de anti-abuso das especiais, `cartas-technomagik.md` §2.1) — o Volta é uma **exceção deliberada** a essa regra geral. **Isto encerra o ponto que antes estava marcado para revisão do líder:** não existe mais tensão entre "21% por uso" e um teto de usos por combate — a carta é repetível, limitada por recurso (bateria), não por contagem de batalha.
 
