@@ -91,7 +91,7 @@ Biolúmen vegetal, fractais visíveis, gótico-matemático. **Verde-azulado domi
 
 ## 5. Lighting bible
 
-**Movido para o Histórico.** A seção original descreve luz direcional/ambiente/fog em termos de engine 3D (`OmniLight3D`, `SDFGI`, `WorldEnvironment` fog volumétrico) — não se aplica a sprites pixel-art, onde luz/sombra normalmente é pintada/baked no próprio sprite ou aplicada via overlay de color-grading 2D.
+**Seção apagada sob a L-24.** A seção original descrevia luz direcional/ambiente/fog em termos de engine 3D (`OmniLight3D`, `SDFGI`, `WorldEnvironment` fog volumétrico) — não se aplica a sprites pixel-art, onde luz/sombra normalmente é pintada/baked no próprio sprite ou aplicada via overlay de color-grading 2D.
 
 **Pendência de spec 2D:** como o jogo comunica "mood" por cena em pixel art — paleta-por-hora-do-dia? overlay de cor no glintfx (screen-space tint)? sprite variants pré-pintados por bioma? Decisão do líder, não assumida aqui. O **mapa emocional por ato** (§6, abaixo) continua vigente independente da resposta técnica.
 
@@ -119,7 +119,7 @@ Vigente, agnóstico de dimensão.
 
 ## 8. Target poly budget
 
-**Movido para o Histórico.** Poly budget (tris/texture/material slots) é conceito 3D puro — não existe em pixel-art.
+**Seção apagada sob a L-24.** Poly budget (tris/texture/material slots) é conceito 3D puro — não existe em pixel-art.
 
 **Resolução do sprite: DECIDIDO em 30/08/2026, pelo líder, por `AskUserQuestion`.** Tamanho canônico **180×180 para todo o elenco**, sem diferenciação por tier (hero/NPC/inimigo/boss/prop compartilham a mesma resolução lógica). Verbatim dele: *"todos 180, mas deixa para mudar o tamanho no glintfx, com o motor grafico, nao precisa regenerar"*. Os assets que hoje estão em 256×256 no disco (o Gus e parte do elenco, ver `docs/art/sprites-inventory.md`) **não são regerados**: o ajuste de tamanho é responsabilidade da camada de apresentação, em tempo de execução, pelo motor gráfico do GlintFx — não do pipeline de geração PixelLab. Isto abre uma exigência nova ao GlintFx, registrada no `TODO.md` (item `P4`); o pedido só vai ao bus quando `present/` esbarrar de fato na falta (L-07).
 
@@ -127,7 +127,7 @@ Vigente, agnóstico de dimensão.
 
 ## 9. Texture strategy
 
-**Movido para o Histórico.** Gradient atlas + vertex color + UV unwrap é pipeline 3D — não se aplica a pixel-art gerado via PixelLab.
+**Seção apagada sob a L-24.** Gradient atlas + vertex color + UV unwrap é pipeline 3D — não se aplica a pixel-art gerado via PixelLab.
 
 **Profundidade de paleta por personagem: DECIDIDO em 30/08/2026, pelo líder, por `AskUserQuestion`.** Dois regimes, por decisão e não por acidente: o **protagonista (Gus) usa cor plena / paleta rica**; o **restante do elenco usa paleta enxuta**. É hierarquia visual intencional — o protagonista está sempre em tela, e carrega o peso de leitura que os companheiros não precisam carregar. Estado atual medido (via `identify`, 30/08/2026): Gus **12.987 cores únicas**, classificado `TrueColorAlpha`; Bento **58**, Iara **23**, Jaci **29**, Linda **41**, Dante **25**, todos classificados `PaletteAlpha`. A distância de ordem de grandeza entre o Gus e o resto do elenco é o dado que passa a sustentar a decisão, não um acidente de geração a ser corrigido depois.
 
@@ -135,7 +135,7 @@ Vigente, agnóstico de dimensão.
 
 ## 10. Shader strategy
 
-**Movido para o Histórico.** A tabela original é shader 3D (`render_mode` custom, inverted hull outline, RIM built-in).
+**Seção apagada sob a L-24.** A tabela original era shader 3D (`render_mode` custom, inverted hull outline, RIM built-in).
 
 **Pendência de spec 2D:** quais efeitos da lista antiga ainda são necessários e como viram efeitos 2D (ex.: glitch/anomalia e holograma provavelmente seguem como shader screen-space no glintfx sobre o sprite; outline pode já vir do próprio PixelLab). Escopo a decidir pelo líder — nada assumido aqui.
 
@@ -185,14 +185,14 @@ A linguagem de cor/forma/movimento por família é **agnóstica de dimensão** e
 
 - Asset com 4+ cores fora da paleta declarada → reprovado. Vigente.
 - Char com silhueta indistinguível em preto → reprovado. Vigente.
-- Material com `metallic > 0` fora das exceções listadas → **movido pro Histórico** (conceito 3D; PixelLab não trabalha com PBR).
-- Normal map fora das exceções listadas → **movido pro Histórico** (idem).
+- Material com `metallic > 0` fora das exceções listadas → **regra apagada sob a L-24** (conceito 3D; PixelLab não trabalha com PBR).
+- Normal map fora das exceções listadas → **regra apagada sob a L-24** (idem).
 - Char SEM proporção SD 1:1:1 (exceto NPCs adultos em 1:1:1.2) → **pendência de spec 2D** (ver §3.2).
 - Char com cabeça redonda inflada + bracinhos curtos gordos (chibi tradicional) → reprovado. SD ectomorfo é a regra. Vigente (semiótica de forma, agnóstica).
 - Texture com lighting baked (sombra desenhada) → reprovado. Vigente. **Decisão do líder, 01/09/2026: a proibição se mantém.** Sombra e luz sobre os sprites vêm do motor, em tempo de execução, nunca do desenho. Essa capacidade ainda não existe no GlintFx — pedida pelo bus em 01/09/2026 (`inbox/glintfx/20260901-1650-gusworld-sombra-de-sprite.md`, repositório `petrinhu/gusworld_ia_autocomm`); enquanto ela não existir, o trabalho de arte que depende de sombra espera.
 - Mistura cidade+Selve fora do ato 3 → reprovado. Vigente.
 - Outline em todos os assets (deve ser só chars + props hero) → **pendência**: o princípio ("outline seletivo, não universal") é agnóstico, mas se o PixelLab já aplica outline por padrão em todo asset, a regra pode precisar de reformulação técnica — pendente.
-- Polycount acima do budget sem aprovação explícita → **movido pro Histórico** (substituído por orçamento de sprite/frame, pendência de spec 2D, ver §8).
+- Polycount acima do budget sem aprovação explícita → **regra apagada sob a L-24** (substituída por orçamento de sprite/frame, pendência de spec 2D, ver §8).
 - VFX usando família errada (ex: rúnico cyan dentro da Selve sem motivo) → reprovado. Vigente.
 - Gus com cabelo em qualquer hex ≠ `#FF6B1A` → reprovado. Vigente.
 - Gus com Tavus-Drive em pulso direito → reprovado (canônico: pulso ESQUERDO). Vigente.

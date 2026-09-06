@@ -130,8 +130,8 @@ TTK-in).
 
 **Correção de narrativa causal (2026-08-01, achado do orquestrador, descrito como
 verificado pelo team-lead e decidido pelo líder):** a versão anterior deste parágrafo
-dizia que o HP do trash foi "calibrado quando a janela-alvo ainda era 4 a 8 rodadas".
-Essa frase não tem lastro documental. Segundo a redação original, o `git log -S` em
+atribuía a inflação de HP do trash a uma janela-alvo antiga, hoje revogada e sem lastro
+documental. Segundo a redação original, o `git log -S` em
 `combat.md` mostraria que a string "4-8" não existe em nenhum commit antes de
 2026-07-19, e a primeira aparição seria o PRÓPRIO commit que decide "3 a 5" (`ed411ec9`,
 §15.1), que chamaria "4-8" de "janela histórica" sem nenhum registro escrito anterior

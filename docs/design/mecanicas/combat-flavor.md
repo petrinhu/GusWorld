@@ -114,13 +114,13 @@ Isto e irmao da regua dos apartes ([`gus-apartes-c-arcane.md`](../../narrative/g
 
 ### 2.4 O que esta clausula SUBSTITUI (pra ninguem ressuscitar)
 
-**A clausula "AFINIDADE, nao exclusividade" (2026-07-16) esta MORTA.** Ela dizia, verbatim, que a linguagem era so afinidade e que o personagem *"PODE ter cartas de outra velocidade **quando o role/balance pede**"*.
+**A clausula "AFINIDADE, nao exclusividade" (2026-07-16) esta MORTA.** Ela subordinava a linguagem a um criterio de role/balance, autorizando velocidade fora da linguagem-ancora do personagem.
 
 **Por que produziu o erro:** a clausula rebaixava a linguagem a **tendencia estetica** e promovia **role/balance** a criterio que **vencia** a linguagem. Traduzindo o que ela autorizava: *"se o balance pedir, faca a carta interpretada ser rapida."* Foi obedecendo a isso que (1) o arquetipo virou lei ("Finalizador = LENTA sempre", "Jab = RAPIDA sempre") acima da linguagem; (2) quando arquetipo e linguagem colidiram, **a linguagem cedeu**; (3) pra vestir a colisao, inventaram-se hooks que **afirmavam fato falso**. O erro foi **sistematico, nao aleatorio**: seguiu a regra escrita, e a regra estava errada.
 
 **Regra derivada (vale para as ESPECIAIS/SUPER tambem):** **nenhum arquetipo dita velocidade. A LINGUAGEM dita.** O arquetipo dita **custo, Power e condicao**. Se um arquetipo futuro "precisar" ser lento numa familia compilada, **o arquetipo esta errado, nao a regua**.
 
-**A "regua-mestre" antiga tambem morreu:** *"CC/heal = rapida sempre, senao chega tarde e e carta desperdicada"*. Ela **colide com a lei** e perde. `Tavusa-Trava` (Stun, Pythia) e **LENTA**, e isso e **custo ACEITO e INTENCIONAL** pelo lider: um Stun que chega tarde e **exatamente a licao** de que interpretado te trai na hora H. Idem `Tavusa-Overclock` (recarga de recurso que chega tarde vale menos). **Watchlist do N=3, nao bug.** Remedio permitido: duracao do status ou casas de espera. Nunca a velocidade.
+**A "regua-mestre" antiga tambem morreu:** ditava velocidade rapida obrigatoria para toda carta de CC/heal. Ela **colide com a lei** e perde. `Tavusa-Trava` (Stun, Pythia) e **LENTA**, e isso e **custo ACEITO e INTENCIONAL** pelo lider: um Stun que chega tarde e **exatamente a licao** de que interpretado te trai na hora H. Idem `Tavusa-Overclock` (recarga de recurso que chega tarde vale menos). **Watchlist do N=3, nao bug.** Remedio permitido: duracao do status ou casas de espera. Nunca a velocidade.
 
 **Gus = compilador universal** (poliglota, usa qualquer linguagem). **Frase comica do Gus:** o Gus solta uma fala engracada de vez em quando durante o cast / nas disputas de linguagem (defende C-Arcane; ver [`characters/party.md`](../../narrative/characters/party.md), secao "Matriz de linguagens-ancora") e os apartes atrelados a cartas especificas ([`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md)); conteudo do narrative-writer, densidade baixa (nem todo cast).
 

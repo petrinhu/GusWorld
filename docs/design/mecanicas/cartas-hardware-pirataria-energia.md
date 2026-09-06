@@ -174,8 +174,8 @@ mesmo dia (ver "Estoque e vazão", logo abaixo):**
    aplicada em `combat.md` §5 e `cartas-spec-logica.md` §3.1.
 2. ✅ **Respondida.** `docs/design/mecanicas/battle-screen.md` linha 50 descreve, dentro do painel
    lateral ("cockpit"), "retrato GRANDE (64px) + nome + barra de HP (com número) + pips de AP (latão)
-   e Mana (cyan)". **Correção de fato, para não repetir:** esta seção havia dito que essa spec estava
-   "embarcada como constantes em `battle_scene.cpp`" — esse arquivo **não existe**; este repositório
+   e Mana (cyan)". **Correção de fato, para não repetir:** esta seção havia atribuído essa spec a um
+   arquivo de código que **não existe**; este repositório
    não tem código nenhum (`find` por `battle_scene*` devolve vazio, `CLAUDE.md` confirma ausência de
    `CMakeLists.txt`/`src/`/`include/`). O documento cita nomes de um consumidor planejado, não de
    código que roda aqui — não é spec "já implementada". Quanto à pergunta em si: os pips de Mana não
@@ -264,8 +264,8 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
    líder ratificando, e nenhum número novo é proposto aqui.
 3. **O limite real de cada turno é o MENOR entre a vazão do turno (a rampa, limitada pelo CCA efetivo
    da bateria) e o que ainda resta na bateria ativa.** Nunca se saca mais do que a bateria tem.
-4. **Deixa de existir subtração dupla.** `cartas-spec-logica.md` §3.1 dizia que o `ChargeCost` sai da
-   bateria e "o mesmo valor que já sai da mana do ator"; isso descrevia dois medidores em paralelo.
+4. **Deixa de existir subtração dupla.** `cartas-spec-logica.md` §3.1 fazia o `ChargeCost` sair tanto
+   da bateria quanto da mana do ator, dois medidores em paralelo.
    Agora é **uma subtração só**, da bateria, limitada pela vazão do turno. Redação corrigida no
    próprio `cartas-spec-logica.md` §3.1 (L-24 deste projeto: o que virou passado se apaga, não se
    guarda como histórico).
@@ -496,10 +496,9 @@ Decisões anteriores do líder, no mesmo assunto, verbatim:
   sai pelo poder."*
 
 **A carta `passiva` (`cartas/_vocabulario.md` §9) nunca tem custo zero de mana/bateria.** O canon
-anterior descrevia a passiva como "ChargeCost 0, equip-only" (`cartas-technomagik.md` §2.3), como se
-ela não consumisse nada além do slot ocupado — essa leitura está revogada por completo; o texto que a
-sustentava foi corrigido nos documentos que a repetiam, sem guardar a redação antiga como histórico
-(L-24 deste projeto). No lugar dela, toda passiva tem **dois gastos distintos**, na mesma moeda
+anterior descrevia a passiva sem custo além do slot ocupado (`cartas-technomagik.md` §2.3) — essa
+leitura está revogada por completo; o texto que a sustentava foi corrigido nos documentos que a
+repetiam, sem guardar a redação antiga como histórico (L-24 deste projeto). No lugar dela, toda passiva tem **dois gastos distintos**, na mesma moeda
 (mana = bateria, seção acima):
 
 1. **Gasto de standby:** contínuo, menor, cobra enquanto a carta está equipada e ligada, mesmo sem o

@@ -145,7 +145,7 @@ Como o instante corrente só anda para a frente, empurrar um ator não pode faz�
 
 ## 4.1 Comando da party sobre o relógio (escolher entre os prontos + segurar)
 
-**Status:** canonizado pelo `ADR-017` (16/07/2026, decisão do líder), reconciliado com este canon em 25/08/2026 (parecer do CTO, decisão do líder). Substitui o modelo 1B (§3, nota superada) de "comando livre dentro do bloco da party sobre uma fila CTB por SPD". Não existe mais "bloco da party" nem "bloco de inimigos" tomando a rodada inteira: cada ator, de qualquer lado, fica pronto no seu próprio instante (§4), e os dois lados se intercalam de verdade no relógio.
+**Status:** canonizado pelo `ADR-017` (16/07/2026, decisão do líder), reconciliado com este canon em 25/08/2026 (parecer do CTO, decisão do líder). Substitui o modelo 1B (§3, nota superada), que organizava o turno em blocos de comando livre por lado sobre uma fila CTB por SPD. Não existe mais "bloco da party" nem "bloco de inimigos" tomando a rodada inteira: cada ator, de qualquer lado, fica pronto no seu próprio instante (§4), e os dois lados se intercalam de verdade no relógio.
 
 ### Conceito
 

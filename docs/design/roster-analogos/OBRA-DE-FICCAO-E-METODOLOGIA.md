@@ -41,7 +41,7 @@
   - [Pending doubtful cases / Casos duvidosos pendentes (decidir no final)](#pending-doubtful-cases--casos-duvidosos-pendentes-decidir-no-final)
   - [Ambiguity decision log / Registro de decisões de ambiguidade](#ambiguity-decision-log--registro-de-decisões-de-ambiguidade)
   - [Per-character records (sorted by domain/ID) / Registros por personagem (ordenados por domínio/ID)](#per-character-records-sorted-by-domainid--registros-por-personagem-ordenados-por-domínioid)
-  - [Pending records (SUPERSEDED / SUPERADA, historical note) / Registros pendentes (superada, nota histórica)](#pending-records-through-the-algorithm--registros-pendentes-pelo-algoritmo)
+  - [Pending records (through the algorithm) / Registros pendentes (pelo algoritmo)](#pending-records-through-the-algorithm--registros-pendentes-pelo-algoritmo)
 - [ROSTER-AUDIT-FINAL / Auto-auditoria da maratona (2026-07-11)](#roster-audit-final--auto-auditoria-da-maratona-2026-07-11)
 
 ---
@@ -369,26 +369,7 @@ Entries set **by authorial fiat** (no algorithm run) state so explicitly and lea
 
 Creator directive (2026-07-11): during the v3 full re-run, **do not stop for each doubtful case; accumulate them here and decide them all together at the end.** A case is doubtful if it lands center (0.401-0.599), if a heroic figure lands left (Einstein zone or nearby), or if a former-fiat figure surprises. Each row gets a final creator decision in one batch, then migrates to the Ambiguity decision log. / Diretriz do criador: no reteste v3, **não parar por caso; acumular aqui e decidir tudo junto no final.**
 
-**RESOLVIDO / RESOLVED (2026-07-11, AMB-09):** todos os casos abaixo foram decididos em lote no fim do reteste v3. Os 14 centros: 7 conservadores (Newton, Dee, Pitágoras, Volta, Euler, Maxwell, Planck) viraram DIREITA/bom pelo desempate; 7 (Faraday, Mandelbrot, Gödel, Ada, Turing, von Neumann, Bruno) ficaram CENTRO/puzzle. Menger = direita-limiar aceita (direita/bom). Tesla e Einstein = esquerda, herói → resolvidos como MAU trágico/equivocado (AMB-10/11, 2026-07-11). Ver a **tabela de classificação final in-fiction** e o **AMB-09/10/11** no log. A tabela abaixo fica como histórico do que foi acumulado. / All rows below were decided in one batch (AMB-09); table kept as history.
-
-| Case / Caso | v3 result / Resultado v3 | Why doubtful / Por que duvidoso | Options sketch / Esboço de opções |
-| :--- | :--- | :--- | :--- |
-| ELM-01 Faraday | rightness_v2 **0.441** (Centrist) | centro genuíno (asceta cristão, meritocrático, nem redistribui nem prega mercado) | aceitar centro/puzzle · desempate · redo |
-| ELM-02 Maxwell | rightness_v2 **0.552** (Right-Wing Populism) | econ direita (64%) + tradição (67%) + autoridade (70%), mas Liberty baixo puxa ao centro | centro/puzzle · direita/bom por desempate conservador |
-| ELM-03 Tesla | rightness_v2 **0.370** (Social Democracy) | esquerda, mas herói e DENTRO da zona Einstein [0.184,0.384] | RESOLVIDO AMB-10: MAU trágico/equivocado (confronto compassivo, não vilão puro) |
-| ELM-04 Volta | rightness_v2 **0.487** (Right-Wing Populism) | econ centro, mas autoridade 73% + tradição 67% (católico trono-e-altar) | centro/puzzle · direita/bom por desempate conservador |
-| ECO-03 Menger | rightness_v2 **0.601** (Classical Liberalism) | direita, mas na exata margem (0.601, igual ao Hayek) | aceitar direita-limiar · confirmar |
-| FIS-02 Newton | rightness_v2 **0.556** (Right-Wing Populism) | econ/tradição/nação direita, mas Authority 77% (Liberty 23%) puxa ao centro | centro/puzzle · direita/bom por desempate conservador |
-| FIS-03 Planck | rightness_v2 **0.464** (centro) | econ centrista + autoritário 70% + nação 61%; conservador prussiano | centro/puzzle · direita/bom por desempate conservador |
-| MAT-01 Mandelbrot | rightness_v2 **0.487** (Liberalism) | econ centro + civil-libertário; refugiado anti-establishment | centro/puzzle · redo 2x |
-| MAT-02 Euler | rightness_v2 **0.480** (Right-Wing Populism) | econ centro + autoritário 73% + tradição 66% (calvinista servo de monarcas) | centro/puzzle · direita/desempate · redo 2x |
-| MAT-03 Gödel | rightness_v2 **0.497** (Centrist) | quase 50/50 em tudo (apolítico, teísta-platonista) | centro/puzzle · redo 2x |
-| CMP-01 Ada | rightness_v2 **0.586** (Neo-Liberalism) | econ direita 70% mas Authority 61% (aristocrata Whig) | centro/puzzle · direita/desempate · redo 2x |
-| CMP-02 Turing | rightness_v2 **0.451** (Social Democracy) | econ centro-esq + civil-libertário 71% (perseguido pelo Estado) | centro/puzzle · redo 2x |
-| CMP-03 von Neumann | rightness_v2 **0.562** (Neo-Liberalism) | econ dir 66% + nação 65% mas Liberty modera (anti-comunista hawk) | centro/puzzle · direita/desempate · redo 2x |
-| OCU-01 Bruno | rightness_v2 **0.481** (Social Democracy) | econ centro + civil-libertário radical (livre-pensador queimado) | centro/puzzle · redo 2x |
-| OCU-02 Dee | rightness_v2 **0.470** (Right-Wing Populism) | econ centro + autoritário 79% + tradição 65% (monarquista imperialista) | centro/puzzle · direita/desempate · redo 2x |
-| OCU-03 Pitágoras | rightness_v2 **0.445** (Theocratic Distributism) | econ centro + autoritário 78% + tradição 68% (aristocrata-hierárquico) | centro/puzzle · direita/desempate · redo 2x |
+**RESOLVIDO / RESOLVED (2026-07-11, AMB-09):** todos os casos duvidosos acumulados durante o reteste v3 foram decididos em lote. Os 14 centros: 7 conservadores (Newton, Dee, Pitágoras, Volta, Euler, Maxwell, Planck) viraram DIREITA/bom pelo desempate; 7 (Faraday, Mandelbrot, Gödel, Ada, Turing, von Neumann, Bruno) ficaram CENTRO/puzzle. Menger = direita-limiar aceita (direita/bom). Tesla e Einstein = esquerda, herói → resolvidos como MAU trágico/equivocado (AMB-10/11, 2026-07-11). Ver a **tabela de classificação final in-fiction** e o **AMB-09/10/11** no log; os valores intermediários deste levantamento não são mais a fonte de verdade. / All doubtful cases accumulated during the v3 re-run were decided in one batch; see the final in-fiction classification table and the AMB-09/10/11 log for the values that stand today.
 
 ### Ambiguity decision log / Registro de decisões de ambiguidade
 
@@ -967,9 +948,9 @@ Os dados abaixo (prompt, respostas, resultado, insights) ficam em pt-br, a líng
 
 ### Pending records (through the algorithm) / Registros pendentes (pelo algoritmo)
 
-**NOTE (2026-07-11): this table is historical/superseded.** All 20 individual figures (every roster figure except the shielded living inspiration, "Helion Tusk") now have a complete record above, either in "Filled records (by fiat)" or in "Computed records (through the algorithm)". The source of truth for the **final in-fiction classification** (right/good, center/neutral, left/deferred) is the final classification table in the "O reteste completo v3" / "The v3 full re-run" section above (decision AMB-09, 2026-07-11): 11 RIGHT/good, 7 CENTER/neutral, 2 LEFT (Tesla, Einstein) resolved as tragic-misguided villains (AMB-10/11). External calibration-only figures (Marx, Mao Zedong) are **not** part of the game roster and get no in-game record; they exist solely as known-left controls in the calibration test.
+All 20 individual figures (every roster figure except the shielded living inspiration, "Helion Tusk") have a complete record above, either in "Filled records (by fiat)" or in "Computed records (through the algorithm)". The source of truth for the **final in-fiction classification** (right/good, center/neutral, left/deferred) is the final classification table in the "O reteste completo v3" / "The v3 full re-run" section above (decision AMB-09, 2026-07-11): 11 RIGHT/good, 7 CENTER/neutral, 2 LEFT (Tesla, Einstein) resolved as tragic-misguided villains (AMB-10/11). External calibration-only figures (Marx, Mao Zedong) are **not** part of the game roster and get no in-game record; they exist solely as known-left controls in the calibration test.
 
-**NOTA (2026-07-11): esta tabela é histórica/superada.** As 20 figuras individuais (toda figura do roster exceto a inspiração viva blindada, "Helion Tusk") já têm registro completo acima, seja em "Registros preenchidos por fiat" seja em "Registros computados (pelo algoritmo)". A fonte de verdade para a **classificação final in-fiction** (direita/bom, centro/neutro, esquerda/deferido) é a tabela de classificação final na seção "O reteste completo v3" acima (decisão AMB-09, 2026-07-11): 11 DIREITA/bom, 7 CENTRO/neutro, 2 ESQUERDA (Tesla, Einstein) resolvidos como MAU trágico/equivocado (AMB-10/11). Figuras externas só-de-calibração (Marx, Mao Tsé-tung) **não** fazem parte do roster do jogo e não têm registro in-game; existem apenas como controles conhecidos de esquerda no teste de calibração.
+Todas as 20 figuras individuais (toda figura do roster exceto a inspiração viva blindada, "Helion Tusk") têm registro completo acima, seja em "Registros preenchidos por fiat" seja em "Registros computados (pelo algoritmo)". A fonte de verdade para a **classificação final in-fiction** (direita/bom, centro/neutro, esquerda/deferido) é a tabela de classificação final na seção "O reteste completo v3" acima (decisão AMB-09, 2026-07-11): 11 DIREITA/bom, 7 CENTRO/neutro, 2 ESQUERDA (Tesla, Einstein) resolvidos como MAU trágico/equivocado (AMB-10/11). Figuras externas só-de-calibração (Marx, Mao Tsé-tung) **não** fazem parte do roster do jogo e não têm registro in-game; existem apenas como controles conhecidos de esquerda no teste de calibração.
 
 ---
 

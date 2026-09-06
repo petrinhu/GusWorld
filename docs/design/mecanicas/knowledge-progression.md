@@ -22,9 +22,8 @@ Há DOIS contadores de "conhecer o inimigo" que NÃO se confundem:
 
 Eixo A é **mecânico** (controle de dano). Eixo B é **narrativo** (compreensão + ending-gate, knowledge-gates.md).
 O modelo de progressão do bestiary (5 estágios de documentação por espécie, evento de domínio por estágio, decisão do
-líder de 30/08/2026, que substitui o modelo antigo de páginas por abate citado nas seções seguintes deste documento)
-é canônico em entries-fichas-bestiary.md §5; esta spec NÃO o toca. O que falta e é definido aqui = a curva do Eixo A
-+ o Scan passivo + a ponte entre os dois.
+líder de 30/08/2026) é canônico em entries-fichas-bestiary.md §5; esta spec NÃO o toca. O que falta e é definido
+aqui = a curva do Eixo A + o Scan passivo + a ponte entre os dois.
 
 ## 2. N-aparições por tier (Eixo A — proposta para ratificação)
 

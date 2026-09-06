@@ -446,7 +446,7 @@ O erro foi **sistemático, não aleatório**: seguiu a regra escrita, e a regra 
 
 > **O §2 do `combat-flavor.md` foi corrigido.** A cláusula "afinidade, NÃO trava" foi **removida** (não apenas marcada superada) e substituída pela **régua-lei**. A contradição entre os dois canônicos **não existe mais**: o framework (`combat-flavor.md` §2) e o conteúdo (este doc, §VELOCIDADE) agora dizem a mesma coisa.
 >
-> O que entrou no §2: banner CANON PÉTREO · régua-lei (conjurar = compilar + executar; **a linguagem TRAVA**) · tabela corrigida (Óxido compila **devagar**, `async` = pior caso) · linha **HÍBRIDO** nova · `C-Arcane = C` separado de **`C-Arcane Major` = C++** · as 2 exceções honestas · **MENTIRA PROIBIDA** + teste de detecção · morte da régua-mestre antiga ("CC/heal = rápida sempre") · ressalva do `>>>` do Cauã (§2.5) · pendência §6 fechada.
+> O que entrou no §2: banner CANON PÉTREO · régua-lei (conjurar = compilar + executar; **a linguagem TRAVA**) · tabela corrigida (Óxido compila **devagar**, `async` = pior caso) · linha **HÍBRIDO** nova · `C-Arcane = C` separado de **`C-Arcane Major` = C++** · as 2 exceções honestas · **MENTIRA PROIBIDA** + teste de detecção · morte da régua-mestre antiga que ditava velocidade rápida obrigatória para CC/heal · ressalva do `>>>` do Cauã (§2.5) · pendência §6 fechada.
 >
 > **Mantido intacto** o que já estava certo: `Asmódico | montada | rápida (a mais)` e `DRE/GRE | interpretada | lenta`. Este último **REFORÇA** o eixo (o runtime do vilão ser lento casa com a oposição Compilação/Gus × Interpretação/Sterling do `arco-principal.md`). **Achado: o eixo novo não quebra a narrativa, ele a endireita.**
 

@@ -207,13 +207,6 @@ int difficult_recovery_stage = 0;
 
 A atualização abaixo já está aplicada em `docs/design/pillars.md`, seção "Game over, 4 modos escalonados por dificuldade" (linhas 134 a 141, conferido em 25/08/2026). **Ela foi aplicada em 10/07/2026, no projeto anterior**, pelo commit `1ebd2734` (*"docs(pillars): Pillar 4 'Game over' de 2 -> 4 modos de morte"*), no mesmo dia das decisões do líder que o §2 registra; chegou a este repositório **já aplicada**, dentro do commit fundador do corpus (`8d81293`, 22/08/2026). O item `G3`, de 24/08/2026, é ato separado e posterior: ele canonizou §1 a §5 deste documento, não aplicou a mudança no `pillars.md`. O trecho de 2 níveis (Normal/Hard) não existe mais no arquivo; `pillars.md` hoje descreve os 4 modos e aponta de volta para este documento, chamando-o de "detalhe canônico". A seção "Sistemas-âncora > Dificuldade, 4 modos" (linhas 253 a 256 de `pillars.md`) também já reflete os 4 níveis, e não repete mais o texto antigo de Normal/Hard.
 
-Registro do que mudou, mantido por ser evidência da decisão:
-
-Trecho antigo de `pillars.md`, substituído:
-
-> - **Normal default**: game over puro (HP=0 → reload save).
-> - **Hard mode (unlock pós-zerar)**: permadeath + **kernel panic puzzle** ao chegar HP=0 (sequência puzzle pra reboot; falhar = game over real).
-
 Trecho hoje vigente em `pillars.md` (citado sem alteração):
 
 > A morte de Gus tem consequência mecânica distinta por nível (default = **Médio**; dificuldade **fixa por save**; detalhe canônico em `docs/design/mecanicas/modos-morte.md`, decisões do líder 2026-07-03/10):
@@ -243,11 +236,11 @@ Trecho hoje vigente em `pillars.md` (citado sem alteração):
 
 ## §6. Plano de implementação incremental (anti-OE)
 
-> ⚠️ **REVOGADO em 24/08/2026 por decisão do líder (item `G3`).** Tudo abaixo desta linha foi escrito contra o código do projeto ANTERIOR e **não é base** (L-01): cita esquema de save V4→V5 e seu migrador, telas e tipos daquela árvore, e os marcos M2 e M7, nada disso existe hoje. Pior, manda a criptografia vir de biblioteca de terceiro vendorizada, o que a **LEI ZERO** proíbe — a cripto vem do **GlintFx** (L-25), e o ADR que a registrava foi apagado.
+> ⚠️ **REVOGADO em 24/08/2026 por decisão do líder (item `G3`).** Tudo abaixo desta linha foi escrito contra o código do projeto ANTERIOR e **não é base** (L-01), e chegava a exigir criptografia de biblioteca de terceiro vendorizada, o que a **LEI ZERO** proíbe — a cripto vem do **GlintFx** (L-25).
 >
 > **O que SOBREVIVE e continua canon:** tudo de §1 a §5 — os quatro modos, a dificuldade fixa por save, o quebra-cabeça de última chance no Hardcore, os três marcos de recuperação do Difícil, o enquadramento narrativo do despertar, e as sete sinalizações abertas do §5.
 >
-> **O que morre:** apenas o plano de fases abaixo. Ele será **re-derivado** sobre a arquitetura de cinco camadas (L-17) por agente especialista, como item próprio da tabela, quando a onda do núcleo de regra chegar. A **ordem** das fases (Fácil primeiro, Hardcore por último) continua sendo raciocínio válido; o que não vale são os nomes e as dependências do projeto anterior.
+> **O que morre:** apenas o plano de fases abaixo. Ele será **re-derivado** sobre a arquitetura de cinco camadas (L-17) por agente especialista, como item próprio da tabela, quando a onda do núcleo de regra chegar. A **ordem** das fases (Fácil primeiro, Hardcore por último) continua sendo raciocínio válido; o resto não vale.
 
 ---
 

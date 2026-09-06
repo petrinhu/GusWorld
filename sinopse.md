@@ -27,7 +27,7 @@ Além de GusWorld City, três cidades-irmãs povoam o canon e aparecem por corre
 
 ## §2. Magia canon
 
-Pillar 2 (reformulado em 2026-05-15): **magia é sistema formal computável, e natureza é matemática rígida.** A formulação anterior ("magia é software") foi descartada por estreita demais. A versão canônica acomoda três substratos de implementação diferentes (silício, analógico, biológico) sem perder coerência sintática.
+Pillar 2 (reformulado em 2026-05-15): **magia é sistema formal computável, e natureza é matemática rígida.** A formulação anterior foi descartada por estreita demais. A versão canônica acomoda três substratos de implementação diferentes (silício, analógico, biológico) sem perder coerência sintática.
 
 **Quatro linguagens diegéticas canônicas:**
 
