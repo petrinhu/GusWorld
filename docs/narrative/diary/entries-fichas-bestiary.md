@@ -587,7 +587,7 @@ Cada entry de bestiary progride em **5 estágios de documentação por espécie*
 
 **Exceção (glitch), herdada do desenho anterior:** Patch-Zero (§5.4) e a Anomalia Glitch (§5.2) **travam no estágio 2** e nunca avançam a 3, 4 ou 5; a entry glitcha permanentemente em vez de estabilizar, exatamente como as duas linhas de tabela já descrevem ("não estabiliza nunca", "nenhuma fraqueza catalogada").
 
-**Correção 05/09/2026 (revisão adversarial): a contagem "17 completam os 5 estágios" não sobrevive às próprias definições de estágio, linha a linha.** O estágio 3 exige "~3-6 combates adicionais contra a mesma espécie"; o estágio 5 exige "recebe o loot da espécie ao menos uma vez" (fraqueza confirmada não basta). Conferindo as 20 linhas de §5.1-§5.4 contra essas duas condições, além das 2 espécies-glitch já excepcionadas, mais 4 espécies não alcançam o estágio 5:
+**Os estágios 3 e 5 têm condições próprias que nem toda espécie alcança.** O estágio 3 exige "~3-6 combates adicionais contra a mesma espécie"; o estágio 5 exige "recebe o loot da espécie ao menos uma vez" (fraqueza confirmada não basta). Conferindo as 20 linhas de §5.1-§5.4 contra essas duas condições, além das 2 espécies-glitch já excepcionadas, mais 4 espécies não alcançam o estágio 5:
 
 - **Sterling Locke, Fase 1 (Rede Distribuída)** (§5.4): encontrado exatamente uma vez no jogo, no clímax, nunca repetível; sem os "3-6 combates adicionais" do estágio 3, trava no estágio 2.
 - **Sterling Locke, Fase 2 (Locke Core)** (§5.4): mesma razão (luta única do clímax) e, além disso, não larga material ("Nenhum material; resolução narrativa"); trava no estágio 2.
