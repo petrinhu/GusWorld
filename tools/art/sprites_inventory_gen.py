@@ -38,17 +38,32 @@ Uso:
                                                           # aponta para outra arvore
                                                           # e outro documento (usado
                                                           # pelo teste de sabotagem)
+    python3 tools/art/sprites_inventory_gen.py --permite-vazio
+                                                          # nao reprova se a arvore
+                                                          # de sprites nao tiver
+                                                          # nenhuma pasta de nivel 1
+                                                          # (use so quando vazio for
+                                                          # mesmo o estado esperado)
+
+Comparacao de desatualizado (--check) ignora o instante de geracao: o bloco no
+disco so conta como desatualizado quando o que descreve o disco muda (tabela,
+contagens, dimensoes), nunca so porque um minuto passou desde a ultima geracao.
 
 Saida: 0 = ok (gravado, ou --check confirmou que ja esta em dia)
        1 = --check achou o bloco desatualizado, ou os numeros de cobertura nao
            fecharam (analisados + falharam != encontrados -- bug deste script)
        2 = erro de uso (documento sem o cabeçalho-ancora na primeira execucao,
-           arvore de sprites inexistente, etc.)
+           arvore de sprites inexistente, varredura vazia sem --permite-vazio,
+           etc.)
+       3 = falha de leitura encontrada na varredura (pasta ilegivel ou imagem
+           corrompida/truncada) -- distinto de "desatualizado": o disco tem um
+           problema proprio, que o texto do documento so registra, nao resolve
 """
 from __future__ import annotations
 
 import argparse
 import datetime as _dt
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -68,6 +83,29 @@ IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".gif"}
 MARCADOR_INICIO = "<!-- INICIO BLOCO GERADO por tools/art/sprites_inventory_gen.py -- NAO EDITAR A MAO ENTRE ESTAS MARCAS -->"
 MARCADOR_FIM = "<!-- FIM BLOCO GERADO -->"
 ANCORA_JULGAMENTO = "## PARTE DE JULGAMENTO"
+
+# O bloco gerado embute "em **DD/MM/AAAA, HH:MM**" (o instante da geracao) --
+# isso e informativo, mas nao pode entrar na comparacao de "esta desatualizado",
+# senao o portao fica vermelho um minuto depois de qualquer geracao, sem que
+# nada no disco tenha mudado. Este regex normaliza so essa parte antes de
+# comparar; o texto gravado no documento continua com o instante real.
+_TIMESTAMP_NO_CABECALHO_RE = re.compile(r"\*\*\d{2}/\d{2}/\d{4}, \d{2}:\d{2}\*\*")
+
+
+def _normaliza_para_comparacao(bloco: str) -> str:
+    return _TIMESTAMP_NO_CABECALHO_RE.sub("**TIMESTAMP**", bloco)
+
+
+def _rel_ou_abs(caminho: Path) -> str:
+    """Caminho relativo ao repo quando possivel; absoluto quando `caminho` fica
+    fora da arvore do repositorio (--sprites-root apontando para outra arvore,
+    como no teste de sabotagem). `Path.relative_to` lanca ValueError nesse caso
+    -- sem este helper, essa excecao escapava de dentro de um bloco que so
+    devia tratar falha de leitura de imagem/pasta."""
+    try:
+        return str(caminho.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(caminho)
 
 
 class ErroDeUso(Exception):
@@ -131,10 +169,14 @@ def _dimensoes_recursivo(pasta: Path, cobertura_imgs: Cobertura) -> "Counter[str
         try:
             with Image.open(arq) as img:
                 largura, altura = img.size
+                img.load()  # forca a leitura completa dos dados -- Image.open
+                            # e preguicoso e so le o cabecalho, entao um arquivo
+                            # truncado no meio dos dados passaria com dimensoes
+                            # certas e falha nenhuma sem este load() explicito
             dims[f"{largura}x{altura}"] += 1
             cobertura_imgs.registra_sucesso()
         except Exception as exc:  # arquivo corrompido, truncado, formato invalido
-            cobertura_imgs.registra_falha(f"{arq.relative_to(REPO_ROOT)}: {exc}")
+            cobertura_imgs.registra_falha(f"{_rel_ou_abs(arq)}: {exc}")
     return dims
 
 
@@ -169,7 +211,7 @@ def inventaria(sprites_root: Path) -> tuple[list[dict], Cobertura, Cobertura]:
             linhas.append(linha)
             cobertura_pastas.registra_sucesso()
         except Exception as exc:  # permissao negada, symlink quebrado, etc.
-            cobertura_pastas.registra_falha(f"{pasta.relative_to(REPO_ROOT)}: {exc}")
+            cobertura_pastas.registra_falha(f"{_rel_ou_abs(pasta)}: {exc}")
 
     cobertura_pastas.fecha_ou_lanca()
     cobertura_imgs.fecha_ou_lanca()
@@ -190,8 +232,8 @@ def monta_bloco(linhas: list[dict], cobertura_pastas: Cobertura, cobertura_imgs:
         f"mecânicos por pasta de nível 1: contagem de arquivos no topo, presença e "
         f"tamanho de `walk/` e de `anims/` (busca só no nível 1 de cada pasta, como o "
         f"resto deste documento), e as dimensões distintas de imagem encontradas "
-        f"recursivamente. O que cada pasta *significa* — quem é personagem, quem é "
-        f"pasta especial, o que está pendente de geração — não é fato mecânico e "
+        f"recursivamente. O que cada pasta *significa* (quem é personagem, quem é "
+        f"pasta especial, o que está pendente de geração) não é fato mecânico e "
         f"continua na PARTE DE JULGAMENTO, escrito à mão.\n\n"
         f"Varredura: {cobertura_pastas.linha_relatorio()}. {cobertura_imgs.linha_relatorio()}.\n\n"
     )
@@ -210,7 +252,12 @@ def monta_bloco(linhas: list[dict], cobertura_pastas: Cobertura, cobertura_imgs:
 def aplica_no_documento(doc_texto: str, bloco_novo: str) -> tuple[str, bool]:
     """Devolve (texto novo, mudou?). Substitui entre os marcadores se existirem;
     senao insere um par novo logo antes do "---" que precede a PARTE DE
-    JULGAMENTO."""
+    JULGAMENTO.
+
+    "Mudou" compara o bloco ignorando o instante de geracao (ver
+    _normaliza_para_comparacao): se so o relogio andou e o que descreve o
+    disco e igual, o documento no disco e mantido tal como esta -- inclusive
+    com o instante antigo -- em vez de regravar so para trocar o timestamp."""
     bloco_marcado = f"{MARCADOR_INICIO}\n\n{bloco_novo}\n{MARCADOR_FIM}"
 
     if MARCADOR_INICIO in doc_texto:
@@ -223,8 +270,11 @@ def aplica_no_documento(doc_texto: str, bloco_novo: str) -> tuple[str, bool]:
         fim = doc_texto.index(MARCADOR_FIM) + len(MARCADOR_FIM)
         if fim <= inicio:
             raise ErroDeUso("marcador de FIM aparece antes do de INICIO -- arquivo corrompido a mao")
+        bloco_atual = doc_texto[inicio:fim]
+        if _normaliza_para_comparacao(bloco_atual) == _normaliza_para_comparacao(bloco_marcado):
+            return doc_texto, False
         texto_novo = doc_texto[:inicio] + bloco_marcado + doc_texto[fim:]
-        return texto_novo, texto_novo != doc_texto
+        return texto_novo, True
 
     if ANCORA_JULGAMENTO not in doc_texto:
         raise ErroDeUso(
@@ -259,6 +309,12 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--sprites-root", type=Path, default=DEFAULT_SPRITES_ROOT)
     parser.add_argument("--doc", type=Path, default=DEFAULT_DOC_PATH)
     parser.add_argument("--check", action="store_true", help="nao grava; sai 1 se o bloco estiver desatualizado")
+    parser.add_argument(
+        "--permite-vazio",
+        action="store_true",
+        help="nao reprova quando a arvore de sprites nao tem nenhuma pasta de nivel 1 "
+        "(por padrao, varredura vazia e tratada como varredura quebrada, GODS_LAWS.md L-36 global)",
+    )
     args = parser.parse_args(argv)
 
     if Image is None:
@@ -271,6 +327,12 @@ def main(argv: Optional[list[str]] = None) -> int:
         doc_texto = args.doc.read_text(encoding="utf-8")
 
         linhas, cobertura_pastas, cobertura_imgs = inventaria(args.sprites_root)
+        if cobertura_pastas.encontrados == 0 and not args.permite_vazio:
+            raise ErroDeUso(
+                f"varredura vazia: nenhuma pasta de nivel 1 encontrada em {args.sprites_root} -- "
+                "zero e sinal de varredura quebrada, nao de disco limpo (GODS_LAWS.md L-36 global). "
+                "Se vazio e mesmo o estado esperado, repita com --permite-vazio."
+            )
         agora = _dt.datetime.now().strftime("%d/%m/%Y, %H:%M")
         try:
             sprites_root_rel = str(args.sprites_root.resolve().relative_to(REPO_ROOT))
@@ -292,16 +354,30 @@ def main(argv: Optional[list[str]] = None) -> int:
     if args.check:
         if mudou:
             print(f"DESATUALIZADO: {args.doc} nao bate com o disco em resources/sprites/.")
-            return 1
-        print(f"em dia: {args.doc} bate com o disco.")
-        return 0
-
-    if mudou:
-        args.doc.write_text(texto_novo, encoding="utf-8")
-        print(f"gravado: {args.doc}")
+            codigo = 1
+        else:
+            print(f"em dia: {args.doc} bate com o disco.")
+            codigo = 0
     else:
-        print(f"sem mudanca: {args.doc} ja estava em dia.")
-    return 0
+        if mudou:
+            args.doc.write_text(texto_novo, encoding="utf-8")
+            print(f"gravado: {args.doc}")
+        else:
+            print(f"sem mudanca: {args.doc} ja estava em dia.")
+        codigo = 0
+
+    # Falha de leitura (pasta ilegivel, imagem corrompida/truncada) e um problema
+    # do DISCO, distinto de o documento estar desatualizado -- a falha ja fica
+    # visivel no texto (Varredura: ... falharam) e nas linhas "falha (...)" acima,
+    # mas isso sozinho nunca mudava o codigo de saida, e quem automatiza nao le
+    # texto. Sai 3 sempre que houver falha, mesmo com --check "em dia" ou com o
+    # documento gravado com sucesso.
+    if cobertura_pastas.falhas or cobertura_imgs.falhas:
+        total_falhas = len(cobertura_pastas.falhas) + len(cobertura_imgs.falhas)
+        print(f"FALHA DE LEITURA: {total_falhas} falha(s) na varredura (ver acima) -- disco com problema proprio.", file=sys.stderr)
+        return 3
+
+    return codigo
 
 
 if __name__ == "__main__":

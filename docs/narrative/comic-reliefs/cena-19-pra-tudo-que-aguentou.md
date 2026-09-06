@@ -4,7 +4,7 @@
 
 **Origem:** frente `LINGUAGENS-COMICAS-DISPUTAS`, aprovada pelo criador em 2026-07-28. Preenche o par **Cauã x Bento** no registro deles, sem o Gus como eixo (as Cenas 2 e 8 são Gus x Bento com o Cauã de passagem).
 
-⚠ **CRONOLOGIA: esta cena acontece ANTES da [Cena 15](#cena-15-pergunta-amanhã-o-cauã-descobre)**, embora o número seja maior (a numeração deste arquivo é ordem de criação, não da linha do tempo). Ela é a **fundação** da Cena 15: sem ela, o jogador tem que aceitar de graça que o Cauã atravessaria a cidade para fazer uma pergunta dolorosa justo ao Bento. Aqui se estabelece o motivo: o Bento tratou o trabalho dele com seriedade uma vez, então ele sabe que vai receber resposta reta e não piada.
+⚠ **CRONOLOGIA: esta cena acontece ANTES da [Cena 15](cena-15-pergunta-amanha.md)**, embora o número seja maior (a numeração deste arquivo é ordem de criação, não da linha do tempo). Ela é a **fundação** da Cena 15: sem ela, o jogador tem que aceitar de graça que o Cauã atravessaria a cidade para fazer uma pergunta dolorosa justo ao Bento. Aqui se estabelece o motivo: o Bento tratou o trabalho dele com seriedade uma vez, então ele sabe que vai receber resposta reta e não piada.
 
 **Contexto:** Ato 2, Fase 2 do retorno de aprofundamento do Cauã, depois de conter a ameaça de inundação dos túneis. A party seguiu; **o Bento ficou para conferir a estrutura, porque é o que ele faz, e ninguém pediu**. Geografia invertida em relação à Cena 15: aqui é o Bento quem está fora do próprio território. **O Gus não está na cena.**
 

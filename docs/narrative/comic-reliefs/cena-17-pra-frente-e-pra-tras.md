@@ -151,5 +151,5 @@ Nove.
 - **A Jaci não grita** e o tic de contar aparece, mas **o off-by-one não é a punchline**: a conta não fecha porque ela mesma usou uma ampola salvando alguém, e ela percebe sozinha. A Cena 9 já gastou a piada do off-by-one puro.
 - Nenhuma fala da Linda é ornamentada; nenhuma fala da Jaci é apressada.
 
-**Relação com as farpas (decisão do criador, 2026-07-27):** as farpas **F17, F18, F19 e F21** de [`farpas-linguagens.md`](farpas-linguagens.md) vivem dentro desta cena. Elas continuam valendo, mas **só disparam DEPOIS de a cena ter acontecido**. Ficam livres desde o começo apenas a F20 e a F22.
+**Relação com as farpas (decisão do criador, 2026-07-27):** as farpas **F17, F18, F19 e F21** de [`farpas-linguagens.md`](../farpas-linguagens.md) vivem dentro desta cena. Elas continuam valendo, mas **só disparam DEPOIS de a cena ter acontecido**. Ficam livres desde o começo apenas a F20 e a F22.
 

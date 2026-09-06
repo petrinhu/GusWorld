@@ -2,7 +2,7 @@
 
 > Parte de [Alívios Cômicos](../comic-reliefs.md).
 
-**Origem:** frente `LINGUAGENS-COMICAS-DISPUTAS`, aprovada pelo criador em 2026-07-27. Fecha a lacuna L-05: o desenho das três fases do deslize do Dante estava pronto, mas **não existia nenhuma cena da fase tardia**. A [Cena 4](#cena-4-force-push-foreshadow-dante-traidor) é o vazamento fundador e acontece muito antes.
+**Origem:** frente `LINGUAGENS-COMICAS-DISPUTAS`, aprovada pelo criador em 2026-07-27. Fecha a lacuna L-05: o desenho das três fases do deslize do Dante estava pronto, mas **não existia nenhuma cena da fase tardia**. A [Cena 4](cena-04-force-push.md) é o vazamento fundador e acontece muito antes.
 
 **Contexto:** Ato 2 tardio, **depois da Cena 4** e a partir de ~75% de campanha (fase (c) do Dante). Oficina da Periferia Industrial. Uma ventoinha industrial antiga, presa por gambiarra, ventila metade do quarteirão.
 

@@ -145,5 +145,5 @@ Não é matéria pra troca.
 
 **Notas de voz:** o Cauã estala os dedos (tic canônico) e não usa bordão em momento pesado, porque não há momento pesado aqui. A Iara sussurra pouco, mantém frase curta e **nenhuma fala dela é ornamentada**, o que a mantém no eixo dela sem invadir o da Linda. A Linda entra com uma linha seca e a palavra "matéria", que é dela por canon.
 
-**Relação com as farpas (decisão do criador, 2026-07-27):** as farpas **F11, F12 e F13** de [`farpas-linguagens.md`](farpas-linguagens.md) vivem dentro desta cena quase palavra por palavra. Elas continuam valendo, mas **só disparam DEPOIS de a cena ter acontecido**: viram lembrança curta do que o jogador viu, nunca repetição cega de algo que ele ainda não presenciou.
+**Relação com as farpas (decisão do criador, 2026-07-27):** as farpas **F11, F12 e F13** de [`farpas-linguagens.md`](../farpas-linguagens.md) vivem dentro desta cena quase palavra por palavra. Elas continuam valendo, mas **só disparam DEPOIS de a cena ter acontecido**: viram lembrança curta do que o jogador viu, nunca repetição cega de algo que ele ainda não presenciou.
 

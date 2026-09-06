@@ -198,7 +198,7 @@ sem `walk/`).
 
 ### Inventário automático por pasta (gerado por ferramenta, não editar à mão)
 
-Gerado por `python3 tools/art/sprites_inventory_gen.py` em **05/09/2026, 17:29** (America/Recife), lendo `resources/sprites` no disco. Cobre só quatro fatos mecânicos por pasta de nível 1: contagem de arquivos no topo, presença e tamanho de `walk/` e de `anims/` (busca só no nível 1 de cada pasta, como o resto deste documento), e as dimensões distintas de imagem encontradas recursivamente. O que cada pasta *significa* — quem é personagem, quem é pasta especial, o que está pendente de geração — não é fato mecânico e continua na PARTE DE JULGAMENTO, escrito à mão.
+Gerado por `python3 tools/art/sprites_inventory_gen.py` em **05/09/2026, 21:48** (America/Recife), lendo `resources/sprites` no disco. Cobre só quatro fatos mecânicos por pasta de nível 1: contagem de arquivos no topo, presença e tamanho de `walk/` e de `anims/` (busca só no nível 1 de cada pasta, como o resto deste documento), e as dimensões distintas de imagem encontradas recursivamente. O que cada pasta *significa* (quem é personagem, quem é pasta especial, o que está pendente de geração) não é fato mecânico e continua na PARTE DE JULGAMENTO, escrito à mão.
 
 Varredura: pastas de nivel 1: 86 encontrados, 86 analisados, 0 falharam. imagens: 888 encontrados, 888 analisados, 0 falharam.
 
