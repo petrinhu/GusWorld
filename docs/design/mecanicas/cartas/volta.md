@@ -7,11 +7,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 **Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 31/08/2026. **Owner:** `technical-writer`; mecânica de recurso fechada por decisão do líder (dado herdado do projeto anterior via L-01 está revogado, ver abaixo).
 
-Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/volta.gw.card). ✅ **Atualizado em 05/09/2026:** o arquivo passou a usar `trigger: OnCast` e `percent: 21` (energia do alvo), substituindo o gatilho `OnDamageDealt` e o `percent: 50` revogados. O split 55/45 de conversão e a escolha cronometrada por dificuldade ainda não têm campo próprio no schema — ver comentário do arquivo.
+Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/volta.gw.card): `trigger: OnCast`, `percent: 21` (energia do alvo). O split 55/45 de conversão e a escolha cronometrada por dificuldade ainda não têm campo próprio no schema — ver comentário do arquivo.
 
 ## Ficha rápida
 
-Família **Elétrico** · categoria **Ativa** · especial · mana 6 ⚠️(posto em dúvida em 31/08/2026, ver "Por que é assim") · alvo único · consome **toda a carga disponível por uso** — repetível na mesma batalha enquanto houver carga disponível (não é limite de 1×/batalha; corrigido em 31/08/2026, ver "Por que é assim").
+Família **Elétrico** · categoria **Ativa** · especial · mana 6 ⚠️(posto em dúvida em 31/08/2026, ver "Por que é assim") · alvo único · consome **toda a carga disponível por uso** — repetível na mesma batalha enquanto houver carga disponível (ver "Por que é assim").
 
 ## Como funciona
 
@@ -25,9 +25,9 @@ Especificação fechada pelo líder em 31/08/2026, por `AskUserQuestion`, verbat
 
 Vale notar a garantia que já valia antes e continua valendo: este leech **não fura a regra de "sem carry-over de mana"** do jogo — é dreno do inimigo, não retenção da própria mana não-gasta (um design anterior, descartado, propunha "mana não-gasta vira Shield"; esse caminho segue morto).
 
-**Revogado em 31/08/2026, por decisão do líder:** a leitura anterior deste efeito, que drenava uma fração do dano causado, está morta. O dreno é sobre a **energia do alvo**, em porcentagem, nunca sobre o dano.
+O dreno é sobre a **energia do alvo**, em porcentagem, nunca sobre o dano.
 
-**Segunda correção do líder, 31/08/2026, verbatim:** *"A carta de volta é uma vez por bateria. Ela drena a bateria toda. Se tiver outra bateria, pode usar novamente."* Isto substitui a leitura de **1×/batalha** que a Ficha Rápida registrava até aqui (herdada do código do projeto anterior como regra geral de anti-abuso das especiais, `cartas-technomagik.md` §2.1) — o Volta é uma **exceção deliberada** a essa regra geral. **Isto encerra o ponto que antes estava marcado para revisão do líder:** não existe mais tensão entre "21% por uso" e um teto de usos por combate — a carta é repetível, limitada por recurso (bateria), não por contagem de batalha.
+**Decisão do líder, 31/08/2026, verbatim:** *"A carta de volta é uma vez por bateria. Ela drena a bateria toda. Se tiver outra bateria, pode usar novamente."* O Volta é uma **exceção deliberada** à regra geral de anti-abuso das especiais herdada do código do projeto anterior (`cartas-technomagik.md` §2.1): não há tensão entre "21% por uso" e um teto de usos por combate — a carta é repetível, limitada por recurso (bateria), não por contagem de batalha.
 
 **Leitura de desenho, registrada porque explica o conjunto:** a bateria é o **combustível** e o dreno é o **efeito**. O jogador gasta energia armazenada (a bateria) para extrair energia do inimigo, e perde 45% como calor no processo — a 2ª lei da termodinâmica aparece nas **duas pontas** da carta (o custo de acionar e o custo de converter), não só numa.
 
@@ -35,7 +35,7 @@ Vale notar a garantia que já valia antes e continua valendo: este leech **não 
 
 **Mana e carga de bateria são o MESMO recurso, com dois nomes (decisão do líder, 31/08/2026 — canon de PROJETO INTEIRO, não desta carta só).** Verbatim: *"como magia é tecnologia, então mana e carga de bateria se confundem e são a mesma coisa. Pode ser citado mana ou bateria... O jogador no início vai se confundir, mas é proposital e depois vai passar a entender quando alguém disser por exemplo que a bateria está com pouco mana."* A confusão inicial do jogador é deliberada, e se desfaz por fala de personagem, não por tutorial. **O registro deste princípio como canon do projeto inteiro é feito por outro agente, em outro documento** — não redigido aqui, para não abrir uma segunda fonte da mesma verdade. Candidato natural a abrigá-lo, não confirmado: `cartas-hardware-pirataria-energia.md` §4-§5 (terminologia e energia).
 
-⚠️ **DÚVIDA MARCADA PARA O LÍDER, NASCIDA DESTA DECISÃO DE HOJE, NÃO RESOLVIDA AQUI:** se mana e carga de bateria são o mesmo recurso, o custo fixo de **mana 6** que a Ficha Rápida registra para esta carta pode estar superado — se a carta consome TODA a carga disponível no uso (ver "Segunda correção" acima), não haveria um número fixo de 6 a cobrar, e sim "o que houver". Não apaguei o 6 nem o mantive como se estivesse confirmado; fica marcado até ele decidir.
+⚠️ **DÚVIDA MARCADA PARA O LÍDER, NASCIDA DESTA DECISÃO DE HOJE, NÃO RESOLVIDA AQUI:** se mana e carga de bateria são o mesmo recurso, o custo fixo de **mana 6** que a Ficha Rápida registra para esta carta pode não valer mais — se a carta consome TODA a carga disponível no uso (ver decisão do líder de 31/08/2026 sobre a bateria, acima), não haveria um número fixo de 6 a cobrar, e sim "o que houver". Não apaguei o 6 nem o mantive como se estivesse confirmado; fica marcado até ele decidir.
 
 Duas consequências da especificação numérica, registradas e **não resolvidas aqui**: o combate por turnos ganha um elemento em tempo real, e a escolha cronometrada é barreira de acessibilidade conhecida. Detalhe completo em `_EFEITOS-ESCOLHIDOS.md` linha 14.
 
@@ -44,5 +44,5 @@ Duas consequências da especificação numérica, registradas e **não resolvida
 - ⚠️ **MARCADO PARA O LÍDER, NASCIDO DA DECISÃO MANA=BATERIA DE 31/08/2026, NÃO RESOLVIDO AQUI:** o custo fixo de **mana 6** (Ficha Rápida) pode estar superado, já que a carta consome toda a carga disponível no uso, não uma quantia fixa. Não decidido, não ajustado.
 - ⚠️ **MARCADO PARA O LÍDER, NÃO RESOLVIDO AQUI:** o princípio canônico de `cartas-hardware-pirataria-energia.md` §3 exige responder, ao planejar cada carta, **"o que muda se ela for original × pirata × homebrew?"** — essa resposta **não existe em lugar nenhum** para o Volta. Não inventada aqui.
 - ⚠️ **ACHADO ADICIONAL, MESMA CATEGORIA, TAMBÉM NÃO RESOLVIDO:** o mesmo §3 exige responder, para toda carta, uma segunda pergunta — **"o que muda se a bateria estiver nova × degradada?"** — e essa resposta também não foi encontrada em lugar nenhum para o Volta. Marcado junto, sem inventar resposta.
-- `resources/cards/volta.gw.card` foi atualizado em 05/09/2026 (ver nota no topo deste documento): `trigger: OnCast`, `percent: 21`. O split 55/45 (conversão à party × perda em calor) e a escolha cronometrada por dificuldade seguem sem campo próprio no schema.
+- `resources/cards/volta.gw.card` usa `trigger: OnCast`, `percent: 21` (ver topo deste documento). O split 55/45 (conversão à party × perda em calor) e a escolha cronometrada por dificuldade seguem sem campo próprio no schema.
 - A chave `CARD_EXEC_VOLTA_NAME` resolve para **"Volt-Leech"** em `resources/translations/pt_br.md` — sem mudança.

@@ -16,8 +16,7 @@
 #meta power 0
 #meta ignores_weakness_wheel false
 
-// Leech termodinamico: ao ser usada (nao mais ao causar dano - leitura
-// revogada pelo lider em 31/08/2026), drena 21% da energia do ALVO por
+// Leech termodinamico: ao ser usada, drena 21% da energia do ALVO por
 // uso. 55% do drenado converte e chega a party; os outros 45% se perdem
 // como calor (2a lei da termodinamica). O schema deste arquivo ainda nao
 // tem campo proprio para o split 55/45 nem para a escolha cronometrada

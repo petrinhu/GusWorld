@@ -99,10 +99,10 @@ alinhada à curva §5, e confirma o tom (Pillar 4).
 
 - **Trigger de abertura:** stub aparece **após o 1º combate** com o tipo (não após Scan), conforme
   entries-fichas-bestiary.md §5.1. Scan isolado revela HP+fraqueza no HUD, mas não cria a entry narrativa.
-- **Estágios de documentação (DA-3, canon 2026-06-03, SUPERADO em 30/08/2026, resolvido em 05/09/2026):** o
-  modelo de páginas por tier desta linha foi substituído pelo modelo de 5 estágios, igual para toda espécie
-  (exceção: 5 espécies travam no estágio 2 e 1 trava no estágio 4, sem nunca alcançar o estágio 5; lista completa
-  em entries-fichas-bestiary.md §5), canonizado em entries-fichas-bestiary.md §5. Decisão do líder em 05/09/2026:
+- **Estágios de documentação (DA-3, canon 2026-06-03, resolvido em 05/09/2026):** o modelo de 5 estágios de
+  documentação vale igual para toda espécie (exceção: 5 espécies travam no estágio 2 e 1 trava no estágio 4, sem
+  nunca alcançar o estágio 5; lista completa em entries-fichas-bestiary.md §5), canonizado em
+  entries-fichas-bestiary.md §5. Decisão do líder em 05/09/2026:
   a profundidade de documentação NÃO varia por tier, os 5 estágios valem igual para Trash/Elite/Mini-boss/Boss;
   o que varia entre tiers é só a capacidade de cada espécie de alcançá-los (N-aparições finito por tier, §2 acima;
   encontro único de missão ou clímax trava mais cedo por estrutura de reencontro, não por desenho de documentação
@@ -160,5 +160,5 @@ ambos tipo Cinético / fraqueza Elétrica (Cauã é o DPS natural).
 |---|---|---|
 | DA-1 | Threshold Scan passivo por tier | **Trash 8 / Elite 6 / Mini-boss 3** — ±13.5% Trash quando ativa; padrão lido mas incerteza residual |
 | DA-2 | Scan sem derrota conta como kill? | **Não conta (0)** — kill = ciclo completo em combate; KnowledgeKills permanece int |
-| DA-3 | Páginas do Diário por tier | **SUPERADO em 30/08/2026** pelo modelo de 5 estágios de documentação, igual para toda espécie (entries-fichas-bestiary.md §5); **resolvido em 05/09/2026:** a profundidade não varia por tier, só a capacidade de cada espécie alcançar os 5 estágios varia, ver §6 |
+| DA-3 | Estágios de documentação do Diário por tier | **5 estágios de documentação, igual para toda espécie** (entries-fichas-bestiary.md §5); **resolvido em 05/09/2026:** a profundidade não varia por tier, só a capacidade de cada espécie alcançar os 5 estágios varia, ver §6 |
 | DA-4 | Tom do Diário | **Híbrido** — stats técnicos sempre; lore/origem só na última página, voz analítica de Gus (Pillar 4) |

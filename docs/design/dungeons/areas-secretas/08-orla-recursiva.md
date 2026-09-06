@@ -12,7 +12,7 @@
 
 Verbo: ler a regra recursiva do espaço para não se perder, o labirinto mais "matemático" do
 jogo. As 5 áreas exploram a MESMA ideia (repetição em escala) em pontos diferentes: quebra de
-padrão, simetria espelhada, e revelação de mapa em escala maior; o tipo de leitura espacial que só
+padrão, simetria espelhada, e alcance de Scan em escala maior; o tipo de leitura espacial que só
 um labirinto pode pedir sem soar arbitrário.
 
 ## Área secreta A: A sala pequena demais
@@ -57,11 +57,11 @@ o tema de que padrão perfeito é ilusão, mesmo aqui.
 
 ## Área secreta D: O trecho que só se alcança dali
 
-**Pista (corrigida 05/09/2026, conserto de mecanismo):** de um ponto elevado da Orla, o alcance
-fixo do Scan dos Óculos Táticos passa a cobrir um trecho do labirinto que o jogador ainda NÃO
-andou, separado dali por um braço fractal que exigiria um desvio longo a pé. Os nós que
-aparecem de repente no HUD desenham, em miniatura, o mesmo padrão de ramificação já visto no
-trecho percorrido até ali: a Orla se repetindo em escala maior, à frente e não atrás.
+**Pista:** de um ponto elevado da Orla, o Scan (Óculos Táticos captando, Matriz Ortodôntica
+amplificando o alcance) passa a cobrir um trecho do labirinto que o jogador ainda NÃO andou,
+separado dali por um braço fractal que exigiria um desvio longo a pé. Os nós que aparecem de
+repente no HUD desenham, em miniatura, o mesmo padrão de ramificação já visto no trecho
+percorrido até ali: a Orla se repetindo em escala maior, à frente e não atrás.
 
 **Como se entra:** subir ao ponto elevado, reconhecer no HUD o padrão de ramificação repetido no
 trecho recém-revelado, e usar esse reconhecimento pra prever o caminho antes de andá-lo,
@@ -81,7 +81,7 @@ aprendido pra navegar o que falta), fechando o arco com a recompensa maior.
 destroços girando em vez de sendo levados adiante, algo está preso ali, contra a física normal
 do rio.
 
-**Como se entra (corrigida 05/09/2026, revisão adversarial):** entrar no redemoinho e andar
+**Como se entra:** entrar no redemoinho e andar
 contra a corrente fraca até o centro dele (o leito ali é raso o bastante para atravessar a pé;
 sente-se a correnteza contra as pernas, mas é só textura de ambientação: o jogo não tem
 mecânica de terreno que retarde o passo, e o avanço é normal).

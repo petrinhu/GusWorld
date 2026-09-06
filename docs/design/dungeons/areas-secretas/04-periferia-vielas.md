@@ -37,15 +37,20 @@ mais tenso do que qualquer outro varal do bairro, afordância honesta de que agu
 **Como se entra:** atravessar o varal como se fosse uma corda bamba (o jogo já ensinou, noutro
 lugar, que superfície que parece suportar suporta).
 
-**O que guarda:** categoria: vantage point (corrigido 05/09/2026, conserto de mecanismo). Do
-telhado, o alcance fixo do Scan dos Óculos Táticos passa a cobrir, de uma vez, várias bocas de
-viela que convergem na Praça do Compilador logo abaixo: nós que, andando pelo chão, só
-apareceriam um de cada vez, conforme o jogador passasse perto de cada beco. A recompensa é essa
-revelação simultânea no HUD (reorientação, não item). Conteúdo material: produção.
+**O que guarda:** categoria: vantage point. Do telhado, o Scan (Óculos Táticos captando, Matriz
+Ortodôntica amplificando o alcance) enxerga por cima dos muros baixos que, na rua, bloqueiam a
+linha de visada entre uma boca de viela e a seguinte: várias bocas que convergem na Praça do
+Compilador logo abaixo acendem juntas no HUD, no mesmo raio de sempre, só sem parede no meio.
+Andando pelo chão — inclusive parado na própria praça —, essas mesmas bocas ficam fora de vista
+umas das outras, e por isso só apareceriam uma de cada vez, conforme o jogador passasse perto de
+cada beco. A recompensa é essa revelação simultânea no HUD (reorientação, não item). Conteúdo
+material: produção.
 
 **O que conta:** ao ver vários nós da vizinhança acenderem de uma vez no HUD, o jogador enxerga
 pela primeira vez que o "caos" das vielas tem uma lógica de bairro remendado convergindo na
-praça: o padrão nasce de onde ele está parado, não de um sistema de mapa que o jogo não tem.
+praça: o padrão nasce de onde ele está parado. O jogo tem sistema de mapa (mapa de área com névoa
+que revela ao andar, e mapa geral das áreas); o que ele não tem é revelação de mapa por ponto
+elevado — esta reorientação vem do Scan, não do mapa.
 
 ## Área secreta C: O sigilo na porta
 
