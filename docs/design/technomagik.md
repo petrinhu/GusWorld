@@ -5,6 +5,8 @@
 > **CORREÇÃO DE TERMO (criador, 2026-07-12):** o termo canônico do meta-conceito é **"TechnoMagik"** (não "techMagic"), e o adjetivo/relativo de tudo que se liga a ele é **"technologiko"**. Este doc ainda usa "techMagic" no corpo (grafia antiga); a reconciliação completa da grafia (corpo do doc + a seção Tavus-Eco abaixo + eventual nome de símbolo de código) fica no item `TECHMAGIC-CANON`. Daqui pra frente, em prosa/lore, usar **TechnoMagik**.
 >
 > **RECONCILIAÇÃO CONCLUÍDA (líder, 25/08/2026):** grafia canônica confirmada como **TechnoMagik**, fechando o item `TECHMAGIC-CANON` para prosa/lore. O corpo deste doc (renomeado de `techmagic.md` para `technomagik.md`) foi normalizado nesta data, junto do resto do corpus vivo. O parágrafo acima fica como registro do que motivou a correção em 2026-07-12; não foi reescrito. **O que segue pendente, fora de escopo desta reconciliação:** o nome do símbolo de código do executor de conjuros (ver §"Camada de código" abaixo) — o projeto ainda não tem nenhuma linha de código (L-01), então esse nome continua decisão futura de `software-architect`/`gameplay_engineer` com aprovação do líder, não decidido hoje.
+>
+> **Documento partido em 06/09/2026 (ordem do líder via `AskUserQuestion`, executado pelo `narrative-designer`): esta metade é PÚBLICA** — a metafísica das três camadas, o mecanismo do Tavus-Eco e a grafia canônica, tudo abaixo, continuam aqui, e podem ser divulgados livremente (site, entrevista, página do jogo) sem risco de entregar o desfecho de nenhuma dungeon. **O que ficou cifrado é uma peça nova desta metafísica, revelada no fim de uma dungeon específica do jogo**, movida para `docs/_secret/dungeons/technomagik-desfecho.md`, área cifrada, por contar o desfecho dessa dungeon a quem ainda não jogou. Este documento aponta pra lá pelo caminho, sem citar conteúdo.
 
 ## O que é
 
@@ -28,6 +30,8 @@ Toda magia é um **sistema formal computável** rodando num substrato físico. C
 3. **O acima — o sublime, raríssimo.** Um punhado de coisas-limiar ficam **genuinamente acima do formalizável**: a **origem multiversal** (o "acidente"/o programador — ver `docs/narrative/deep/eras/cosmologia-origem-deep.md`), o **divino**, o **Helíaco Vyr**. Não é terror, é o sublime — o "source fora do programa em execução", o horizonte tipo halting-problem. Reservado pros beats-chave da lore.
 
 > A qualidade "irredutível / limite do conhecimento" **migra** do Patch-Zero (camada 2) pra camada 3.
+
+> **Extensão pendente desta metafísica (área cifrada):** o fim de uma dungeon específica do jogo revela uma peça adicional dela — o que ela é e o efeito que produz ficam em `docs/_secret/dungeons/technomagik-desfecho.md`, por revelarem o desfecho dessa dungeon a quem ainda não jogou.
 
 ## Camada de código (o subtexto vira literal)
 
@@ -77,4 +81,4 @@ Aplicação mais literal de "magia = software". O **Tavus-Eco** é um self compi
 
 ## Cross-refs
 
-`docs/design/pillars.md` (Pillar de magia — alvo da reformulação) · `docs/narrative/characters/patch-zero.md` (reclassificação) · `docs/narrative/lingua/` (léxico Sylvarin pro nome in-world) · `docs/narrative/deep/eras/cosmologia-origem-deep.md` (camada 3, origem) · `docs/design/mecanicas/combat.md` + `combat_state_machine.cpp` (o executor) · Pillar 3 / Tavus-Drive · `docs/design/brainstorm-backlog.md`.
+`docs/design/pillars.md` (Pillar de magia — alvo da reformulação) · `docs/narrative/characters/patch-zero.md` (reclassificação) · `docs/narrative/lingua/` (léxico Sylvarin pro nome in-world) · `docs/narrative/deep/eras/cosmologia-origem-deep.md` (camada 3, origem) · `docs/design/mecanicas/combat.md` + `combat_state_machine.cpp` (o executor) · Pillar 3 / Tavus-Drive · `docs/design/brainstorm-backlog.md` · `docs/_secret/dungeons/technomagik-desfecho.md` (metade cifrada deste mesmo documento, extensão pendente da metafísica).

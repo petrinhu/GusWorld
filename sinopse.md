@@ -10,6 +10,8 @@
 
 GusWorld é um mundo de **reconstrução tecnológica sobre ruínas litúrgicas**. A civilização presente (Era 3, dita Era Sterling) ergue-se sobre os destroços de duas anteriores: a Era Pré-Código (Neo-Sylvania, civilização arcano-cerimonial colapsada por volta de -820 e parcialmente lacrada em -750) e a Era do Compilador (-115 a -50, período de codificação técnica que produziu as quatro linguagens diegéticas e ergueu as quatro cidades canônicas).
 
+Antes das duas, uma pré-história sem eventos hoje documentados: a **Era Lendária** (nome público, canon 29/08/2026), cujo colapso fecha a era e abre o intervalo que leva à Era Pré-Código. Data exata do colapso, deslocamento entre as duas contagens de calendário e o que a dungeon final da Selve Profunda revela sobre essa era ficam em área cifrada; o esqueleto histórico público está em `docs/narrative/timeline.md`.
+
 A cosmovisão é **pós-apocalíptica sem meta-simulação**. Não há universo dentro do universo. Há, sim, uma estratificação geológica de civilizações: Neo-Sylvania sob a Era do Compilador, e a Era do Compilador sob a Era Sterling. O presente é o último estrato visível; os anteriores afloram por descoberta, escavação, ou ruína exposta (Catedrais Neo-Sylvania ainda de pé, pilares Era 1 esculpidos nos Dutos Infernais, placas de latão Era 2 ao longo das trilhas da Selve).
 
 O mapa canônico se organiza em torno de duas âncoras opostas (Pillar 5 reformulado: **setting multipolar com duas âncoras**):
@@ -154,7 +156,7 @@ Estrutura Era 1 (origem -950) com seis catedrais canônicas, das quais quatro fu
 - **Quinta** (subroutine calendário, nome próprio perdido em inscrição parcial): sede informal Ordem.
 - **Atelaiá** (subroutine irrigação): saqueada por operação Sterling em -3.
 - **São Vargas** (subroutine sementeira): saqueada por operação Sterling em -3.
-- **Catedral-Mãe** (mainframe litúrgico, lacrada por dentro em -750): submersa, lendária, possivelmente afundada. Cristal piezo pareado Boca-da-Funda preservado em câmara central (calibrado originalmente pelo Helíaco Vyr, Primeiro Cantor-de-Pedras Era 1).
+- **Catedral-Mãe** (mainframe litúrgico, lacrada por dentro em -750): submersa, lendária (adjetivo comum, distinto do nome próprio **Era Lendária** — ver §1 e `docs/narrative/timeline.md`), possivelmente afundada. Cristal piezo pareado Boca-da-Funda preservado em câmara central (calibrado originalmente pelo Helíaco Vyr, Primeiro Cantor-de-Pedras Era 1).
 
 ## §8. Famílias-Pilastra (axiologia binária)
 
