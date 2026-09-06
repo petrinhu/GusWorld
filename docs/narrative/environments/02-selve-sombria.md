@@ -115,7 +115,7 @@ A câmera entra por uma trilha normal. Há vento. Há canto de coruja distante. 
 
 ## 11. Corrupção zumbi do Pântano de Markov (decisão do líder 31/08/2026)
 
-- **Não é um lugar novo.** Os zumbis habitam o **Pântano de Markov**, já descrito em §2 (landmark 3) e em §5 (Ruínas cross-era). Corrige um registro anterior desta seção, que propunha por engano um sub-local separado ("Pântano da Atelaiá"); a proposta foi descartada pelo líder porque o lugar já existia. Nada em §1 a §10 deste documento muda: o Pântano de Markov continua meio-jogo do ato 2, com a névoa em pulsos calculáveis, as criaturas de estado observável e o boss-vírus turn-based já descritos.
+- **Não é um lugar novo.** Os zumbis habitam o **Pântano de Markov**, já descrito em §2 (landmark 3) e em §5 (Ruínas cross-era). Nada em §1 a §10 deste documento muda: o Pântano de Markov continua meio-jogo do ato 2, com a névoa em pulsos calculáveis, as criaturas de estado observável e o boss-vírus turn-based já descritos.
 - **Causa da corrupção (fato canônico):** Sterling saqueou a **Atelaiá**, catedral menor de subroutine de irrigação na borda Norte da Selve (`PLACES.md`), em **-3**. O saque quebrou a subroutine de irrigação. A água nunca mais parou. Parte do terreno do Pântano afogou, e o ciclo de decomposição que ali funcionava travou no mesmo loop.
 - **Âncora geográfica:** a **Catedral Submersa**, já registrada dentro do Pântano de Markov (§9 acima), não a Atelaiá, que fica do lado de fora, na borda.
 - **A leitura que amarra Markov e zumbi:** o Pântano de Markov funciona porque as criaturas transitam de estado de forma observável (ler o estado anterior prevê o próximo, Pillar 1: jogador atento vence sem dano). Os zumbis são a cadeia que **parou de transitar**: entraram num estado do qual não saem. É o mesmo loop travado do enquadramento Pillar 2 (rotina de decomposição-reanimação presa em loop infecto), agora na linguagem que este lugar já usava. Ensina pelo contraste: no resto do Pântano, ler o padrão funciona; nos zumbis, não funciona mais, porque não há próximo estado.
@@ -130,4 +130,4 @@ A câmera entra por uma trilha normal. Há vento. Há canto de coruja distante. 
 
 ---
 
-**Última revisão:** 2026-05-15. Canônico (Bloco F). Atualizações exigem aprovação do criador supremo. **Exceção pontual:** §11 acrescentado em 31/08/2026 por autorização expressa do líder, corrigido no mesmo dia após a leitura errada de "sub-local novo" ser identificada; §11 revisado em 05/09/2026 por decisão do líder (reanimação ilimitada fechada, remove proposta de fração de HP revogada) mais proposta de caminho para o trunfo Gödel, ainda pendente de decisão dele.
+**Última revisão:** 2026-05-15. Canônico (Bloco F). Atualizações exigem aprovação do criador supremo. **Exceção pontual:** §11 acrescentado em 31/08/2026 por autorização expressa do líder; §11 revisado em 05/09/2026 por decisão do líder, mais proposta de caminho para o trunfo Gödel, ainda pendente de decisão dele.
