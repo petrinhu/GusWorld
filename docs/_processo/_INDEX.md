@@ -33,8 +33,9 @@ Trazidas inteiras pelo `technical-writer`, na varredura profunda de narrativa, c
 - `AUDIT-T2-LUGARES-V2.md` — auditoria v2 de lugares; os 2 críticos residuais já estão resolvidos na árvore atual (conferido 25/08/2026).
 - `AUDIT-T3-CRONOLOGIA.md` — auditoria v1 de cronologia cross-doc, 31 achados; sucedida pela v2 abaixo.
 - `AUDIT-T3-CRONOLOGIA-V2.md` — auditoria v2 de cronologia; os 4 críticos residuais (idade do Bento no incidente Patch-Zero) estão resolvidos na árvore atual, exceto uma menção em `diary/entries-manuscrito-glossario.md:425` que pode ser informação legítima e distinta — achado a confirmar com o líder.
-- `AUDIT-T4-VOZ-V2.md` — auditoria de fadiga de prosa ("voz Stephenson") concentrada em `era-2-boom-tecnico.md`; 71 achados, nenhum reconferido (é julgamento editorial, não fato de canon). Candidato a passe do `narrative-writer`.
-- `AUDIT-T6-PALAVRAS-V2.md` — auditoria de palavras/pontuação proibida; o achado principal (992 travessões/em-dash em prosa canônica) está hoje reduzido a 130 ocorrências em todo `docs/narrative/` (~87% de queda, conferido 25/08/2026), mas não foi feita varredura arquivo a arquivo do que resta.
+- `AUDIT-T4-VOZ-V2.md` — auditoria de fadiga de prosa ("voz Stephenson") concentrada em `era-2-boom-tecnico.md`; 71 achados. Reconferido item a item em 05/09/2026, ver `RECONFERENCIA-D38-T4-T6.md` abaixo.
+- `AUDIT-T6-PALAVRAS-V2.md` — auditoria de palavras/pontuação proibida; o achado principal (992 travessões/em-dash em prosa canônica) está hoje reduzido a 130 ocorrências em todo `docs/narrative/` (~87% de queda, conferido 25/08/2026), mas não foi feita varredura arquivo a arquivo do que resta. Reconferido em 05/09/2026, ver `RECONFERENCIA-D38-T4-T6.md` abaixo.
+- `RECONFERENCIA-D38-T4-T6.md` — item `D38` do `TODO.md`: reconferência dos dois dossiês acima contra a árvore de 05/09/2026, com a contagem encontrados/reconferidos/vivos que a L-36 global exige. Recupera 17 dos 71 achados do T4 (antes todos "sem âncora") por medição de fórmula e por nome de personagem; confirma e agrava o achado maçônico do T6 (21 trechos em 15 arquivos com "esquadro e compasso" explícito, contra os 9 do relatório original); nenhum achado foi corrigido, só reconferido (L-33).
 
 A auditoria de easter eggs (T5) tem lugar em `docs/_secret/`, cifrada — ver o `_INDEX.md` de lá.
 
