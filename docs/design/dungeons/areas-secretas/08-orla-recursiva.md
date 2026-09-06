@@ -57,15 +57,18 @@ o tema de que padrão perfeito é ilusão, mesmo aqui.
 
 ## Área secreta D: O trecho que só se alcança dali
 
-**Pista:** de um ponto elevado da Orla, o Scan (Óculos Táticos captando, Matriz Ortodôntica
-amplificando o alcance) passa a cobrir um trecho do labirinto que o jogador ainda NÃO andou,
-separado dali por um braço fractal que exigiria um desvio longo a pé. Os nós que aparecem de
+**Pista:** um trecho do labirinto se dobra sobre si mesmo, a mesma auto-similaridade que rege toda
+a Orla: um ponto do caminho já andado fica, na grade, à distância mínima de um braço do labirinto
+que o jogador ainda NÃO percorreu, embora a rota a pé até esse braço exija um desvio longo,
+contornando a dobra inteira. Dali, o raio fixo do Scan (Óculos Táticos captando, Matriz
+Ortodôntica amplificando o alcance) já alcança esse braço distante, e os nós que aparecem de
 repente no HUD desenham, em miniatura, o mesmo padrão de ramificação já visto no trecho
 percorrido até ali: a Orla se repetindo em escala maior, à frente e não atrás.
 
-**Como se entra:** subir ao ponto elevado, reconhecer no HUD o padrão de ramificação repetido no
-trecho recém-revelado, e usar esse reconhecimento pra prever o caminho antes de andá-lo,
-coerente com o verbo da dungeon (ler a regra recursiva antes de se perder nela).
+**Como se entra:** reconhecer, na própria grade, o ponto onde a dobra aproxima o caminho andado
+do braço ainda não percorrido, e ler no HUD o padrão de ramificação repetido pra prever o caminho
+antes de andá-lo, coerente com o verbo da dungeon (ler a regra recursiva antes de se perder
+nela).
 
 **O que guarda:** categoria: a maior recompensa das 5 (fecha o conjunto), crafting raro/lore
 denso. Conteúdo exato: produção.
