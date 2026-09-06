@@ -18,7 +18,7 @@ jogo, coerente com o peso 3 de puzzle puro e com a identidade única desta área
 
 ## Área secreta A: O oco que só se ouve chegando perto
 
-**Pista (corrigida 05/09/2026, revisão adversarial):** sem scan, nenhuma sobreposição de HUD
+**Pista:** sem scan, nenhuma sobreposição de HUD
 indica piso oco. O sinal é sonoro, e se percebe a alguns passos de distância, não só debaixo do
 próprio pé: cada passo do jogador na câmara ecoa cheio contra o piso maciço, mas ao se aproximar
 daquela seção específica, o eco muda de timbre, mais oco, já alguns passos antes de pisar nela,

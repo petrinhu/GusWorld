@@ -4,7 +4,7 @@
 >
 > **Atualização 2026-08-25 (líder, canon pessoal do Gus Dragon, L-16 de `GODS_LAWS.md`):** o líder dita, no mesmo dia, a expansão de quatro para **doze comidas** favoritas reais dele como itens de cura do jogo, mais **oito ingredientes de craft** (catálogo completo em `comidas-ingredientes-craft.md` §5.5 (catálogo movido de `economia.md` em 25/08/2026, L-33)). Duas das doze, suco de limão e água com gás, continuam alimentando craft de **bateria de baixa qualidade**, via refino em suco puro de limão / água destilada: ver §5, subseção "Bateria de baixa qualidade (craftada)", que nesta rodada também fecha se a bateria craftada herda os riscos da pirata comprada (herda, sim).
 >
-> **Status:** ✅ **CANON FECHADO (líder, 2026-07-28).** Os quatro pontos que este cabeçalho listava como abertos foram entregues: os **números** viraram `cartas-numeros-proposta.md` (com as últimas duas ambiguidades fechadas em 2026-07-28), a **spec de implementação** virou `cartas-spec-dados.md` (aprovada em 2026-07-28) e `cartas-spec-logica.md`, e os **efeitos do vírus** e o **mercado negro** estão fixados aqui e nos docs de números. Reflexo pendente em `cartas-technomagik.md` e na terminologia, que é passo de escrita, não decisão. _(Status original, por registro: BRAINSTORM EM ANDAMENTO, líder, 2026-07-18.)_ Decisões fechadas via AskUserQuestion capturadas fielmente. Ainda ABERTO: efeitos exatos do vírus, o mercado negro (lugar/vendedor), números (delegar ao `economy-designer`), spec de implementação (delegar a `gameplay_engineer`/`backend-engineer`). NÃO é canon fechado até o líder revisar o doc consolidado.
+> **Status:** ✅ **CANON FECHADO (líder, 2026-07-28).** Os **números** vivem em `cartas-numeros-proposta.md`, a **spec de implementação** em `cartas-spec-dados.md` e `cartas-spec-logica.md`, e os **efeitos do vírus** e o **mercado negro** estão fixados aqui e nos docs de números. Reflexo pendente em `cartas-technomagik.md` e na terminologia, que é passo de escrita, não decisão. Decisões fechadas via AskUserQuestion capturadas fielmente.
 >
 > **Origem:** derivou do "vírus do Dante" (guarda-chuva Faraday, ver `docs/design/mundo-topologia.md` / brainstorm-backlog). O líder escalou o evento pontual (Dante injeta vírus na carta Faraday à noite) para um SISTEMA geral de cartas modificadas / piratas / infectadas / com bateria.
 >
@@ -222,16 +222,13 @@ partir da carga e da saúde, nunca campo guardado à parte.**
 > cada bateria tem sua classe, sao coisas diferentes"*.
 
 **"Bateria de internet" é SINAL, não canal de compra duvidoso (decisão do líder, 03/09/2026, por
-`AskUserQuestion`, ratificando a resposta do Gus Dragon na issue 3 do bus, 02/09/2026).** A leitura
-que o líder deu em 02/09/2026 sobre a expressão "bateria de internet", de que ela descrevia
-o canal de compra pela rede, junto a vendedores de origem duvidosa, foi superada nesta data.
+`AskUserQuestion`, ratificando a resposta do Gus Dragon na issue 3 do bus, 02/09/2026).** É uma
+bateria que precisa de sinal para funcionar e só recarrega onde há cobertura dentro da dungeon.
 Verbatim do Gus Dragon, ao escolher entre as duas opções que lhe foram devolvidas: *"Jeito 1, o 2
-sinto que já foi coberto com as baterias privadas"*. O "Jeito 1" era uma bateria que precisa de
-sinal para funcionar e só recarrega onde há cobertura dentro da dungeon; o "Jeito 2", que ele
-recusou, era o canal de compra duvidoso, por já estar coberto pelas baterias "pirata / genérica" e
-"de baixa qualidade (craftada)" que este §5 já descreve, acima. O líder ratificou a escolha do Gus
-no mesmo dia. Regra de recarga por sinal, completa: ver "Bateria de internet: recarga por
-cobertura de sinal", mais abaixo.
+sinto que já foi coberto com as baterias privadas"*. O canal de compra duvidoso ("Jeito 2", que
+ele recusou) já está coberto pelas baterias "pirata / genérica" e "de baixa qualidade (craftada)"
+que este §5 já descreve, acima. O líder ratificou a escolha do Gus no mesmo dia. Regra de recarga
+por sinal, completa: ver "Bateria de internet: recarga por cobertura de sinal", mais abaixo.
 
 **Escala de tensão do jogo (decisão do líder, 02/09/2026):** os volts do jogo são uma escala própria,
 ancorada no nominal de **3 V da CR2032** (§5, cabeçalho). ⚠️ **Os valores 12,6 V, 12,4 V e 12,1 V que
@@ -264,11 +261,8 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
    líder ratificando, e nenhum número novo é proposto aqui.
 3. **O limite real de cada turno é o MENOR entre a vazão do turno (a rampa, limitada pelo CCA efetivo
    da bateria) e o que ainda resta na bateria ativa.** Nunca se saca mais do que a bateria tem.
-4. **Deixa de existir subtração dupla.** `cartas-spec-logica.md` §3.1 fazia o `ChargeCost` sair tanto
-   da bateria quanto da mana do ator, dois medidores em paralelo.
-   Agora é **uma subtração só**, da bateria, limitada pela vazão do turno. Redação corrigida no
-   próprio `cartas-spec-logica.md` §3.1 (L-24 deste projeto: o que virou passado se apaga, não se
-   guarda como histórico).
+4. **A subtração é uma só**, da bateria, limitada pela vazão do turno — não dois medidores em
+   paralelo. Redação fechada em `cartas-spec-logica.md` §3.1.
 5. **Os dois elementos da tela existem, e cada um mostra uma coisa** (decisão do líder, 31/08/2026,
    completando o acréscimo de "Múltiplas baterias e a barra da tela"): **barra contínua = o ESTOQUE**
    (a carga da bateria ativa); **pips discretos = a VAZÃO** (quanto ainda se pode sacar neste turno;
@@ -392,13 +386,11 @@ dela aparece boa, sempre visível, e a saúde, que é o que está ruim, fica des
 medir (leitura de agente sobre as decisões de 01/09 e 02/09, não frase do líder; sinalizada para
 confirmação).
 
-**Duas consequências da resposta de 31/08, JÁ RESPONDIDAS no canon vizinho, não são pendência nova.**
-Corrigido em 31/08/2026, depois de o orquestrador conferir o corpus inteiro antes de marcar qualquer
-coisa como aberta:
+**Duas consequências da resposta de 31/08, já cobertas pelo canon vizinho, não são pendência nova:**
 
-- **(a) Ficar sem bateria no meio da batalha passa a ser possível, e o mecanismo JÁ ESTÁ ESPECIFICADO.**
-  Antes não era possível: a rampa recarregava ao máximo todo turno. Agora o estoque pode acabar, e a
-  carta vira `DEPLETED` (inerte, gate sempre `REJECTED` até troca, `cartas-spec-logica.md` §3.2). O
+- **(a) Ficar sem bateria no meio da batalha é possível, e o mecanismo está especificado.**
+  O estoque pode acabar, e a carta vira `DEPLETED` (inerte, gate sempre `REJECTED` até troca,
+  `cartas-spec-logica.md` §3.2). O
   jogador troca por uma bateria carregada do inventário em combate via ação de emergência dedicada,
   `SwapBattery`, custando **2 AP fixo, sem escalar por dificuldade** (`cartas-spec-logica.md` §3.3-3.4,
   `cartas-numeros-proposta.md` §1c). A bateria velha `DEPLETED` retirada vai para o inventário como
@@ -495,11 +487,8 @@ Decisões anteriores do líder, no mesmo assunto, verbatim:
   standby, usa o mínimo para ficar apenas ativa. Mas quano o poder dela é ativado, o gasto de energia
   sai pelo poder."*
 
-**A carta `passiva` (`cartas/_vocabulario.md` §9) nunca tem custo zero de mana/bateria.** O canon
-anterior descrevia a passiva sem custo além do slot ocupado (`cartas-technomagik.md` §2.3) — essa
-leitura está revogada por completo; o texto que a sustentava foi corrigido nos documentos que a
-repetiam, sem guardar a redação antiga como histórico (L-24 deste projeto). No lugar dela, toda passiva tem **dois gastos distintos**, na mesma moeda
-(mana = bateria, seção acima):
+**A carta `passiva` (`cartas/_vocabulario.md` §9) nunca tem custo zero de mana/bateria.** Toda
+passiva tem **dois gastos distintos**, na mesma moeda (mana = bateria, seção acima):
 
 1. **Gasto de standby:** contínuo, menor, cobra enquanto a carta está equipada e ligada, mesmo sem o
    efeito ter sido exercido.
@@ -709,11 +698,10 @@ cobertura de sinal dentro da dungeon. Fora dessas áreas ela não recarrega, mes
 descritos acima em "Troca e recarga" (cidade, estação, in-battle); a cobertura de sinal é
 pré-condição da recarga desta bateria, não um canal alternativo a eles.
 
-**Não é um quinto tipo de bateria no eixo da compra.** O líder já havia dito, em 02/09/2026, que
-"bateria de internet" não nomeava um tipo à parte na tabela de baterias (§5, "Bateria pirata /
-genérica" e "Bateria de baixa qualidade (craftada)"); a leitura de "internet" como canal de compra
-duvidoso foi superada acima. O que nasce aqui é uma **regra de recarga por zona**, própria da
-bateria desta carta, não um tipo novo na classificação de bateria.
+**Não é um quinto tipo de bateria no eixo da compra.** "Bateria de internet" não nomeia um tipo à
+parte na tabela de baterias (§5, "Bateria pirata / genérica" e "Bateria de baixa qualidade
+(craftada)"). O que nasce aqui é uma **regra de recarga por zona**, própria da bateria desta carta,
+não um tipo novo na classificação de bateria.
 
 **Fronteira da LEI ZERO (L-06, L-27 deste projeto):** cobertura de sinal como dado de mapa é
 formato de mapa, e formato de mapa é do GlintFx. O que é do GusWorld aqui é a regra de jogo: onde a
@@ -891,8 +879,6 @@ A bancada onde a cópia é gravada é a mesma do §4 (terminal de bancada fixo, 
 ### 15.6 Como a party recebe a SUPER (decisão do líder, 03/09/2026, por `AskUserQuestion`)
 
 **O mecanismo já estava escrito, e o líder ratificou o canon existente: manter o canon, as vinte peças são a chave, a carta está inteira.** As vinte peças especiais que dão acesso à missão-capstone são a CHAVE que abre o caminho até a SUPER, nunca matéria-prima que a compõe. A carta é original, inteira, escrita de próprio punho por Helion Tusk num compilador que ele mesmo apagou; ninguém jamais a teve em punho tempo bastante para examiná-la, o que é a mesma razão que trava a engenharia reversa dela (§15.2). Mecanismo completo, com a cena do encaixe das vinte peças na bancada emprestada de Helion Tusk: `docs/narrative/deep/characters/mestre-cap-21-helion-tusk.md`, §6 (não repetido aqui, L-30).
-
-**A alegação de contradição reaberta que esta seção trazia era falsa, e sai (L-24 deste projeto).** Medido em 03/09/2026, os quatro documentos que esta seção citava como ainda descrevendo um "ritual de forja da Carta 21" já estavam corrigidos, todos com a correção de 25/08/2026 citada inline: `docs/design/roster-analogos/21-helion-tusk.md` (as ocorrências de "forja" são o nome do lugar, "Forja do Vértice", e um trecho de registro histórico do design de 2026-07-09 com a correção já embutida), `docs/narrative/deep/characters/mestre-cap-21-helion-tusk.md` (§6, corrigido em 25/08/2026), `docs/design/mecanicas/cartas/_vocabulario.md` (campo `tier`, já diz "carta original, nunca forjada"), `docs/design/mecanicas/deck-mao-sistema.md` (já diz "NÃO é forjada nem compilada por ninguém: é carta original, achada"). Nenhum dos quatro precisava de correção nesta rodada.
 
 ---
 

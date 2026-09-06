@@ -175,7 +175,7 @@ Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilib
 | Difícil | 8 |
 | Hardcore | 13 |
 
-O limiar de "3 erros seguidos" do corpus **não muda**. Nota de argumento, corrigida na própria decisão: mais grades tornam a conquista **mais acessível**, não mais rara, o piso protege a alcançabilidade orgânica (destravar sem grinding deliberado), não a raridade.
+O limiar de "3 erros seguidos" do corpus **não muda**. Mais grades tornam a conquista **mais acessível**, não mais rara: o piso protege a alcançabilidade orgânica (destravar sem grinding deliberado), não a raridade.
 
 ---
 

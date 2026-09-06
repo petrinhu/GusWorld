@@ -48,6 +48,7 @@ Economia de crédito (faucets/sinks, §2 a §7 abaixo), bateria/energia de carta
 (`cartas-hardware-pirataria-energia.md`), pirataria × original (arco Bastiat, mesmo doc §12),
 craft/upgrade de tier (§7.6), e a mira do inimigo escalonada por periculosidade
 (`proposta-mira-inimiga.md`, mapeamento proposto em `proposta-economia-comedimento.md`).
+Economia de cidade fica fora deste escopo: é conteúdo a especificar, não algo já prometido.
 
 ### §0.4 Não é sofrimento sem fim
 

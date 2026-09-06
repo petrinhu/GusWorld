@@ -32,7 +32,7 @@ para desafios de leitura silenciosa mais à frente na mesma zona.
 **Onde vive:** junto da Casa Neumann (origem canônica de Linda), num cômodo lateral fora da rota
 principal.
 
-**Pista (corrigida 05/09/2026, revisão adversarial):** já na entrada do cômodo lateral, a Matriz
+**Pista:** já na entrada do cômodo lateral, a Matriz
 Ortodôntica capta uma ressonância fraca vinda de algum ponto do ambiente, como um sinal de rádio
 distante, ainda indistinta ali, mas perceptível de longe, e mais forte a cada passo em direção à
 parede certa, até virar inconfundível bem junto dela: o mesmo sinal da Área A (rastreável a

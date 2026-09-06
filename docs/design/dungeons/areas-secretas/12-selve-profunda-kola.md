@@ -16,10 +16,9 @@
 > §1.2: intensidade **total** (como as outras 12; a Kola não é a exceção fraca, que é só a
 > dungeon de abertura).
 >
-> ⚠️ **Área secreta B corrigida em 05/09/2026 (revisão adversarial), retido mantido:** a pista da
-> Área B não sobrevivia à própria régua do `_INDEX.md` (nenhuma área secreta pode depender de o
-> jogador já ter feito a escolha, às cegas, que a própria área premia). Correção abaixo; segue
-> RETIDO como o resto do arquivo.
+> ⚠️ **Área secreta B segue a mesma régua do `_INDEX.md`:** nenhuma área secreta pode depender de
+> o jogador já ter feito a escolha, às cegas, que a própria área premia. Continua RETIDO como o
+> resto do arquivo.
 
 ## Por que 2, e por que ficam só nos beats públicos
 
@@ -57,7 +56,7 @@ diálogo novo.
 party volta equipada, e o combate deixa de ser obrigatório nesse retorno), antes de alcançar a
 porta em forma de LP.
 
-**Pista (corrigida 05/09/2026, revisão adversarial):** um dos possíveis pontos de combate
+**Pista:** um dos possíveis pontos de combate
 opcional do retorno tem um inimigo parado bem no meio de um vão estreito entre rochas, de costas
 para uma fresta que deixa passar um fio de luz mais forte do que o resto do corredor, visível de
 longe, ANTES de qualquer decisão de lutar, sugerindo que há espaço aberto atrás dele que a

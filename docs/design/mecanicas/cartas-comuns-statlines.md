@@ -11,8 +11,6 @@
 > **Regra de alteração:** qualquer mudança de velocidade de qualquer carta exige **autorização explícita do líder**, naquele contexto, carta a carta. Aprovação anterior não vale pra frente. Nenhum agente inverte uma linha "por balance".
 >
 > **Se o playtest N=3 acusar problema:** o remédio é mexer em **Power / mana / duração de status / quantas casas a lenta anda na fila**, nunca na velocidade. A velocidade é premissa, o resto se ajusta em volta dela.
->
-> A atribuição anterior (2026-07-17, "8 exceções") **INVERTIA o eixo** e foi SUSPENSA e refeita com o líder. Ver §"Correção do framework" no fim do doc.
 
 ## Fundamentos (do canon)
 - **Comuns NÃO passam pelo executor techMagic (ADR-016)**, isso é exclusivo de ESPECIAL/SUPER. Comuns usam o record-base de carta (`combat.md §7`, `StatusApplied`) + a fórmula divisiva §11 + `StatusId` já existentes. **Zero EffectKind novo.**
@@ -105,8 +103,6 @@ Cada carta = **sintaxe real da linguagem-âncora do dono** + uma frase que ensin
 (Frases pedagógicas completas no relatório do `narrative-writer`, a canonizar 1:1 quando produzir o doc de conteúdo final.) Flags: 3 nomes longos (`#[derive(Debug)]`, `borrow_conflitante()`, `mutex.lock()`) podem pedir fonte menor/2 linhas na moldura (art-director); nome exibido vs slug interno = decisão de impl.
 
 ## VELOCIDADE (compilada/rápida × interpretada/lenta): CANON, líder, carta a carta, 2026-07-17
-
-> **Esta seção SUBSTITUI INTEGRALMENTE a atribuição de 2026-07-16/17 ("afinidade não trava" + "8 exceções"), que está ERRADA e SUSPENSA.** A versão velha invertia o eixo compilado × interpretado. Ver §"Correção do framework".
 
 ### A régua-lei: conjurar = compilar + executar
 
@@ -278,7 +274,7 @@ O `Ondha-Colapso` rápido não é o Bento ficando forte demais: é o jogo **ensi
 - **Naming** das 30 (narrative-writer; voz do mundo; líder lê antes de aprovar), cruza com a frente LINGUAGENS-COMICAS-DISPUTAS (Pythia/Óxido/Asmódico/C-Arcane).
 - **Frases pedagógicas** por carta (didática) + VFX, dentro de CARTAS-PRODUCAO.
 - **`consume_status` pro Rimin-Exploit** (efeito novo do líder 2026-07-17): checar se o `resolve_use_card` já remove `StatusId` do alvo; se não, item pro `backend-engineer` (escopo pequeno, data-driven). Pré-req de CARTAS-PRODUCAO.
-- ~~**Decisão do líder pendente:** corrigir `combat-flavor.md` §2~~ **FEITO 2026-07-17.** §2 reescrito com a régua-lei; `C-Arcane = C` e `C-Arcane Major = C++` separados na tabela dele. Ver §"Correção do framework". **Sobra 1 doc desalinhado:** a tabela de convenção diegética de `gus-apartes-c-arcane.md` ainda diz `C-Arcane | C / C++`. **Não corrigido de propósito:** aquele doc é canon aprovado frase a frase pelo líder e declara que qualquer mudança exige nova autorização explícita dele. **Pedir autorização** (edição de 1 célula, não afeta velocidade nem nenhum aparte: C e C++ compilam, ambos rápidos).
+- **Pendência:** a tabela de convenção diegética de `gus-apartes-c-arcane.md` ainda diz `C-Arcane | C / C++`, desalinhada com `combat-flavor.md` §2 (`C-Arcane = C`, `C-Arcane Major = C++`). **Não corrigido de propósito:** aquele doc é canon aprovado frase a frase pelo líder e exige nova autorização explícita dele antes de qualquer mudança. **Pedir autorização** (edição de 1 célula, não afeta velocidade nem nenhum aparte: C e C++ compilam, ambos rápidos).
 
 ## Engine (CARTAS-COMUNS-ENGINE, descrita como FEITO 2026-07-16, `backend-engineer`, TDD + gêmeo preview<->real)
 
@@ -300,7 +296,7 @@ O `Ondha-Colapso` rápido não é o Bento ficando forte demais: é o jogo **ensi
 
 ## Re-voz das cartas de velocidade notável (REESCRITA 2026-07-17, pós-decisão do líder)
 
-> **Esta seção SUBSTITUI a "Re-voz das 8 exceções" (PROPOSTA de 2026-07-17), que está MORTA.** Aquela proposta reconciliava a voz de 8 cartas contra uma atribuição de velocidade que estava **invertida**. Corrigido o eixo, **5 das 8 deixaram de precisar de reconciliação** (a velocidade delas virou a velocidade natural da linguagem do dono) e **3 hooks foram descartados por serem falsos**.
+> Das 8 cartas originalmente marcadas como exceção de velocidade, **5 têm a velocidade natural da linguagem do dono** (não são mais exceção) e **3 hooks foram descartados por serem falsos**. Restam **3 exceções genuínas** — ver "Placar" e seções abaixo.
 
 **De 8 exceções para 3.** Só sobrou "exceção" onde a Pythia é rápida, e **essas três não são exceção de verdade**: são os três casos em que **a Pythia genuinamente compila**. Elas não furam a regra, elas **provam** a regra.
 
@@ -418,43 +414,10 @@ O jogador **espera** que o jab seja rápido. O Cauã **jura** que a Pythia dele 
 
 ---
 
-## Correção do framework: `combat-flavor.md` §2 está SUPERADO (a raiz do erro)
-
-**Registro obrigatório.** A atribuição errada não foi descuido pontual: ela foi **autorizada pelo framework**. A causa-raiz tem endereço.
-
-### A cláusula que abriu a porta
-
-`combat-flavor.md` §2, "Amarração FECHADA (decisão do criador 2026-07-16)", tratava a linguagem/velocidade como **afinidade** da carta com o personagem (não exclusividade), autorizando velocidade diferente da linguagem-âncora sempre que o role/balance pedisse.
-
-**Por que isso produziu o erro:** a cláusula rebaixava a linguagem a **tendência estética** e promovia **role/balance** a critério que **vencia** a linguagem. Na prática, permitia fazer a carta interpretada ser rápida sempre que o balance pedisse. Foi obedecendo a isso que:
-
-1. o arquétipo virou lei ("Finalizador = LENTA sempre", "Jab = RÁPIDA sempre"), acima da linguagem;
-2. quando arquétipo e linguagem colidiram, **a linguagem cedeu** (era só "afinidade", afinal);
-3. pra vestir a colisão, inventaram-se hooks que **afirmavam fato falso** (Assembly lento, REPL rápido).
-
-O erro foi **sistemático, não aleatório**: seguiu a regra escrita, e a regra estava errada. Por isso corrigir só as cartas não basta.
-
-### Status: SUPERADO
-
-> A cláusula "afinidade, NÃO trava" de `combat-flavor.md` §2 está **SUPERADA** pela **régua-lei** desta seção VELOCIDADE (líder, 2026-07-17).
->
-> **A linguagem TRAVA.** Não é afinidade, não é tendência, não é sabor. É **lei**, e está **acima de role, de balance e de arquétipo**, porque o eixo compilado × interpretado é definição do Gus original (acima dos pillars).
->
-> Balance NUNCA inverte velocidade. Balance ajusta **Power, mana, duração e casas de espera**. A velocidade é premissa; o balance trabalha **em volta** dela.
-
----
-
 ## Termos canônicos novos (2026-07-17)
 
 | Termo diegético | Real | Nota |
 |---|---|---|
 | **C-Arcane Major** | **C++** | Criado pelo líder em 2026-07-17 (resolve AMB-01 de `gus-apartes-c-arcane.md`). Mantém a convenção de nunca citar nome real de linguagem em diálogo. Estreia na **frase rara** (o "bilhete dourado", a única em que o Gus critica o C-Arcane): *"Dá pra fazer classe em C-Arcane puro, sabia? Não é BEM classe... é struct com ponteiro de função. O C-Arcane Major só deixou fácil pra quem tem preguiça."* |
 
-**⚠ Consequência (status 2026-07-17):** com `C-Arcane Major = C++` canonizado, **`C-Arcane` mapeia pra C sozinho**. Duas tabelas canônicas diziam `C-Arcane | C / C++`:
-
-| Tabela | Status |
-|---|---|
-| `combat-flavor.md` §2 (linguagens) | ✅ **CORRIGIDA 2026-07-17.** `C-Arcane` = C, e linha nova `C-Arcane Major` = C++ |
-| `gus-apartes-c-arcane.md` (convenção diegética) | ⏳ **PENDENTE, aguarda autorização explícita do líder.** Doc de canon aprovado frase a frase; não se edita sem ordem dele |
-
-Não afeta velocidade (C e C++ compilam, ambos rápidos) nem invalida nenhum aparte, mas é **inconsistência real** entre canônicos e vai confundir o próximo leitor.
+Com `C-Arcane Major = C++` canonizado, **`C-Arcane` mapeia pra C sozinho** (`combat-flavor.md` §2). Não afeta velocidade (C e C++ compilam, ambos rápidos) nem invalida nenhum aparte. `gus-apartes-c-arcane.md` ainda não reflete essa separação — ver "Pendência" acima.

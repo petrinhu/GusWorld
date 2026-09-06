@@ -4,7 +4,7 @@
 
 **Convencao:** pt-br na prosa. As mensagens de erro ficam no ORIGINAL tecnico (ingles do terminal real): a autenticidade e a piada (Pillar 1/2, magia = software). Sem em-dash; usa hifen, virgula, parenteses, dois-pontos.
 
-**⚠ Atualizacao 2026-07-17 (lider):** o **§2 foi reescrito** e agora carrega a **regua-lei** de velocidade (**CANON PETREO**, acima dos pillars). A clausula "afinidade, nao trava" que vivia ali esta **removida**. Todo agente que for desenhar carta (inclusive **ESPECIAIS/SUPER**, que passam pelo executor techMagic, [ADR-016](../../tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)) le o §2 **antes**.
+**§2 carrega a regua-lei** de velocidade (**CANON PETREO**, acima dos pillars). Todo agente que for desenhar carta (inclusive **ESPECIAIS/SUPER**, que passam pelo executor techMagic, [ADR-016](../../tech/adr/ADR-016-techmagic-effect-engine-data-driven.md)) le o §2 **antes**.
 
 **Cross-ref:** [`combat.md`](combat.md), [`battle-screen.md`](battle-screen.md), [`pillars.md`](../pillars.md), [`arco-principal.md`](../../narrative/arco-principal.md) (eixo Compilacao vs Interpretacao, Gus vs Sterling), [`cartas-comuns-statlines.md`](cartas-comuns-statlines.md) (§VELOCIDADE: o doc de CONTEUDO que espelha a regua-lei do §2), [`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md) (regua fato x juizo).
 
@@ -55,8 +55,6 @@ Ao falhar, sorteia-se aleatoriamente uma frase do acervo (paragrafo 3), do canal
 > **Regra de alteracao:** qualquer mudanca exige **autorizacao explicita do lider**, naquele contexto. Aprovacao anterior nao vale pra frente. **Nenhum agente inverte uma velocidade "por balance".**
 >
 > **Se o playtest doer:** o remedio e **Power / mana / duracao de status / casas de espera na fila**. **Nunca a velocidade.** A velocidade e premissa; o balance trabalha em volta dela.
->
-> A clausula anterior deste paragrafo (2026-07-16) foi **removida** em 2026-07-17: era a **causa-raiz** de uma atribuicao de velocidade que INVERTIA o eixo. Ver §2.4.
 
 As linguagens do canon parodiam linguagens reais; o nome (parecido com o original) TELEGRAFA o tipo da carta. Camada de legibilidade dupla: quem programa reconhece, o leigo aprende pela cor/icone. O eixo Compilacao (Gus, disciplina) vs Interpretacao (Sterling, controle) ja e canonico em [`arco-principal.md`](../../narrative/arco-principal.md).
 
@@ -82,9 +80,9 @@ A velocidade **nao e uma regra imposta por cima da lore**. Ela e a **consequenci
 | **HIBRIDO** | cast numa linguagem, **executor final em outra** | A velocidade e a do **elo mais lento**. Se o executor final e interpretado, a carta e lenta, **e a culpa e do executor** | **a do elo mais lento** | a do elo que quebrou | caso canon: `Ondha-Fratura` (cast Asmodico, executor Pythia) |
 | **DRE / GRE** | runtime/VM (JS/Go/Lua) | **Nao compila. Interpreta tudo em runtime**, por projeto (anti-compilacao e a tese do vilao) | **lenta** | RUNTIME ERROR | Sterling (vilao) |
 
-**Nota de canon (2026-07-17):** `C-Arcane` mapeia pra **C sozinho**. O C++ tem nome diegetico proprio, **C-Arcane Major**, criado pelo lider em 2026-07-17 (resolve AMB-01 de [`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md)). A linha antiga `C-Arcane | C / C++` tratava os dois como um so. **Nao muda velocidade nenhuma**: os dois compilam, os dois sao rapidos.
+**Nota de canon:** `C-Arcane` mapeia pra **C sozinho**; o C++ tem nome diegetico proprio, **C-Arcane Major** (resolve AMB-01 de [`gus-apartes-c-arcane.md`](../../narrative/gus-apartes-c-arcane.md)). **Nao muda velocidade nenhuma**: os dois compilam, os dois sao rapidos.
 
-**Achado a registrar (o eixo novo nao quebra a narrativa, ele a ENDIREITA):** a linha `DRE / GRE (Sterling) | interpretada | lenta` **ja estava correta e REFORCA a regua-lei**. O runtime do vilao ser lento casa exatamente com a oposicao **Compilacao (Gus) x Interpretacao (Sterling)** de [`arco-principal.md`](../../narrative/arco-principal.md). Idem `Asmodico | montada | rapida (a mais)`: **ja estava correto** e ja antecipava esta regua. O framework tinha a verdade; a clausula "afinidade" a atropelou.
+A linha `DRE / GRE (Sterling) | interpretada | lenta` **REFORCA a regua-lei**: o runtime do vilao ser lento casa exatamente com a oposicao **Compilacao (Gus) x Interpretacao (Sterling)** de [`arco-principal.md`](../../narrative/arco-principal.md). Idem `Asmodico | montada | rapida (a mais)`.
 
 ### 2.2 As duas excecoes honestas (que PROVAM a regra, nao furam)
 
@@ -361,5 +359,4 @@ Decisao macro tomada. O design FINO dos dois registros (estilo do terminal cru v
 ## 6. Pendencias (a fechar no design do M5)
 
 - Canonizar a mecanica de cast-time (paragrafo 1) como extensao do combat.md, via lead-game-designer (ratificacao do criador). Parametros finos a definir (todos `//PLAYTEST`, afinaveis livremente): quantas posicoes a frente a lenta resolve (por carta?), o que a interrupcao faz (cancela e perde AP/mana? atrasa? reduz potencia proporcional ao dano?), o que "le o tabuleiro tarde" significa (re-mira? escala com estado?).
-- ~~A amarracao linguagem<->carta<->personagem~~ **RESOLVIDA (lider, 2026-07-17): a linguagem TRAVA a velocidade.** Ver §2 (regua-lei) e [`cartas-comuns-statlines.md`](cartas-comuns-statlines.md) §VELOCIDADE (as 30 comuns, aprovadas carta a carta). **Nao reabrir sem autorizacao explicita do lider.**
 - Estilo visual das fases (spinner/log) e da mensagem de falha na tela: ver [`battle-screen.md`](battle-screen.md).
