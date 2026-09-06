@@ -6,6 +6,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > **Escrito em 05/09/2026, sob o item `D38` do `TODO.md`, reprovado na verificação do mesmo dia por não imprimir a contagem obrigatória exigida pela L-36 global (encontrados/reconferidos/vivos, sempre, mesmo em zero).** Este documento fecha essa lacuna: reconfere, contra a árvore de hoje, os dois relatórios legado que o `D38` mandava reconferir, `AUDIT-T4-VOZ-V2.md` (voz Stephenson, 71 achados) e `AUDIT-T6-PALAVRAS-V2.md` (palavras e pontuação proibidas). **Nenhum achado foi corrigido aqui**: este item entrega só o relatório; o conserto do que segue vivo é item próprio, aberto depois (L-33).
 >
 > Convenção de contagem: "encontrado" é todo achado catalogado no relatório original; "reconferido" é aquele que esta rodada conseguiu medir contra a árvore de hoje, por `grep`, por seção ou por nome; "vivo" é aquele cuja medição confirma que o problema persiste. Achado reconferido e não-vivo é achado morto, com a causa registrada. Achado não-reconferido fica em `SEM ÂNCORA`, nunca em `MORTO` (achado sem resposta não é achado morto).
+>
+> **Correção de 06/09/2026, por verificação externa (item D38 na fila de exceção do `TODO.md`):** a linha do T6 abaixo somava quatro vivos mais quatro mortos para nove encontrados (4+4=8≠9), e nunca enumerava quais achados caíam em cada categoria. A tabela e a enumeração abaixo foram refeitas por leitura item a item do corpo do §3 desta reconferência (nunca corrigido; só a contagem estava errada). Duas categorias novas nasceram desse reconto: **`HERDADO`** (achado cujo veredito não foi remedido nesta rodada, por dizer explicitamente no corpo que herda um veredito de rodada anterior — não é `RECONFERIDO`, pela própria definição acima, mas também não é `SEM ÂNCORA`, porque tem veredito, só que de outro dia) e **`ZONA CINZENTA`** (achado reconferido cujo veredito depende de decisão do líder que este relatório explicitamente não toma — nem vivo nem morto até essa decisão).
 
 ---
 
@@ -13,12 +15,28 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 ## 1. Contagens consolidadas
 
-| Relatório | Encontrados | Reconferidos | Vivos | Mortos | Sem âncora |
-|---|---|---|---|---|---|
-| `AUDIT-T4-VOZ-V2.md` (voz) | 71 | 17 | 17 | 0 | 54 |
-| `AUDIT-T6-PALAVRAS-V2.md` (palavras) | 9 itens nomeados | 9 | 4 (+ 1 achado novo, fora do escopo original) | 4 | 0 |
+| Relatório | Encontrados | Reconferidos nesta rodada | Herdado (não remedido) | Vivos | Mortos | Zona cinzenta | Sem âncora |
+|---|---|---|---|---|---|---|---|
+| `AUDIT-T4-VOZ-V2.md` (voz) | 71 | 17 | 0 | 17 | 0 | 0 | 54 |
+| `AUDIT-T6-PALAVRAS-V2.md` (palavras) | 9 itens nomeados | 8 | 1 | 2 | 5 | 2 | 0 |
 
-O T4 conta por achado individual (18 críticos + 31 médios + 22 leves = 71); o próprio dossiê original avisa que não há "arquivo:linha simples" para nenhum dos 71, porque é crítica de estilo, não de fato. O T6 conta por **item nomeado** (o achado principal do em-dash, mais os quatro `C-T6-0X` nomeados, mais o bloco de médios do anglicismo, mais a lista negra, mais as duas pendências T1-T5), porque as "1.060+ issues" originais são majoritariamente a mesma classe de violação (em-dash) repetida centena de vezes, não achados distintos.
+O T4 conta por achado individual (18 críticos + 31 médios + 22 leves = 71); o próprio dossiê original avisa que não há "arquivo:linha simples" para nenhum dos 71, porque é crítica de estilo, não de fato. O T6 conta por **item nomeado** (o achado principal do em-dash, mais os quatro `C-T6-0X` nomeados, mais o bloco de médios do anglicismo, mais a lista negra, mais as duas pendências T1-T5), porque as "1.060+ issues" originais são majoritariamente a mesma classe de violação (em-dash) repetida centena de vezes, não achados distintos. Conferência da linha do T6: reconferidos (8) + herdado (1) = 9 = encontrados; vivos (2) + mortos (5) + zona cinzenta (2) = 9 = encontrados. As duas somas fecham.
+
+### 1.1. Os 9 itens nomeados do T6, um a um
+
+| # | Item | Seção | Categoria | Por quê |
+|---|---|---|---|---|
+| 1 | Em-dash em prosa canônica | §3.1 | MORTO | 131 ocorrências em 3 arquivos, todas exceção registrada ou meta-processo; zero em prosa canônica |
+| 2 | `C-T6-02`, termos maçom explícitos | §3.2 | VIVO | Confirmado e agravado: 21 trechos em 15 arquivos, contra os 9 alegados |
+| 3 | `C-T6-03`, autoincoerência `BIBLE-V1-CAPA.md` | §3.3 | MORTO | Já eufemizado, sem rótulo de ofício explícito ao lado |
+| 4 | `C-T6-04`, rótulos de ordem fechada no glossário | §3.4 | ZONA CINZENTA | Reformulação aplicada (Aprendiz/Companheiro/Mestre sem a palavra "maçom"), mas o relatório original deixava decisão one-way-door pendente e este relatório não a resolve |
+| 5 | `C-T6-05`, rótulo de instrumentos em `4-linguagens-deep.md` | §3.5 | MORTO | Decisão one-way-door tomada e aplicada ("Selo dos Quatro Instrumentos") |
+| 6 | Médios, anglicismo "cross-X" | §3.6 | VIVO | 95 arquivos hoje contra 30 no original; mais que triplicou |
+| 7 | Lista negra factual (T1-T5) | §3.7 | HERDADO | "Não re-medida individualmente nesta rodada (falta de tempo); herda o veredito de 25/08" — não é `RECONFERIDO` por definição própria deste documento (§ acima), e o veredito herdado é morto (0 ocorrências em 25/08) |
+| 8 | "Patch Zero" sem hífen | §3.7 | ZONA CINZENTA | Sobrevive 1 ocorrência, mas pode ser codinome operacional intencional; "fica para o líder decidir, não é conserto óbvio" |
+| 9 | "Janelarum" como cidade autônoma | §3.7 | MORTO | Uso hoje é sempre marca/sistema, nunca topônimo; "parece resolvido" |
+
+O achado novo mencionado na versão anterior desta tabela ("+1 achado novo, fora do escopo original") não é um décimo item: é a densidade agravada de `C-T6-02` (item 2 acima, 21 contra 9 alegados), já contada dentro dele. Não soma à parte.
 
 ## 2. T4-VOZ: os 17 críticos recuperados por medição/nome
 
@@ -131,4 +149,4 @@ Linhas 27 e 116 hoje dizem "Selo dos Quatro Instrumentos", a mesma solução apl
 
 ## 5. Status
 
-**Nenhum achado foi corrigido neste item.** T4: 17 críticos vivos e agravados, 1 crítico e 53 médios/leves sem âncora recuperável nesta rodada. T6: achado principal (em-dash) e três dos quatro `C-T6-0X` mortos; o quarto (`C-T6-04`) em zona cinzenta; achado novo de 21 trechos maçônicos explícitos (contra os 9 alegados) confirma e agrava C-T6-02 e C-T4-017; anglicismo cross-X vivo e mais que triplicado. Conserto de tudo que segue vivo é item próprio, a abrir depois (L-33 do projeto).
+**Nenhum achado foi corrigido neste item.** T4: 71 encontrados, 17 reconferidos, 17 vivos e agravados, 0 mortos, 54 sem âncora. T6: 9 encontrados, 8 reconferidos nesta rodada + 1 herdado de 25/08, 2 vivos (`C-T6-02` agravado de 9 para 21 trechos, e o anglicismo cross-X mais que triplicado de 30 para 95 arquivos), 5 mortos (em-dash, `C-T6-03`, `C-T6-05`, lista negra factual herdada, "Janelarum"), 2 em zona cinzenta (`C-T6-04` e "Patch Zero" sem hífen, ambos aguardando decisão do líder), 0 sem âncora. Conserto de tudo que segue vivo é item próprio, a abrir depois (L-33 do projeto).
