@@ -45,7 +45,7 @@ Transcrito de `GODS_LAWS.md` (37 leis, medido em 01/09/2026 por `grep -c "^## L-
 | [L-21](GODS_LAWS.md#l-21) | achar que o `inicial.md` cumpriu o papel dele | Só se apaga com as quatro condições satisfeitas e o líder confirmando |
 | [L-22](GODS_LAWS.md#l-22) | nomear qualquer coisa, ou escrever comentário e commit | Identificador e comentário em inglês, `snake_case`; commit em pt-br |
 | [L-23](GODS_LAWS.md#l-23) | criar tag, publicar release, ou mexer na versão | Versão e tag são `vA.B.C.D`, como no GlintFx |
-| [L-24](GODS_LAWS.md#l-24) | ver regra, seção ou documento que o líder revogou | Revogado se APAGA; não se guarda como histórico |
+| [L-24](GODS_LAWS.md#l-24) | ver regra, seção ou documento que o líder revogou, ou escrever relatório/reconferência que narraria por que uma versão anterior dele reprovou | Revogado se APAGA; não se guarda como histórico — vale também para histórico de processo (bilhete sobre reprovação anterior) |
 | [L-25](GODS_LAWS.md#l-25) | tocar save, configuração, mapa ou catálogo de conteúdo | Envelope binário selado, teto técnico faseado, cripto vem do GlintFx |
 | [L-26](GODS_LAWS.md#l-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, quatro direções cardeais, grade quadrada |
 | [L-27](GODS_LAWS.md#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |

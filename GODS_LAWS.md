@@ -42,7 +42,7 @@
 | [L-21](#l-21) | achar que o `inicial.md` cumpriu o papel dele | Só se apaga com as quatro condições satisfeitas e o líder confirmando |
 | [L-22](#l-22) | nomear qualquer coisa, ou escrever comentário e commit | Identificador e comentário em inglês, `snake_case`; commit em pt-br |
 | [L-23](#l-23) | criar tag, publicar release, ou mexer na versão | Versão e tag são `vA.B.C.D`, como no GlintFx |
-| [L-24](#l-24) | ver regra, seção ou documento que o líder revogou | Revogado se APAGA; não se guarda como histórico |
+| [L-24](#l-24) | ver regra, seção ou documento que o líder revogou, ou escrever relatório/reconferência que narraria por que uma versão anterior dele reprovou | Revogado se APAGA; não se guarda como histórico — vale também para histórico de processo (bilhete sobre reprovação anterior) |
 | [L-25](#l-25) | tocar save, configuração, mapa ou catálogo de conteúdo | Envelope binário selado, teto técnico faseado, cripto vem do GlintFx |
 | [L-26](#l-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, quatro direções cardeais, grade quadrada |
 | [L-27](#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
@@ -153,7 +153,7 @@ Nenhuma versão ou tag do GusWorld sai fora do formato de quatro componentes: o 
 
 ## L-24
 
-Nenhum texto revogado pelo líder permanece legível em bloco de histórico, nota de status superado ou seção recolhida: revogado se apaga por inteiro, inclusive do índice de gatilhos. Nenhuma exceção existe além de texto com efeito jurídico ou direito adquirido de terceiro, que não se apaga e vai ao líder. Nenhuma citação órfã para documento inexistente é apagada por agente sozinho: primeiro o líder decide, pela L-14, que o documento citado está morto; só depois se apaga o ponteiro, preservando a afirmação.
+Nenhum texto revogado pelo líder permanece legível em bloco de histórico, nota de status superado ou seção recolhida: revogado se apaga por inteiro, inclusive do índice de gatilhos. Nenhuma exceção existe além de texto com efeito jurídico ou direito adquirido de terceiro, que não se apaga e vai ao líder. Nenhuma citação órfã para documento inexistente é apagada por agente sozinho: primeiro o líder decide, pela L-14, que o documento citado está morto; só depois se apaga o ponteiro, preservando a afirmação. — **REFORMA DE 06/09/2026, decisão do líder por `AskUserQuestion`.** Apresentadas opções sobre se um relatório de auditoria/reconferência pode narrar dentro de si que um item já reprovou antes, quantas vezes, e por quê, **o líder escolheu, verbatim, a opção "Vale: apaga também"**: a mesma proibição desta lei vale também para **histórico de PROCESSO**, não só para canon do jogo; apaga, não se reescreve em outra forma. O argumento que fundamentava essa opção — uma régua só para tudo, sem julgar caso a caso qual histórico é inocente, porque critério que exige interpretar degrada na primeira exceção, e a nota que explica o passado sempre acha justificativa para existir — **foi escrito pelo orquestrador da sessão (main) na descrição da alternativa; o líder concordou com ele ao escolhê-la, não o formulou.**
 
 ## L-25
 
