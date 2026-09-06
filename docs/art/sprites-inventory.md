@@ -4,8 +4,7 @@ Mapa de onde vivem os sprites de cada personagem, o que cada pasta já tem, e co
 gerar o que falta. **Fonte da verdade sobre a árvore `resources/sprites/`.**
 
 > Reformado 31/08/2026 (decisão do líder de 30/08/2026, por `AskUserQuestion`): o
-> documento passa a separar PARTE MEDIDA de PARTE DE JULGAMENTO, e corrige oito
-> divergências achadas entre o texto anterior e o disco.
+> documento separa PARTE MEDIDA de PARTE DE JULGAMENTO.
 
 ## Como ler este documento
 
@@ -471,8 +470,8 @@ direta (`animate-with-text-v3`, `no_background`, referência = o sprite direcion
 real de cada um) — mas **a parte medida confirma que só o `bento_requiem` recebeu
 o lote** (181 arquivos); `caua_volt`, `iara_lumen`, `linda_siren`, `dante_grid` e
 `jaci_proxy` têm `anims/` vazio. **Não existe** a pasta de staging
-`_<anim>_STAGING_2026-07-23/` citada em versões anteriores deste documento — nem
-para o Bento, nem para nenhum outro. O Gus recebeu, no mesmo período, o
+`_<anim>_STAGING_2026-07-23/` — nem para o Bento, nem para nenhum outro. O Gus
+recebeu, no mesmo período, o
 `breathing_idle` de Norte/Leste/Oeste (ver bloco ⭐ acima), já na pasta final.
 
 O **Gus protagonista** tem a árvore mais completa de todas (ver bloco ⭐ acima:
@@ -483,9 +482,8 @@ Bento.
 
 ### `models_frente/`
 
-Existe com 9 arquivos rastreados (ver PARTE MEDIDA) e não estava documentada em
-nenhuma versão anterior deste mapa. **O papel dela não está decidido aqui** — só
-o conteúdo é descrito.
+Existe com 9 arquivos rastreados (ver PARTE MEDIDA). **O papel dela não está
+decidido aqui** — só o conteúdo é descrito.
 
 ### Personagens com 4 direções estáticas, SEM walk (76)
 

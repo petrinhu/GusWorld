@@ -65,18 +65,11 @@ compilador que a decisão do líder escolheu para esse alvo (não GCC/Clang via
 MinGW, que reintroduziria uma ABI POSIX-like sobre Windows e anularia o
 propósito de ter MSVC como o detector mais divergente do POSIX).
 
-## Contagem de entradas da matriz: NOVE, confirmado pelo líder em 25/08/2026
+## Contagem de entradas da matriz: NOVE
 
-A versão anterior deste ADR levantou uma divergência aritmética: a ordem de
-serviço original citava "sete entradas", mas a leitura literal das duas
-decisões de compilador — **GCC e Clang, os dois, em CADA uma das quatro
-plataformas Linux** — fecha em nove, não sete. Em vez de forçar o número
-para sete inventando qual subconjunto de plataformas ficaria com um único
-compilador (decisão de escopo de cobertura que não me cabia tomar, L-11), a
-divergência foi devolvida ao líder como pergunta aberta.
-
-**O líder respondeu: a matriz tem NOVE entradas**, a leitura literal e
-uniforme, sem exceção de plataforma:
+A matriz tem NOVE entradas, a leitura literal e uniforme das duas decisões
+de compilador — **GCC e Clang, os dois, em CADA uma das quatro plataformas
+Linux** —, sem exceção de plataforma:
 
 | Plataforma | Compilador(es) | Entradas |
 |---|---|---|
@@ -98,15 +91,6 @@ naquela que o CI escolheu arbitrariamente testar com os dois.
 
 **As nove entradas são bloqueantes, sem exceção (L-20).** Nenhuma delas é
 informativa nem pode ficar de fora do gate de push (L-32).
-
-⚠️ **Correção de registro, porque o erro era do lado de quem redigiu a ordem
-de serviço, não meu, e isso fica dito com todas as letras:** o número "sete"
-citado originalmente era um erro aritmético do coordenador, propagado
-também para o item `G6` do `TODO.md`. A recusa de forçar o número ou de
-inventar um subconjunto de plataformas foi o comportamento correto — a
-pergunta devolvida (L-11) é o que permitiu a correção acontecer antes do
-número errado virar fundação. **Toda ocorrência de "sete entradas" neste
-documento, no ADR-023 e no `_INDEX.md` foi substituída por "nove".**
 
 ## Evidência de que a imagem oficial existe
 

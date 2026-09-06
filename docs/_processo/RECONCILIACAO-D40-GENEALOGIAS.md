@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-> **Escrito em 06/09/2026, sob o item `D40` do `TODO.md`, reprovado duas vezes: a primeira por não cruzar as três cadeias genealógicas que o líder confirmou em 01/09/2026 serem objetos distintos (institucional, descendência de sangue, matrilinear canônica); a segunda porque os achados dessa reconferência foram registrados em quatro linhas soltas da fila de exceção do `TODO.md` (drenadas ali entre os commits `2ee4405` e `447670b`, mais uma quarta linha independente), sem arquivo nem linha, e o relatório que o item exige nunca foi escrito.** Este documento fecha essa lacuna: cada achado abaixo carrega arquivo e linha, e nenhum foi corrigido aqui — correção é item próprio, aberto depois, como a linha do `D40` já registra (L-33 do projeto).
+> **Escrito em 06/09/2026, sob o item `D40` do `TODO.md`.** As três cadeias genealógicas do corpus — institucional, descendência de sangue e matrilinear canônica — são objetos distintos, confirmado pelo líder em 01/09/2026. Cada achado abaixo carrega arquivo e linha, e nenhum foi corrigido aqui — correção é item próprio, aberto depois, como a linha do `D40` já registra (L-33 do projeto).
 >
 > **Convenção desta reconferência:** cada achado é reportado com [FATO] (o que o `grep`/a leitura confirma, com arquivo:linha) separado de [INFERÊNCIA] (a causa apurada ou a leitura editorial, quando não é fato bruto) — L-18 global. Onde a premissa recebida da fila de exceção não pôde ser confirmada byte a byte contra o corpus atual, isto é dito explicitamente, não silenciado.
 
