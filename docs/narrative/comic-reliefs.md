@@ -97,7 +97,7 @@ Ou seja: o certo ganha por mais de dois para um, e **não se escreve fala errada
 | Ato 2 tardio (pós-Cena 4, a partir de ~75%) | 18 (A peça que ainda gira, fase tardia do deslize do Dante) |
 | Ato 2 (fase 2 do retorno do Cauã, ANTES da Cena 15 na cronologia) | 19 (Pra tudo que aguentou, Cauã x Bento, fundação da Cena 15) |
 | Ato 2 (regional) | EE-1, EE-2 (Dutos), EE-5, EE-6 (Selve), EE-8 (fronteira), EE-11, EE-15, EE-19 (Mirage), EE-13, EE-14 (vilarejo Jaci), EE-17 (Catedrais), EE-21, EE-22 (Orla Recursiva) |
-| Cross-ato (conquistas) | EE-4 (cogumelo), EE-9 (100 inimigos), EE-10 (placa hospital), EE-12 (mortes na mesma cena, limiar por dificuldade), EE-16 (diálogo casca azul), EE-18 (encorajador), EE-20 (reunião de emergência) |
+| Cross-ato (conquistas) | EE-4 (cogumelo), EE-9 (144 inimigos), EE-10 (placa hospital), EE-12 (mortes na mesma cena, limiar por dificuldade), EE-16 (diálogo casca azul), EE-18 (encorajador), EE-20 (reunião de emergência) |
 
 ---
 

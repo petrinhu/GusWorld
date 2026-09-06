@@ -31,7 +31,7 @@ Bestiary segue mesma regra: HP, ataque visto, padrão de movimento são técnica
 | **NPCs ambientais nomeados** | 24 (catalogados §3) | Conversa significativa | Sub-quest associada |
 | **Facções (perfis)** | 7 (6 facções + Dutos como comunidade) | 1º contato direto | Knowledge alta + arco da facção |
 
-Total catalogável: **41 fichas únicas**. Bestiary: **20 inimigos turn-based** medidos em §5 (5 cidade, 6 Selve, 6 cross-settings, 3 bosses incluindo Sterling 2 fases + Patch-Zero condicional), corrigindo a estimativa "~22" desta linha, nunca conferida contra o corpo real de §5, à luz da tensão numérica de `docs/design/mecanicas/conquistas.md` §2.9 (ver nota em §5). O catálogo cresce até **144 espécies distintas**, por decisão do líder de 06/09/2026 (nota de escopo no início de §5).
+Total catalogável: **41 fichas únicas**. Bestiary: **20 inimigos turn-based** medidos em §5 (5 cidade, 6 Selve, 6 cross-settings, 3 bosses incluindo Sterling 2 fases + Patch-Zero condicional; ver nota em §5). O catálogo cresce até **144 espécies distintas**, por decisão do líder de 06/09/2026 (nota de escopo no início de §5).
 
 ---
 
