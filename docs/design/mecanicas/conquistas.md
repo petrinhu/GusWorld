@@ -76,7 +76,7 @@ Três das sete (EE-4, EE-10, EE-16) não têm condição de destravar em lugar n
 - **(A) Contagem cumulativa de eventos**, contando toda vez que um inimigo é documentado (incluindo reencontros com o mesmo inimigo já catalogado antes — cada abate ou cada "1º combate" novo soma, mesmo repetindo espécie). Compatível com "100" mesmo havendo só ~22 espécies.
 - **(B) Contagem de entradas ÚNICAS completas do catálogo.** Neste caso 100 é **matematicamente impossível** com ~22 espécies catalogáveis, e o número do corpus está errado ou o catálogo precisa crescer.
 
-Não decido entre as duas (L-14). Pergunta formal em §3. **✅ RESOLVIDO em 30/08/2026 (`G12` do `TODO.md`, Eixo 2 de `docs/_secret/proposta-balanceamento-easter-eggs.md`):** nenhuma das duas leituras, o líder escolheu criar o conceito de **documentação multi-estágio por espécie** (avistamento, primeiro combate, análise completa, fraqueza descoberta, item de drop identificado), mantendo o limiar em **100**.
+Não decido entre as duas (L-14). Pergunta formal em §3. O líder escolheu nenhuma das duas leituras: criou o conceito de **documentação multi-estágio por espécie** (avistamento, primeiro combate, análise completa, fraqueza descoberta, item de drop identificado), mantendo o limiar em **100**.
 
 **Aplicado em `docs/narrative/diary/entries-fichas-bestiary.md` §5 (item `D32` do `TODO.md`, 05/09/2026; recalculado em 05/09/2026 por revisão adversarial):** a estimativa "~22 espécies × 5 estágios ≈ 110" desta seção não se confirmou por medição, e a medição seguinte (89 eventos) também não sobreviveu à conferência linha a linha contra as próprias definições de estágio. O corpo real de §5 cataloga **20 espécies** (5 cidade, 6 Selve, 6 cross-settings, 3 bosses), das quais **14** completam os 5 estágios, **1** (Voz Cromada Sterling, sem loot material) trava no estágio 4, e **5** (Patch-Zero, Anomalia Glitch, exceção de glitch já descrita, mais Sterling Locke Fase 1, Sterling Locke Fase 2 e o Mestre pró-Sterling Asmódico da cena do arco Bento, os três últimos por serem encontros não repetíveis, sem os "3-6 combates adicionais" que o estágio 3 exige) travam no estágio 2. Isso dá **84 eventos de documentação possíveis no jogo inteiro** (14×5 + 1×4 + 5×2), mesmo documentando tudo, abaixo do limiar de 100. Tensão numérica não resolvida, levada ao líder de novo em `entries-fichas-bestiary.md` §5: crescer o catálogo, ou fazer o contador somar também reencontros de estágio além do primeiro. Não decido entre as duas (L-14).
 
@@ -100,7 +100,7 @@ Não decido entre as duas (L-14). Pergunta formal em §3. **✅ RESOLVIDO em 30/
 
 **Gatilho de domínio:** o contador de derrotas de Gus dentro de uma mesma identidade de cena atinge o limiar de dificuldade do save (tabela abaixo, não mais um valor único). Em vocabulário de evento já estabelecido em `combat.md` §16 (`CombatBus`): `CombatEnded(outcome=Defeat, payload)` seguido de `ActorDefeated(gus)` — o avaliador de conquistas incrementa, por identidade de cena, um contador de derrotas.
 
-**✅ RESOLVIDO em 30/08/2026** (`G12` do `TODO.md`, Eixo 5 de `docs/_secret/proposta-balanceamento-easter-eggs.md`, `AskUserQuestion`): o valor único de 100 fica revogado (L-24) e substituído por um limiar escalado por dificuldade:
+O limiar de derrotas na mesma cena escala por dificuldade:
 
 | Dificuldade | Limiar de derrotas na mesma cena |
 |---|---|
@@ -181,15 +181,14 @@ O limiar de "3 erros seguidos" do corpus **não muda**. Nota de argumento, corri
 
 ## 3. Perguntas ao líder (lacunas e ambiguidades que este documento NÃO resolve)
 
-Nenhuma das sete abaixo foi decidida por mim (L-14). Cada uma referencia a seção correspondente.
+Nenhuma das seis abaixo foi decidida por mim (L-14). Cada uma referencia a seção correspondente.
 
 1. **EE-4 (§2.4) — existe conquista aqui, ou é só o item?** O corpus só descreve o Cogumelo-Recuperador como item de revive. Se o líder quiser uma conquista ligada a ele, preciso saber qual condição: obter o item pela primeira vez, ou usá-lo (reviver) pela primeira vez — as duas são leituras plausíveis e nenhuma está escrita.
 2. **EE-10 (§2.10) — existe conquista aqui, ou é só a placa?** Nenhuma condição de destravar está descrita. Se o líder quiser uma, preciso de qual evento a dispara (ler a placa? entrar no hospital pela primeira vez? algo ligado à piada da doação?).
-3. ~~**EE-9 (§2.9) — "100 inimigos" é contagem cumulativa de eventos ou de entradas únicas?**~~ **✅ RESOLVIDO em 30/08/2026** pelo líder (`G12` do `TODO.md`, `AskUserQuestion`): nem cumulativa nem entrada única simples — cria-se **documentação multi-estágio por espécie** (5 estágios), limiar mantido em 100. Detalhe em §2.9 acima e em `docs/_secret/proposta-balanceamento-easter-eggs.md` Eixo 2.
-4. **EE-12 e EE-18 (§2.12, §2.18) — "mesma cena" é identidade de local fixo ou de instância de tentativa?** Preciso saber se o domínio já tem (ou vai ganhar) um identificador de cena/encontro que persista através de retries — sem isso, nem o limiar de derrotas por dificuldade na mesma cena (§2.12) nem a concessão única por identidade de cena de §2.18 são implementáveis como descritas.
-5. **EE-16 (§2.16) — existe conquista aqui, ou é só a cena de diálogo?** Nenhuma condição de destravar está descrita, e nenhuma das outras 18 cenas de humor tem conquista equivalente. Se o líder quiser uma, preciso de qual evento a dispara.
-6. **EE-18 (§2.18) — é uma conquista de catálogo (banner com nome e dica) ou um sistema de suporte sem entrada em `.gw.achv`?** Ao contrário de EE-9/EE-12/EE-20, o corpus nunca chama isto de "conquista oculta" — é "sistema oculto". Preciso saber se ele entra no catálogo `.gw.achv` (e aí precisa de nome e dica próprios, que também não existem) ou se fica de fora, e a linha da tabela de `comic-reliefs.md` está usando "conquista" num sentido mais largo que o `.gw.achv` formaliza.
-7. **EE-18 (§2.18): o Token-de-Coragem é concedido uma vez por identidade de cena, não uma vez por campanha inteira** (`G12` do `TODO.md`, Opção A de `docs/_secret/proposta-balanceamento-easter-eggs.md` Eixo 3, `AskUserQuestion`): cura por dificuldade (Fácil 3% / Médio 5% / Difícil 8% do HP-máx, `Regen` no primeiro turno seguinte), Hardcore sem Token. Detalhe em §2.18 acima.
+3. **EE-12 e EE-18 (§2.12, §2.18) — "mesma cena" é identidade de local fixo ou de instância de tentativa?** Preciso saber se o domínio já tem (ou vai ganhar) um identificador de cena/encontro que persista através de retries — sem isso, nem o limiar de derrotas por dificuldade na mesma cena (§2.12) nem a concessão única por identidade de cena de §2.18 são implementáveis como descritas.
+4. **EE-16 (§2.16) — existe conquista aqui, ou é só a cena de diálogo?** Nenhuma condição de destravar está descrita, e nenhuma das outras 18 cenas de humor tem conquista equivalente. Se o líder quiser uma, preciso de qual evento a dispara.
+5. **EE-18 (§2.18) — é uma conquista de catálogo (banner com nome e dica) ou um sistema de suporte sem entrada em `.gw.achv`?** Ao contrário de EE-9/EE-12/EE-20, o corpus nunca chama isto de "conquista oculta" — é "sistema oculto". Preciso saber se ele entra no catálogo `.gw.achv` (e aí precisa de nome e dica próprios, que também não existem) ou se fica de fora, e a linha da tabela de `comic-reliefs.md` está usando "conquista" num sentido mais largo que o `.gw.achv` formaliza.
+6. **EE-18 (§2.18): o Token-de-Coragem é concedido uma vez por identidade de cena, não uma vez por campanha inteira** (`G12` do `TODO.md`, Opção A de `docs/_secret/proposta-balanceamento-easter-eggs.md` Eixo 3, `AskUserQuestion`): cura por dificuldade (Fácil 3% / Médio 5% / Difícil 8% do HP-máx, `Regen` no primeiro turno seguinte), Hardcore sem Token. Detalhe em §2.18 acima.
 
 ---
 

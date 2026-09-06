@@ -81,7 +81,7 @@ O puzzle **É** a "morte condicional" que o Pillar 4 original já previa — nã
 
 **Camada 2 — machine-binding:** o HMAC do save (extensão do que o ADR-006 já faz pro envelope selado) passa a incorporar uma chave derivada **da máquina**, não só do conteúdo. Efeito colateral desejado: mover o `.sav` pra outro PC também quebra o load — reforça a Camada 1 sem depender de rede.
 
-**Camada 3 — wipe por trechos (otimização aprovada pelo líder, substitui o wipe-de-arquivo-inteiro da versão anterior desta spec):**
+**Camada 3 — wipe por trechos (otimização aprovada pelo líder):**
 
 - Não é preciso zerar o arquivo inteiro. Basta sobrescrever **o selo/HMAC + o nonce anti-rollback + o cabeçalho** do envelope — isso já torna o arquivo **incarregável** (o `load_save`/`load_game` já rejeita qualquer payload sem selo válido, comportamento existente hoje). Instantâneo mesmo em mídia lenta (HDD antigo) — o objetivo é "incarregável", não "sem resquício de dado em disco" (saves são poucos KB; zerar tudo não protegeria mais que zerar o essencial).
 - Cobre os 4 arquivos da cadeia (primário + `backup1..backup3` — senão a morte "final" seria revertível via `load_game_from_backup`, que já existe no motor).

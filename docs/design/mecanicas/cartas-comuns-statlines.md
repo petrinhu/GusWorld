@@ -442,22 +442,6 @@ O erro foi **sistemático, não aleatório**: seguiu a regra escrita, e a regra 
 >
 > Balance NUNCA inverte velocidade. Balance ajusta **Power, mana, duração e casas de espera**. A velocidade é premissa; o balance trabalha **em volta** dela.
 
-### ✅ RESOLVIDO (líder autorizou; `combat-flavor.md` §2 REESCRITO em 2026-07-17)
-
-> **O §2 do `combat-flavor.md` foi corrigido.** A cláusula "afinidade, NÃO trava" foi **removida** (não apenas marcada superada) e substituída pela **régua-lei**. A contradição entre os dois canônicos **não existe mais**: o framework (`combat-flavor.md` §2) e o conteúdo (este doc, §VELOCIDADE) agora dizem a mesma coisa.
->
-> O que entrou no §2: banner CANON PÉTREO · régua-lei (conjurar = compilar + executar; **a linguagem TRAVA**) · tabela corrigida (Óxido compila **devagar**, `async` = pior caso) · linha **HÍBRIDO** nova · `C-Arcane = C` separado de **`C-Arcane Major` = C++** · as 2 exceções honestas · **MENTIRA PROIBIDA** + teste de detecção · morte da régua-mestre antiga que ditava velocidade rápida obrigatória para CC/heal · ressalva do `>>>` do Cauã (§2.5) · pendência §6 fechada.
->
-> **Mantido intacto** o que já estava certo: `Asmódico | montada | rápida (a mais)` e `DRE/GRE | interpretada | lenta`. Este último **REFORÇA** o eixo (o runtime do vilão ser lento casa com a oposição Compilação/Gus × Interpretação/Sterling do `arco-principal.md`). **Achado: o eixo novo não quebra a narrativa, ele a endireita.**
-
-**Registro do motivo (por que era urgente):**
-
-1. **`combat-flavor.md` é o doc de FRAMEWORK; este aqui é de CONTEÚDO.** Anotar "superado" no doc de conteúdo conserta as 30 cartas de hoje, mas deixa a cláusula errada de pé **na fonte que os agentes vão ler amanhã**. O próximo agente que abrir o framework pra desenhar as **ESPECIAIS/SUPER** vai ler "afinidade, não trava" + "role/balance pode pedir" e **repetir o erro inteiro**, de boa-fé.
-2. **A superfície de risco é maior que as comuns.** As especiais/SUPER passam pelo executor techMagic (ADR-016) e são **narrativa protegida** (`reference_deck_mao_sistema`). Errar o eixo lá é mais caro que nas comuns.
-3. **Contradição ativa entre dois docs canônicos.** Hoje o §2 diz "não trava" e este diz "trava". Dois canônicos em oposição direta = o próximo leitor escolhe **o que der na telha**.
-
-**Escopo executado (2026-07-17, autorizado pelo líder):** todos os 5 itens acima entraram no `combat-flavor.md` §2. Nada além disso foi tocado naquele doc.
-
 ---
 
 ## Termos canônicos novos (2026-07-17)

@@ -25,7 +25,7 @@ Mirar o lado errado em qualquer uma das duas primeiras faces faz a carta **dissi
 
 ## Por que é assim
 
-Este é o exemplo mais completo, no catálogo, do princípio "toda carta com duas faces roteia por filtro de lado, e dissipa no lado errado sem exceção e sem crash" — o comentário-fonte é explícito: "Duas faces, roteadas por `side_filter` (ambas dissipam-no-lado-errado, sem erro e sem exceção)". A forma AoE da face ofensiva não era a implementação original: o design (`_EFEITOS-ESCOLHIDOS.md`, AMB-04) registra que a versão anterior tratava o Poço como alvo único, "herdado do template genérico de carta especial", e a decisão do líder em 2026-07-15 (N-1 a N-4) generalizou para o grupo inteiro — mais fiel à física real (um poço gravitacional não escolhe 1 vítima).
+Este é o exemplo mais completo, no catálogo, do princípio "toda carta com duas faces roteia por filtro de lado, e dissipa no lado errado sem exceção e sem crash" — o comentário-fonte é explícito: "Duas faces, roteadas por `side_filter` (ambas dissipam-no-lado-errado, sem erro e sem exceção)". A forma AoE da face ofensiva vem de decisão do líder em 2026-07-15 (`_EFEITOS-ESCOLHIDOS.md`, AMB-04, N-1 a N-4) — mais fiel à física real (um poço gravitacional não escolhe 1 vítima).
 
 **Achado colateral que veio junto, e vale registrar porque não é exclusivo desta carta:** ao implementar o Newton, a auditoria descobriu que `resolve_use_card` somava o ataque do conjurador ao dano-base **mesmo quando o alvo era do próprio time** — um bug pré-existente que já quebrava silenciosamente os modos-benefício de outras cartas (Einstein, Faraday). A correção virou regra geral do motor ("fogo amigo desligado": nenhuma carta causa dano-base num alvo do próprio time), não um remendo local do Newton.
 

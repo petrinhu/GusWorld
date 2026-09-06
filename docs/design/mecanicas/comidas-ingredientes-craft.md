@@ -249,11 +249,9 @@ em §5.5.4, logo abaixo.
 
 ### 5.5.3 Fôlego do corpo × energia de ação (LACUNA FECHADA, 2026-08-25)
 
-A versão anterior deste documento registrava como lacuna aberta se "água com gás" mirava o
-**fôlego do corpo** (`core::player::WindedTimer`, `stamina.md`) ou a **energia de ação (AP)** de
-combate. O líder fechou isso nesta rodada, por ditado direto: água com gás restaura **fôlego do
-corpo**, não AP. A mesma leitura vale para a linha 5 (sanduíche de queijo sem queijo derretido),
-que soma fôlego a HP.
+Água com gás restaura **fôlego do corpo** (`core::player::WindedTimer`, `stamina.md`), não a
+**energia de ação (AP)** de combate — ditado direto do líder. A mesma leitura vale para a linha 5
+(sanduíche de queijo sem queijo derretido), que soma fôlego a HP.
 
 Os dois recursos seguem distintos, como já eram:
 

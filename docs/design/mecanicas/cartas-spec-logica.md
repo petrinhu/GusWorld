@@ -113,10 +113,9 @@ registrada em `cartas-hardware-pirataria-energia.md` §5 ("Mana e bateria são o
 também conta contra a vazão do turno do ator (`combat.md` §5, `chargeDrawMax = 2 +
 contagemPropriaDeTurnos`, relido como taxa máxima de saque, não como pool próprio; o gate de
 vazão passa a consultar o CCA efetivo da bateria em uso).
-⚠️ **Redação anterior apagada (L-24 do projeto):** a versão anterior descrevia bateria e mana do
-ator como dois medidores debitados em paralelo. Mana e carga de bateria são o mesmo recurso e só
-existe UM lugar de onde a carga sai. (`cartas-numeros` §1a, AMB-02 já resolvida: "recurso Y" =
-`ChargeCost`, não um multiplicador extra.) Regra de Híbridas (Faraday/Maxwell/Newton/von Neumann/John Dee,
+Mana e carga de bateria são o mesmo recurso e só existe UM lugar de onde a carga sai.
+(`cartas-numeros` §1a, AMB-02 já resolvida: "recurso Y" = `ChargeCost`, não um multiplicador
+extra.) Regra de Híbridas (Faraday/Maxwell/Newton/von Neumann/John Dee,
 `cartas-technomagik.md` §2.3): a face **passiva** nunca tem custo zero (decisão do líder,
 03/09/2026, `cartas-hardware-pirataria-energia.md` §5, "Passiva tem dois gastos: standby e
 disparo"); ela drena o gasto de standby, contínuo e menor, enquanto a carta fica equipada e ligada.

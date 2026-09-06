@@ -128,38 +128,22 @@ dos heróis. Essa quase-independência é a esperança do estudo inteiro: talvez
 encurtar a luta (mexer no TTK-out) sem tornar o Gus mais massacrável (sem mexer no
 TTK-in).
 
-**Correção de narrativa causal (2026-08-01, achado do orquestrador, descrito como
-verificado pelo team-lead e decidido pelo líder):** a versão anterior deste parágrafo
-atribuía a inflação de HP do trash a uma janela-alvo antiga, hoje revogada e sem lastro
-documental. Segundo a redação original, o `git log -S` em
-`combat.md` mostraria que a string "4-8" não existe em nenhum commit antes de
-2026-07-19, e a primeira aparição seria o PRÓPRIO commit que decide "3 a 5" (`ed411ec9`,
-§15.1), que chamaria "4-8" de "janela histórica" sem nenhum registro escrito anterior
-que a sustente. O que está de fato escrito em `combat.md` hoje (§17) é **"TTK alvo 3-5
-TURNOS"**, não rodadas. E "turno", no vocabulário do próprio documento, significa a vez
-de UM ator (a mesma seção de AP diz "AP pertence ao ator ativo no turno... cada membro
-da party tem seus 3 AP independentes quando age na fila", o que a redação original
-descrevia como batendo com o motor real de então, onde `begin_turn()` seria por ator,
-não por rodada). Prova adicional citada pela redação original: em outra seção (§18,
-ciclo de ambientes), haveria um override explícito ("'Turnos' do ciclo = rodadas
-completas de fila"), e só se escreve override quando o sentido padrão é outro. Ou seja:
-a inflação de HP de junho foi calibrada contra uma **unidade diferente** (turnos de
-ator, não rodadas), e a duração em RODADAS provavelmente nunca foi verificada até o
-MIRA-SIM medir 7, cravadas, em 2026-08-01. O alvo ATIVO deste estudo continua sendo
+`combat.md` §17 diz hoje **"TTK alvo 3-5 TURNOS"**, não rodadas. E "turno", no vocabulário
+do próprio documento, significa a vez de UM ator (a mesma seção de AP diz "AP pertence ao
+ator ativo no turno... cada membro da party tem seus 3 AP independentes quando age na
+fila"), com um override explícito em outra seção (§18, ciclo de ambientes: "'Turnos' do
+ciclo = rodadas completas de fila") — só se escreve override quando o sentido padrão é
+outro. A inflação de HP de junho provavelmente foi calibrada contra essa **unidade
+diferente** (turnos de ator, não rodadas), e a duração em RODADAS provavelmente nunca foi
+verificada até o MIRA-SIM medir 7, cravadas, em 2026-08-01. O alvo ATIVO deste estudo é
 **3 a 5 RODADAS** (§15.1, decisão do líder com o Gus em 2026-07-19; rodada definida sem
-ambiguidade em §4.1 como "uma volta completa da fila CTB"), e isso não muda. O que
-muda é a história de por que o HP está fora da janela: não é uma janela que apertou por
-cima de uma calibração antiga na MESMA unidade, é uma calibração antiga numa unidade
-diferente, talvez nunca verificada em rodadas. O estudo da mira mediu a consequência
-mensurável, em rodadas: 7 cravadas.
+ambiguidade em §4.1 como "uma volta completa da fila CTB"). O estudo da mira mediu a
+consequência mensurável, em rodadas: 7 cravadas.
 
-> ⚠️ **Não verificado contra código.** A busca por `git log -S` em commits antigos de
-> `combat.md` (`ed411ec9` e vizinhos) e a afirmação sobre `begin_turn()` no "motor real"
-> vêm da análise de projeto, não de uma busca executada neste repositório. Este
-> repositório nasce do zero (GODS_LAWS.md, L-01) e não tem o histórico de commits que a
-> redação original citava. A leitura textual do que `combat.md` diz HOJE sobre "TTK alvo
-> 3-5 TURNOS" e a conclusão sobre a unidade de medida continuam válidas como análise do
-> documento atual; revalidar `begin_turn()` contra código quando houver implementação.
+> ⚠️ **Não verificado contra código.** A leitura de `combat.md` sobre "turno" vs "rodada"
+> vem de análise textual do documento, não de busca executada neste repositório (que
+> nasce do zero, GODS_LAWS.md L-01, sem o histórico de commits de `combat.md` para
+> conferir). Revalidar `begin_turn()` contra código quando houver implementação.
 
 **Segunda decisão do líder daí derivada:** já que junho falava de "turnos de ator", e
 essa unidade mede naturalmente algo mais parecido com "quantos golpes derrubam um
