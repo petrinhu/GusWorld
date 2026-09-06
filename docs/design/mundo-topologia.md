@@ -42,6 +42,11 @@ Nota: os **Dutos** são "enxuta" de população mas já **densos de enredo** (mi
 
 **Princípio (decisão do criador):** 1 dungeon por área seria previsível (o jogador vira checklist). Então o número **varia por área conforme a ficção** (0 a 2), e o **padrão numérico fica escondido no TOTAL (13)**, nunca visível por área (respeita o elemento velado — o jogador não decodifica o padrão). "Dungeon" = espaço feito à mão (level design + puzzle/encontros); é o item CARO, por isso capado em ~13.
 
+**Nota de vocabulário (ordem do líder, 06/09/2026), verbatim: "algumas dungeons são cavernas, eu que misturo os termos. Dungeons são catacumbas, em algum momento foram construídas. Cavernas são espaços naturais."** As duas palavras vivem em eixos diferentes, que não se excluem:
+
+- **"Dungeon"**, no sentido técnico deste documento (parágrafo acima), é uma categoria de PRODUÇÃO: espaço feito à mão, level design + puzzle/encontros, item caro, capado em 13. Essa categoria não diz nada sobre a natureza ficcional do espaço.
+- **"Caverna" × "catacumba/construção"** é um eixo de FICÇÃO, dentro da categoria de produção acima: uma dungeon pode ser, na ficção, um espaço natural (caverna) ou um espaço já construído em algum momento (catacumba, ducto, ruína). As duas coisas coexistem sem conflito: uma dungeon É o espaço feito à mão pelo estúdio; dentro dela, a ficção pode descrever esse espaço como natural ou como construído.
+
 | Área | Dungeons | Ficção |
 |---|---|---|
 | Distritos Inferiores | 0 | rua/tutorial + NPCs (a dungeon da abertura fica nos Dutos) |
@@ -85,6 +90,15 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
 | Catedrais #2 | só batalhas |
 | Selve Profunda (final) | mista (clímax) |
 | Área faraday | puzzle puro (EM/Faraday) |
+
+**Classificação natural × construído (canon vigente, decisão do líder em 06/09/2026), verbatim: "final: caverna. selve: caverna. orla: começa dungeon e vira caverna em andares mais profundos. Outros: decidir se caverna/dungeon quando for discutir sobre cada um."**
+
+| Dungeon | Classificação |
+|---|---|
+| Selve Profunda (final, Kola-SG3-12262) | **Caverna** (espaço natural) |
+| Selve Sombria | **Caverna** (espaço natural) |
+| Orla Recursiva | **As duas, por profundidade.** Entra como espaço construído (concreto da cidade) e, conforme o jogador desce, transiciona para espaço natural (caverna): não é uma mistura uniforme, é uma progressão em uma direção só, de construído para natural, coerente com a própria Orla já ser descrita como "a dobradiça: onde o concreto encontra a flora fractal" (§7 abaixo). Qualquer leitura de "Orla é meio-a-meio o tempo todo" está errada; ela muda com o andar. |
+| Dutos — aparato (abertura) · Dutos — laboratório FIR · Setor Mirage — Festival · Periferia (residencial) — vielas · Ferrovelhos — reduto do Dante · Zona do Silêncio #1 · Zona do Silêncio #2 · Catedrais #1 · Catedrais #2 · Área faraday | **Sem classificação.** Cada uma se classifica quando for discutida individualmente; ausência de classificação aqui é decisão do líder, não lacuna a preencher por conta própria. |
 
 **Conceitos de dungeon (só conceito — tema + gimmick + forma; level design fino fica pra produção com a engine + `level-designer`; criador aprovou "só conceito" 2026-07-12):**
 
