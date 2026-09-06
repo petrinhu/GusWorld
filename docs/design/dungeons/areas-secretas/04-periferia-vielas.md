@@ -37,13 +37,15 @@ mais tenso do que qualquer outro varal do bairro, afordância honesta de que agu
 **Como se entra:** atravessar o varal como se fosse uma corda bamba (o jogo já ensinou, noutro
 lugar, que superfície que parece suportar suporta).
 
-**O que guarda:** categoria: vantage point. Chegar ao telhado revela o mapa da Praça do
-Compilador e do labirinto de vielas ao redor dela (recompensa de reorientação, revelação de mapa,
-não item). Conteúdo material: produção.
+**O que guarda:** categoria: vantage point (corrigido 05/09/2026, conserto de mecanismo). Do
+telhado, o alcance fixo do Scan dos Óculos Táticos passa a cobrir, de uma vez, várias bocas de
+viela que convergem na Praça do Compilador logo abaixo: nós que, andando pelo chão, só
+apareceriam um de cada vez, conforme o jogador passasse perto de cada beco. A recompensa é essa
+revelação simultânea no HUD (reorientação, não item). Conteúdo material: produção.
 
-**O que conta:** ao revelar o mapa, o jogador enxerga pela primeira vez que o "caos" das vielas
-tem uma lógica de bairro remendado: o próprio desenho do mapa conta a história de adaptação da
-Periferia sem texto.
+**O que conta:** ao ver vários nós da vizinhança acenderem de uma vez no HUD, o jogador enxerga
+pela primeira vez que o "caos" das vielas tem uma lógica de bairro remendado convergindo na
+praça: o padrão nasce de onde ele está parado, não de um sistema de mapa que o jogo não tem.
 
 ## Área secreta C: O sigilo na porta
 

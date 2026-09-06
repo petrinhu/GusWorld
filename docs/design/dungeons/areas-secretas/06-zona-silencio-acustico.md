@@ -35,7 +35,7 @@ principal.
 **Pista (corrigida 05/09/2026, revisão adversarial):** já na entrada do cômodo lateral, a Matriz
 Ortodôntica capta uma ressonância fraca vinda de algum ponto do ambiente, como um sinal de rádio
 distante, ainda indistinta ali, mas perceptível de longe, e mais forte a cada passo em direção à
-parede certa, até virar inconfundível bem junto dela — o mesmo sinal da Área A (rastreável a
+parede certa, até virar inconfundível bem junto dela: o mesmo sinal da Área A (rastreável a
 distância, crescente), só que aplicado a este cômodo.
 
 **Como se entra:** seguir a ressonância, que cresce de intensidade conforme o jogador se

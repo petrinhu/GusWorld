@@ -55,21 +55,25 @@ que "sobra".
 **O que conta:** mesmo a natureza mais matematicamente "perfeita" do jogo tem uma falha: reforça
 o tema de que padrão perfeito é ilusão, mesmo aqui.
 
-## Área secreta D: O que só o mapa revela
+## Área secreta D: O trecho que só se alcança dali
 
-**Pista (corrigida 05/09/2026, revisão adversarial):** de um ponto elevado da Orla, subir revela
-o mapa do trecho de labirinto já percorrido de uma vez só; o próprio desenho do mapa mostra um
-padrão reconhecível maior (o próprio fractal em escala visível), só perceptível depois de já ter
-andado boa parte do labirinto e revelado mapa suficiente dele.
+**Pista (corrigida 05/09/2026, conserto de mecanismo):** de um ponto elevado da Orla, o alcance
+fixo do Scan dos Óculos Táticos passa a cobrir um trecho do labirinto que o jogador ainda NÃO
+andou, separado dali por um braço fractal que exigiria um desvio longo a pé. Os nós que
+aparecem de repente no HUD desenham, em miniatura, o mesmo padrão de ramificação já visto no
+trecho percorrido até ali: a Orla se repetindo em escala maior, à frente e não atrás.
 
-**Como se entra:** beat clássico de labirinto: subir, revelar o mapa, reconhecer o padrão nele,
-voltar por uma rota antes ignorada porque só fazia sentido depois de ver o mapa cheio.
+**Como se entra:** subir ao ponto elevado, reconhecer no HUD o padrão de ramificação repetido no
+trecho recém-revelado, e usar esse reconhecimento pra prever o caminho antes de andá-lo,
+coerente com o verbo da dungeon (ler a regra recursiva antes de se perder nela).
 
 **O que guarda:** categoria: a maior recompensa das 5 (fecha o conjunto), crafting raro/lore
 denso. Conteúdo exato: produção.
 
-**O que conta:** o jogador finalmente "vê o fractal" como um todo, no mapa; o próprio ato de
-revelar o mapa inteiro é o clímax de aprendizagem da dungeon, reforçado pela recompensa maior.
+**O que conta:** o jogador não vê só "o que já andou": usa o padrão que já aprendeu pra
+reconhecer, à distância, uma parte do labirinto que ainda não pisou. O clímax de aprendizagem da
+dungeon deixa de ser nostalgia (ver de novo o que já foi visto) e vira previsão (usar o
+aprendido pra navegar o que falta), fechando o arco com a recompensa maior.
 
 ## Área secreta E: O redemoinho do Lentíssimo
 
@@ -78,8 +82,9 @@ destroços girando em vez de sendo levados adiante, algo está preso ali, contra
 do rio.
 
 **Como se entra (corrigida 05/09/2026, revisão adversarial):** entrar no redemoinho e andar
-contra a corrente fraca até o centro dele (o leito ali é raso o bastante para atravessar a pé; a
-corrente resiste, mas não impede).
+contra a corrente fraca até o centro dele (o leito ali é raso o bastante para atravessar a pé;
+sente-se a correnteza contra as pernas, mas é só textura de ambientação: o jogo não tem
+mecânica de terreno que retarde o passo, e o avanço é normal).
 
 **O que guarda:** categoria: item preso na correnteza (lore ou material). Conteúdo exato:
 produção.
