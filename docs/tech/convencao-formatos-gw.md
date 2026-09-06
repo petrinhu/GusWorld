@@ -58,9 +58,9 @@ O líder fechou a lista. **Um tipo por elemento de jogo**, e não um tipo genér
 
 **A lista veio do canon, não de invenção:** a **L-04** nomeia *"carta, item, inimigo, efeito de status, diálogo, missão"*, e a **L-18** acrescenta que *"'item' inclui o catálogo de conteúdo"*. O corte da **L-29** que ainda elimina um candidato é o **C-12**: **afinidade romântica de companion** (medidor de afeto e simulador de namoro) continua fora. Afinidade de NPC como estado de reação social é outra coisa, e está dentro (L-29, alcance corrigido em 25/08/2026); ela não é catálogo, é resultado de diálogo, e não abre tipo próprio aqui.
 
-**Conquista deixou de ser candidato eliminado por corte** (correção 25/08/2026): a citação antiga — "fora pelo `C-08`" — caiu junto com a revogação desse corte na mesma data (`GODS_LAWS.md` L-29). O jogo **tem** conquistas, e a definição de cada uma vira o tipo `.gw.achv` (ver a tabela acima e a seção dedicada abaixo). O que ficou de fora foi só a integração com a Steam, por colisão de licença (SDK Steamworks e AGPL), e isso não é assunto de formato.
+O jogo **tem** conquistas, e a definição de cada uma vira o tipo `.gw.achv` (ver a tabela acima e a seção dedicada abaixo). O que ficou de fora foi só a integração com a Steam, por colisão de licença (SDK Steamworks e AGPL), e isso não é assunto de formato.
 
-**Receita deixou de ser candidato eliminado por corte** (correção 25/08/2026): a razão original — "fora pelo C-03 e pelo C-13" — caiu junto com a revogação desses dois cortes na mesma data (`GODS_LAWS.md` L-29). Isso não abre um décimo-terceiro tipo: **receita não vira tipo próprio porque o dado de criação passou a morar dentro do próprio `.gw.table`**, no ramo de criação (ver abaixo), não porque esteja cortada.
+Receita não abre um décimo-terceiro tipo: **receita não vira tipo próprio porque o dado de criação passou a morar dentro do próprio `.gw.table`**, no ramo de criação (ver abaixo).
 
 **Fora desta lista de propósito:** save e configuração. Não são catálogo de conteúdo — são **estado do jogador**, e a **L-25** já os põe no envelope binário selado. Misturá-los aqui confundiria fonte de compilação com estado de tempo de execução.
 
@@ -68,7 +68,7 @@ O líder fechou a lista. **Um tipo por elemento de jogo**, e não um tipo genér
 
 `.gw.bag` e `.gw.box` **guardam**; `.gw.table` **transforma**. São tipos separados porque mudam por razões diferentes: bolsa cresce com melhoria de equipamento, mesa muda quando a regra de transformação muda. **Essa distinção sobrevive intacta à revisão abaixo:** ela não é sobre o que a mesa faz por dentro, é sobre guardar contra agir — e continuar guardando não virou agir. `.gw.bag` e `.gw.box` não ganharam poder de transformar nada; só `.gw.table` transforma, como sempre.
 
-⚠️ **A cerca da mesa, revista em 25/08/2026 (revogação de `C-03` e `C-13`, `GODS_LAWS.md` L-29):** a cerca antiga dizia que a mesa **só transforma o que já existe** e que **nada nasce nela**. Isso deixou de ser verdade: o líder revogou os dois cortes que sustentavam a frase, e **a mesa vira a bancada**. `.gw.table` passa a cobrir **duas** operações, não uma:
+⚠️ **A cerca da mesa:** `.gw.table` cobre **duas** operações, não uma:
 
 - **Reparo** (o que a cerca antiga descrevia por inteiro): recarrega, repara, troca bateria, limpa vírus. O item entra e sai o MESMO item, com outro estado.
 - **Criação:** craft de cópia pirata de carta — comum, ESPECIAL ou SUPER (`cartas-hardware-pirataria-energia.md` §15). Aqui o item que sai é **novo**, e é **sempre inferior** ao original: qualidade pior, efeito trocado, ou só o nome sem função nenhuma. A original de ESPECIAL/SUPER **nunca** nasce numa bancada, continua só por progresso narrativo.

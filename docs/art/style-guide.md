@@ -171,28 +171,24 @@ A linguagem de cor/forma/movimento por família é **agnóstica de dimensão** e
 ## 12. Anti-objetivos (o que GusWorld NÃO é)
 
 - **Não é PBR.** Zero metallic/roughness workflow. Quem propor texture realista é redirecionado. Vigente.
-- **Não é cel-shaded anime 3D.** **Vigente:** paleta restrita, não anime AAA — não Genshin, não BoTW. A formulação antiga do princípio falava em silhueta low-poly e foi **apagada sob a L-24**, por ser 3D.
-- **SUPERADO — "Não é pixel art".** O princípio original tratava a leitura como pixel-art-like sobre geometria 3D real. Isso está **contradito pelo pivô de arte**: o jogo AGORA É pixel-art de verdade (via PixelLab), não mais 3D com leitura pixel-art-like.
+- **Não é cel-shaded anime 3D.** **Vigente:** paleta restrita, não anime AAA — não Genshin, não BoTW.
 - **Não é fotorrealista cyberpunk.** A cidade é estilizada gótica neon, não Cyberpunk 2077. Vigente.
 - **É chibi-SD canônico, NÃO realista, com tom analítico/gótico, não fofo/kawaii.** O princípio de proporção/tom é vigente; a formulação exata em pixel-grid é pendência de spec 2D (ver §3.2).
 - **Não é gore.** Sangue, vísceras, dismemberment proibidos. Inimigos derrotados "compilam erro" + dissolvem em partículas. Vigente.
 - **Não é zona-híbrida-genérica.** Cidade e Selve nunca se misturam visualmente até o ato 3 deliberado. Vigente.
 - **PENDÊNCIA — "Não é HD-2D (Octopath)".** A razão original ("decisão consciente: 3D real estilizado, não sprites 2D em ambiente 3D") não existe mais — o jogo agora usa sprites 2D. Se HD-2D (sprites 2D + ambiente 3D) volta a ser cogitado como abordagem de câmera/renderização, é decisão pendente do líder; não assumida aqui.
-- **Não é open-world.** Áreas curadas, navegação limitada por região. Vigente (a formulação "câmera orbital" era 3D-específica).
+- **Não é open-world.** Áreas curadas, navegação limitada por região. Vigente.
 - **Não é marketing visualmente diferente do jogo.** Key art final renderiza no engine + retoque mínimo. Sem bait. Vigente.
 
 ## 13. Don'ts visuais (checklist de rejeição em review)
 
 - Asset com 4+ cores fora da paleta declarada → reprovado. Vigente.
 - Char com silhueta indistinguível em preto → reprovado. Vigente.
-- Material com `metallic > 0` fora das exceções listadas → **regra apagada sob a L-24** (conceito 3D; PixelLab não trabalha com PBR).
-- Normal map fora das exceções listadas → **regra apagada sob a L-24** (idem).
 - Char SEM proporção SD 1:1:1 (exceto NPCs adultos em 1:1:1.2) → **pendência de spec 2D** (ver §3.2).
 - Char com cabeça redonda inflada + bracinhos curtos gordos (chibi tradicional) → reprovado. SD ectomorfo é a regra. Vigente (semiótica de forma, agnóstica).
 - Texture com lighting baked (sombra desenhada) → reprovado. Vigente. **Decisão do líder, 01/09/2026: a proibição se mantém.** Sombra e luz sobre os sprites vêm do motor, em tempo de execução, nunca do desenho. Essa capacidade ainda não existe no GlintFx — pedida pelo bus em 01/09/2026 (`inbox/glintfx/20260901-1650-gusworld-sombra-de-sprite.md`, repositório `petrinhu/gusworld_ia_autocomm`); enquanto ela não existir, o trabalho de arte que depende de sombra espera.
 - Mistura cidade+Selve fora do ato 3 → reprovado. Vigente.
 - Outline em todos os assets (deve ser só chars + props hero) → **pendência**: o princípio ("outline seletivo, não universal") é agnóstico, mas se o PixelLab já aplica outline por padrão em todo asset, a regra pode precisar de reformulação técnica — pendente.
-- Polycount acima do budget sem aprovação explícita → **regra apagada sob a L-24** (substituída por orçamento de sprite/frame, pendência de spec 2D, ver §8).
 - VFX usando família errada (ex: rúnico cyan dentro da Selve sem motivo) → reprovado. Vigente.
 - Gus com cabelo em qualquer hex ≠ `#FF6B1A` → reprovado. Vigente.
 - Gus com Tavus-Drive em pulso direito → reprovado (canônico: pulso ESQUERDO). Vigente.
