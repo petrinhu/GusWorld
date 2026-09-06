@@ -49,7 +49,7 @@ Item raro: chocolate 80% cacau em formato de cogumelo, embrulhado em papel alum�
 | Hardcore | 0% |
 
 - **Hardcore fica em 0%**, preservando a exclusividade do kernel-panic puzzle como única segunda chance daquele modo (`docs/design/mecanicas/modos-morte.md` §2.3a: "a chance é ÚNICA por run").
-- **✅ REESCRITO em 05/09/2026 (`D33` do `TODO.md`):** a descrição do item e a dica de Diário acima já refletem a composição de chocolate e papel alumínio, a fonte de drop por inimigo-mestre sem respawn e a taxa por dificuldade. Ainda em aberto, fora de escopo desta reescrita de prosa: o nome do inimigo-mestre do bioma misto (linha "Fonte do drop" acima) e o design do craft que usa o papel alumínio como insumo.
+- **Em aberto:** o design do craft que usa o papel alumínio como insumo.
 
 ---
 
@@ -130,7 +130,7 @@ Achievement banner aparece com fundo de quadrados neon piscando.
 
 **Canon mecânico, decidido pelo líder em 30/08/2026 (`G12` do `TODO.md`, Eixo 5 de `docs/_secret/proposta-balanceamento-easter-eggs.md`):**
 
-- **O valor único "100" acima é revogado** (L-24) e substituído por um limiar escalado por dificuldade:
+- **Limiar de mortes na mesma cena, escalado por dificuldade:**
 
 | Dificuldade | Limiar de mortes na mesma cena |
 |---|---|
@@ -140,7 +140,6 @@ Achievement banner aparece com fundo de quadrados neon piscando.
 | Hardcore | 144 |
 
 - Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilibrar.
-- **✅ REESCRITO em 05/09/2026:** o título e a dica acima já refletem o limiar escalado por dificuldade, tal qual `D33` fez para o Eixo 1.
 
 ---
 

@@ -10,7 +10,7 @@
 
 ## Função narrativa
 
-- **Antagonista principal canônico.** Substitui completamente Iolanda da versão anterior dos docs.
+- **Antagonista principal canônico.**
 - **Vilão puro, sem redenção.** Confirmado Pillar 4: não há cena de "Sterling teve infância difícil" justificando. Não há momento de hesitação ética. Sterling escolheu predação por convicção.
 - **Espelho filosófico do Gus.** Ambos são lógicos prodigiosos. Diferem em um único eixo: serve à vida (Gus) ou serve a si mesmo consumindo vida (Sterling).
 - **Único adulto em foco no jogo.** Todos os outros protagonistas e antagonistas são peers 11-14. Sterling é o adulto. A diferença etária é parte da ameaça: ele tem décadas de vantagem técnica e ideológica.

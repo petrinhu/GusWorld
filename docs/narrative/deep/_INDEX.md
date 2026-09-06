@@ -30,7 +30,7 @@ Camada **complementar e não-substitutiva**. Cada doc deep:
 
 ## Estrutura da pasta
 
-> Árvore regravada 2026-07-08 (AUD-LORE) a partir do `find docs/narrative/deep/` real. Nomes de arquivo abaixo são os do disco, não os planejados na versão anterior deste índice.
+> Nomes de arquivo abaixo são os do disco (`find docs/narrative/deep/` real), não um planejamento.
 
 ```
 docs/narrative/deep/
