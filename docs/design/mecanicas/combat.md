@@ -145,7 +145,7 @@ Como o instante corrente só anda para a frente, empurrar um ator não pode faz�
 
 ## 4.1 Comando da party sobre o relógio (escolher entre os prontos + segurar)
 
-**Status:** canonizado pelo `ADR-017` (16/07/2026, decisão do líder), reconciliado com este canon em 25/08/2026 (parecer do CTO, decisão do líder). Substitui o modelo 1B (§3, nota superada), que organizava o turno em blocos de comando livre por lado sobre uma fila CTB por SPD. Não existe mais "bloco da party" nem "bloco de inimigos" tomando a rodada inteira: cada ator, de qualquer lado, fica pronto no seu próprio instante (§4), e os dois lados se intercalam de verdade no relógio.
+**Status:** canonizado pelo `ADR-017` (16/07/2026, decisão do líder), reconciliado com este canon em 25/08/2026 (parecer do CTO, decisão do líder). O modelo 1B organizava o turno em blocos de comando livre por lado sobre uma fila CTB por SPD; não existe mais "bloco da party" nem "bloco de inimigos" tomando a rodada inteira: cada ator, de qualquer lado, fica pronto no seu próprio instante (§4), e os dois lados se intercalam de verdade no relógio.
 
 ### Conceito
 
@@ -173,7 +173,7 @@ O SPD não decide mais "qual lado abre a rodada": não existe mais rodada nem la
 | **SetupPhase (§3)** | Inicializa o relógio (instante corrente = 0, `next_action_at` inicial de cada ator); não calcula mais "qual lado abre". |
 | **Cast-time / cartas lentas (CARTAS-CAST-TIME, INBOX)** | Preservado como resolução agendada no mesmo relógio (§4), não mais como "posição à frente na fila". |
 | **Haste / Slow (§9/§18)** | Preservados: mexem na velocidade efetiva, o que muda o resultado da fórmula de reset (§4). |
-| **Ambientes que mexem SPD (§18)** | O efeito de SPD sobre o relógio (reset mais cedo) substitui o efeito antigo sobre "posição na fila/rodada". Os efeitos específicos do §18 que ainda citam "posição-de-fila" ficam fora do escopo desta reconciliação (relatório do agente que fez esta edição, item 6). |
+| **Ambientes que mexem SPD (§18)** | O efeito de SPD sobre o relógio (reset mais cedo) substitui o efeito antigo sobre "posição na fila/rodada"; nenhum efeito do §18 cita mais "posição-de-fila" (medido por busca no arquivo em 06/09/2026, zero ocorrências). |
 | **ITEM-SPD-INICIATIVA (INBOX)** | O item aumenta SPD; no relógio isso significa resets mais rápidos, não mais "abrir a rodada". Precisa de re-derivação; fora do escopo desta reconciliação. |
 | **Análise Preditiva / fragilidade do Gus (§2.1)** | Intacta. |
 | **Fórmula de dano (§11)** | NÃO muda. O relógio decide seleção de ator, não resolução de ação. |
