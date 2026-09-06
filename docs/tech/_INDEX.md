@@ -14,6 +14,14 @@ o código do GusWorld nasce do zero, sempre assentado sobre o GlintFx (LEI ZERO,
   chave, locale como dimensão aberta, cadeia de fallback, placeholder/plural/gênero (subconjunto de
   ICU MessageFormat, decidido pelo líder em 01/09/2026), termo de lore sem tradução honesta,
   orçamento de expansão. `B9` e `D19` dependem dele.
+- `spec-gw-text.md` — especificação do formato-fonte `.gw.text` (item `B9`, metade 1 de 2): gramática
+  do grafo de diálogo ramificado, derivada dos quatro arquivos reais de `resources/dialogues/` e do
+  piloto da Cena 15; nomeia o que o exemplo não cobre (leitura condicional de flag, gatilho
+  estruturado) em vez de inventar, e devolve quatro pendências de produto ao líder.
+- `spec-catalogo-dialogo-binario.md` — especificação do payload compilado de diálogo (item `B9`,
+  metade 2 de 2): a fronteira jurídica que separa a estrutura do grafo (`E8a`, embutida no
+  executável, AGPL) da prosa por locale (`E8b`, pacote binário selado, direitos reservados); não
+  redesenha o envelope comum `E1`, ainda pendente.
 - `ai-assets-provenance.md` — proveniência e cadeia de titularidade dos assets gerados por IA;
   resgatado do `gusworld_legacy` em 25/08/2026, com correção de regime (o texto fala em CC-BY-SA,
   o regime vigente é todos-os-direitos-reservados por L-08; o motivo de fundo — titularidade do

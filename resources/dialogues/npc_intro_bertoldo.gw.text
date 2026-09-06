@@ -59,9 +59,9 @@ on_enter: npc_intro.met=true
 @node n1_hook
 speaker: bertoldo
 text: DIALOGUE_NPC_INTRO_N1_HOOK
-- [DIALOGUE_NPC_INTRO_CHOICE_CURIOSO] -> n2a_curioso flag:npc_intro.choice_curioso=true
-- [DIALOGUE_NPC_INTRO_CHOICE_PRAGMATICO] -> n2b_pragmatico flag:npc_intro.choice_pragmatico=true
-- [DIALOGUE_NPC_INTRO_CHOICE_SECO] -> n2c_seco flag:npc_intro.choice_seco=true
+- [DIALOGUE_NPC_INTRO_N1_HOOK_CHOICE_CURIOSO] -> n2a_curioso flag:npc_intro.choice_curioso=true
+- [DIALOGUE_NPC_INTRO_N1_HOOK_CHOICE_PRAGMATICO] -> n2b_pragmatico flag:npc_intro.choice_pragmatico=true
+- [DIALOGUE_NPC_INTRO_N1_HOOK_CHOICE_SECO] -> n2c_seco flag:npc_intro.choice_seco=true
 
 @node n2a_curioso
 speaker: bertoldo

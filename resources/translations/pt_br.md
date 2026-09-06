@@ -547,13 +547,13 @@ Cedo pra rua, moço. Essa cidade... nunca soube dormir direito.
 ## DIALOGUE_NPC_INTRO_N1_HOOK
 Aquilo ali, ninguém mais para pra olhar. Você parou. Isso já diz alguma coisa sobre você.
 
-## DIALOGUE_NPC_INTRO_CHOICE_CURIOSO
+## DIALOGUE_NPC_INTRO_N1_HOOK_CHOICE_CURIOSO
 O desenho ali não fecha. Tem um padrão, eu sei que tem.
 
-## DIALOGUE_NPC_INTRO_CHOICE_PRAGMATICO
+## DIALOGUE_NPC_INTRO_N1_HOOK_CHOICE_PRAGMATICO
 É perigoso? Por onde eu sigo?
 
-## DIALOGUE_NPC_INTRO_CHOICE_SECO
+## DIALOGUE_NPC_INTRO_N1_HOOK_CHOICE_SECO
 (Só aceno e sigo andando.)
 
 ## DIALOGUE_NPC_INTRO_N2A_CURIOSO

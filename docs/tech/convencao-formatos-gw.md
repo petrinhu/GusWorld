@@ -19,7 +19,7 @@ Todo arquivo de formato **próprio do GusWorld** usa a extensão composta `.gw.<
 
 | Extensão | Quem desenhou o conteúdo | Observação |
 |---|---|---|
-| `.gw.text` | **nós** | fonte de diálogo e texto; formato próprio de verdade, especificação em `B9` |
+| `.gw.text` | **nós** | fonte de diálogo e texto; formato próprio de verdade, especificação em `docs/tech/spec-gw-text.md` (item `B9`) |
 | `.gw.map` | **o GlintFx** | ver abaixo |
 
 ## O caso do mapa, decidido em 24/08/2026
