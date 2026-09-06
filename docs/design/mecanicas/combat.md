@@ -1281,7 +1281,7 @@ O contraste `-O0` (pulou) vs `-O2` (encarou e otimizou) é o feedback diegético
 Este doc (`combat.md`) define o que acontece DENTRO da batalha; o de encontros define QUANDO uma batalha genérica nasce no overworld. Resumo do contrato, detalhes lá:
 
 - **Rampa com graça:** 8 tiles de graça a chance zero após qualquer desfecho de batalha (inclusive auto-kill do Ouro, §19.2), entrada em área e load; depois a chance por tile cruzado cresce linear de 1% (tile 9) a 8% (tile 42, rampa de 34 tiles) e trava no platô de 8% (nunca há encontro forçado). Forma inteira exata de base 6600 para implementação e testes.
-- **Multiplicadores:** `multDificuldade` (slot reservado, tabela de dado do `ENCONTRO-FREQ-DIFICULDADE`, Médio = 1,0) × `multFaraday` (0,5× com a carta Gaiola de Faraday ativa; reduz, não suprime; PEM segue afetando só o autosave).
+- **Multiplicadores:** `multDificuldade` (slot reservado, tabela de dado do `ENCONTRO-FREQ-DIFICULDADE`, Médio = 1,0) × `multFaraday` (0,5× com a carta Gaiola de Faraday ativa; reduz, não suprime; PEM segue afetando o save da dungeon, manual e automático, `save-por-local.md` §1.2, nunca a taxa de encontro).
 - **Composição:** 1 inimigo por encontro nesta onda (`group_size` existe no schema como dado para calibração futura; o motor de combate já aceita 1 a 4, §2).
 - **Área é dado:** `EncounterProfile` por `AreaDescriptor` (ADR-020); cidade é 100% segura por ausência de perfil; o sistema estreia jogável na 1ª dungeon.
 - **Costura com o combate:** o spawn-path `EnemyTemplate → CombatActor` do director é o primeiro call site de produção do `difficulty_multiplier_for` (`DIFICULDADE-TABELA-DADO`), e o desfecho do encontro segue o eixo de domínio da §19 (auto-kill / auto-resolve / encarar).

@@ -91,7 +91,7 @@ Mini-boss opcional na fronteira-Selve. Olho gigante voador, vermelho. Drop: **To
 
 **EE-9: "Pegue Todos os Bytes"**
 
-Conquista oculta destrava quando Gus tem 100 entradas completas no Bestiário do Diário:
+Conquista oculta destrava quando o contador cumulativo de eventos de estágio de documentação do Bestiário (não 100 entradas completas; ver `docs/design/mecanicas/conquistas.md` §2.9) atinge 100:
 > **"Coletor de Bytes: Você documentou 100 inimigos. Os Anciões da Pilha Sobrecarregada te reverenciam."**
 
 Som curto de captura: *"plink-plink-plink-clic."*
@@ -133,7 +133,7 @@ Achievement banner aparece com fundo de quadrados neon piscando.
 | Hardcore | 144 |
 
 - Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilibrar.
-- **✅ REESCRITO em 05/09/2026:** o título e a dica acima já não citam o valor único "100", tal qual `D33` fez para o Eixo 1.
+- **✅ REESCRITO em 05/09/2026:** o título e a dica acima já refletem o limiar escalado por dificuldade, tal qual `D33` fez para o Eixo 1.
 
 ---
 

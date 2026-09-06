@@ -18,11 +18,13 @@ Há DOIS contadores de "conhecer o inimigo" que NÃO se confundem:
 | Eixo | Contador | O que faz | Vive em |
 |---|---|---|---|
 | **A. Variância de combate** | `CombatActor.KnowledgeKills` | decai ±30%→±5% (combat.md §11) | engine POCO + SaveSystem |
-| **B. Bestiary do Diário** | progresso de páginas (1-4) | preenche entry narrativa + Knowledge categorial | diary/entries-fichas-bestiary.md |
+| **B. Bestiary do Diário** | progresso por 5 estágios de documentação | preenche entry narrativa + Knowledge categorial | diary/entries-fichas-bestiary.md §5 |
 
 Eixo A é **mecânico** (controle de dano). Eixo B é **narrativo** (compreensão + ending-gate, knowledge-gates.md).
-Os triggers de página do bestiary (4/4/1 kills) JÁ são canônicos em entries-fichas-bestiary.md §5 e knowledge-gates.md §3;
-esta spec NÃO os toca. O que falta e é definido aqui = a curva do Eixo A + o Scan passivo + a ponte entre os dois.
+O modelo de progressão do bestiary (5 estágios de documentação por espécie, evento de domínio por estágio, decisão do
+líder de 30/08/2026, que substitui o modelo antigo de páginas por abate citado nas seções seguintes deste documento)
+é canônico em entries-fichas-bestiary.md §5; esta spec NÃO o toca. O que falta e é definido aqui = a curva do Eixo A
++ o Scan passivo + a ponte entre os dois.
 
 ## 2. N-aparições por tier (Eixo A — proposta para ratificação)
 
@@ -72,7 +74,13 @@ O jogo "não responde a esforço repetitivo" (knowledge-gates.md §8). Progress�
 
 `varianceFactor = max(0.05, 0.30 × e^(-kills × 0.10))`. "% incerteza" = ±varianceFactor sobre o dano.
 
-| kills | varianceFactor | % incerteza | Estado do Diário (bestiary) | Scan passivo (Trash)? |
+⚠️ **A coluna "Estado do Diário" abaixo é ilustrativa e usa o modelo de páginas anterior a 30/08/2026.** O
+modelo canônico hoje é o de 5 estágios de documentação (entries-fichas-bestiary.md §5), que não é indexado
+diretamente por contagem de kills (estágio 3 pede "~3-6 combates adicionais", estágios 4 e 5 pedem um evento,
+não uma contagem). Recalibrar esta coluna para o modelo novo não é óbvio e não está decidido em lugar nenhum
+do corpus; a coluna de `varianceFactor`/`% incerteza` (Eixo A) não muda e continua valendo como está.
+
+| kills | varianceFactor | % incerteza | Estado do Diário (modelo antigo, ilustrativo) | Scan passivo (Trash)? |
 |---|---|---|---|---|
 | 0 | 0.300 | ±30.0% | Stub (1ª aparição: silhueta, HP visto, 1 ataque) | não |
 | 1 | 0.271 | ±27.1% | Stub | não |
@@ -96,8 +104,11 @@ alinhada à curva §5, e confirma o tom (Pillar 4).
 
 - **Trigger de abertura:** stub aparece **após o 1º combate** com o tipo (não após Scan), conforme
   entries-fichas-bestiary.md §5.1. Scan isolado revela HP+fraqueza no HUD, mas não cria a entry narrativa.
-- **Páginas por tier (DA-3 canon 2026-06-03):** Trash 1-2 / Elite 2-3 / Mini-boss 3 / Boss 4. Escala com
-  importância; econômico de conteúdo. Casa com pillars.md §Knowledge: "max 1 pág comum / 4 pág mestre".
+- **Estágios de documentação (DA-3, canon 2026-06-03, SUPERADO em 30/08/2026):** o modelo de páginas por tier
+  desta linha foi substituído pelo modelo de 5 estágios, igual para toda espécie (exceção: as 2 entradas-glitch
+  travam no estágio 2), canonizado em entries-fichas-bestiary.md §5. Se a profundidade de documentação ainda varia
+  por tier (Trash/Elite/Mini-boss/Boss) sob o modelo novo não está resolvido em lugar nenhum do corpus; fica para
+  o líder.
 - **Tom (DA-4 canon 2026-06-03):** híbrido. Stats técnicos (HP/fraqueza/counter) SEMPRE; lore/origem só na
   última página em voz analítica de Gus (prodígio 11 anos). Serve Knowledge categorial sem virar lore-dump.
 - **Conteúdo por página (tom Pillar 4, prodígio 11 anos):** stub = observação crua, hipótese ("hipótese:
@@ -151,5 +162,5 @@ ambos tipo Cinético / fraqueza Elétrica (Cauã é o DPS natural).
 |---|---|---|
 | DA-1 | Threshold Scan passivo por tier | **Trash 8 / Elite 6 / Mini-boss 3** — ±13.5% Trash quando ativa; padrão lido mas incerteza residual |
 | DA-2 | Scan sem derrota conta como kill? | **Não conta (0)** — kill = ciclo completo em combate; KnowledgeKills permanece int |
-| DA-3 | Páginas do Diário por tier | **Trash 1-2 / Elite 2-3 / Mini-boss 3 / Boss 4** — escala com importância, econômico de conteúdo |
+| DA-3 | Páginas do Diário por tier | **SUPERADO em 30/08/2026** pelo modelo de 5 estágios de documentação, igual para toda espécie (entries-fichas-bestiary.md §5); aplicação por tier sob o modelo novo não resolvida, ver §6 |
 | DA-4 | Tom do Diário | **Híbrido** — stats técnicos sempre; lore/origem só na última página, voz analítica de Gus (Pillar 4) |

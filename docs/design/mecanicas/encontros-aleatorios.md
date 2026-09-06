@@ -2,7 +2,7 @@
 
 **Status:** Canônico. As 4 decisões estruturais foram tomadas pelo criador supremo em 2026-08-12 via AskUserQuestion (modelo da taxa; estreia; interação com Faraday; composição do encontro). Materializa o item `ENCONTRO-ALEATORIO-SISTEMA` (decisão de CONSTRUIR de 2026-08-03) e destrava o item filho `ENCONTRO-FREQ-DIFICULDADE`. Arquitetura técnica da onda desenhada pelo CTO: módulo `domain/encounter/` POCO, `EncounterProfile` como DADO por área, `EncounterDirector` com contador de graça e rolagem por tile cruzado, tabela de multiplicador por dificuldade no molde de `enemy_difficulty_constants.hpp`, e o spawn-path `EnemyTemplate → CombatActor` (a lacuna de wiring já registrada em `DIFICULDADE-TABELA-DADO` nasce fechada aqui).
 
-**Cross-ref:** `combat.md` (§2 parâmetros macro, §17 stats de referência, §19 eixo de domínio auto-kill/auto-resolve, §20 cross-ref de origem do combate), `docs/tech/adr/ADR-020` (lei do átomo: lugar novo é DADO, nunca método par-a-par), item `INIMIGO-SOME-POS-FUGA-DERROTA` (encontro fixo × genérico), memória `project_save_dungeon_pem_faraday` (PEM × autosave).
+**Cross-ref:** `combat.md` (§2 parâmetros macro, §17 stats de referência, §19 eixo de domínio auto-kill/auto-resolve, §20 cross-ref de origem do combate), `docs/tech/adr/ADR-020` (lei do átomo: lugar novo é DADO, nunca método par-a-par), item `INIMIGO-SOME-POS-FUGA-DERROTA` (encontro fixo × genérico), memória `project_save_dungeon_pem_faraday` (PEM × save manual e automático).
 
 **Convenção de escrita:** pt-br. Termos de game-dev no original (tile, spawn, clamp, pity). Sem em-dash; usa ponto, vírgula, parênteses, dois-pontos.
 
@@ -123,7 +123,7 @@ Quando a carta **Gaiola de Faraday** está ativa numa dungeon:
 
 **Decisão definitiva:** a opção de supressão total (0×, dungeon silenciosa enquanto a carta está ativa) foi apresentada e o líder escolheu a redução de 0,5×. Consequência de design registrada: a Faraday é MITIGAÇÃO tática contínua, não imunidade; a dungeon nunca fica 100% silenciosa por causa de uma carta só, o risco residual mantém a tensão de exploração viva, e o custo de manter a carta ativa (bateria, slot) segue tendo contrapartida honesta em vez de virar botão de desligar o sistema.
 
-**Ortogonalidade com o PEM:** PEM descoberto continua afetando SOMENTE o autosave (memória `project_save_dungeon_pem_faraday`); não toca a taxa de encontro. São dois sistemas separados que a mesma carta atravessa por caminhos distintos.
+**Ortogonalidade com o PEM:** o PEM continua afetando o save da dungeon, manual e automático (`docs/design/mecanicas/save-por-local.md` §1.2/§2.1; memória `project_save_dungeon_pem_faraday`); não toca a taxa de encontro. São dois sistemas separados que a mesma carta atravessa por caminhos distintos.
 
 ### 4.3 Ordem e teto
 
@@ -183,7 +183,7 @@ O teto de 8% (em vez de crescer até forçar encontro) é deliberado: explorar c
 | **Eixo de domínio (`combat.md` §19)** | O director só decide QUE há encontro e QUAL inimigo. O desfecho segue o eixo: selo Ouro resolve como auto-kill silencioso (conforme o toggle de 3 estados §19.5), Bronze/Prata monta arena com [Resolver sem encarar] disponível, sem selo encara. Auto-kill conta como desfecho e reseta a graça (§3). |
 | **`INIMIGO-SOME-POS-FUGA-DERROTA`** | Encontro aleatório é GENÉRICO por definição: não existe entidade persistente no overworld para "sumir". A regra de sumiço vale para encontros fixos; aqui o reset de graça pós-fuga cumpre o papel de respiro. |
 | **Fuga (`combat.md` §14)** | Fugir reseta a graça (desfecho de batalha): o jogador que foge ganha os 8 tiles para escapar de verdade. O custo da fuga continua sendo o do próprio combate (sem loot, sem Knowledge). |
-| **PEM / autosave** | Ortogonal (§4.2): PEM afeta autosave, nunca a taxa de encontro. |
+| **PEM / save** | Ortogonal (§4.2): PEM afeta o save da dungeon, manual e automático (`save-por-local.md` §1.2), nunca a taxa de encontro. |
 | **`DIFICULDADE-TABELA-DADO`** | O spawn-path deste sistema é o primeiro consumidor de produção do `difficulty_multiplier_for` (HP/Atk por tier × dificuldade). |
 | **`ENCONTRO-FREQ-DIFICULDADE`** | Consome o slot `multDificuldade` (§4.1). Só é escrevível agora que este sistema existe. |
 | **Save** | Nada persiste (§3). |

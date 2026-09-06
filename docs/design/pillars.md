@@ -240,7 +240,7 @@ Doc dedicado: `docs/design/mecanicas/hospital-economia.md` (a criar).
 ### Diário do Gus (UI canônica)
 
 Wiki in-game paginada que registra Knowledge Progression. Sub-seções:
-- **Bestiário** (inimigos — 1-4 páginas por entrada, preenche por kill)
+- **Bestiário** (inimigos, 5 estágios de documentação por espécie, `docs/narrative/diary/entries-fichas-bestiary.md` §5)
 - **Cartas** (mestria, combos descobertos, combos secretos)
 - **Lore** (mundo, facções, settings, eventos)
 - **Companions** (perfis, arcs, mini-quests)
