@@ -4,7 +4,7 @@
 >
 > **Trigger:**
 > - **Fichas:** 1º encontro abre stub vago (silhueta + 2-3 bullets). Interações sucessivas + Knowledge progride atualiza (média = perfil técnico parcial; alta = perfil completo com cross-refs).
-> - **Bestiary:** pós-1º combate cria stub de 1 página (HP visível, ataque visto). Kills repetidos completam até 4 páginas (Knowledge alta = fraquezas + exploits + counter-companion sugerido).
+> - **Bestiary:** cada espécie progride por 5 estágios de documentação (avistamento, primeiro combate, análise completa, fraqueza descoberta, item de drop identificado; ver §5), um evento de domínio por estágio, não mais "página por abate". Exceção: as 2 entradas-glitch travam no estágio 2 e nunca avançam.
 >
 > **Cross-refs imutáveis:** [[_INDEX]] · [[lore-bible]] · [[factions]] · [[characters/gus]] · [[characters/caua-volt]] · [[characters/iara-lumen]] · [[characters/bento-requiem]] · [[characters/linda-siren]] · [[characters/dante-grid]] · [[characters/jaci-proxy]] · [[characters/sterling-locke]] · [[characters/patch-zero]] · [[arco-principal]] · [[timeline]] · [[foreshadowing]] · [[ui-spec]] · [[entries-mapas-timeline]] · [[knowledge-gates]] · [[foreshadow-links]].
 
@@ -585,13 +585,22 @@ Cada entry de bestiary progride em **5 estágios de documentação por espécie*
 | **4. Fraqueza descoberta** | Explora a fraqueza sugerida com sucesso ao menos uma vez | Fraqueza confirmada, deixa de ser hipótese |
 | **5. Item de drop identificado** | Recebe o loot da espécie ao menos uma vez | Loot catalogado, exploit avançado, **companion-counter sugerido**, lore (origem) cross-ref Bloco I: era a antiga "página 4" |
 
-**Exceção (glitch), herdada do desenho anterior:** Patch-Zero (§5.4) e a Anomalia Glitch (§5.2) **travam no estágio 2** e nunca avançam a 3, 4 ou 5; a entry glitcha permanentemente em vez de estabilizar, exatamente como as duas linhas de tabela já descrevem ("não estabiliza nunca", "nenhuma fraqueza catalogada"). As outras 17 espécies completam os 5 estágios normalmente.
+**Exceção (glitch), herdada do desenho anterior:** Patch-Zero (§5.4) e a Anomalia Glitch (§5.2) **travam no estágio 2** e nunca avançam a 3, 4 ou 5; a entry glitcha permanentemente em vez de estabilizar, exatamente como as duas linhas de tabela já descrevem ("não estabiliza nunca", "nenhuma fraqueza catalogada").
 
-⚠️ **Tensão numérica a levar ao líder, não resolvida aqui (mesma família da tensão já registrada em `conquistas.md` §2.9, que este parágrafo atualiza com o número medido):** este documento cataloga **19 espécies** (§5.1: 5, §5.2: 5, §5.3: 6, §5.4: 3, contadas por linha de tabela/subseção de §5, não pela estimativa "~22" que o sumário do topo carregava até esta revisão). Com 17 espécies completando os 5 estágios e 2 travando no estágio 2, o total de eventos de documentação possíveis no jogo inteiro é **89**, mesmo documentando tudo, abaixo do limiar de 100 que o líder decidiu manter. Não decido a resolução (L-14 global, L-29 do projeto): as leituras que ficam de pé, já que o limiar está mantido, são (a) crescer o catálogo em 2-3 espécies novas, ou (b) o contador do achievement somar também eventos de reencontro além do primeiro por estágio (ex.: cada "Análise completa" reafirmada em combates extras soma de novo). Devolvo a escolha entre as duas, e a decisão sobre as 2 espécies-glitch permanecerem travadas em 2 mesmo nesse cenário, para o líder.
+**Correção 05/09/2026 (revisão adversarial): a contagem "17 completam os 5 estágios" não sobrevive às próprias definições de estágio, linha a linha.** O estágio 3 exige "~3-6 combates adicionais contra a mesma espécie"; o estágio 5 exige "recebe o loot da espécie ao menos uma vez" (fraqueza confirmada não basta). Conferindo as 19 linhas de §5.1-§5.4 contra essas duas condições, além das 2 espécies-glitch já excepcionadas, mais 4 espécies não alcançam o estágio 5:
+
+- **Sterling Locke, Fase 1 (Rede Distribuída)** (§5.4): encontrado exatamente uma vez no jogo, no clímax, nunca repetível; sem os "3-6 combates adicionais" do estágio 3, trava no estágio 2.
+- **Sterling Locke, Fase 2 (Locke Core)** (§5.4): mesma razão (luta única do clímax) e, além disso, não larga material ("Nenhum material; resolução narrativa"); trava no estágio 2.
+- **Mestre pró-Sterling Asmódico (3 inimigos coletivos)** (§5.3): a própria entry descreve o encontro como cena roteirizada ("Catedrais Neo-Sylvania, cena contaminação arco Bento"), não um inimigo reencontrável; sem repetição possível, trava no estágio 2, apesar de ter fraqueza e loot catalogados que nunca chega a usar.
+- **Voz Cromada Sterling (entidade ambient hostil)** (§5.1): a própria entry diz "loot: nada material; info ambient destravada"; tem fraqueza confirmável (Mantra do Silêncio) e por isso alcança o estágio 4, mas nunca o 5, por não largar item nenhum.
+
+O LIMIAR de 100 não muda com esta correção, só o TETO recalculado abaixo. As outras 13 espécies (4 de §5.1, 4 de §5.2, 5 de §5.3, nenhuma de §5.4) completam os 5 estágios normalmente.
+
+⚠️ **Tensão numérica a levar ao líder, não resolvida aqui (mesma família da tensão já registrada em `conquistas.md` §2.9, que este parágrafo atualiza com o número recalculado):** este documento cataloga **19 espécies** (§5.1: 5, §5.2: 5, §5.3: 6, §5.4: 3, contadas por linha de tabela/subseção de §5). Com **13 espécies** completando os 5 estágios, **1 espécie** (Voz Cromada Sterling) travando no estágio 4 e **5 espécies** (Patch-Zero, Anomalia Glitch, Sterling Locke Fase 1, Sterling Locke Fase 2, Mestre pró-Sterling Asmódico) travando no estágio 2, o total de eventos de documentação possíveis no jogo inteiro é **79** (13×5 + 1×4 + 5×2), mesmo documentando tudo, abaixo do limiar de 100 que o líder decidiu manter: a divergência entre teto e limiar **cresce** em relação à medição anterior (89), não diminui. Não decido a resolução (L-14 global, L-29 do projeto): as leituras que ficam de pé, já que o limiar está mantido, são (a) crescer o catálogo em espécies novas, agora precisando de mais margem do que antes, ou (b) o contador do achievement somar também eventos de reencontro além do primeiro por estágio (ex.: cada "Análise completa" reafirmada em combates extras soma de novo). Devolvo a escolha entre as duas, e a decisão sobre as espécies que travam antes do estágio 5 permanecerem travadas nesse ponto mesmo nesse cenário, para o líder.
 
 ### 5.1 Inimigos da Cidade (5)
 
-| Inimigo | Setting | Stats observados (página 1) | Stats completos (página 4) | Fraqueza | Loot | Companion-counter |
+| Inimigo | Setting | Stats observados (estágio 2: Primeiro combate) | Stats completos (estágio 5: Item de drop identificado) | Fraqueza | Loot | Companion-counter |
 |---|---|---|---|---|---|---|
 | **Drone Patrulha FIR Mk-II** | [[01-cidade-cyber-gotica|Núcleo Metropolitano]] + [[06-periferia|Periferia]] | HP médio. Ataque: descarga elétrica cone curto. | HP 12. Cooldown EM 3 turnos. Motherboard exposta no torso traseiro. | Pulso EM atordoa 2 turnos; alvo de ataque cinético na motherboard exposta | sucata Sterling, token Elétrico baixo | **Cauã** (Pulso EM Concêntrico finaliza grupos de 3+) |
 | **Patrulheiro FIR** | [[01-cidade-cyber-gotica|Mercado da Sucata Honesta]] + [[06-periferia]] | HP baixo. Ataque: cassetete elétrico. | HP 8. Recua a 30% HP (chama backup). Ignora ordens superiores se Knowledge alta + sub-quest Vitória Marquês ativa. | Crowd control sônico atordoa cassette antes de carregar | crédito, fragmento de cota | **Linda** (Eco do Cânion paralisa grupo) |
@@ -601,7 +610,7 @@ Cada entry de bestiary progride em **5 estágios de documentação por espécie*
 
 ### 5.2 Inimigos da Selve (5)
 
-| Inimigo | Setting | Stats página 1 | Stats página 4 | Fraqueza | Loot | Companion-counter |
+| Inimigo | Setting | Stats (estágio 2: Primeiro combate) | Stats (estágio 5: Item de drop identificado) | Fraqueza | Loot | Companion-counter |
 |---|---|---|---|---|---|---|
 | **Raposa-Fractal corrompida** | [[02-selve-sombria|Orla Recursiva]] | HP médio. Ataque: mordida em padrão recorrente. | HP 11. Padrão recorrente corrompido (números errados → sintoma Patch-Zero local). | Bioquímico Null cura corrupção (NÃO mata; transforma em raposa neutra) | semente-relíquia, token Bioquímico | **Jaci** (Antídoto Sintético converte em aliada temporária 3 turnos) |
 | **Coruja-Mandelbrot** | [[02-selve-sombria|Pântano de Markov]] | HP alto. Ataque: olhar recursivo (debuff confusão). | HP 16. Padrão Markov estocástico; telegrafia varia. Boss-tier 3 estados (calm/agitada/recursiva infinita). | Cinético compressivo paralisa ciclo recursivo | pena-Mandelbrot, token Cinético médio | **Bento** (Vetor de Recuo + Cronômetro Ressonante) |
@@ -611,7 +620,7 @@ Cada entry de bestiary progride em **5 estágios de documentação por espécie*
 
 ### 5.3 Inimigos cross-settings (Catedrais / Dutos / Mirage / Periferia / Silêncio) (6)
 
-| Inimigo | Setting | Stats página 1 | Stats página 4 | Fraqueza | Loot | Companion-counter |
+| Inimigo | Setting | Stats (estágio 2: Primeiro combate) | Stats (estágio 5: Item de drop identificado) | Fraqueza | Loot | Companion-counter |
 |---|---|---|---|---|---|---|
 | **Mestre pró-Sterling Asmódico (3 inimigos coletivos)** | [[03-catedrais-neo-sylvania|Catedrais Neo-Sylvania]] (cena contaminação arco Bento) | HP alto coletivo. Ataque: cinético rotacional + escudo cronômetro. | HP 14 cada. Sincronizam cronômetros mecânicos; combate em cadência. | Quebrar cadência (Cronômetro Ressonante reverso) desorienta os 3 | engrenagens valiosas, token Cinético médio | **Bento** (Cronômetro Ressonante reverso); duelo simbólico interno Ordem |
 | **Drone-Operário FIR (Dutos)** | [[04-dutos-infernais|Posto FIR Duto 7]] | HP médio. Ataque: serra plasma cinética. | HP 10. Bug exploit: para 1 turno se temperatura ambiente sobe acima de 70°C (Hosvaldo confirma). | Aproveitar turbina superaquecida; **EM + Pythia improvisada** quebra firmware | sucata cinética, token Elétrico médio | **Cauã** (signature local) |
@@ -629,7 +638,7 @@ Cada entry de bestiary progride em **5 estágios de documentação por espécie*
 | Stats | Conteúdo |
 |---|---|
 | HP visível pré-encontro | **"?"** (Gus nunca enfrentou; bestiary entry trava em página 1 até momento) |
-| HP completo página 4 | HP central 30 + 7 nodes 5 cada (total 65). Nodes regeneram central em 3 turnos se vivos. |
+| HP completo (estágio 5: Item de drop identificado) | HP central 30 + 7 nodes 5 cada (total 65). Nodes regeneram central em 3 turnos se vivos. |
 | Ataques | Deletar variável (debuff string aliado); reescrita em runtime (anula buff aliado); chuva de drones-mensagem (dano em área) |
 | Fraqueza | Eliminar nodes antes do central. Refração + EM combo destrava prioridade. |
 | Loot | Token DRE corrompido (NÃO usável; Gus arquiva como evidência) |
