@@ -96,6 +96,13 @@ Conquista oculta destrava quando o contador cumulativo de eventos de estágio de
 
 Som curto de captura: *"plink-plink-plink-clic."*
 
+**Canon mecânico, decidido pelo líder em 30/08/2026 (`G12` do `TODO.md`, Eixo 2 de `docs/_secret/proposta-balanceamento-easter-eggs.md`):**
+
+- **O limiar permanece em 100**, e não é lido nem como contagem de abates nem como contagem de espécies únicas: é a soma de **eventos de estágio de documentação** (`BestiaryEntryDocumented(foe_id, stage)`), um evento por estágio alcançado, com os 5 estágios canonizados em `docs/narrative/diary/entries-fichas-bestiary.md` §5 (avistamento, primeiro combate, análise completa, fraqueza descoberta, item de drop identificado).
+- Fecha a pergunta 3 de `docs/design/mecanicas/conquistas.md` §3.
+- **Fato medido no fechamento (30/08/2026):** o Bestiário ainda não tinha o conceito de estágio; criá-lo virou item `D32` do `TODO.md`, pré-requisito para este eixo funcionar de fato.
+- ⚠️ **Tensão numérica residual, não fechada por esta decisão:** o teto real de eventos alcançáveis no jogo inteiro, medido em `entries-fichas-bestiary.md` §5, fica abaixo do limiar de 100 (número corrente e leituras possíveis vivem só naquele documento, para não duplicar estado aqui).
+
 **EE-10: A Placa do Hospital**
 
 Placa na entrada do hospital onde companions são curados:

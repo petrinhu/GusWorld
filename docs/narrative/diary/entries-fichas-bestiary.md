@@ -4,7 +4,7 @@
 >
 > **Trigger:**
 > - **Fichas:** 1º encontro abre stub vago (silhueta + 2-3 bullets). Interações sucessivas + Knowledge progride atualiza (média = perfil técnico parcial; alta = perfil completo com cross-refs).
-> - **Bestiary:** cada espécie progride por 5 estágios de documentação (avistamento, primeiro combate, análise completa, fraqueza descoberta, item de drop identificado; ver §5), um evento de domínio por estágio, não mais "página por abate". Exceção: as 2 entradas-glitch travam no estágio 2 e nunca avançam.
+> - **Bestiary:** cada espécie progride por 5 estágios de documentação (avistamento, primeiro combate, análise completa, fraqueza descoberta, item de drop identificado; ver §5), um evento de domínio por estágio, não mais "página por abate". Exceção: 5 espécies travam no estágio 2 (2 por desenho de glitch permanente, 3 por serem encontro único atrelado a missão/clímax, sem repetição possível) e 1 trava no estágio 4 (sem item de drop); nenhuma das seis alcança o estágio 5 (ver §5 para a lista e o motivo de cada uma).
 >
 > **Cross-refs imutáveis:** [[_INDEX]] · [[lore-bible]] · [[factions]] · [[characters/gus]] · [[characters/caua-volt]] · [[characters/iara-lumen]] · [[characters/bento-requiem]] · [[characters/linda-siren]] · [[characters/dante-grid]] · [[characters/jaci-proxy]] · [[characters/sterling-locke]] · [[characters/patch-zero]] · [[arco-principal]] · [[timeline]] · [[foreshadowing]] · [[ui-spec]] · [[entries-mapas-timeline]] · [[knowledge-gates]] · [[foreshadow-links]].
 
@@ -593,6 +593,8 @@ Cada entry de bestiary progride em **5 estágios de documentação por espécie*
 - **Sterling Locke, Fase 2 (Locke Core)** (§5.4): mesma razão (luta única do clímax) e, além disso, não larga material ("Nenhum material; resolução narrativa"); trava no estágio 2.
 - **Mestre pró-Sterling Asmódico (3 inimigos coletivos)** (§5.3): a própria entry descreve o encontro como cena roteirizada ("Catedrais Neo-Sylvania, cena contaminação arco Bento"), não um inimigo reencontrável; sem repetição possível, trava no estágio 2, apesar de ter fraqueza e loot catalogados que nunca chega a usar.
 - **Voz Cromada Sterling (entidade ambient hostil)** (§5.1): a própria entry diz "loot: nada material; info ambient destravada"; tem fraqueza confirmável (Mantra do Silêncio) e por isso alcança o estágio 4, mas nunca o 5, por não largar item nenhum.
+
+**Reencontrabilidade das quatro, decisão do líder em 05/09/2026:** as quatro espécies acima continuam presentes no mundo depois do encontro atrelado à missão que as introduz: a entidade não some do jogo naquele ponto, é vista de novo narrativamente. Isso não abre nenhum estágio novo para nenhuma delas, porque a trava de cada uma vem de uma estrutura própria (combate que não se repete, ou ausência de loot), não da entidade deixar de existir depois do encontro. É esta permanência, agora escrita, que sustenta como válido o TETO de 79 calculado abaixo: sem ela, ficaria em aberto se a espécie reaparecendo destravaria estágio adicional, e o teto precisaria de outra conta.
 
 O LIMIAR de 100 não muda com esta correção, só o TETO recalculado abaixo. As outras 13 espécies (4 de §5.1, 4 de §5.2, 5 de §5.3, nenhuma de §5.4) completam os 5 estágios normalmente.
 

@@ -73,24 +73,20 @@ O jogo "não responde a esforço repetitivo" (knowledge-gates.md §8). Progress�
 ## 5. Curva visual (Eixo A — valores calculados para ratificação)
 
 `varianceFactor = max(0.05, 0.30 × e^(-kills × 0.10))`. "% incerteza" = ±varianceFactor sobre o dano.
+Esta curva é só do Eixo A (variância de combate); o Eixo B (Bestiary do Diário) tem o próprio modelo de
+progressão, canônico em entries-fichas-bestiary.md §5, e não é indexado por esta tabela.
 
-⚠️ **A coluna "Estado do Diário" abaixo é ilustrativa e usa o modelo de páginas anterior a 30/08/2026.** O
-modelo canônico hoje é o de 5 estágios de documentação (entries-fichas-bestiary.md §5), que não é indexado
-diretamente por contagem de kills (estágio 3 pede "~3-6 combates adicionais", estágios 4 e 5 pedem um evento,
-não uma contagem). Recalibrar esta coluna para o modelo novo não é óbvio e não está decidido em lugar nenhum
-do corpus; a coluna de `varianceFactor`/`% incerteza` (Eixo A) não muda e continua valendo como está.
-
-| kills | varianceFactor | % incerteza | Estado do Diário (modelo antigo, ilustrativo) | Scan passivo (Trash)? |
-|---|---|---|---|---|
-| 0 | 0.300 | ±30.0% | Stub (1ª aparição: silhueta, HP visto, 1 ataque) | não |
-| 1 | 0.271 | ±27.1% | Stub | não |
-| 3 | 0.222 | ±22.2% | Página 2 (padrão, 2-3 ataques, hipótese de fraqueza) | não |
-| 4 | 0.201 | ±20.1% | Página 3 (Trash: fraqueza confirmada, loot, telegrafia) | não |
-| 6 | 0.165 | ±16.5% | Página 3 | não |
-| **8** | **0.135** | **±13.5%** | Página 3 -> 4 conforme Knowledge | **SIM (proposta Trash)** |
-| 12 | 0.090 | ±9.0% | Página 4 (exploit, companion-counter, lore) | sim |
-| 18 (crossover) | 0.050 (≈) | ±5.0% | Página 4 plena | sim |
-| 30+ | 0.050 (piso) | ±5.0% | Página 4 plena | sim |
+| kills | varianceFactor | % incerteza | Scan passivo (Trash)? |
+|---|---|---|---|
+| 0 | 0.300 | ±30.0% | não |
+| 1 | 0.271 | ±27.1% | não |
+| 3 | 0.222 | ±22.2% | não |
+| 4 | 0.201 | ±20.1% | não |
+| 6 | 0.165 | ±16.5% | não |
+| **8** | **0.135** | **±13.5%** | **SIM (proposta Trash)** |
+| 12 | 0.090 | ±9.0% | sim |
+| 18 (crossover) | 0.050 (≈) | ±5.0% | sim |
+| 30+ | 0.050 (piso) | ±5.0% | sim |
 
 Observação numérica: o piso ±5% só é atingido formalmente por volta de kills≈18 (`0.30 × e^(-1.8) ≈ 0.0496` -> clamp 0.05).
 Para Trash (~20 aparições) isto é alcançável; para Elite (~8) o jogador para em ~±8%, para Mini-boss (~4) em ~±17%.
@@ -104,11 +100,14 @@ alinhada à curva §5, e confirma o tom (Pillar 4).
 
 - **Trigger de abertura:** stub aparece **após o 1º combate** com o tipo (não após Scan), conforme
   entries-fichas-bestiary.md §5.1. Scan isolado revela HP+fraqueza no HUD, mas não cria a entry narrativa.
-- **Estágios de documentação (DA-3, canon 2026-06-03, SUPERADO em 30/08/2026):** o modelo de páginas por tier
-  desta linha foi substituído pelo modelo de 5 estágios, igual para toda espécie (exceção: as 2 entradas-glitch
-  travam no estágio 2), canonizado em entries-fichas-bestiary.md §5. Se a profundidade de documentação ainda varia
-  por tier (Trash/Elite/Mini-boss/Boss) sob o modelo novo não está resolvido em lugar nenhum do corpus; fica para
-  o líder.
+- **Estágios de documentação (DA-3, canon 2026-06-03, SUPERADO em 30/08/2026, resolvido em 05/09/2026):** o
+  modelo de páginas por tier desta linha foi substituído pelo modelo de 5 estágios, igual para toda espécie
+  (exceção: 5 espécies travam no estágio 2 e 1 trava no estágio 4, sem nunca alcançar o estágio 5; lista completa
+  em entries-fichas-bestiary.md §5), canonizado em entries-fichas-bestiary.md §5. Decisão do líder em 05/09/2026:
+  a profundidade de documentação NÃO varia por tier, os 5 estágios valem igual para Trash/Elite/Mini-boss/Boss;
+  o que varia entre tiers é só a capacidade de cada espécie de alcançá-los (N-aparições finito por tier, §2 acima;
+  encontro único de missão ou clímax trava mais cedo por estrutura de reencontro, não por desenho de documentação
+  menor).
 - **Tom (DA-4 canon 2026-06-03):** híbrido. Stats técnicos (HP/fraqueza/counter) SEMPRE; lore/origem só na
   última página em voz analítica de Gus (prodígio 11 anos). Serve Knowledge categorial sem virar lore-dump.
 - **Conteúdo por página (tom Pillar 4, prodígio 11 anos):** stub = observação crua, hipótese ("hipótese:
@@ -162,5 +161,5 @@ ambos tipo Cinético / fraqueza Elétrica (Cauã é o DPS natural).
 |---|---|---|
 | DA-1 | Threshold Scan passivo por tier | **Trash 8 / Elite 6 / Mini-boss 3** — ±13.5% Trash quando ativa; padrão lido mas incerteza residual |
 | DA-2 | Scan sem derrota conta como kill? | **Não conta (0)** — kill = ciclo completo em combate; KnowledgeKills permanece int |
-| DA-3 | Páginas do Diário por tier | **SUPERADO em 30/08/2026** pelo modelo de 5 estágios de documentação, igual para toda espécie (entries-fichas-bestiary.md §5); aplicação por tier sob o modelo novo não resolvida, ver §6 |
+| DA-3 | Páginas do Diário por tier | **SUPERADO em 30/08/2026** pelo modelo de 5 estágios de documentação, igual para toda espécie (entries-fichas-bestiary.md §5); **resolvido em 05/09/2026:** a profundidade não varia por tier, só a capacidade de cada espécie alcançar os 5 estágios varia, ver §6 |
 | DA-4 | Tom do Diário | **Híbrido** — stats técnicos sempre; lore/origem só na última página, voz analítica de Gus (Pillar 4) |
