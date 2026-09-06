@@ -35,20 +35,22 @@ mão humana recente, não de acidente.
 mais tenso do que qualquer outro varal do bairro, afordância honesta de que aguenta peso.
 
 **Como se entra:** atravessar o varal andando; mecanicamente é um trecho de piso comum, percorrido
-com a locomoção de sempre (sem pulo, sem estado novo), só que texturizado como corda esticada
-ligando dois telhados.
+com a locomoção de sempre (sem pulo, sem estado novo), na mesma grade e no mesmo plano de jogo de
+sempre — só que texturizado como corda esticada, ligação entre dois pontos que a rua não conecta.
 
-**O que guarda:** categoria: vantage point. A célula alcançada fica sobre os telhados, no meio do
-quarteirão, sem passagem pelo chão até ali (só o varal liga um telhado ao outro). Dali, o raio
-fixo do Scan (Óculos Táticos captando, Matriz Ortodôntica amplificando o alcance) cobre de uma vez
-várias bocas de viela que, no chão, ficam cada uma numa rua diferente, mais distantes entre si do
-que o alcance do Scan permite revelar ao mesmo tempo. Só ali em cima, equidistante de todas, elas
-caem juntas no mesmo raio. A recompensa é essa revelação simultânea no HUD (reorientação, não
-item). Conteúdo material: produção.
+**O que guarda:** categoria: célula de leitura espacial. A célula alcançada é um vão interno do
+quarteirão, cercado de prédios e sem entrada pela rua (só o varal liga as duas bordas). Geometricamente,
+esse ponto fica mais perto de várias bocas de viela ao mesmo tempo do que qualquer célula acessível
+pela rua, que ficam espalhadas cada uma numa esquina diferente do quarteirão. Com o alcance de Scan
+que o jogador já tem ali (Óculos Táticos captando, Matriz Ortodôntica amplificando — o mesmo raio de
+sempre, upgradável como em qualquer outro lugar do jogo, sem raio dedicado a esta célula), várias
+bocas caem dentro dele de uma vez só a partir dali. A recompensa é essa revelação simultânea no HUD
+(reorientação, não item). Conteúdo material: produção.
 
 **O que conta:** ao ver várias bocas de viela acenderem juntas no HUD, de um ponto que só o varal
 alcança, o jogador enxerga que o labirinto de vielas tem uma lógica de bairro remendado que
-nenhuma rota no chão revela de uma vez só: o padrão só se lê inteiro de fora da rota normal.
+nenhuma rota no chão revela de uma vez só: o padrão só se lê inteiro de um centro que a rua não
+alcança.
 
 ## Área secreta C: O sigilo na porta
 
