@@ -25,9 +25,7 @@ GusWorld é **pixel-art estilizado** (pipeline PixelLab): silhuetas legíveis em
 | **Tunic** (Andrew Shouldice, 2022) | Isometric-ish low-poly fofo + dungeon sombria; contraste tonal entre overworld e zona perigosa |
 | **The Last Night** (mockup) | Ciber-gótico neon noir; referência de city palette, NÃO de execução |
 
-Anti-ref: Genshin (PBR + anime AAA, fora de orçamento).
-
-**Pendência de revisão:** o anti-ref original também incluía "Octopath (HD-2D, escolha 2D que falha em câmera rotacional)" — essa razão específica (câmera 3D rotacional) não existe mais agora que a arte É pixel-art. Se HD-2D volta a ser cogitado como referência de câmera/renderização, é **decisão pendente do líder**, não assumida aqui.
+Anti-ref: Genshin (PBR + anime AAA, fora de orçamento); Octopath Traveler (HD-2D — sprites 2D compostos sobre ambiente 3D, com câmera de profundidade variável e desfoque tipo diorama/tilt-shift pra dar sensação de espaço). GusWorld não tem ambiente 3D em runtime, e a câmera é 3/4 fixa, sem giro nem órbita, sobre grade quadrada sem eixo de altura — não há profundidade nem plano de foco variável para esse efeito operar. (Decisão do líder, 06/09/2026.)
 
 ## 3. Pillars visuais
 
@@ -176,7 +174,7 @@ A linguagem de cor/forma/movimento por família é **agnóstica de dimensão** e
 - **É chibi-SD canônico, NÃO realista, com tom analítico/gótico, não fofo/kawaii.** O princípio de proporção/tom é vigente; a formulação exata em pixel-grid é pendência de spec 2D (ver §3.2).
 - **Não é gore.** Sangue, vísceras, dismemberment proibidos. Inimigos derrotados "compilam erro" + dissolvem em partículas. Vigente.
 - **Não é zona-híbrida-genérica.** Cidade e Selve nunca se misturam visualmente até o ato 3 deliberado. Vigente.
-- **PENDÊNCIA — "Não é HD-2D (Octopath)".** A razão original ("decisão consciente: 3D real estilizado, não sprites 2D em ambiente 3D") não existe mais — o jogo agora usa sprites 2D. Se HD-2D (sprites 2D + ambiente 3D) volta a ser cogitado como abordagem de câmera/renderização, é decisão pendente do líder; não assumida aqui.
+- **Não é HD-2D (Octopath).** Esse visual combina sprites 2D com ambiente 3D, câmera de profundidade variável e desfoque tipo diorama/tilt-shift pra dar sensação de espaço. GusWorld não tem ambiente 3D em runtime, e a câmera é 3/4 fixa, sem giro nem órbita, sobre grade quadrada sem eixo de altura — não há profundidade nem plano de foco variável para esse efeito operar. Vigente. (Decisão do líder, 06/09/2026.)
 - **Não é open-world.** Áreas curadas, navegação limitada por região. Vigente.
 - **Não é marketing visualmente diferente do jogo.** Key art final renderiza no engine + retoque mínimo. Sem bait. Vigente.
 
@@ -208,7 +206,6 @@ Nenhum destes pontos foi decidido nesta atualização; listados aqui pra virarem
 6. Profundidade de paleta indexada por personagem: DECIDIDA (dois regimes — Gus paleta rica, resto do elenco paleta enxuta — ver §9, 30/08/2026); segue pendente se normal/emission map em pixel art (suportado pelo PixelLab) é usado ou abandonado.
 7. Escopo de shaders 2D remanescentes (glitch/anomalia, holograma) — quais migram pro glintfx como screen-space/sprite shader.
 8. Implementação de VFX (spritesheet de frames vs. sistema de partículas 2D).
-9. Reavaliação do anti-ref "Octopath/HD-2D" e do anti-objetivo correspondente, agora que a razão original (câmera 3D) não se aplica mais.
 
 **Revisão prevista:** após primeiro vertical slice (cidade + uma zona Selve + combate funcional). Atualizar paletas/budgets com dados reais de perf.
 
