@@ -22,10 +22,7 @@ jogo, coerente com o peso 3 de puzzle puro e com a identidade única desta área
 indica piso oco. O sinal é sonoro, e se percebe a alguns passos de distância, não só debaixo do
 próprio pé: cada passo do jogador na câmara ecoa cheio contra o piso maciço, mas ao se aproximar
 daquela seção específica, o eco muda de timbre, mais oco, já alguns passos antes de pisar nela,
-perceptível prestando atenção ao próprio corpo e ao próprio ouvido, não à tela. A leitura anterior
-("perceptível só andando devagar", sem mais detalhe) equivalia, na prática, a exigir que o
-jogador pisasse em todo o piso da câmara até achar o trecho certo, o que a régua do `_INDEX.md`
-proíbe; esta versão dá o sinal a distância, crescente conforme o jogador se aproxima.
+perceptível prestando atenção ao próprio corpo e ao próprio ouvido, não à tela.
 
 **Como se entra:** seguir a mudança de timbre do eco dos próprios passos até a seção que soa oca,
 e então forçar o peso ali.

@@ -61,10 +61,7 @@ porta em forma de LP.
 opcional do retorno tem um inimigo parado bem no meio de um vão estreito entre rochas, de costas
 para uma fresta que deixa passar um fio de luz mais forte do que o resto do corredor, visível de
 longe, ANTES de qualquer decisão de lutar, sugerindo que há espaço aberto atrás dele que a
-própria postura do inimigo esconde. A leitura anterior só revelava a passagem depois de o
-jogador já ter escolhido não lutar (o inimigo bloqueava fisicamente a visão enquanto ativo, sem
-nenhum sinal antes da escolha), o que contraria a régua do `_INDEX.md` de que toda área secreta
-dá um sinal legível antes de existir para o jogador; esta versão dá o sinal antes da escolha.
+própria postura do inimigo esconde.
 
 **Como se entra:** evitar o combate opcional daquele ponto específico (furtividade ou rota
 alternativa), revelando por inteiro a passagem que a fresta de luz já indicava.

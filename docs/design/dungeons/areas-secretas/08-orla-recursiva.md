@@ -60,10 +60,7 @@ o tema de que padrão perfeito é ilusão, mesmo aqui.
 **Pista (corrigida 05/09/2026, revisão adversarial):** de um ponto elevado da Orla, subir revela
 o mapa do trecho de labirinto já percorrido de uma vez só; o próprio desenho do mapa mostra um
 padrão reconhecível maior (o próprio fractal em escala visível), só perceptível depois de já ter
-andado boa parte do labirinto e revelado mapa suficiente dele. A leitura anterior ("visto de
-cima", "vista de cima") descrevia uma câmera que sobe/orbita, incompatível com a perspectiva 3/4
-top-down fixa do jogo (L-26 do projeto); esta versão usa a revelação de mapa, mecanismo que o
-jogo já tem.
+andado boa parte do labirinto e revelado mapa suficiente dele.
 
 **Como se entra:** beat clássico de labirinto: subir, revelar o mapa, reconhecer o padrão nele,
 voltar por uma rota antes ignorada porque só fazia sentido depois de ver o mapa cheio.
@@ -82,9 +79,7 @@ do rio.
 
 **Como se entra (corrigida 05/09/2026, revisão adversarial):** entrar no redemoinho e andar
 contra a corrente fraca até o centro dele (o leito ali é raso o bastante para atravessar a pé; a
-corrente resiste, mas não impede). A leitura anterior pedia "nadar/mergulhar", verbo que não
-existe em nenhum documento de locomoção do jogo (só andar e correr); esta versão resolve o mesmo
-beat sem inventar verbo novo.
+corrente resiste, mas não impede).
 
 **O que guarda:** categoria: item preso na correnteza (lore ou material). Conteúdo exato:
 produção.

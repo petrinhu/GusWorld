@@ -58,7 +58,7 @@ QTE; real-time twitch; HP-sponge boss; dano inflacionado por level; "spam habili
 
 **Frase-âncora:** Toda magia é diegética como sistema formal computável (em silício OU em substrato mecânico/analógico); todo bioma da Selve obedece padrão matemático observável pelo jogador.
 
-> **Reformulação canônica vs original:** versão prévia dizia "magia é software". Substituído por "sistema formal computável" para acomodar **Bento "Requiem"** (magia heráldica em relojoaria mecânica de latão) — relógio mecânico É state machine, só substrato diferente que silício.
+> **Reformulação canônica:** o eixo agora é "sistema formal computável", para acomodar **Bento "Requiem"** (magia heráldica em relojoaria mecânica de latão) — relógio mecânico É state machine, só substrato diferente que silício.
 
 ### Mecânicas que servem
 
@@ -167,7 +167,7 @@ Romance; gore explícito centrado no Gus; fan-service edgy; dilema moral cínico
 
 **Frase-âncora:** O mundo de GusWorld é organizado em **8 settings de identidade visual/sonora/mecânica distinta**, ancorados pelo contraste **megacidade ciber-gótica × Selve Sombria tecnorgânica**. Cada setting é arena dramática de um companion ou antagonista — nunca decoração genérica.
 
-> **Reformulação canônica vs original:** versão prévia dizia "bipartido". Substituído por "multipolar com 2 âncoras" — o contraste cidade×Selve permanece **eixo temático fundador**, mas o mundo se expressa em 8 polos satélites que orbitam esse eixo.
+> **Reformulação canônica:** o mapa de poder agora é "multipolar com 2 âncoras" — o contraste cidade×Selve permanece **eixo temático fundador**, mas o mundo se expressa em 8 polos satélites que orbitam esse eixo.
 
 ### Os 8 settings
 
