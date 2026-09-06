@@ -364,6 +364,21 @@ A revisão que auditou §9-§11 encontrou nove defeitos, cada um registrado abai
 
 ---
 
+## 13. SigKill: custo base e agravamento do modificador Stream (PROPOSTA, PENDENTE DE MEDIÇÃO, adicionada 06/09/2026)
+
+Cobre `cartas-technomagik.md` §5.7 (o efeito `SigKill`, carta comum "Eco de Encerramento", único jeito de manter caído o zumbi do Pântano de Markov) e o item `G28` do `TODO.md`.
+
+| Eixo | Estado fechado hoje | Proposta (pendente de medição) |
+|---|---|---|
+| Custo base (`ChargeCost`) | 3, ancorado no teto da faixa COMUM (`cartas-technomagik.md` §2.2) | descer para o chão da faixa (1-2) |
+| Modificador Stream (versão em área) | aceito nesta carta, sem exceção de elegibilidade (decisão do líder, `AskUserQuestion`) | incremento acima do `+2` padrão; total proposto de 6, patamar já usado para "gasta quase todo o pool do turno" |
+
+**Racional da proposta (`lead-game-designer`, 05/09/2026):** a reanimação ilimitada dos zumbis do Pântano de Markov (`02-selve-sombria.md` §11) tornou o `SigKill` a única saída de combate da área, repetida a cada zumbi. Cobrar o teto da faixa comum de um efeito de progresso obrigatório e repetível vai contra o próprio princípio que justifica esse teto ("sem estratégia obrigatória, sem vala da morte" vale também para custo de mana, não só para presença de carta); por isso o custo base proposto desce ao chão da faixa. O mesmo raciocínio se estende ao modificador Stream: limpar vários zumbis de uma vez também deixou de ser uma escolha tática opcional em áreas com mais de um, então o incremento acima do `+2` padrão se justifica pelo valor marginal de acertar vários de uma vez (o efeito não tem diminishing return por alvo: cada zumbi acertado vale o mesmo tanto de "resolvido de vez").
+
+**Verificação que derruba o argumento de baixar o custo, registrada para quem for calibrar não repetir o raciocínio:** pela vazão de mana já fixada em `combat.md` §5 (`chargeDrawMax = 2 + contagemPropriaDeTurnos`, sem carry-over, crescendo a cada turno do próprio ator), a diferença entre custar 1-2 e custar 3 muda o turno em que a carta fica jogável por, no máximo, um turno do próprio ator: com custo até 2 a carta já é jogável no primeiro turno do ator, com custo 3 só no segundo. Dentro de um combate que dura vários turnos contra um inimigo que reanima até levar o `SigKill`, essa diferença de um turno quase não move o resultado. As alavancas reais sobre quando a carta resolve o zumbi são ter conseguido a carta (progressão, loot) e a vida do inimigo (quantos turnos de combate precedem a queda), não o custo de mana da carta em si.
+
+---
+
 ## Ambiguidades registradas
 
 - **AMB-01 (UX do upload homebrew):** proposto gate narrativo (1 beat, zero timer real) como default barato. Alternativa: barra de progresso em tempo real (~34 segundos, escada numérica canônica) na tela da bancada, mais "sentida" mas exige UI nova. Recomendo o gate narrativo; líder pode preferir o timer se quiser mais peso sensorial na cena de pirataria.

@@ -31,7 +31,7 @@ Bestiary segue mesma regra: HP, ataque visto, padrão de movimento são técnica
 | **NPCs ambientais nomeados** | 24 (catalogados §3) | Conversa significativa | Sub-quest associada |
 | **Facções (perfis)** | 7 (6 facções + Dutos como comunidade) | 1º contato direto | Knowledge alta + arco da facção |
 
-Total catalogável: **41 fichas únicas**. Bestiary: **19 inimigos turn-based** medidos em §5 (5 cidade, 5 Selve, 6 cross-settings, 3 bosses incluindo Sterling 2 fases + Patch-Zero condicional), corrigindo a estimativa "~22" desta linha, nunca conferida contra o corpo real de §5, à luz da tensão numérica de `docs/design/mecanicas/conquistas.md` §2.9 (ver nota em §5).
+Total catalogável: **41 fichas únicas**. Bestiary: **20 inimigos turn-based** medidos em §5 (5 cidade, 6 Selve, 6 cross-settings, 3 bosses incluindo Sterling 2 fases + Patch-Zero condicional), corrigindo a estimativa "~22" desta linha, nunca conferida contra o corpo real de §5, à luz da tensão numérica de `docs/design/mecanicas/conquistas.md` §2.9 (ver nota em §5).
 
 ---
 
@@ -573,7 +573,7 @@ Cada facção tem ficha visual + texto. Knowledge cresce em 3 estados como nos c
 
 ---
 
-## §5. Bestiary: Catálogo turn-based (19 espécies medidas)
+## §5. Bestiary: Catálogo turn-based (20 espécies medidas)
 
 Cada entry de bestiary progride em **5 estágios de documentação por espécie**, decisão do líder (`G12`/Eixo 2 de `docs/_secret/proposta-balanceamento-easter-eggs.md`, 30/08/2026), o conceito que dá lastro ao limiar de 100 do `achv_byte_collector` (`docs/design/mecanicas/conquistas.md` §2.9). Cada estágio é um evento de domínio (`BestiaryEntryDocumented(foe_id, stage)`) que o avaliador de conquistas soma ao contador cumulativo:
 
@@ -587,18 +587,18 @@ Cada entry de bestiary progride em **5 estágios de documentação por espécie*
 
 **Exceção (glitch), herdada do desenho anterior:** Patch-Zero (§5.4) e a Anomalia Glitch (§5.2) **travam no estágio 2** e nunca avançam a 3, 4 ou 5; a entry glitcha permanentemente em vez de estabilizar, exatamente como as duas linhas de tabela já descrevem ("não estabiliza nunca", "nenhuma fraqueza catalogada").
 
-**Correção 05/09/2026 (revisão adversarial): a contagem "17 completam os 5 estágios" não sobrevive às próprias definições de estágio, linha a linha.** O estágio 3 exige "~3-6 combates adicionais contra a mesma espécie"; o estágio 5 exige "recebe o loot da espécie ao menos uma vez" (fraqueza confirmada não basta). Conferindo as 19 linhas de §5.1-§5.4 contra essas duas condições, além das 2 espécies-glitch já excepcionadas, mais 4 espécies não alcançam o estágio 5:
+**Correção 05/09/2026 (revisão adversarial): a contagem "17 completam os 5 estágios" não sobrevive às próprias definições de estágio, linha a linha.** O estágio 3 exige "~3-6 combates adicionais contra a mesma espécie"; o estágio 5 exige "recebe o loot da espécie ao menos uma vez" (fraqueza confirmada não basta). Conferindo as 20 linhas de §5.1-§5.4 contra essas duas condições, além das 2 espécies-glitch já excepcionadas, mais 4 espécies não alcançam o estágio 5:
 
 - **Sterling Locke, Fase 1 (Rede Distribuída)** (§5.4): encontrado exatamente uma vez no jogo, no clímax, nunca repetível; sem os "3-6 combates adicionais" do estágio 3, trava no estágio 2.
 - **Sterling Locke, Fase 2 (Locke Core)** (§5.4): mesma razão (luta única do clímax) e, além disso, não larga material ("Nenhum material; resolução narrativa"); trava no estágio 2.
 - **Mestre pró-Sterling Asmódico (3 inimigos coletivos)** (§5.3): a própria entry descreve o encontro como cena roteirizada ("Catedrais Neo-Sylvania, cena contaminação arco Bento"), não um inimigo reencontrável; sem repetição possível, trava no estágio 2, apesar de ter fraqueza e loot catalogados que nunca chega a usar.
 - **Voz Cromada Sterling (entidade ambient hostil)** (§5.1): a própria entry diz "loot: nada material; info ambient destravada"; tem fraqueza confirmável (Mantra do Silêncio) e por isso alcança o estágio 4, mas nunca o 5, por não largar item nenhum.
 
-**Reencontrabilidade das quatro, decisão do líder em 05/09/2026:** as quatro espécies acima continuam presentes no mundo depois do encontro atrelado à missão que as introduz: a entidade não some do jogo naquele ponto, é vista de novo narrativamente. Isso não abre nenhum estágio novo para nenhuma delas, porque a trava de cada uma vem de uma estrutura própria (combate que não se repete, ou ausência de loot), não da entidade deixar de existir depois do encontro. É esta permanência, agora escrita, que sustenta como válido o TETO de 79 calculado abaixo: sem ela, ficaria em aberto se a espécie reaparecendo destravaria estágio adicional, e o teto precisaria de outra conta.
+**Reencontrabilidade de quatro espécies de missão, decisão do líder em 05/09/2026:** o Adepto Cult Mirage hostil, a Tropa de extração FIR Periferia, o Sentinela Acústico Sterling e o Drone Camuflado Sterling (todas em §5.3) são introduzidos em contexto de missão (festival sabotado, Subestação 11, arco Linda, sub-quest ato 2-3), mas continuam presentes no mundo depois desse encontro: a espécie não some do jogo naquele ponto, é reencontrável e por isso alcança normalmente os estágios que exigem combate repetido (3, 4 e 5), junto das demais espécies de §5.3 que não travam por glitch nem por clímax. É esta permanência, agora escrita, que sustenta como válido o TETO de 84 calculado abaixo: sem ela, as quatro cairiam no mesmo grupo que trava no estágio 2, e o teto precisaria de outra conta.
 
-O LIMIAR de 100 não muda com esta correção, só o TETO recalculado abaixo. As outras 13 espécies (4 de §5.1, 4 de §5.2, 5 de §5.3, nenhuma de §5.4) completam os 5 estágios normalmente.
+O LIMIAR de 100 não muda com esta correção, só o TETO recalculado abaixo. As outras 14 espécies (4 de §5.1, 5 de §5.2, 5 de §5.3, nenhuma de §5.4) completam os 5 estágios normalmente.
 
-⚠️ **Tensão numérica a levar ao líder, não resolvida aqui (mesma família da tensão já registrada em `conquistas.md` §2.9, que este parágrafo atualiza com o número recalculado):** este documento cataloga **19 espécies** (§5.1: 5, §5.2: 5, §5.3: 6, §5.4: 3, contadas por linha de tabela/subseção de §5). Com **13 espécies** completando os 5 estágios, **1 espécie** (Voz Cromada Sterling) travando no estágio 4 e **5 espécies** (Patch-Zero, Anomalia Glitch, Sterling Locke Fase 1, Sterling Locke Fase 2, Mestre pró-Sterling Asmódico) travando no estágio 2, o total de eventos de documentação possíveis no jogo inteiro é **79** (13×5 + 1×4 + 5×2), mesmo documentando tudo, abaixo do limiar de 100 que o líder decidiu manter: a divergência entre teto e limiar **cresce** em relação à medição anterior (89), não diminui. Não decido a resolução (L-14 global, L-29 do projeto): as leituras que ficam de pé, já que o limiar está mantido, são (a) crescer o catálogo em espécies novas, agora precisando de mais margem do que antes, ou (b) o contador do achievement somar também eventos de reencontro além do primeiro por estágio (ex.: cada "Análise completa" reafirmada em combates extras soma de novo). Devolvo a escolha entre as duas, e a decisão sobre as espécies que travam antes do estágio 5 permanecerem travadas nesse ponto mesmo nesse cenário, para o líder.
+⚠️ **Tensão numérica a levar ao líder, não resolvida aqui (mesma família da tensão já registrada em `conquistas.md` §2.9, que este parágrafo atualiza com o número recalculado):** este documento cataloga **20 espécies** (§5.1: 5, §5.2: 6, §5.3: 6, §5.4: 3, contadas por linha de tabela/subseção de §5). Com **14 espécies** completando os 5 estágios, **1 espécie** (Voz Cromada Sterling) travando no estágio 4 e **5 espécies** (Patch-Zero, Anomalia Glitch, Sterling Locke Fase 1, Sterling Locke Fase 2, Mestre pró-Sterling Asmódico) travando no estágio 2, o total de eventos de documentação possíveis no jogo inteiro é **84** (14×5 + 1×4 + 5×2), mesmo documentando tudo, abaixo do limiar de 100 que o líder decidiu manter. Não decido a resolução (L-14 global, L-29 do projeto): as leituras que ficam de pé, já que o limiar está mantido, são (a) crescer o catálogo em espécies novas, precisando de mais margem, ou (b) o contador do achievement somar também eventos de reencontro além do primeiro por estágio (ex.: cada "Análise completa" reafirmada em combates extras soma de novo). Devolvo a escolha entre as duas, e a decisão sobre as espécies que travam antes do estágio 5 permanecerem travadas nesse ponto mesmo nesse cenário, para o líder.
 
 ### 5.1 Inimigos da Cidade (5)
 
@@ -610,15 +610,18 @@ O LIMIAR de 100 não muda com esta correção, só o TETO recalculado abaixo. As
 | **Coletor de Cota FIR** | [[06-periferia|Periferia Industrial]] | HP médio. Ataque: cabo de extração corporal. | HP 14. Imune a 1 turno do primeiro ataque (escudo cota). Solta loot ao morrer. | Cinético quebra escudo cota; depois alvo qualquer | crédito alto, voucher Janelarum | **Bento** (Cronômetro Ressonante quebra cadência escudo) |
 | **Voz Cromada Sterling (entidade ambient hostil)** | [[01-cidade-cyber-gotica|Núcleo Metropolitano]] + [[05-setor-mirage]] | HP indireto (mensagem). Ataque: voz "continue" causa atordoamento mental. | Persistente; não morre. Silenciável por 4 turnos com Mantra do Silêncio. | Sônico Null cancela transmissão | nada material; **info ambient destravada** | **Linda** (Mantra do Silêncio cancela transmissão por 4 turnos) |
 
-### 5.2 Inimigos da Selve (5)
+### 5.2 Inimigos da Selve (6)
 
 | Inimigo | Setting | Stats (estágio 2: Primeiro combate) | Stats (estágio 5: Item de drop identificado) | Fraqueza | Loot | Companion-counter |
 |---|---|---|---|---|---|---|
 | **Raposa-Fractal corrompida** | [[02-selve-sombria|Orla Recursiva]] | HP médio. Ataque: mordida em padrão recorrente. | HP 11. Padrão recorrente corrompido (números errados → sintoma Patch-Zero local). | Bioquímico Null cura corrupção (NÃO mata; transforma em raposa neutra) | semente-relíquia, token Bioquímico | **Jaci** (Antídoto Sintético converte em aliada temporária 3 turnos) |
 | **Coruja-Mandelbrot** | [[02-selve-sombria|Pântano de Markov]] | HP alto. Ataque: olhar recursivo (debuff confusão). | HP 16. Padrão Markov estocástico; telegrafia varia. Boss-tier 3 estados (calm/agitada/recursiva infinita). | Cinético compressivo paralisa ciclo recursivo | pena-Mandelbrot, token Cinético médio | **Bento** (Vetor de Recuo + Cronômetro Ressonante) |
 | **Larva-Polinomial** | [[02-selve-sombria|Orla Recursiva]] | HP baixo. Ataque: cuspe ácido. | HP 6. Multiplica em 3 polinômios de grau 2 se 1 sobrevive 2 turnos. | Pulso EM atordoa antes de multiplicar | polímero Pythia, token Bioquímico baixo | **Cauã** + **Jaci** (combo: EM + Antídoto) |
-| **Anomalia Glitch (Patch-Zero infectado)** | [[02-selve-sombria|Pântano]] + [[08-selve-profunda|Núcleo Mandelbrot Interno]] | HP **glitch (número não estabiliza)**. Ataque: visual descontínuo. | Não estabiliza nunca. Página 4 do bestiary tem glitch tipográfico permanente. Telegrafia falha. | Nenhuma fraqueza catalogada; **selável**, não eliminável | nada material; **info Bloco I** (sticky-notes Patch-Zero) | nenhum companion único; combo party 3+ necessário |
+| **Anomalia Glitch (Patch-Zero infectado)** | [[02-selve-sombria|Pântano]] + [[08-selve-profunda|Núcleo Mandelbrot Interno]] | HP **glitch (número não estabiliza)**. Ataque: visual descontínuo. | Não estabiliza nunca. A entry trava no estágio 2, com glitch tipográfico permanente. Telegrafia falha. | Nenhuma fraqueza catalogada; **selável**, não eliminável | nada material; **info Bloco I** (sticky-notes Patch-Zero) | nenhum companion único; combo party 3+ necessário |
 | **Fungo-Recursivo Patogênico** | [[08-selve-profunda|Selve Profunda]] | HP médio. Ataque: esporos respiratórios em área. | HP 13. Esporos propagam contaminação se aliado não cura em 2 turnos. | Bioquímico Null limpa contágio; Sônico ultrassom quebra esporo | espora-mãe, token Bioquímico médio | **Jaci** (Antídoto em área) + **Linda** (ultrassom suporte) |
+| **Zumbi do Pântano de Markov** | [[02-selve-sombria|Pântano de Markov]] | HP: **PENDENTE DE MEDIÇÃO** (`02-selve-sombria.md` §11). Ataque: não descrito na fonte; a entrada canônica só especifica a queda e a reanimação. | HP: **PENDENTE DE MEDIÇÃO**. Cai a qualquer dano normal, mas reanima com a vida cheia (sem fração residual; reanimação ilimitada), a menos que a queda esteja sob a marca `SigKill` (`cartas-technomagik.md` §5.7). | Nenhuma por volume de dano: só a marca `SigKill` (status Sônico, carta comum "Eco de Encerramento") impede a reanimação, convertendo a queda em morte real dentro da janela de turnos. | ainda não decidido (`TODO.md` item `G29`) | **Linda** (família Sônico, a mesma do `SigKill`) |
+
+**Nota operacional (Pântano de Markov, `02-selve-sombria.md` §11):** o zumbi convive com a Coruja-Mandelbrot e o boss-vírus já catalogados nesta mesma área, sem tirar nenhum dos dois de cena. Alcança os 5 estágios de documentação normalmente: é inimigo regular reencontrável na área, tem fraqueza catalogável (`SigKill`) e recebe loot (lista ainda por decidir, `G29`); nenhuma das travas estruturais do topo desta seção (encontro único, ausência de loot material) se aplica a ele.
 
 ### 5.3 Inimigos cross-settings (Catedrais / Dutos / Mirage / Periferia / Silêncio) (6)
 
@@ -639,7 +642,7 @@ O LIMIAR de 100 não muda com esta correção, só o TETO recalculado abaixo. As
 
 | Stats | Conteúdo |
 |---|---|
-| HP visível pré-encontro | **"?"** (Gus nunca enfrentou; bestiary entry trava em página 1 até momento) |
+| HP visível pré-encontro | **"?"** (Gus nunca enfrentou; bestiary entry trava no estágio 1, avistamento, até momento) |
 | HP completo (estágio 5: Item de drop identificado) | HP central 30 + 7 nodes 5 cada (total 65). Nodes regeneram central em 3 turnos se vivos. |
 | Ataques | Deletar variável (debuff string aliado); reescrita em runtime (anula buff aliado); chuva de drones-mensagem (dano em área) |
 | Fraqueza | Eliminar nodes antes do central. Refração + EM combo destrava prioridade. |
