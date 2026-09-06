@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 **Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 31/08/2026. **Owner:** `technical-writer`; mecânica de recurso fechada por decisão do líder (dado herdado do projeto anterior via L-01 está revogado, ver abaixo).
 
-Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/volta.gw.card). ⚠️ **Esse arquivo ainda carrega o número e o gatilho revogados** — atualizá-lo é fatia própria, fora deste documento (dado de carta, não canon de design).
+Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/volta.gw.card). ✅ **Atualizado em 05/09/2026:** o arquivo passou a usar `trigger: OnCast` e `percent: 21` (energia do alvo), substituindo o gatilho `OnDamageDealt` e o `percent: 50` revogados. O split 55/45 de conversão e a escolha cronometrada por dificuldade ainda não têm campo próprio no schema — ver comentário do arquivo.
 
 ## Ficha rápida
 
@@ -44,5 +44,5 @@ Duas consequências da especificação numérica, registradas e **não resolvida
 - ⚠️ **MARCADO PARA O LÍDER, NASCIDO DA DECISÃO MANA=BATERIA DE 31/08/2026, NÃO RESOLVIDO AQUI:** o custo fixo de **mana 6** (Ficha Rápida) pode estar superado, já que a carta consome toda a carga disponível no uso, não uma quantia fixa. Não decidido, não ajustado.
 - ⚠️ **MARCADO PARA O LÍDER, NÃO RESOLVIDO AQUI:** o princípio canônico de `cartas-hardware-pirataria-energia.md` §3 exige responder, ao planejar cada carta, **"o que muda se ela for original × pirata × homebrew?"** — essa resposta **não existe em lugar nenhum** para o Volta. Não inventada aqui.
 - ⚠️ **ACHADO ADICIONAL, MESMA CATEGORIA, TAMBÉM NÃO RESOLVIDO:** o mesmo §3 exige responder, para toda carta, uma segunda pergunta — **"o que muda se a bateria estiver nova × degradada?"** — e essa resposta também não foi encontrada em lugar nenhum para o Volta. Marcado junto, sem inventar resposta.
-- `resources/cards/volta.gw.card` segue com o número e o gatilho revogados (ver aviso no topo deste documento) — atualização do dado é tarefa separada, não feita aqui.
+- `resources/cards/volta.gw.card` foi atualizado em 05/09/2026 (ver nota no topo deste documento): `trigger: OnCast`, `percent: 21`. O split 55/45 (conversão à party × perda em calor) e a escolha cronometrada por dificuldade seguem sem campo próprio no schema.
 - A chave `CARD_EXEC_VOLTA_NAME` resolve para **"Volt-Leech"** em `resources/translations/pt_br.md` — sem mudança.

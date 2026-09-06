@@ -16,11 +16,13 @@
 #meta power 0
 #meta ignores_weakness_wheel false
 
-// Leech termodinamico: drena uma fracao do dano causado e devolve como
-// recurso ao conjurador. A fracao exata de conversao (VOLTA-LEECH-%) e
-// design ainda em aberto no doc-fonte; o valor abaixo e o que o codigo
-// usava em runtime.
+// Leech termodinamico: ao ser usada (nao mais ao causar dano - leitura
+// revogada pelo lider em 31/08/2026), drena 21% da energia do ALVO por
+// uso. 55% do drenado converte e chega a party; os outros 45% se perdem
+// como calor (2a lei da termodinamica). O schema deste arquivo ainda nao
+// tem campo proprio para o split 55/45 nem para a escolha cronometrada
+// mana-ou-vida por dificuldade; ver docs/design/mecanicas/cartas/volta.md.
 @effect
-trigger: OnDamageDealt
+trigger: OnCast
 kind: Leech
-percent: 50   // kVoltaLeechPercent, //PLAYTEST
+percent: 21   // kVoltaDrainPercent, decisao do lider 31/08/2026: % da energia do ALVO drenada por uso (substitui o antigo kVoltaLeechPercent de 50%, que lia fracao do dano causado)
