@@ -50,8 +50,8 @@ Nota: os **Dutos** são "enxuta" de população mas já **densos de enredo** (mi
 | Área | Dungeons | Ficção |
 |---|---|---|
 | Distritos Inferiores | 0 | rua/tutorial + NPCs (a dungeon da abertura fica nos Dutos) |
-| Núcleo Metropolitano | 0 | hub cívico: lojas, quests, gente |
-| Dutos Infernais | 2 | aparato (abertura) + laboratório FIR (Ato 2) |
+| Núcleo Metropolitano | 1 | hub cívico: lojas, quests, gente; a dungeon é o subsolo do Edifício Vance (`D27`), a mesma estrutura subterrânea dos Dutos Infernais, ligada a eles por uma porta (nota abaixo da tabela) |
+| Dutos Infernais | 1 | aparato (abertura); o laboratório FIR (Ato 2) é a mesma estrutura da dungeon do Núcleo Metropolitano, vista pela outra entrada (nota abaixo da tabela) |
 | Setor Mirage | 1 | o Festival / Cult |
 | Periferia (residencial) | 1 | vielas apertadas da Praça do Compilador |
 | Ferrovelhos (Periferia Industrial) | 1 | reduto do Dante / ferro-velho |
@@ -64,6 +64,14 @@ Nota: os **Dutos** são "enxuta" de população mas já **densos de enredo** (mi
 | Área faraday especial | 1 | ela mesma é a dungeon-segredo |
 | **Total** | **13** | padrão numérico velado no agregado |
 
+**A porta entre o Núcleo Metropolitano e os Dutos Infernais (decisão do líder, 06/09/2026, verbatim: "os dois se interligam, mas a porta é invisível do lado do edf Vance. Só será vista quando aberta do lado dos dutos infernais, se tornando um caminho alternativo. Quando aberta a porta da primeira vez, ela será vista pelos dois lados normalmente.").** O subsolo do Edifício Vance e os Dutos Infernais são o MESMO subterrâneo; uma única dungeon (orçada uma vez, no Núcleo Metropolitano) tem duas entradas. A porta entre as duas tem três estados, nesta ordem exata:
+
+1. **Fechada e invisível do lado do Edifício Vance.** Quem desce pelo alçapão do subsolo do Vance não a vê nem interage com ela.
+2. **Visível e destrancável do lado dos Dutos Infernais**, desde o início. É de lá que a party a abre pela primeira vez.
+3. **Depois de aberta uma vez, visível e utilizável dos dois lados, para sempre** — vira caminho alternativo entre as duas áreas, no mesmo padrão de atalho já canônico (§9: encurta entre dois pontos já alcançáveis, nunca é o único acesso).
+
+Especificação completa da dungeon (os 8 níveis, a segunda entrada, o objeto no fundo): `docs/design/dungeons/subsolo-vance-disco-de-ouro.md` (`D27`).
+
 \* A Selve Profunda também hospeda o **ritual do Núcleo Mandelbrot**, clímax do arco Jaci
 (`docs/narrative/deep/settings/08-selve-profunda.md` §4), posterior à Kola-SG3-12262 na mesma área
 (sequência fixada pelo líder, 05/09/2026, `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md`
@@ -73,12 +81,12 @@ total de 13 acima ficam intactos.
 
 Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; ver seed #2 `FARADAY-DUNGEON-ITENS` + `project_save_dungeon_pem_faraday`): **todas** revestidas por gaiola que contém o PEM, com intensidade de restrição de save que varia por dungeon, fraca ou total (decisão do líder, 21/08/2026, ver `docs/design/mecanicas/save-por-local.md` §1.2).
 
-**Tipos de dungeon (seed #6; variedade, peso em puzzle pela Pillar 4):** cada uma das 13 tem um tipo, distribuído pra nenhuma vizinha repetir. Contagem: tutorial 1 · puzzle puro 4 · só batalhas 3 · labirinto 2 · mista 3.
+**Tipos de dungeon (seed #6; variedade, peso em puzzle pela Pillar 4):** cada uma das 13 tem um tipo, distribuído pra nenhuma vizinha repetir. Contagem: tutorial 1 · puzzle puro 4 · só batalhas 2 · labirinto 2 · mista 4.
 
 | Dungeon | Tipo |
 |---|---|
 | Dutos — aparato (abertura) | tutorial (+ puzzle leve) |
-| Dutos — laboratório FIR | só batalhas |
+| Núcleo Metropolitano — subsolo do Edifício Vance (`D27`) | mista |
 | Setor Mirage — Festival | puzzle puro (ilusão/decifrar) |
 | Periferia (residencial) — vielas | labirinto |
 | Ferrovelhos — reduto do Dante | só batalhas |
@@ -98,12 +106,13 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
 | Selve Profunda (final, Kola-SG3-12262) | **Caverna** (espaço natural) |
 | Selve Sombria | **Caverna** (espaço natural) |
 | Orla Recursiva | **As duas, por profundidade.** Entra como espaço construído (concreto da cidade) e, conforme o jogador desce, transiciona para espaço natural (caverna): não é uma mistura uniforme, é uma progressão em uma direção só, de construído para natural, coerente com a própria Orla já ser descrita como "a dobradiça: onde o concreto encontra a flora fractal" (§7 abaixo). Qualquer leitura de "Orla é meio-a-meio o tempo todo" está errada; ela muda com o andar. |
-| Dutos — aparato (abertura) · Dutos — laboratório FIR · Setor Mirage — Festival · Periferia (residencial) — vielas · Ferrovelhos — reduto do Dante · Zona do Silêncio #1 · Zona do Silêncio #2 · Catedrais #1 · Catedrais #2 · Área faraday | **Sem classificação.** Cada uma se classifica quando for discutida individualmente; ausência de classificação aqui é decisão do líder, não lacuna a preencher por conta própria. |
+| Núcleo Metropolitano — subsolo do Edifício Vance (`D27`) | **Construída** (catacumba/instalação erguida à mão, não espaço natural — `docs/design/dungeons/subsolo-vance-disco-de-ouro.md` §2, dedução direta do próprio conceito, não decisão nova do líder). |
+| Dutos — aparato (abertura) · Setor Mirage — Festival · Periferia (residencial) — vielas · Ferrovelhos — reduto do Dante · Zona do Silêncio #1 · Zona do Silêncio #2 · Catedrais #1 · Catedrais #2 · Área faraday | **Sem classificação.** Cada uma se classifica quando for discutida individualmente; ausência de classificação aqui é decisão do líder, não lacuna a preencher por conta própria. |
 
 **Conceitos de dungeon (só conceito — tema + gimmick + forma; level design fino fica pra produção com a engine + `level-designer`; criador aprovou "só conceito" 2026-07-12):**
 
 1. **Dutos — aparato (abertura):** linear-curta; gimmick = roteamento de energia cooperativo (Gus lê o circuito, Cauã é a corrente), cadeia de 3 sub-circuitos; ensina o loop e apresenta a party. O 1º grande momento de gameplay.
-2. **Dutos — laboratório FIR (Ato 2):** hub com celas; gimmick = ondas de guardas FIR + terminais que o Gus hackeia (desliga câmeras/torres) pra abrir caminho; clímax = payoff da Subestação 7.
+2. **Núcleo Metropolitano — subsolo do Edifício Vance (`D27`):** instalação de guarda esquecida sob a fundação do prédio; gimmick = selos formais (TechnoMagik camada 1) resolvidos por lógica/sequência, combate concentrado perto do fim; 8 espaços em trilha curta e linear com dois desvios opcionais; segunda entrada pelos Dutos Infernais, pela porta de três estados (§4 acima) — do lado dos Dutos, essa entrada É o laboratório FIR (ondas de guardas, terminais hackeáveis, payoff da Subestação 7 do arco do Cauã, que continua intacto); é o próprio Cauã quem acha a porta ao terminar aquele arco. A party sai da dungeon com o disco de ouro. Especificação completa: `docs/design/dungeons/subsolo-vance-disco-de-ouro.md`.
 3. **Setor Mirage — Festival:** labirinto-de-ilusões curto; gimmick = o scan distingue real × holográfico (parede/inimigo falso vs real); decifrar o padrão do Festival pra desligar a extração sensorial. Arco Iara.
 4. **Periferia (residencial) — labirinto de vielas:** o bairro apertado da Praça do Compilador; gimmick = becos/portões/escadas que reconfiguram a rota; refugiados Tesla/Einstein nos cantos.
 5. **Ferrovelhos (Periferia Industrial) — reduto do Dante (só batalhas):** arena em camadas de sucata (cobertura/armadilha), ondas até o núcleo; lar do Dante (tensão velada), FIR presente, e o mercado espontâneo dos economistas nos cantos.
@@ -128,16 +137,24 @@ Camada de lugares secretos **DENTRO de cada dungeon**, distinta da camada por di
 | só batalhas | **1** |
 | tutorial | **1** |
 
-**Aritmética** (contagem de tipos vinda da tabela de §4: tutorial 1 · puzzle puro 4 · só batalhas 3 · labirinto 2 · mista 3):
+**Aritmética** (contagem de tipos vinda da tabela de §4: tutorial 1 · puzzle puro 4 · só batalhas 2 ·
+labirinto 2 · mista 4):
 
 - labirinto: 2 dungeons × 5 = 10
 - puzzle puro: 4 × 3 = 12
-- mista: 3 × 2 = 6
-- só batalhas: 3 × 1 = 3
+- mista: 3 dungeons no padrão × 2 = 6, mais a exceção do Núcleo Metropolitano/`D27` (seção abaixo) = 3
+  → subtotal mista = **9**
+- só batalhas: 2 × 1 = 2
 - tutorial: 1 × 1 = 1
-- **Total: 32 áreas secretas dentro das dungeons.**
+- **Total: 34 áreas secretas dentro das dungeons.**
 
-Somadas às **21** lugares secretos do §5, o jogo passa a ter **53 lugares secretos ao todo**.
+**Exceção nomeada: o Núcleo Metropolitano/`D27` ganha uma área secreta a mais que o padrão da mista
+(3, não 2)** — o que ela comporta por ser a maior das 13 (8 espaços) e por ter duas entradas
+(Edifício Vance e Dutos Infernais, `docs/design/dungeons/subsolo-vance-disco-de-ouro.md` §4). Sem
+esta exceção a soma fecharia em 33; com ela, fecha em 34.
+
+Somadas às **21** lugares secretos do §5, o jogo tem **55 lugares secretos ao todo**. **Os três
+números são Fibonacci, e essa é a razão da escolha, não coincidência: 21 + 34 = 55.**
 
 **As duas camadas são DISTINTAS, não a mesma coisa contada duas vezes:**
 
@@ -145,6 +162,8 @@ Somadas às **21** lugares secretos do §5, o jogo passa a ter **53 lugares secr
 - **§4.1 (esta, cara):** dentro de uma dungeon específica, sala feita à mão.
 
 **⚠️ Superação deliberada e informada do filtro de produção (linha 5 deste documento).** O filtro diz *"o caro (dungeons feitas à mão) fica capado; o barato (lugares secretos pequenos, interiores) escala"* — e continua valendo para tudo o mais neste documento; **esta seção é a exceção registrada**, não uma correção dele. O orquestrador apresentou ao líder a alternativa enxuta (11 áreas secretas, mantendo o filtro estrito) e apontou que 32 é o tipo de número que costuma ser cortado depois sob pressão de prazo. **O líder escolheu 32 mesmo assim, ciente do trade-off, em 31/08/2026, por `AskUserQuestion`.** Registrado aqui para que ninguém "corrija" o número para baixo depois achando que ele escapou da regra, e para que um corte futuro, se vier, seja feito sabendo exatamente o que está sendo cortado.
+
+**Atualização de 06/09/2026, decisão do líder, verbatim:** *"temos que ser fibonacci, entao 33 areas secretas e total de 55"* — e, ao ver que 33 + 21 = 54 e não 55, o líder fechou em **34** áreas secretas dentro de dungeons (a exceção do Núcleo Metropolitano/`D27` acima), com 21 + 34 = 55. Isto não é o corte que a nota de 31/08/2026 protegia: é elevação por critério novo (a sequência de Fibonacci 21-34-55), e a proteção contra baixar o número continua valendo.
 
 **O que NÃO está decidido:** o que há dentro de cada área secreta, onde cada uma fica dentro da dungeon, e que recompensa dá. Fica para produção, junto do layout fino de cada dungeon (§10, item 1).
 
@@ -164,7 +183,7 @@ Camada distinta das 13 dungeons (§4) e dos lugares secretos (§5): eventos ou e
 
 **Efeito no orçamento:** nenhum membro desta categoria consome slot do total fechado de 13 dungeons do §4. A Selve Profunda mantém o orçamento de 1 dungeon (a Kola-SG3-12262) intacto mesmo hospedando também o ritual do Núcleo Mandelbrot: as duas coisas grandes da área não competem pelo mesmo slot porque só uma delas é dungeon.
 
-**O que isto NÃO resolve:** a dungeon de 8 níveis sob o Subsolo do Edifício Vance (`D27`) é uma dungeon de exploração de verdade (level design sala-a-sala, não uma cena única) e continua sem orçamento na área Núcleo Metropolitano (linha 47 acima, 0 dungeons orçadas). Esse é problema distinto, sem saída por este critério: ver `D27` na `TODO.md`.
+**Orçamento da dungeon de 8 níveis sob o Subsolo do Edifício Vance (`D27`):** é dungeon de exploração de verdade (level design sala-a-sala, não uma cena única) pelo critério acima, e está orçada em `Núcleo Metropolitano` na tabela do §4 — a mesma estrutura subterrânea dos Dutos Infernais, ligada por uma porta (nota após a tabela do §4). Especificação completa: `docs/design/dungeons/subsolo-vance-disco-de-ouro.md`.
 
 ## 5. Lugares secretos — gradiente numérico por distância (barato)
 
