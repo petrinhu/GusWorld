@@ -29,7 +29,7 @@ O item TECHMAGIC-EXECUTOR (`techmagic.md`) nomeou um fork: (a) resolvedor data-d
 ## MVP (ordem minima pra destravar PS-Y1 hibrida + PS-Y2 primitivas)
 
 1. **Records/enums** (backend-engineer): `CardTier` (Comum/Especial/Super) + sub-categoria; flags `ignores_weakness_wheel`/`is_universal_compiler`; `std::vector<EffectSpec>` no `Card` (comuns = vetor vazio, intocadas); `StatusId::{SobrecargaTermica, Resfriamento, Reflect}` (numeros de §5 ja fechados). `CardFamily::Universal` ja entregue (ADR/PS-R1, commit e594d07).
-2. **Executor `techMagic` + 3 hooks** (gameplay_engineer): OnCast, OnDamageDealt (leech Volta), OnDamageReceived (reflect Newton) na cadeia de `resolve_use_card`; regra 1x/batalha reusando o flag da Analise Preditiva. -> uma ATIVA, uma PASSIVA e uma HIBRIDA de ponta a ponta = **PS-Y1 fecha**.
+2. **Executor `techMagic` + 2 hooks** (gameplay_engineer): OnCast (inclui o leech da Volta, que drena energia do ALVO — ver `docs/design/mecanicas/cartas/volta.md`), OnDamageReceived (reflect Newton) na cadeia de `resolve_use_card`; regra 1x/batalha reusando o flag da Analise Preditiva. -> uma ATIVA, uma PASSIVA e uma HIBRIDA de ponta a ponta = **PS-Y1 fecha**.
 3. **Ledger cross-ator + hook OnRoundEnd** (Pythagoras): hits por alvo/round no estado de combate. -> **PS-Y2 fecha**.
 4. **Catalogo das especiais** no padrao `canonical_templates` (dados tunaveis num arquivo so; playtest N=3 mexe num lugar).
 5. **Por demanda do slice:** clone entidade-Objeto (slot visual = camada app + prompt glintfx), hooks de turno (Ada/Hayek/Mises), query de posse pras fora-de-combate (nao bloqueia o combate).
@@ -300,8 +300,9 @@ separado por decisao do criador, capricho de paridade com o preview.
   `effects` vazio (so o trunfo `ignores_weakness_wheel=true`) pra `Ativa`, mana 0, com
   `effects = [OnCast -> ApplyStatus NullProof, side_filter AllyOnly]` - concede o status ao
   PORTADOR (proprio Godel ou um aliado, `AllyOnly` inclui self). 1x/batalha via
-  `specials_cast_` (mesmo gate de Volta/Newton/Faraday, secao 2.1). `StatusId::NullProof`
-  (ordinal 17, append-only apos `BlindagemEM`).
+  `specials_cast_` (mesmo gate de Newton/Faraday, secao 2.1; a Volta nao usa este gate, e
+  limitada por bateria, nao por batalha - ver `docs/design/mecanicas/cartas/volta.md`).
+  `StatusId::NullProof` (ordinal 17, append-only apos `BlindagemEM`).
 - **`StatusId::NullProof` = buff-trunfo GUARDADO**, nao um debuff-timer: duracao-sentinela
   ALTA (`dur=99`, `//PLAYTEST` - nao expira por turno na pratica do slice). A saida real e
   por CONSUMO (`remove_status` no hit que fura), nao por tick de duracao - sem isso o
