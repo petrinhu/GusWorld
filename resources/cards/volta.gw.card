@@ -25,4 +25,4 @@
 @effect
 trigger: OnCast
 kind: Leech
-percent: 21   // kVoltaDrainPercent, decisao do lider 31/08/2026: % da energia do ALVO drenada por uso (substitui o antigo kVoltaLeechPercent de 50%, que lia fracao do dano causado)
+percent: 21   // kVoltaDrainPercent, decisao do lider 31/08/2026: % da energia do ALVO drenada por uso

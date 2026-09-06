@@ -133,7 +133,7 @@ Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilib
 
 ### 2.18 — `achv_encourager` (EE-18, "O Encorajador") — parcial
 
-**O que o corpus diz** (`comic-reliefs/homenagens-diegeticas.md`, EE-18): "Sistema oculto: se Gus morre 10 vezes na mesma cena específica, NPC aparece no save ou hospital" com uma fala de encorajamento, oferece **Token-de-Coragem** e grava uma entrada de Diário. Há também uma mensagem opcional de carregamento. **✅ RESOLVIDO em 30/08/2026** (`G12` do `TODO.md`, Eixo 3 de `docs/_secret/proposta-balanceamento-easter-eggs.md`): o efeito escala por dificuldade (cura percentual, sem Token no Hardcore) — magnitude completa adiante nesta seção, na linha "Destravável mais de uma vez".
+**O que o corpus diz** (`comic-reliefs/homenagens-diegeticas.md`, EE-18): "Sistema oculto: dependendo da dificuldade escolhida no save, NPC aparece no save ou hospital" com uma fala de encorajamento, oferece **Token-de-Coragem** e grava uma entrada de Diário. Há também uma mensagem opcional de carregamento. **✅ RESOLVIDO em 30/08/2026** (`G12` do `TODO.md`, Eixo 3 de `docs/_secret/proposta-balanceamento-easter-eggs.md`): o efeito escala por dificuldade (cura percentual, sem Token no Hardcore) — magnitude completa adiante nesta seção, na linha "Destravável mais de uma vez".
 
 **Isto TEM gatilho explícito** (diferente de EE-4/EE-10/EE-16), mas **nunca é enquadrado como "conquista oculta"** com nome e dica de banner, ao contrário de EE-9/EE-12/EE-20 — é descrito como sistema/evento narrativo. Por isso a especificação abaixo cobre o que É derivável, e a seção de perguntas cobre o que não é.
 
