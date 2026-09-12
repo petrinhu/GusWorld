@@ -44,7 +44,7 @@ A pilha de Volta virou reserva de bolso. A gaiola de Faraday virou blindagem de 
 
 Gerações depois da morte dela, todo aparato da rede técnica que repete um passo sozinho, sem ordem nova de ninguém, está, sem saber, relendo o caderno que ela deixou fechado numa gaveta antes de a máquina certa existir pra abri-lo.
 
-O mundo esqueceu o nome de quem escreveu o primeiro Conjuro pra uma máquina que ainda não existia. O caderno, não. Diante do fim, Ada fez consigo o que fazia com todo problema fechado em regra: compilou de si um eco, verso dentro do cálculo, e selou junto da carta antes de a doença chegar à última linha do caderno. O eco dorme até que alguém prove ter seguido o Conjuro do jeito que ela deixou escrito, passo a passo, sem pular etapa; quem prova, encontra Ada uma última vez, e ela entrega a carta pela própria mão.
+O mundo esqueceu o nome de quem escreveu o primeiro Conjuro pra uma máquina que ainda não existia. O caderno, não. Diante do fim, Ada fez consigo o que fazia com todo problema fechado em regra: compilou de si um eco, verso dentro do cálculo, e selou junto da carta antes de a doença chegar à última linha do caderno. O eco dorme até que alguém prove ter seguido o Conjuro do jeito que ela deixou escrito, passo a passo, sem pular etapa; quem prova, encontra Ada uma última vez, e ela entrega a carta pela própria mão. O sinal só chega a quem já sintonizou o rádio do padre Landell; sem ele, o artefato segue mudo mesmo resolvido.
 
 ---
 

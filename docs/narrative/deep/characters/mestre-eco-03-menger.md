@@ -40,7 +40,7 @@ A pilha de Volta virou reserva de bolso. A gaiola de Faraday virou blindagem de 
 
 O tratado dele sobrevive hoje como manuscrito raro, fragmentado, citado por mais de uma facção da boa evolução do presente como fundamento intelectual. No Mercado da Sucata Honesta, entre o Núcleo e a Periferia, o princípio dele nunca parou de rodar: quem compra e quem vende ali mistura moeda oficial e ficha sem nome, do jeito que Menger documentou primeiro. Não é papel deste registro dizer se alguém, ali, sabe que o gesto tem autor.
 
-O mundo esqueceu o copista que riscava preço em boletim de rua, mas o boletim não ficou sozinho. Diante do fim, Menger fez consigo o que fazia com toda peça de sucata: julgou o que restava, comprimiu de si um eco, peça por peça, e o selou junto da carta. O eco dorme até que alguém prove ter entendido o que vale pra quem precisa. Quem prova, encontra: o copista aparece uma última vez, entrega a carta pela própria mão e conversa.
+O mundo esqueceu o copista que riscava preço em boletim de rua, mas o boletim não ficou sozinho. Diante do fim, Menger fez consigo o que fazia com toda peça de sucata: julgou o que restava, comprimiu de si um eco, peça por peça, e o selou junto da carta. O eco dorme até que alguém prove ter entendido o que vale pra quem precisa. Quem prova, encontra: o copista aparece uma última vez, entrega a carta pela própria mão e conversa. O sinal só chega a quem já sintonizou o rádio do padre Landell; sem ele, o artefato segue mudo mesmo resolvido.
 
 ---
 

@@ -33,6 +33,8 @@ A sensação dominante é a de uma cidade que **funciona apesar de si mesma**. O
 *Primeira impressão:* arco de concreto Era 2 monumental com inscrição C-Arcane esmaecida, e duas estações de pesquisa botânica abandonadas ao lado, uma com janela quebrada por raiz que cresceu de dentro pra fora.
 *Gancho exploratório:* portal canônico de saída pra Selve; primeira "amostra" de Patch-Zero visível em casca de árvore (puzzle de leitura para Knowledge alta).
 
+**Cross-ref:** uma central telefônica desativada do Núcleo Metropolitano guarda uma das cinco peças do Rádio do Padre Landell, o diafragma metálico (`docs/design/mecanicas/radio-padre-landell.md` §6).
+
 ## 3. Props narrativos (15)
 
 | Prop | Onde | O que conta |

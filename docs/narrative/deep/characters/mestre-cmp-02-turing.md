@@ -50,7 +50,7 @@ Gerações depois da morte dele, os poucos estudiosos que leem lado a lado o teo
 
 O método de Turing sobrevive como base de todo trabalho posterior de decodificação de cripto-glifo na rede. Todo aparato de varredura que hoje lê um símbolo antigo a partir de um fragmento já conhecido está, sem saber, rodando o mesmo procedimento que ele deixou pronto antes de a Ordem cortar seu acesso a esse trabalho.
 
-A Ordem apagou o nome de quem provou que existe uma máquina única capaz de rodar qualquer procedimento. A carta, porém, não espera sozinha. Diante do fim, Turing fez consigo o que fazia com todo cripto-glifo: tomou um fragmento verdadeiro de si mesmo, compilou o resto por eliminação lógica, e selou o eco junto da carta antes que o acesso cortado virasse silêncio total. O eco dorme até que alguém decifre a prova a partir do fragmento que ela deixa à mostra; quem decifra, encontra Turing uma última vez, e ele entrega a carta pela própria mão.
+A Ordem apagou o nome de quem provou que existe uma máquina única capaz de rodar qualquer procedimento. A carta, porém, não espera sozinha. Diante do fim, Turing fez consigo o que fazia com todo cripto-glifo: tomou um fragmento verdadeiro de si mesmo, compilou o resto por eliminação lógica, e selou o eco junto da carta antes que o acesso cortado virasse silêncio total. O eco dorme até que alguém decifre a prova a partir do fragmento que ela deixa à mostra; quem decifra, encontra Turing uma última vez, e ele entrega a carta pela própria mão. O sinal só chega a quem já sintonizou o rádio do padre Landell; sem ele, o artefato segue mudo mesmo resolvido.
 
 ---
 

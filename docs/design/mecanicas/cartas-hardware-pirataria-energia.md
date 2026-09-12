@@ -852,7 +852,7 @@ Duas camadas que se combinam:
 | | COMUM | ESPECIAL / SUPER original | ESPECIAL / SUPER pirata |
 |---|---|---|---|
 | Craftável | sim, já era canon (`cartas-technomagik.md` §2.2) | **não, nunca** | **sim — decisão de hoje** |
-| Mecanismo | compilação-no-cast (runtime) | progresso narrativo (Tavus-Eco do mestre; para a SUPER, missão-capstone — mecanismo de entrega fechado em 03/09/2026, §15.6) | homebrew via RSB, gravado numa carta vazia, na bancada das oficinas do mercado negro/ferro-velho (§4 e §14 acima) |
+| Mecanismo | compilação-no-cast (runtime) | progresso narrativo (Tavus-Eco do mestre, condicionado ao rádio do padre Landell sintonizado; para a SUPER, missão-capstone — mecanismo de entrega fechado em 03/09/2026, §15.6) | homebrew via RSB, gravado numa carta vazia, na bancada das oficinas do mercado negro/ferro-velho (§4 e §14 acima) |
 | Fidelidade | não se aplica — não há "original" separado da carta pra imitar, é sistema aberto por natureza | é a régua, 100% por definição | **teto de 20%** (§15.2) |
 
 O jogador nunca monta a original ESPECIAL ou SUPER numa bancada — ele monta, no máximo, uma **imitação**. É a mesma distinção que o anti-pillar do `gdd.md` já preservava para a COMUM (compilar ≠ inventar), estendida aqui: gravar uma cópia pirata de uma ESPECIAL ou da SUPER é **duplicar-tentando**, nunca criar (§3.6 acima).
@@ -861,7 +861,7 @@ O jogador nunca monta a original ESPECIAL ou SUPER numa bancada — ele monta, n
 
 **Decisão do líder, 25/08/2026, sobre a SUPER especificamente, verbatim:** *"A original foi criada em asmódico puro, com compilador próprio que se perdeu ao longo dos tempos. As melhores cartas piratas nao alcancam nem 20% de fidelidade, pois RE é impossivel, já que a carta não está disponível para ninguém tentar fazer RE e entender os mecanismos."*
 
-A causa não é dificuldade técnica arbitrária — é que **ninguém jamais teve a carta original em mãos para examinar**. Engenharia reversa exige uma amostra pra desmontar; a SUPER nunca circulou, então não existe amostra. O mesmo vale, por construção, para as 20 ESPECIAIS: cada uma é única, entregue direto pelo Tavus-Eco do mestre, e nunca esteve em circulação para alguém copiar por exame direto. _(Esta extensão às ESPECIAIS é inferência por simetria com a razão dada pelo líder para a SUPER — ele agrupou as duas no mesmo tratamento na decisão 1, mas a frase sobre RE impossível foi dita sobre a SUPER. Sinalizado no relatório para confirmação.)_
+A causa não é dificuldade técnica arbitrária — é que **ninguém jamais teve a carta original em mãos para examinar**. Engenharia reversa exige uma amostra pra desmontar; a SUPER nunca circulou, então não existe amostra. O mesmo vale, por construção, para as 20 ESPECIAIS: cada uma é única, entregue direto pelo Tavus-Eco do mestre (condicionado ao rádio do padre Landell sintonizado), e nunca esteve em circulação para alguém copiar por exame direto. _(Esta extensão às ESPECIAIS é inferência por simetria com a razão dada pelo líder para a SUPER — ele agrupou as duas no mesmo tratamento na decisão 1, mas a frase sobre RE impossível foi dita sobre a SUPER. Sinalizado no relatório para confirmação.)_
 
 **Teto: as melhores cópias piratas não passam de 20% de fidelidade.** É o único número que o líder deu; nenhum outro valor (percentual de sucesso de craft, custo em crédito ou material, taxa por grau de falha) está decidido — fica para a onda de balanceamento, com `economy-designer`, junto do resto da tabela de risco de contaminação (§9) e dos preços já sinalizados como `[calcular]` neste documento.
 

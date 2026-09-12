@@ -44,7 +44,7 @@ A pilha de Volta virou reserva de bolso. A gaiola de Faraday virou blindagem de 
 
 O tratado dele sobrevive hoje como manuscrito raro, fragmentado, citado por mais de uma facção da boa evolução do presente como fundamento intelectual, sem que nenhuma delas o trate como propriedade exclusiva. Não é papel deste registro decidir qual facção lê melhor.
 
-O mundo esqueceu o quadro emprestado e o giz gasto até o cotoco, mas a dedução não parou com o homem. Diante do fim, Mises fez consigo o que fazia com todo axioma: reduziu-se ao passo mais simples, deduziu de si um eco, quadro por quadro, e o selou junto da carta. O eco dorme até que alguém prove ter seguido a dedução até o fim sem pular passo nenhum. Quem prova, encontra: o professor aparece uma última vez, entrega a carta pela própria mão e conversa.
+O mundo esqueceu o quadro emprestado e o giz gasto até o cotoco, mas a dedução não parou com o homem. Diante do fim, Mises fez consigo o que fazia com todo axioma: reduziu-se ao passo mais simples, deduziu de si um eco, quadro por quadro, e o selou junto da carta. O eco dorme até que alguém prove ter seguido a dedução até o fim sem pular passo nenhum. Quem prova, encontra: o professor aparece uma última vez, entrega a carta pela própria mão e conversa. O sinal só chega a quem já sintonizou o rádio do padre Landell; sem ele, o artefato segue mudo mesmo resolvido.
 
 ---
 

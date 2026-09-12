@@ -53,6 +53,8 @@ Hub social informal. Veteranos C-Arcane se reúnem ao fim do dia. Aprendizes cir
 
 Aqui acontece a cena diurna de oficina-em-pé descrita em §8 vinheta A: mestre ensinando C-Arcane a aprendizes ao ar livre, FIR passa de caminhão, Dante cumprimenta naturalmente, leitor 2ª-passada vê desconforto.
 
+**Cross-ref:** uma das cinco peças do Rádio do Padre Landell, o par de esferas de faísca, é achada na Periferia residencial, guardada por um dos refugiados Tesla/Einstein (`docs/design/mecanicas/radio-padre-landell.md` §6).
+
 ### 2.4 Subestação Industrial 11 (FIR ostensivo)
 
 Subestação elétrica com letreiro grande: "**FIR: CIRCULARIDADE QUE CONSTRÓI FUTURO**" (slogan público canônico, [[factions]] §3). Cerca alta, drone Sterling em sobrevoo de baixa altitude regular. Patrulha FIR amarela-e-preta com cortador plasma. Caminhões entrando e saindo carregados.

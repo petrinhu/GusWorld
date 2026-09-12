@@ -40,7 +40,7 @@ Três tiers de carta, com identidade mecânica e narrativa distinta. Nenhum tier
 | Tier | O que é | Como se obtém | Onde vive |
 |---|---|---|---|
 | **COMUM** | conjuro compilado de 3 Tokens (5 famílias + roda de fraqueza, combat.md §6; modelo carta-base + modificador, combat.md §7) | **loja/craft/loot(garantido+aleatório)/achado** (evolução de pillar 2026-07-16, §2.2; a curadoria narrativa migrou pras ESPECIAIS) | deck em campo + mão-loadout, junto com ESPECIAL |
-| **ESPECIAL** | conjuro-assinatura lendário dos 20 mestres, pré-compilado e único (1 cópia no jogo inteiro) | entregue pelo Tavus-Eco do mestre, ao fim da missão dele | 1 dos 15 slots em campo |
+| **ESPECIAL** | conjuro-assinatura lendário dos 20 mestres, pré-compilado e único (1 cópia no jogo inteiro) | entregue pelo Tavus-Eco do mestre, ao fim da missão dele, com o rádio do padre Landell sintonizado no artefato | 1 dos 15 slots em campo |
 | **SUPER** | "A Carta Perdida de Tusk", efeito Consórcio (passiva que potencia as 20 ESPECIAIS + ativa suprema) | **carta original, nunca forjada** (decisão do líder, 25/08/2026); as 20 ESPECIAIS já coletadas são pré-requisito de ACESSO à missão-capstone, não material de um ritual de criação — ver §2.4 | slot dedicado, FORA dos 15 |
 
 ### 2.2 COMUM
@@ -80,7 +80,7 @@ Três tiers de carta, com identidade mecânica e narrativa distinta. Nenhum tier
   - **Regra geral:** a base da carta ESPECIAL fica DENTRO da roda de fraqueza (tem família, tem contra). O jogador ainda pode explorar fraqueza/resistência normalmente contra ela e com ela.
   - **Família das não-elementais (decisão do criador 2026-07-14, achado PS-R1):** só as ~7 cartas do domínio eletromagnético (Faraday/Maxwell/Tesla/Volta/Euler...) mapeiam limpo em Elétrico; as ~13 restantes (matemáticos/computação/economistas/ocultistas) recebem a família **`Universal`** (valor novo do enum `CardFamily`, combat.md §17): FORA da roda de fraqueza, `multFraqueza` sempre 1.0, sem Fraco/Resistente/Imune. Resolve o campo obrigatório `Card.Family` que antes não tinha valor pra elas.
   - **Exceção (trunfo fora da roda):** cartas cuja assinatura NARRATIVA já quebra a regra do sistema (ex.: Gödel, cuja "Sentença Indecidível" ignora imunidade por design temático, um teorema de incompletude não se deixa resolver por classificação de família) ficam marcadas como **trunfo fora da roda**: não seguem `multFraqueza`, resolvem por regra própria. Esse comportamento vive como uma **flag no Card record** (ex.: `IgnoresWeaknessWheel: bool`), não como exceção hardcoded no resolvedor da roda.
-- **Entrega:** o Tavus-Eco do mestre (ver `technomagik.md`, canon 2026-07-12) entrega a carta ao fim da missão, em pessoa (projeção compilada). Nunca é loot de baú, nunca é compra.
+- **Entrega:** o Tavus-Eco do mestre (ver `technomagik.md`, canon 2026-07-12) entrega a carta ao fim da missão, em pessoa (projeção compilada), condicionado ao rádio do padre Landell já sintonizado no artefato (sem ele, o eco não roda). Nunca é loot de baú, nunca é compra.
 - **Naming:** `cardExec-[figura]`, nome real do mestre, NÃO traduzido (ex.: `cardExec-Tesla`, `cardExec-Einstein`, `cardExec-Gödel`).
 
 ### 2.4 SUPER (Tusk)

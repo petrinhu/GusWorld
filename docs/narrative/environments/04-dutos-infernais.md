@@ -58,6 +58,8 @@ Nível 5, profundidade 80m. Pilar de pedra escura, dois metros de diâmetro, cra
 **Primeira impressão:** silêncio inesperado nesta profundidade (paredões Neo-Sylvania absorvem som; eco distante da turbina principal vira murmúrio). Cauã solene aqui, uma das poucas vezes em que ele baixa a voz sem ser brigado por Bento.
 **Gancho exploratório:** entalhes do pilar são cripto-glifos parcialmente legíveis. Bento, se na party, identifica fragmento de Asmódico ancestral: "canal-quente reverenciado em substrato vivo". Sub-quest cross-arc opcional: documentar o pilar (Knowledge Bronze) destrava Diário entry sobre continuidade da matemática rígida da água quente.
 
+**Cross-ref:** uma das cinco peças do Rádio do Padre Landell, a câmara de ressonância, é achada nos Dutos Infernais, num trecho de tubo abandonado (`docs/design/mecanicas/radio-padre-landell.md` §6).
+
 ---
 
 ## 3. Props narrativos (15)

@@ -8,6 +8,9 @@
 > `mundo-topologia.md` §2/§8; nenhuma revelação nova aqui). `docs/design/mecanicas/save-por-local.md`
 > §1.2: intensidade **total**.
 
+> **Cross-ref:** uma das cinco peças do Rádio do Padre Landell, a bobina de Ruhmkorff, é achada
+> entre a sucata dos Ferrovelhos (`docs/design/mecanicas/radio-padre-landell.md` §6).
+
 ## Por que só 1, e por que ela não é puzzle
 
 Verbo da dungeon: onda de combate em arena de sucata até o núcleo. A área secreta não pede

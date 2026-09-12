@@ -31,6 +31,8 @@ Coração público do distrito. Praça octogonal, piso de azulejo cromado que re
 
 **O que ninguém comenta:** o pedestal da estátua tem **placa de latão Era 2 gravada**, originalmente do bairro cooperativo. Hoje coberta por painel de LED Sterling que projeta logo do Cult em loop. Iara conhece a posição exata. Em arco dela, mostra a Gus. Para ler, é preciso desligar o painel por 8 segundos. Player com Knowledge média escuta Iara dizer "abaixa, lê".
 
+**Cross-ref:** uma das cinco peças do Rádio do Padre Landell, a peça que trata a luz como portadora, é achada entre o aparato do Festival do Setor Mirage (`docs/design/mecanicas/radio-padre-landell.md` §6).
+
 ### 2.2 Teatro Holográfico Maior (Caleidoscópio)
 
 Sede oficial de espetáculos Cult Mirage. Fachada de fibra óptica refratante, hierofantes de plantão na entrada, fila contínua de adeptos em vestuário Holohaute. Capacidade ~3.000. Sede da **Atualização Sensorial** ([[tradicoes-cultura]] §6).

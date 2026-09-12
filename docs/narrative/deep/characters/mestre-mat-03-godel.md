@@ -38,7 +38,7 @@ A pilha de Volta virou reserva de bolso. A gaiola de Faraday virou blindagem de 
 
 Gerações depois da morte dele, estudiosos que ele jamais chegou a conhecer desceram aos fólios antigos em busca do teorema inteiro, porque precisavam entender, com urgência que nenhum deles explicava em voz alta, por que uma coisa que não cabia em sistema formal nenhum, e que sistema nenhum conseguia remover de dentro de si, só podia ser contida por fora, nunca apagada por dentro.
 
-O mundo esqueceu quem foi a mão que escreveu a primeira sentença indecidível. A prova, não. Diante do fim, Gödel fez consigo o que fazia com cada sistema formal: codificou a própria vida em poucos símbolos, compilou de si um eco, sentença por sentença, e selou o eco junto da carta. O eco dorme até que alguém prove que entendeu por que nenhuma regra dá conta de provar tudo que enuncia. Quem prova, encontra: o lógico aparece uma última vez, entrega a carta pela própria mão e conversa.
+O mundo esqueceu quem foi a mão que escreveu a primeira sentença indecidível. A prova, não. Diante do fim, Gödel fez consigo o que fazia com cada sistema formal: codificou a própria vida em poucos símbolos, compilou de si um eco, sentença por sentença, e selou o eco junto da carta. O eco dorme até que alguém prove que entendeu por que nenhuma regra dá conta de provar tudo que enuncia. Quem prova, encontra: o lógico aparece uma última vez, entrega a carta pela própria mão e conversa. O sinal só chega a quem já sintonizou o rádio do padre Landell; sem ele, o artefato segue mudo mesmo resolvido.
 
 ---
 

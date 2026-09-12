@@ -40,7 +40,7 @@ O legado maior não cabe nela. O método de rotas que Euler formalizou a partir 
 
 Gerações depois da morte dele, o mesmo vocabulário de rotas atravessou, sem aviso e sem crédito, do mapa de passarelas pra um mapa mais fundo que Euler nunca chegou a ver, emprestado por estudiosos que ele jamais conheceu, pra descrever um território que não aparece em carta nenhuma da rede.
 
-O mundo esqueceu de quem foi a boca que ditou o primeiro símbolo. O tratado, não. Diante do fim, Euler fez consigo o que fazia com cada rede de passarelas: reduziu a própria vida a ponto e linha, ditou de memória um eco, travessia por travessia, e selou o eco junto da carta. O eco dorme até que alguém prove que entendeu por que a paridade de conexão nunca perdoa aposta de plantão. Quem prova, encontra: o cartógrafo aparece uma última vez, entrega a carta pela própria mão e conversa.
+O mundo esqueceu de quem foi a boca que ditou o primeiro símbolo. O tratado, não. Diante do fim, Euler fez consigo o que fazia com cada rede de passarelas: reduziu a própria vida a ponto e linha, ditou de memória um eco, travessia por travessia, e selou o eco junto da carta. O eco dorme até que alguém prove que entendeu por que a paridade de conexão nunca perdoa aposta de plantão. Quem prova, encontra: o cartógrafo aparece uma última vez, entrega a carta pela própria mão e conversa. O sinal só chega a quem já sintonizou o rádio do padre Landell; sem ele, o artefato segue mudo mesmo resolvido.
 
 ---
 
