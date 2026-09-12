@@ -47,7 +47,7 @@ Transcrito de `GODS_LAWS.md` (38 leis, medido em 12/09/2026 por `grep -c "^## L-
 | [L-23](GODS_LAWS.md#l-23) | criar tag, publicar release, ou mexer na versão | Versão e tag são `vA.B.C.D`, como no GlintFx |
 | [L-24](GODS_LAWS.md#l-24) | ver regra, seção ou documento que o líder revogou, ou escrever relatório/reconferência que narraria por que uma versão anterior dele reprovou | Revogado se APAGA; não se guarda como histórico — vale também para histórico de processo (bilhete sobre reprovação anterior) |
 | [L-25](GODS_LAWS.md#l-25) | tocar save, configuração, mapa ou catálogo de conteúdo | Envelope binário selado, teto técnico faseado, cripto vem do GlintFx |
-| [L-26](GODS_LAWS.md#l-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, quatro direções cardeais, grade quadrada |
+| [L-26](GODS_LAWS.md#l-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, grade quadrada; sprite em quatro cardeais, locomoção em oito |
 | [L-27](GODS_LAWS.md#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
 | [L-28](GODS_LAWS.md#l-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
 | [L-29](GODS_LAWS.md#l-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é |
@@ -65,7 +65,7 @@ Transcrito de `GODS_LAWS.md` (38 leis, medido em 12/09/2026 por `grep -c "^## L-
 
 Jogo **2D pixel-art**, single-player e offline, em **C++23**, assentado sobre o framework [GlintFx](../GlintFx) (LEI ZERO): o GusWorld não cria janela, não possui contexto gráfico e não roda laço próprio de quadro — isso é do GlintFx, e o GusWorld escreve só a lógica do jogo.
 
-- **Perspectiva:** 3/4 top-down fixa, quatro direções cardeais desenhadas à mão (sem espelhamento), grade quadrada (L-26).
+- **Perspectiva:** 3/4 top-down fixa, grade quadrada; o **sprite** vive em quatro direções cardeais desenhadas à mão (sem espelhamento) e a **locomoção** aceita diagonal, exibindo o cardeal mais próximo (L-26).
 - **Estrutura de mundo:** **sem mundo aberto e sem mundo persistente** (corte `C-02`). ⚠️ A **forma da conectividade** é do `docs/design/mundo-topologia.md` — 13 áreas em grafo, com dobradiças ligando regiões —, e **não** do corte: em 28/08/2026 o líder tirou da lei a frase que ditava "hub central mais incursões radiais". O radial sobrevive como **ritmo de missão** no `pillars.md`, não como geografia.
 - **Progressão de cartas:** por progresso narrativo **e por crafting**. O corte `C-13`, que proibia carta craftada, foi **revogado pelo líder em 25/08/2026** junto com o `C-03`, restaurando canon do projeto anterior (L-29).
 - **Escopo da campanha:** **fechado e definido por conteúdo; sem número de horas fixado** (corte `C-15`, reescrito em 28/08/2026). O número anterior — 4 a 8 horas — foi derrubado pelo líder, que registrou não tê-lo escolhido; a duração se mede quando houver cena jogável.
@@ -106,7 +106,7 @@ Estas foram tomadas explicitamente via `AskUserQuestion` (salvo onde indicado) e
 |---|---|
 | Natureza | Jogo 2D pixel-art, single-player, offline — executável final, não biblioteca |
 | Linguagem e build | C++23; única dependência de framework é o GlintFx (LEI ZERO) |
-| Perspectiva e câmera | 3/4 top-down fixa, quatro direções cardeais desenhadas à mão, sem espelhamento, grade quadrada (L-26) |
+| Perspectiva e câmera | 3/4 top-down fixa, grade quadrada; sprite em quatro cardeais desenhadas à mão e sem espelhamento, locomoção em oito exibindo o cardeal mais próximo (L-26) |
 | Estrutura de mundo | Sem mundo aberto nem persistente (`C-02`); a **geografia** é o grafo de 13 áreas com dobradiças do `mundo-topologia.md`, não o corte |
 | Plataformas | Fedora 44 (primário, pinado), Ubuntu, Arch, CachyOS (próprio, não é Arch renomeado), Windows — cinco entradas distintas de CI desde o primeiro commit (L-09, L-20) |
 | Arquitetura | Espinha de cinco camadas (`core/ → content/ → domain/ → app/ → present/`), dependência só para baixo, com gate de CI; regra como transição determinística por comando e evento (L-17) |

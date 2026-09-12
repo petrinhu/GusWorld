@@ -92,7 +92,7 @@ Itens ratificados pelo criador supremo Sprint 2 W2 2026-06-03.
 
 | # | Decisão | Canon (ratificado 2026-06-03) |
 |---|---|---|
-| **DA-1** | Câmera e navegação no overworld | **3/4 top-down fixa + controle direto** — WASD/stick move Gus nas quatro direções cardeais (north/south/east/west); câmera acompanha o personagem, sem girar. |
+| **DA-1** | Câmera e navegação no overworld | **3/4 top-down fixa + controle direto** — WASD/stick move Gus livremente, inclusive na diagonal; o sprite exibido é sempre o cardeal (north/south/east/west) mais próximo do vetor de movimento (L-26); câmera acompanha o personagem, sem girar. |
 | **DA-2** | First-strike por Scan prévio | **Sem vantagem mecânica** — Scan no overworld só adianta info. Nenhum bônus em combate. Preserva Pillar 1: "info, não poder". |
 | **DA-3** | Limite/cooldown do Scan-overworld | **Contínuo, sem cooldown** — passivo permanente. AP só existe em combate. Coerente com combat.md §12. |
 

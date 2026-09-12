@@ -10,7 +10,7 @@
 
 ## 1. Decisão
 
-Locomoção top-down em **4 direções puras**: Sul, Norte, Leste, Oeste. Sem diagonais animadas. Estilo de cadência minimalista (poucos frames), suavizável depois sem retrabalho de código.
+Locomoção top-down em oito direções, com deslocamento diagonal liberado; o sprite exibido é sempre um dos quatro cardeais puros (Sul, Norte, Leste, Oeste), o mais próximo do vetor de movimento, sem sprite nem animação diagonal (L-26). Estilo de cadência minimalista (poucos frames), suavizável depois sem retrabalho de código.
 
 As 4 direções são **desenhadas à mão, uma a uma, em TODOS os personagens** (party, antagonistas E NPCs). **Proibido espelhamento / flip horizontal** para gerar Leste a partir de Oeste (ou vice-versa).
 

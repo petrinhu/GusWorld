@@ -177,7 +177,7 @@ Nenhum texto revogado pelo líder permanece legível em bloco de histórico, not
 
 ## L-26
 
-Nenhuma perspectiva do jogo sai de 3/4 top-down fixa com mapa em grade quadrada, e nenhuma câmera gira ou orbita. Nenhuma direção além das quatro cardeais existe, e nenhuma delas é espelhamento horizontal de outra: todas são desenhadas à mão. Nenhuma proposta de diagonal, rotação de câmera ou projeção isométrica avança sem decisão do líder.
+Nenhuma perspectiva do jogo sai de 3/4 top-down fixa com mapa em grade quadrada, e nenhuma câmera gira ou orbita. O sprite de qualquer criatura existe em quatro direções cardeais, e nenhuma delas é espelhamento horizontal de outra: todas são desenhadas à mão. A locomoção, essa, aceita deslocamento diagonal, e o sprite exibido é sempre o cardeal mais próximo do vetor de movimento: move-se em oito, desenha-se em quatro. Nenhuma proposta de sprite diagonal, rotação de câmera ou projeção isométrica avança sem decisão do líder. Decisão do líder, 12/09/2026, verbatim: "Opção um", escolhida entre confirmar oito direções desenhadas e cancelar a mudança.
 
 ## L-27
 

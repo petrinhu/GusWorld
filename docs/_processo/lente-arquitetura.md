@@ -76,7 +76,7 @@ Convenção: FATO = citação de lei ou de trecho do arquivo bruto. INFERÊNCIA 
 
 `D9 | pré-requisitos: D1; decisão B5 pendente | flags: nenhuma (bloqueio por decisão, não por GlintFx) | INFERÊNCIA: diálogo como dado só pode fixar sua forma de armazenamento depois que B5 resolver a tensão .dlg.txt/Markdown vs L-18.`
 
-`D10 | pré-requisitos: D1 | flags: nenhuma | FATO (L-26, já resolvida): grade quadrada, quatro direções cardeais, colisão por célula. A lei já fechou a decisão de perspectiva; este item é só a implementação. Gateia F1 (marcação de bloco atravessável é usada pela carta glitch).`
+`D10 | pré-requisitos: D1 | flags: nenhuma | FATO (L-26, já resolvida): grade quadrada, sprite em quatro cardeais desenhados à mão, locomoção com deslocamento diagonal liberado (sprite mostra o cardeal mais próximo do vetor), colisão por célula. A lei já fechou a decisão de perspectiva; este item é só a implementação. Gateia F1 (marcação de bloco atravessável é usada pela carta glitch).`
 
 `D11 | pré-requisitos: D3, D4, D5, D6, D7, D8, D9, D10 | flags: FUNDACAO | INFERÊNCIA: o modelo de save precisa da forma final de cada sistema de domínio que contribui estado; construir o save antes de D3-D10 estabilizarem obriga a re-serializar tudo a cada mudança de forma. É a base direta de E2.`
 
@@ -156,7 +156,7 @@ Não recebi IDs específicos de TST-*/AUD-* no arquivo bruto (o item diz que "a 
 - **E1 (envelope binário) e por extensão E9 (save híbrido fase 2)**: uma vez que exista um save de jogador no formato, mudar magia/versão/tipo quebra compatibilidade; é exatamente o que a L-23 reserva ao componente A da versão ("quebra de compatibilidade sentida pelo jogador, save antigo incluído"). Custo de errar: forçar todo jogador com save existente a perder progresso, ou construir migração cara.
 - **A5/A8 (licença AGPL-3.0 do código)**: uma vez distribuído o binário combinado com GlintFx sob AGPL, relicenciar depois exige consentimento de todo contribuidor futuro. Custo de errar: impossível de fato reverter num projeto com mais de um contribuidor.
 - **A3 (chave do git-crypt)**: perder a chave depois de cifrar e commitar é perda permanente do conteúdo de docs/_secret/**. Custo de errar: dado irrecuperável, não apenas caro.
-- **D10/L-26 (perspectiva 3/4 top-down, grade quadrada, direções cardeais)**: já decidida por lei, não é decisão em aberto nesta lista, mas registro o custo citado na própria L-26 para contexto: qualquer diagonal, rotação de câmera ou isométrico futuro custa refazer a locomoção dos sete personagens já com sprite pronto.
+- **D10/L-26 (perspectiva 3/4 top-down, grade quadrada, sprite em quatro cardeais, locomoção com diagonal liberada)**: já decidida por lei, não é decisão em aberto nesta lista, mas registro o custo citado na própria L-26 para contexto: sprite diagonal, rotação de câmera ou isométrico futuro custam refazer a arte dos sete personagens já com sprite pronto.
 
 ## Ciclos
 
