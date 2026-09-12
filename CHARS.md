@@ -53,7 +53,7 @@
 
 | Nome | Apelido / codinome | Características | 1ª aparição | Status |
 |---|---|---|---|---|
-| Inácia Berenger | — | Mãe do Cauã, sucateira no Mercado da Sucata Honesta, guarda peças Apex-Data Era 2 corporativa morta | `docs/narrative/environments/01-cidade-cyber-gotica.md` + `factions.md` | ✅ canônico |
+| Inácia Berenger | — | Mãe do Cauã, sucateira no Mercado da Sucata Honesta, guarda peças Apex-Data Era 2 corporativa morta. Ensina pelo faro de ofício, sem nomear, o padrão que separa estoque real de estoque inventado (easter egg do faro da Inácia, `docs/design/mecanicas/easter-egg-faro-de-inacia.md`) | `docs/narrative/environments/01-cidade-cyber-gotica.md` + `factions.md` + `docs/design/mecanicas/easter-egg-faro-de-inacia.md` | ✅ canônico |
 | Davi Berenger | — | Irmão do Cauã. Nascido ~-21, morto aos 16 em -5 na Subestação 7 (alvo Sterling). Cauã tinha 8 anos na perda. Referenciado in-world-docs DD-013 | `docs/narrative/characters/caua-volt.md` + `in-world-docs.md` DD-013 | 💀 morto pré-jogo |
 | Vivendel Berenger | — | Bio-hacker rival/aliado da Jaci na Selve Profunda | `docs/narrative/environments/08-selve-profunda.md` | 🟡 secundário |
 | Salviano Alencar | — | Pai morto do Dante, mestre cooperativo Era 2 (ferro de solda "S.A." na bancada), referenciado in-world-docs DD-016 | `docs/narrative/foreshadowing.md` F129 + `in-world-docs.md` DD-016 | 💀 morto pré-jogo |

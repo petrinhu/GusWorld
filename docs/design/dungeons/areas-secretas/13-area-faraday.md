@@ -3,9 +3,11 @@
 > Tipo: **puzzle puro** (EM/Faraday) · Áreas secretas: **3** · Nível: conceito (ver `_INDEX.md`).
 >
 > Cross-refs: `docs/design/mundo-topologia.md` §4 item 13 (câmara blindada; dentro da gaiola o
-> scan/HUD "cega", sinal morto; o Gus resolve às escuras, por dedução pura; guarda carta/item-chave),
-> §2 (esta é, ela mesma, a dungeon-segredo do mundo, camada distinta das áreas secretas internas
-> aqui descritas), §9 (o item-chave Faraday/Tesla como chave de mundo). `docs/design/mecanicas/save-por-local.md`
+> scan/HUD "cega", sinal morto; o Gus resolve às escuras, por dedução pura; guarda carta/item-chave;
+> nota de resolução acrescentada em 12/09/2026 nomeia o mecanismo da fechadura/porta principal
+> citado na Área secreta C abaixo — **espiral de Ulam**, decisão do líder), §2 (esta é, ela mesma,
+> a dungeon-segredo do mundo, camada distinta das áreas secretas internas aqui descritas), §9 (o
+> item-chave Faraday/Tesla como chave de mundo). `docs/design/mecanicas/save-por-local.md`
 > §1.2: intensidade **total**. `docs/design/mecanicas/cartas/dee.md` e a carta passiva Gaiola de
 > Faraday não são tocadas por este documento.
 
@@ -56,6 +58,11 @@ na mão. A blindagem protege o segredo até de quem a construiu.
 geométrica que resolve a fechadura/porta principal). Depois de resolvido, aplicar essa MESMA
 regra numa parede lateral, ainda não testada, revela que ela não se encaixa: uma exceção à regra
 que só é perceptível depois de já ter aprendido a regra.
+
+Vale aqui a mesma trava do puzzle principal (`mundo-topologia.md` §4, nota "a espiral de Ulam"):
+quem resolve é o jogador, sem anúncio do personagem, sem marcação de interface, e sem a exceção
+cedendo por insistência — o jogo confere só o acerto ao reaplicar a regra na parede lateral, nunca
+se o jogador sabe explicar por que ela falha ali.
 
 **Como se entra:** reaplicar a lógica do puzzle principal, já resolvido, a uma segunda superfície
 da câmara, e notar que ali ela falha; o próprio fracasso é a pista.

@@ -176,6 +176,7 @@ Vendedora dos perfumes-memória. Cobertura cínica que esconde informante leve d
 - **Exploração vertical:** prédios do Mirage têm 4-5 andares, fachadas escaláveis por andaime de eventos Cult. Cobertura visual permite ver "atrás" dos hologramas. Recompensa Knowledge: lore-fragments + linha-de-visão pra Praça do Olho Refratado.
 - **Stealth ambient:** distrito tem patrulhas Cult contratadas + drones Sterling de baixa altitude. Gus pode atravessar sem combate usando **cifragem Iara** (token criptográfico + bool aliado). Falha em ato 2 = encontro forçado; sucesso = bypass + bonus Knowledge entry sobre rotas Cult.
 - **Hub social:** Praça do Olho Refratado funciona como hub menor durante ato 2; Gus volta entre arcos pra ouvir ambient mudar (NPCs comentam progresso da resistência artista, fofocas Cult, descontentamento crescente pós-festival sabotado).
+- **Salão do Tapete Perfeito** (Catacumbas do Cult, nível -1): câmara-armadilha com o piso mutilado e a prova por paridade de cor, decisão do líder 12/09/2026. Especificação completa: `docs/design/dungeons/mirage-piso-mutilado.md`.
 
 ---
 

@@ -2,23 +2,16 @@
 
 > Tipo: **mista (clímax)** · Áreas secretas: **2** · Nível: conceito (ver `_INDEX.md`).
 >
-> ⚠️ **RETIDO. Decisão do líder, 05/09/2026, por `AskUserQuestion`: as duas áreas abaixo aguardam
-> revisão dele, separadas das outras doze. Nada neste arquivo é canon até essa revisão.** Aquela
-> dungeon foi decidida linha a linha pelo líder e acabou de passar por um recuo de material para a
-> área cifrada; um erro ali custa mais que nos outros doze. Documento hub já existente e aprovado:
-> `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md`, com beat sheet fixado (secão 3,
-> beats 1-8 públicos, beats 9-12 em área cifrada `docs/_secret/dungeons/kola-sg3-12262-desfecho.md`).
-> As duas áreas abaixo são desvios opcionais **ancorados só nos beats já públicos e já aprovados
-> (1 e 3)**, sem alterar a cadeia de missão fixada, sem tocar nenhum beat cifrado, e sem inventar
-> fato de lore novo sobre o espelho, a Era Lendária ou o confronto final; reconferidas em
-> 05/09/2026 contra o texto público atual do documento hub (pós-recuo), sem divergência encontrada:
-> beats 1 e 3 seguem exatamente como estavam quando as duas áreas foram ancoradas. `docs/design/mecanicas/save-por-local.md`
-> §1.2: intensidade **total** (como as outras 12; a Kola não é a exceção fraca, que é só a
-> dungeon de abertura).
+> Cross-refs: documento hub já aprovado, `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md`,
+> com beat sheet fixado (secão 3, beats 1-8 públicos, beats 9-12 em área cifrada
+> `docs/_secret/dungeons/kola-sg3-12262-desfecho.md`). As duas áreas abaixo são desvios opcionais
+> ancoradas só nos beats já públicos (1 e 3), sem alterar a cadeia de missão fixada, sem tocar
+> nenhum beat cifrado, e sem inventar fato de lore novo sobre o espelho, a Era Lendária ou o
+> confronto final. `docs/design/mecanicas/save-por-local.md` §1.2: intensidade **total** (como as
+> outras 12; a Kola não é a exceção fraca, que é só a dungeon de abertura).
 >
-> ⚠️ **Área secreta B segue a mesma régua do `_INDEX.md`:** nenhuma área secreta pode depender de
-> o jogador já ter feito a escolha, às cegas, que a própria área premia. Continua RETIDO como o
-> resto do arquivo.
+> Área secreta B segue a mesma régua do `_INDEX.md`: nenhuma área secreta pode depender de o
+> jogador já ter feito a escolha, às cegas, que a própria área premia.
 
 ## Por que 2, e por que ficam só nos beats públicos
 

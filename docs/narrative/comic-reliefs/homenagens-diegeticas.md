@@ -278,3 +278,9 @@ Rio acima, presa numa raiz da margem do Lentíssimo, uma bandeira preta desbotad
 
 Não há recompensa mecânica. É só flavor: a bandeira balança na água, e Gus segue viagem.
 
+---
+
+**A numeração EE-N continua além deste catálogo.** EE-23 e EE-24 vivem em
+[`easter-eggs-educacionais.md`](easter-eggs-educacionais.md): não são homenagem a obra externa, são
+um easter egg educacional (o faro da Inácia) ensinado por um personagem do próprio mundo.
+

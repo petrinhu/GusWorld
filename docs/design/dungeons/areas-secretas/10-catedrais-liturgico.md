@@ -35,13 +35,24 @@ que precisa de atenção deliberada, contra o instinto de "ignorar o que já fun
 **Pista:** o piso tesselado do pátio (padrão geométrico repetido) tem uma seção que não fecha a
 conta do resto do desenho, um encaixe visivelmente errado numa mosaico normalmente perfeito.
 
-**Como se entra:** pressionar/girar a peça que não fecha, revelando um mecanismo por baixo.
+**Como se entra:** pressionar/girar a peça que não fecha revela, sob o piso, a entrada de uma
+capela lateral: ali esperam a bancada de vidro estilhaçado e os oito torniquetes de corda da
+rosácea, sob os pés de quem passa desde antes de a área existir para o jogador.
 
-**O que guarda:** categoria: lore da Ordem Recursiva. Conteúdo exato: produção.
+**O enigma:** o vitral das quatro cores. A peça de piso que não fecha a conta é só a pista que
+leva até a rosácea; o enigma que a party resolve dentro da capela é o vitral em si, concepção
+completa (as oito regiões, a armadilha do vértice contra a borda, a amostra que ensina antes de
+cobrar, a trava de que é o jogador quem resolve, nunca o jogo):
+`docs/design/dungeons/areas-secretas/catedrais-vitral-quatro-cores.md`.
+
+**O que guarda:** um registro da Ordem Recursiva sobre o mestre que montou a rosácea (lore) e
+fragmentos de vidro-tech tratado (material de crafting), as duas metades do mesmo achado;
+detalhes no documento do vitral, §8.
 
 **O que conta:** o pátio onde Bento foi ferido guarda, literalmente sob os pés de quem passa, uma
-falha que ninguém consertou: o espaço carrega o peso do que aconteceu ali sem precisar de uma
-cena para confirmar.
+falha que ninguém consertou. E a falha, resolvida, não é sobre castigo: a "conta" do piso e a
+"conta" das quatro cores são a mesma ideia dita de dois jeitos: um padrão que só parece não
+fechar até alguém ler a fronteira com cuidado.
 
 ## Área secreta C: A alvenaria nova demais
 

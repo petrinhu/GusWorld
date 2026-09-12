@@ -21,6 +21,17 @@ Não tem nenhum efeito de combate. É uma carta de posse: dá um atalho de explo
 
 O nome vem do problema clássico: "As 7 pontes de Königsberg: dava pra cruzar todas sem repetir? Euler resolveu e criou a teoria dos grafos. Eis o seu mapa" (`_EFEITOS-ESCOLHIDOS.md`). O efeito escolhido junta duas peças (`_EFEITOS-ESCOLHIDOS.md`, Lote 3): a "Ponte de Euler" (passiva de atalho) e "Traçar Rota" (ativa que revela o grafo de uma dungeon) — a mesma lógica de teoria dos grafos, aplicada como mecânica de exploração. No código-fonte, isso aparece só como registro posse-only, sem `EffectSpec`: o sistema de "revelar grafo" em si não tem implementação, é design de exploração ainda a construir.
 
+## Fronteira: o que a carta não faz
+
+A face ativa ("Traçar Rota") revela o MAPA de uma dungeon (nós e conexões, nos óculos táticos):
+quais salas existem e o que liga a quê. Ela nunca revela qual caminho satisfaz a condição de um
+enigma, nunca destaca a saída certa, e nunca computa paridade ou qualquer outra conta do puzzle.
+Nenhum puzzle do jogo, incluindo a própria missão de descoberta desta carta na Periferia
+(`docs/design/dungeons/periferia-pontes-de-konigsberg.md`), se resolve por equipá-la ou usá-la:
+mostrar que uma ligação existe não é o mesmo que apontar qual delas sobra ou falta. Decisão do
+líder, 12/09/2026, generalizada em L-38 de `GODS_LAWS.md`: nenhum enigma do jogo cede por
+ferramenta do jogo em vez do jogador que segura o controle.
+
 ## Pontas soltas
 
 - Nenhum número numérico afinável — a carta não tem `@effect` nenhum no legado.

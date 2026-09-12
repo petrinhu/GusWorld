@@ -66,13 +66,14 @@ exploração.
 | 9 | `09-selve-sombria.md` | Selve Sombria: mista | mista | 2 | fechado |
 | 10 | `10-catedrais-liturgico.md` | Catedrais #1: puzzle litúrgico | puzzle puro | 3 | fechado |
 | 11 | `11-catedrais-batalhas.md` | Catedrais #2: só batalhas | só batalhas | 1 | fechado |
-| 12 | `12-selve-profunda-kola.md` | Selve Profunda: Kola-SG3-12262 (final) | mista (clímax) | 2 | ⚠️ RETIDO |
+| 12 | `12-selve-profunda-kola.md` | Selve Profunda: Kola-SG3-12262 (final) | mista (clímax) | 2 | fechado |
 | 13 | `13-area-faraday.md` | Área faraday especial | puzzle puro (EM) | 3 | fechado |
 | | | | **Total** | **34 (32 escritas)** | |
 
-## Estado de aprovação (05/09/2026, decisão do líder por `AskUserQuestion`; item 2 corrigido em 12/09/2026)
+## Estado de aprovação (05/09/2026, decisão do líder por `AskUserQuestion`; item 2 corrigido em
+12/09/2026; item 12 aprovado em 12/09/2026)
 
-**11 arquivos fechados, 1 retido, 1 pendente.** Os arquivos 1, 3 a 11 e 13 (11 dungeons) tiveram a
+**12 arquivos fechados, 1 pendente.** Os arquivos 1, 3 a 12 e 13 (12 dungeons) tiveram a
 granularidade de design confirmada pelo líder e seguem como estão.
 
 **O arquivo 2 (`02-dutos-laboratorio-fir.md`) está PENDENTE.** A dungeon que ele descreve é o
@@ -80,12 +81,3 @@ subsolo do Edifício Vance (`D27`, tipo mista, com a exceção do Núcleo Metrop
 entrada dos Dutos Infernais; ela tem direito a 3 áreas secretas, e só 1 (a "Área secreta A: A cela
 armada") está escrita. As outras 2 não foram inventadas aqui: ficam para o líder decidir, junto do
 `level-designer`, quando este arquivo voltar a ser trabalhado.
-
-**O arquivo 12 (`12-selve-profunda-kola.md`) está RETIDO, separado dos outros doze: nada nele é
-canon até o líder revisar.** É o único que toca uma dungeon já canonizada em profundidade
-(`docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md`), com beat sheet fixado pelo líder e
-metade do conteúdo em área cifrada, que acabou de passar por um recuo de material para a cifra;
-um erro ali custa mais que nos outros doze. As duas áreas secretas propostas ali são desvios
-opcionais ancorados nos beats já públicos (1 e 3), reconferidas em 05/09/2026 contra o texto
-público pós-recuo sem divergência encontrada, sem tocar nenhum beat cifrado (4 em diante) nem
-alterar a cadeia de missão existente.

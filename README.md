@@ -59,7 +59,9 @@ GusWorld é escrito em **C++23** ([L-03](GODS_LAWS.md#l-03)). A única dependên
 - [`Standards.md`](Standards.md): índice dos manuais de processo do projeto (código, testes, metodologia ágil, deploy, auditorias, ferramentas).
 - [`docs/design/pillars.md`](docs/design/pillars.md): os cinco pilares criativos, por completo.
 - [`sinopse.md`](sinopse.md), [`CHARS.md`](CHARS.md), [`PLACES.md`](PLACES.md): o panorama canônico do mundo, o inventário de personagens e o inventário de lugares.
+- [`docs/mapa-do-lore.md`](docs/mapa-do-lore.md): mapa por assunto de todo o lore do mundo (gente, lugares, tempo, língua, facções, objetos, sistemas, história, textos in-world, humor e segredos), com caminho para cada documento.
 - [`docs/tech/adr/`](docs/tech/adr/): os registros de decisão de arquitetura.
+- [`docs/decisoes-do-lider.md`](docs/decisoes-do-lider.md): índice único das decisões do líder, com data e onde cada uma vive por completo.
 - [`TODO.md`](TODO.md): a tabela de pendências, onde o projeto está agora e o que vem a seguir.
 
 ## Contribuindo

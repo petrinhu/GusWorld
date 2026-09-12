@@ -33,6 +33,7 @@ Cenas de humor LucasArts-like (Monkey Island, Amazon Queen, Day of the Tentacle,
 | Cena 13: "Linha de comando" (peer pressure) | [`comic-reliefs/cena-13-linha-de-comando.md`](comic-reliefs/cena-13-linha-de-comando.md) |
 | Cena 14: "Comutador vs Tocador-Trono" | [`comic-reliefs/cena-14-comutador-vs-tocador-trono.md`](comic-reliefs/cena-14-comutador-vs-tocador-trono.md) |
 | Homenagens diégeticas (catálogo com as 11 obras, EE-1 a EE-22) | [`comic-reliefs/homenagens-diegeticas.md`](comic-reliefs/homenagens-diegeticas.md) |
+| Easter eggs educacionais, sem homenagem a obra externa (EE-23 e EE-24, o faro da Inácia) | [`comic-reliefs/easter-eggs-educacionais.md`](comic-reliefs/easter-eggs-educacionais.md) |
 | Cena 15: "Pergunta amanhã" (o Cauã descobre; 3 movimentos) | [`comic-reliefs/cena-15-pergunta-amanha.md`](comic-reliefs/cena-15-pergunta-amanha.md) |
 | Cena 16: "Ela está pensando" (Cauã x Iara, a briga sem o Gus) | [`comic-reliefs/cena-16-ela-esta-pensando.md`](comic-reliefs/cena-16-ela-esta-pensando.md) |
 | Cena 17: "Pra frente e pra trás" (Jaci x Linda) | [`comic-reliefs/cena-17-pra-frente-e-pra-tras.md`](comic-reliefs/cena-17-pra-frente-e-pra-tras.md) |

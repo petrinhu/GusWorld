@@ -85,6 +85,7 @@ A sensação não é a de aventura selvagem. É a de **estar dentro de algoritmo
 - **Puzzle:** ler o fungo de tronco-vermelho ([[in-world-docs]] doc 7 fragmento 11) para prever queda de folha em sete dias e usar timing para descobrir trilha segura sazonal. Knowledge alto destrava versão completa (3 folhas mapeáveis, 3 trilhas).
 - **Encontro:** boss-vírus turn-based no Pântano de Markov. Comportamento previsível via cadeia de Markov (estado anterior prevê próximo). Pillar 1: jogador atento ganha sem dano. Jogador apressado leva 3 turnos a mais. Pillar 2: vírus = bug com regras, debug = puzzle.
 - **Exploração:** mapear as 50 placas de latão Era 2 da Trilha dos Pioneiros. Knowledge Progression: recompensa entries Diário substanciais (cada placa conta um pioneiro), não XP combatível. Algumas placas em zonas perigosas exigem timing. Vinculado a [[bento-requiem]] arco (cooperação Asmódico-Pythia recompensada).
+- **Puzzle (mecanismo do gimmick de flora matemática, decisão do líder 12/09/2026):** o jardim, autômato celular que abre o ramal mais curto da trilha. Especificação completa em `docs/design/dungeons/selve-sombria-jardim-de-conway.md`.
 
 ## 8. Vinhetas sensoriais (2 cenas curtas)
 

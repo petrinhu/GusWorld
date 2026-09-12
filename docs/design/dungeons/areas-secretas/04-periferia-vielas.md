@@ -3,9 +3,11 @@
 > Tipo: **labirinto** · Áreas secretas: **5** · Nível: conceito (ver `_INDEX.md`).
 >
 > Cross-refs: `docs/design/mundo-topologia.md` §4 item 4 (gimmick: becos/portões/escadas que
-> reconfiguram a rota; refugiados Tesla/Einstein nos cantos, Praça do Compilador); §9 (cartas
-> Tesla/Newton como chave de mundo, tema compatível). `docs/design/mecanicas/save-por-local.md`
-> §1.2: intensidade **total**.
+> reconfiguram a rota; refugiados Tesla/Einstein nos cantos, Praça do Compilador; nota de resolução
+> acrescentada em 12/09/2026 nomeia o mecanismo do labirinto inteiro, decisão do líder: **as Sete
+> Pontes de Königsberg**, especificação completa em
+> `docs/design/dungeons/periferia-pontes-de-konigsberg.md`); §9 (cartas Tesla/Newton como chave de
+> mundo, tema compatível). `docs/design/mecanicas/save-por-local.md` §1.2: intensidade **total**.
 
 ## Por que 5, e por que todas pedem orientação espacial
 
