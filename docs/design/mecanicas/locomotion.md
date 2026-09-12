@@ -16,6 +16,10 @@ As 4 direções são **desenhadas à mão, uma a uma, em TODOS os personagens** 
 
 > **Motivo canônico (Pillar 3):** o hardware do personagem é assimétrico. Os óculos táticos, a Matriz Ortodôntica (antena UHF/VHF do Gus) e os aparatos laterais ficam de UM lado. Um flip horizontal trocaria o lado do aparato (antena no lado errado, olho do óculos invertido), quebrando a leitura diegética do Triângulo de hardware. Por isso Leste e Oeste são desenhos distintos, nunca o mesmo desenho refletido.
 
+A diagonal não corta canto: o passo diagonal só acontece quando as duas células cardeais vizinhas ao movimento estão livres. Se uma delas está bloqueada, o passo diagonal não acontece. Efeito observável: diante da quina de um obstáculo, o personagem contorna em vez de atravessá-la. Esta regra é colisão em grade, lógica de jogo pura: o GusWorld a escreve e a testa sem depender do GlintFx.
+
+**Fronteira com o GlintFx (LEI ZERO, L-05):** ler a entrada (duas teclas simultâneas ou eixo analógico) e transformar isso num vetor de direção é do GlintFx, não do GusWorld. A locomoção diagonal só se manifesta quando esse vetor chegar de lá.
+
 ---
 
 ## 2. Estados, poses, direções e custo de desenho
