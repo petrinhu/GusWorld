@@ -56,6 +56,7 @@
 | [L-35](#l-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, o resultado é "não executado" |
 | [L-36](#l-36) | decidir se lore ainda não escrita atrasa uma fatia de engenharia, ou sentir a tentação de esperar completar canon antes de codar | Lore que falta não bloqueia código, puxa-se sob demanda em micro-sessão pontual; distinta da L-13, que trava por canon que contradiz, não por canon que ainda falta |
 | [L-37](#l-37) | editar, revisar ou propor mudança em fala, aparte, revide, cena ou traço de caracterização já aprovado que define o Gus original | Mudança em conteúdo já aprovado do Gus original exige nova autorização explícita do líder; parente da L-16, sem fundir nela |
+| [L-38](#l-38) | desenhar, revisar ou implementar qualquer enigma, puzzle ou câmara de lógica do jogo | Nenhum puzzle cede por ferramenta do jogo em vez do jogador; só o acerto é conferido, nunca o vocabulário; vale para todo enigma, escrito antes ou depois desta lei |
 
 ---
 
@@ -238,3 +239,7 @@ Nenhuma fatia de engenharia espera lore ainda não escrita: lore que falta se pu
 ## L-37
 
 Nenhuma fala, aparte, revide, cena ou traço de caracterização do Gus original já aprovado pelo líder linha a linha é editado, reescrito, cortado, comprimido ou acrescentado sem nova autorização explícita dele, nem quando a mudança parece compressão honesta. Esta lei não se confunde com a lei de homenagem a pessoa real: aquela autoriza a homenagem existir; esta autoriza mudar o que já foi aprovado.
+
+## L-38
+
+Nenhum enigma do jogo, em nenhuma dungeon, câmara ou área secreta, cede por ferramenta do jogo em vez do jogador que segura o controle: nenhum personagem anuncia o padrão em fala ou aparte, nenhuma marcação de interface (HUD, scan, contorno de destaque, prompt) aponta a resposta, e nenhuma passagem cede por insistência ou tentativa exaustiva confortável. A regra vale para todo enigma do jogo, escrito antes ou depois desta lei, sem exceção por antiguidade, e cada documento de puzzle repete a frase-guarda no próprio texto: qualquer solução em que o jogo aponte a resposta contradiz esta decisão. Decisão do líder, 12/09/2026, verbatim: "o jogador resolve, nao é pra ser automatico". O jogo confere só o acerto, nunca o vocabulário técnico por trás dele.
