@@ -1,18 +1,26 @@
-# Áreas secretas · Dutos Infernais: laboratório FIR (Ato 2)
+# Áreas secretas · Núcleo Metropolitano: subsolo do Edifício Vance (`D27`), entrada dos Dutos Infernais/laboratório FIR (Ato 2)
 
-> Tipo: **só batalhas** · Áreas secretas: **1** · Nível: conceito (ver `_INDEX.md`).
+> Tipo: **mista (`D27`, exceção do Núcleo Metropolitano)** · Áreas secretas: **3** (1 escrita, 2
+> pendentes, ver `_INDEX.md`) · Nível: conceito (ver `_INDEX.md`).
+>
+> **Correção de 12/09/2026:** esta dungeon é o subsolo do Edifício Vance (`D27`), a mesma
+> estrutura subterrânea dos Dutos Infernais, vista aqui pela entrada do lado dos Dutos (o
+> laboratório FIR); ela não é uma dungeon separada de tipo "só batalhas". Por ser a maior das
+> treze dungeons e ter duas entradas, `mundo-topologia.md` §4.1 dá a ela uma área secreta a mais
+> que o padrão da mista (3, não 2).
 >
 > Cross-refs: `docs/design/mundo-topologia.md` §4 item 2 (conceito da dungeon: hub com celas,
-> ondas de guardas FIR, terminais que Gus hackeia); `docs/design/mecanicas/save-por-local.md` §1.2
-> (intensidade **total**: só se salva na porta).
+> ondas de guardas FIR, terminais que Gus hackeia) e §4.1 (a exceção do `D27`);
+> `docs/design/dungeons/subsolo-vance-disco-de-ouro.md` §4 (a dungeon completa, com as duas
+> entradas); `docs/design/mecanicas/save-por-local.md` §1.2 (intensidade **total**: só se salva na
+> porta).
 
-## Por que só 1, e por que ela não é puzzle
+## Por que esta área não é puzzle, mesmo sendo combate sob pressão
 
-O verbo desta dungeon é combate sob pressão, não exploração: o jogador já está dentro de um hub
-com celas e ondas de guardas, navegando por terminais que ele mesmo hackeia para avançar. Uma
-dungeon só de batalhas ganha 1 área secreta porque o desvio dela nunca pode pedir o mesmo tipo de
-leitura espacial de um labirinto: pedir isso aqui contradiria o próprio verbo do espaço. A área
-secreta de uma dungeon de batalha é um risco extra de combate, não um enigma.
+O verbo desta entrada é combate sob pressão, não exploração: o jogador já está dentro de um hub
+com celas e ondas de guardas, navegando por terminais que ele mesmo hackeia para avançar. A área
+secreta já escrita abaixo é um risco extra de combate, não um enigma, porque pedir leitura
+espacial (como um labirinto pede) contradiria o verbo deste trecho da dungeon.
 
 ## Área secreta A: A cela armada
 
