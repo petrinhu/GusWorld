@@ -314,7 +314,7 @@ Encaixa **imediatamente após o Beat 5** (§6): o Gus sai do apartamento Vance, 
 - **Premissa diegética:** o aparato da Era 1 transmite porque a energia flui por um **caminho corrompido** dentro dele.
 - **Loop cooperativo:** o **Gus LÊ** (scan) a topologia do circuito e **deduz a sequência de nós** correta; o **Cauã é a corrente** — redireciona a energia pelos nós na ordem que o Gus dita. Complementaridade literal: um pensa, o outro executa a descarga.
 - **Formato: cadeia de 3 sub-circuitos (escalada tutorial).** Três mini-circuitos em sequência, cada um introduzindo UMA regra nova:
-  1. **Ordem** — ligar os nós na sequência correta que o scan revela.
+  1. **Ordem**: o scan revela a topologia do circuito, quais nós existem e como estão ligados; no primeiro sub-circuito essa cadeia é curta e linear a ponto de a sequência de ligação saltar aos olhos assim que a topologia aparece, sem o jogo apontá-la.
   2. **Evitar o nó corrompido** — o scan marca um nó "doente"; a solução tem que contorná-lo.
   3. **Redirecionar** — reencaminhar a corrente por um caminho alternativo pra fechar o circuito são.
   A escalada ensina por fazer e culmina no desligamento do aparato.

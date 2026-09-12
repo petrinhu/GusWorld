@@ -87,6 +87,12 @@ Rota elegante: aguardar P1 afastar (passo onde P1 está em col 4), cruzar row2�
 
 Determinístico, sem RNG punitivo (Pillar 2). Sem twitch (Pillar 1: pressão é lógica). Hardware-triad presente (Pillar 3). Complexidade de 11 anos (K baixo, janelas legíveis, Pillar 4). Stealth aqui é **modo de puzzle pontual, não sistema obrigatório** (respeita corte GDD §9). No VS, caminho único (D4 canon 2026-06-03): todos N=3 testadores validam o Gambito-puzzle. Rota alternativa de combate no jogo final. Sem open-world. **"Sem crafting profundo" aqui descreve só este módulo de puzzle** (ele não usa crafting) — não é corte de escopo do jogo: o jogo TEM crafting, inclusive de cartas (ver `docs/design/gdd.md` §9 e `cartas-technomagik.md` §2.2-2.4).
 
+## 11. Fronteira com a L-38 (enigma versus vigilância)
+
+O que os Óculos Táticos projetam aqui é ESTADO do mundo: onde cada patrulha está, para onde ela anda no seu ciclo, e o que o cone de visão dela alcança naquele tick. Isto nunca é a RESPOSTA de um enigma. A L-38 (nenhum enigma cede por ferramenta do jogo em vez do jogador) continua valendo integralmente nesta dungeon para qualquer enigma de lógica que ela venha a ter.
+
+A linha que separa as duas coisas: mostrar estado observável é ferramenta legítima; resolver o raciocínio pelo jogador é o que a L-38 proíbe. O Gambito-puzzle exige que o próprio jogador calcule, a partir do estado mostrado, a janela de passagem e a rota; os Óculos não calculam essa janela por ele, não indicam qual rota é a elegível, e não anunciam o passo certo. Decisão do líder, 12/09/2026, verbatim: "Prever patrulha é o verbo daquela dungeon, como apertar um botão é o verbo de outra. A lei nova proíbe apontar a resposta de um enigma de lógica, e ali não há enigma: há vigilância."
+
 ---
 
 ## Decisões Canonizadas (Sprint 2 W2 2026-06-03)
