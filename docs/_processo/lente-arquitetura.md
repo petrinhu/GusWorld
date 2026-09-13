@@ -76,7 +76,7 @@ Convenção: FATO = citação de lei ou de trecho do arquivo bruto. INFERÊNCIA 
 
 `D9 | pré-requisitos: D1; decisão B5 pendente | flags: nenhuma (bloqueio por decisão, não por GlintFx) | INFERÊNCIA: diálogo como dado só pode fixar sua forma de armazenamento depois que B5 resolver a tensão .dlg.txt/Markdown vs L-18.`
 
-`D10 | pré-requisitos: D1 | flags: nenhuma | FATO (L-26, já resolvida): grade quadrada, sprite em quatro cardeais desenhados à mão, locomoção com deslocamento diagonal liberado (sprite mostra o cardeal mais próximo do vetor), colisão por célula. A lei já fechou a decisão de perspectiva; este item é só a implementação. Gateia F1 (marcação de bloco atravessável é usada pela carta glitch).`
+`D10 | pré-requisitos: D1 | flags: nenhuma | FATO (L-26, já resolvida): grade quadrada, sprite em quatro cardeais desenhados à mão, locomoção com deslocamento diagonal liberado (sprite mostra o cardeal mais próximo do vetor). A lei já fechou a decisão de perspectiva; este item é a semântica do mapa que o GusWorld escreve, não a consulta de colisão em si (LEI ZERO, L-05: consulta de colisão em grade, movimentação pela grade, busca de caminho e visibilidade são mecanismo do GlintFx, decisão do líder registrada no ESCOPO.md dele §5). O que o GusWorld constrói aqui é dizer quais células são sólidas e o que cada uma significa (parede, porta), dado que o GlintFx consulta. Gateia F1 (marcação de bloco atravessável é usada pela carta glitch).`
 
 `D11 | pré-requisitos: D3, D4, D5, D6, D7, D8, D9, D10 | flags: FUNDACAO | INFERÊNCIA: o modelo de save precisa da forma final de cada sistema de domínio que contribui estado; construir o save antes de D3-D10 estabilizarem obriga a re-serializar tudo a cada mudança de forma. É a base direta de E2.`
 
