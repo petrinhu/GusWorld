@@ -6,6 +6,8 @@
 
 Solo G1 indie, engine própria C++23 sobre GlintFx, **2D pixel-art estilizado via pipeline PixelLab** (não mais 3D). Documento vivo. Toda decisão visual valida contra `docs/design/pillars.md`.
 
+**Interface:** este guia governa a arte de MUNDO; a interface da bancada e do mercado (UI Kit do Claude Design) está descrita em [`ui-kit-claude-design.md`](ui-kit-claude-design.md).
+
 **Spec mestre de personagem:** `Resources/gusworld/character-spec-gus.md` (canônica — traços de identidade vigentes; a spec de mesh 3D antiga foi removida do arquivo). Sheet de produção: `docs/art/characters/gus.md`.
 
 ---
