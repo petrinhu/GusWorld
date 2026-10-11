@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Formatting policy for the whole tree (TODO.md item C6): LLVM base style,
+# 4-space indentation, 100-column limit. The lint gate that enforces it with
+# `clang-format --dry-run -Werror` is not wired yet (CI and local mirror items).
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 100
