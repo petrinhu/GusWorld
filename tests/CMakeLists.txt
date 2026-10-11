@@ -1,14 +1,8 @@
 # Test harness: in-house and minimal (ADR-025). No third-party test framework.
 
-enable_testing()
-
-# Must be set BEFORE include(CTest). CTest sets this as a cache entry at include time
-# with a default of 1500 seconds, and the cache value set here is kept because the
-# CTest set does not use FORCE. Fixing it after the include has no effect.
-set(DART_TESTING_TIMEOUT 300 CACHE STRING
-  "Maximum time allowed before CTest will kill the test.")
-
-include(CTest)
+# enable_testing(), the timeout and include(CTest) live in the ROOT CMakeLists.txt:
+# add_test() in a subdirectory is only visible to ctest when the test subsystem was
+# enabled in the root scope.
 
 add_library(gusworld_test_harness STATIC
   harness/check.cpp
