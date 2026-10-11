@@ -30,7 +30,7 @@ Transcrito de `GODS_LAWS.md` (38 leis, medido em 12/09/2026 por `grep -c "^## L-
 | [L-06](GODS_LAWS.md#l-06) | decidir o que construir primeiro | Núcleo puro agora; a camada que desenha só nasce com o GlintFx |
 | [L-07](GODS_LAWS.md#l-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
 | [L-08](GODS_LAWS.md#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
-| [L-09](GODS_LAWS.md#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos; Fedora 44 primário; CachyOS é próprio, não Arch |
+| [L-09](GODS_LAWS.md#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos, todos em `:latest`; Fedora primário; CachyOS é próprio, não Arch |
 | [L-10](GODS_LAWS.md#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level fable audita e cria; sonnet implementa |
 | [L-11](GODS_LAWS.md#l-11) | fazer **qualquer** pergunta ao líder, inclusive de esclarecimento | `AskUserQuestion` SEMPRE, com opções clicáveis; nunca pergunta em prosa |
 | [L-12](GODS_LAWS.md#l-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
@@ -108,7 +108,7 @@ Estas foram tomadas explicitamente via `AskUserQuestion` (salvo onde indicado) e
 | Linguagem e build | C++23; única dependência de framework é o GlintFx (LEI ZERO) |
 | Perspectiva e câmera | 3/4 top-down fixa, grade quadrada; sprite em quatro cardeais desenhadas à mão e sem espelhamento, locomoção em oito exibindo o cardeal mais próximo (L-26) |
 | Estrutura de mundo | Sem mundo aberto nem persistente (`C-02`); a **geografia** é o grafo de 13 áreas com dobradiças do `mundo-topologia.md`, não o corte |
-| Plataformas | Fedora 44 (primário, pinado), Ubuntu, Arch, CachyOS (próprio, não é Arch renomeado), Windows — cinco entradas distintas de CI desde o primeiro commit (L-09, L-20) |
+| Plataformas | Fedora (primário, em `:latest`), Ubuntu, Arch, CachyOS (próprio, não é Arch renomeado), Windows: cinco entradas distintas de CI desde o primeiro commit, todas acompanhando `:latest` como no GlintFx (L-09, L-20) |
 | Arquitetura | Espinha de cinco camadas (`core/ → content/ → domain/ → app/ → present/`), dependência só para baixo, com gate de CI; regra como transição determinística por comando e evento (L-17) |
 | Persistência de dado | Nenhum formato de texto: save, configuração, mapa e catálogo de conteúdo em envelope binário único selado (L-18, L-25) |
 | Licença do código | AGPL-3.0-or-later, com ressalva explicando o caráter offline do jogo (L-08) |

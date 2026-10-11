@@ -27,7 +27,7 @@
 | [L-06](#l-06) | decidir o que construir primeiro | Núcleo puro agora; a camada que desenha só nasce com o GlintFx |
 | [L-07](#l-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
 | [L-08](#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
-| [L-09](#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos; Fedora 44 primário; CachyOS é próprio, não Arch |
+| [L-09](#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos, todos em `:latest`; Fedora primário; CachyOS é próprio, não Arch |
 | [L-10](#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; auditoria/arquitetura são de C-level fable da constelação; implementação é de agente operacional sonnet da constelação, nunca genérico |
 | [L-11](#l-11) | fazer **qualquer** pergunta ao líder, inclusive de esclarecimento | `AskUserQuestion` SEMPRE, com opções clicáveis; nunca pergunta em prosa |
 | [L-12](#l-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
@@ -94,7 +94,7 @@ Nenhum código do jogo sai sob licença diferente de AGPL-3.0-or-later, e a ress
 
 ## L-09
 
-Nenhum CI cobre menos que cinco alvos distintos (Fedora 44 pinado, Ubuntu, Arch, CachyOS e Windows), e nenhuma declaração de suporte a uma plataforma se apoia no job verde de outra, especialmente CachyOS sobre Arch.
+Nenhum CI cobre menos que cinco alvos distintos (Fedora, Ubuntu, Arch, CachyOS e Windows), e nenhuma declaração de suporte a uma plataforma se apoia no job verde de outra, especialmente CachyOS sobre Arch. Nenhum alvo da matriz fixa versão de imagem: todos acompanham `:latest`, inclusive o Fedora, que é o alvo primário por ser o sistema do líder. **Decisão do líder de 11/10/2026, por `AskUserQuestion` e depois de contra-argumentação:** o chão de validação do jogo é o mesmo do GlintFx, que soltou o pino em 27/08/2026, e o custo fica aceito de forma explícita: o CI pode ficar vermelho por atualização de distro, não só por mudança de código, e a L-32 bloqueia push com CI vermelho.
 
 ## L-10
 
