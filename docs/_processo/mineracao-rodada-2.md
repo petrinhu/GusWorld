@@ -122,7 +122,7 @@ A ordem do líder pedia para levantar o que o backup diz sobre o roster e **conf
 | 1 | Faraday | Gaiola de Faraday | eletromagnetismo (canonizada) |
 | 2 | Maxwell | Onda Unificada | eletromagnetismo |
 | 3 | Tesla | Ressonância de Tesla | eletromagnetismo |
-| 4 | Volta | Carga Armazenada | eletromagnetismo |
+| 4 | Volta | Volt-Leech | eletromagnetismo |
 | 5 | Einstein | Dilatação Temporal | física |
 | 6 | Newton | Gravitação Universal | física |
 | 7 | Planck | Salto Quântico | física |

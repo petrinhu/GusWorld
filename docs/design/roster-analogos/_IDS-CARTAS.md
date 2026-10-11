@@ -9,7 +9,7 @@ DOM: ELM eletromag `#22D3EE` · FIS física `#A78BFA` · MAT matemática `#34D39
 | **ELM-01-C_v1.0** | Faraday | Gaiola de Faraday | eletromag | C ✅ (canonizada) |
 | ELM-02-R_v1.0 | Maxwell | Onda Unificada | eletromag | R |
 | ELM-03-R_v1.0 | Tesla | Ressonância de Tesla | eletromag | R |
-| ELM-04-C_v1.0 | Volta | Carga Armazenada | eletromag | C |
+| ELM-04-C_v1.0 | Volta | Volt-Leech | eletromag | C |
 | FIS-01-R_v1.0 | Einstein | Dilatação Temporal | física | R |
 | FIS-02-R_v1.0 | Newton | Gravitação Universal | física | R |
 | FIS-03-R_v1.0 | Planck | Salto Quântico | física | R |

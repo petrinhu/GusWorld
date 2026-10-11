@@ -20,14 +20,9 @@ Volta relatou os resultados à Royal Society de Londres (carta publicada em 1800
 - **Tece na timeline:** Era 2, sem tocar datas/eventos canônicos; o legado dele (o princípio da pilha) é o alicerce técnico que o presente herda, do mesmo jeito que a Gaiola de Faraday herda o campo.
 - **Verdade enterrada (endgame):** como os demais análogos, Volta é um eco convergente do arquétipo "domador de carga estática" que recorre pela multiplicação do Transbordamento (ver `cosmologia-origem-deep.md`).
 
-## 3. A CARTA "Pilha Voltaica"
+## 3. A CARTA "Volt-Leech"
 
-Carta-chave BÁSICA (obtida relativamente cedo, cluster eletromagnetismo/energia). Efeito ligado à contribuição real (armazenar e liberar carga sob demanda), mapeado ao recurso de **mana** (recurso de compilação do Codex, §6.2 do GDD) por ser o recurso que mais se parece com "energia acumulada que cresce e se gasta". **3 opções pro criador escolher:**
-
-- **Opção A (fiel ao seed): PASSIVA pura: "Carga Armazenada".** No fim de cada turno, o mana não gasto não se perde por inteiro: até um teto (metade do mana máximo atual), o excedente fica retido como reserva e soma ao mana disponível no turno seguinte. Simples, é o item-chave básico "guarda-e-libera" limpo; ensina o princípio sem overhead de gerenciamento extra.
-- **Opção B: PASSIVA + ATIVA.** Reserva passiva (como A) + ativa "Descarga da Pilha" (custo 1 AP): consome toda a carga armazenada de uma vez, convertendo em dano elétrico de área OU enchendo instantaneamente o mana de toda a party. Mais jogável em combate, dá ao jogador o momento "descarregar tudo agora".
-- **Opção C: PASSIVA + FAILSAFE.** Reserva passiva (como A) + gatilho automático: se um companion vai sofrer dano fatal, a carga armazenada dispara sozinha como escudo de emergência de 1 uso por combate (eco de nobreak/UPS: a pilha "segura a queda"). Sem custo de AP, mas limitado e imprevisível pelo jogador (é reativo, não escolhido).
-> Recomendo **A** pra manter a carta como chave básica limpa, no mesmo espírito do Faraday; B como upgrade posterior natural (o "big button" de descarga), C como variante mais defensiva se o criador preferir uma carta de suporte a uma de utilidade pura.
+Carta-chave BÁSICA (obtida relativamente cedo, cluster eletromagnetismo/energia), domínio eletromag, ligada à contribuição real de armazenar e liberar carga sob demanda. **A especificação está fechada e vive em `docs/design/mecanicas/cartas/volta.md`**: dreno de 21% da energia do alvo por uso, 55% convertido à party com escolha cronometrada entre mana e vida, piso de ativação 6 e consumo da carga inteira. Nenhuma mecânica se decide neste documento.
 
 ## 4. Descoberta (missão/puzzle)
 
