@@ -11,13 +11,13 @@ Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/v
 
 ## Ficha rápida
 
-Família **Elétrico** · categoria **Ativa** · especial · mana 6 ⚠️(posto em dúvida em 31/08/2026, ver "Por que é assim") · alvo único · consome **toda a carga disponível por uso** — repetível na mesma batalha enquanto houver carga disponível (ver "Por que é assim").
+Família **Elétrico** · categoria **Ativa** · especial · **piso de ativação 6** (só jogável com 6 ou mais de carga na bateria) · alvo único · consome **toda a carga disponível por uso**, repetível na mesma batalha enquanto houver carga disponível (ver "Por que é assim").
 
 ## Como funciona
 
 Ao ser usada, drena **21% da energia do ALVO** por uso (porcentagem do alvo, não valor absoluto — este número não muda com nada abaixo). **55% do drenado converte e chega à party**; os outros **45% se perdem como calor** (2ª lei da termodinâmica). No momento do uso, **o jogador escolhe** se o retorno vira mana ou vida — a escolha é **cronometrada por dificuldade**: Fácil 13s, Médio 8s, Difícil 5s, Hardcore 3s. Esgotado o tempo sem escolha, a energia dissipa e o jogador **não recebe nada** (nem mana, nem vida).
 
-Isso é o dreno sobre o ALVO. Separado disso, usar a carta tem um custo para o PRÓPRIO conjurador: consome **toda a carga disponível** (não uma fração dela) — ver "Por que é assim" sobre o que essa carga é, e a dúvida que isso abre sobre o número de mana registrado acima. Com carga disponível de novo (outra bateria), a carta pode ser usada de novo na mesma batalha — não há teto de usos por combate; o teto é a carga que o jogador tem.
+Isso é o dreno sobre o ALVO. Separado disso, usar a carta tem um custo para o PRÓPRIO conjurador: consome **toda a carga disponível** (não uma fração dela), e só é jogável com **6 ou mais de carga** na bateria em uso. Abaixo de 6, a carta aparece indisponível: não pode ser escolhida, e nenhuma carga é gasta, nem parcialmente (ver "Por que é assim"). Com carga disponível de novo (outra bateria), a carta pode ser usada de novo na mesma batalha: não há teto de usos por combate; o teto é a carga que o jogador tem.
 
 ## Por que é assim
 
@@ -35,13 +35,12 @@ O dreno é sobre a **energia do alvo**, em porcentagem, nunca sobre o dano.
 
 **Mana e carga de bateria são o MESMO recurso, com dois nomes (decisão do líder, 31/08/2026 — canon de PROJETO INTEIRO, não desta carta só).** Verbatim: *"como magia é tecnologia, então mana e carga de bateria se confundem e são a mesma coisa. Pode ser citado mana ou bateria... O jogador no início vai se confundir, mas é proposital e depois vai passar a entender quando alguém disser por exemplo que a bateria está com pouco mana."* A confusão inicial do jogador é deliberada, e se desfaz por fala de personagem, não por tutorial. **O registro deste princípio como canon do projeto inteiro é feito por outro agente, em outro documento** — não redigido aqui, para não abrir uma segunda fonte da mesma verdade. Candidato natural a abrigá-lo, não confirmado: `cartas-hardware-pirataria-energia.md` §4-§5 (terminologia e energia).
 
-⚠️ **DÚVIDA MARCADA PARA O LÍDER, NASCIDA DESTA DECISÃO DE HOJE, NÃO RESOLVIDA AQUI:** se mana e carga de bateria são o mesmo recurso, o custo fixo de **mana 6** que a Ficha Rápida registra para esta carta pode não valer mais — se a carta consome TODA a carga disponível no uso (ver decisão do líder de 31/08/2026 sobre a bateria, acima), não haveria um número fixo de 6 a cobrar, e sim "o que houver". Não apaguei o 6 nem o mantive como se estivesse confirmado; fica marcado até ele decidir.
+**Piso de ativação e consumo total, decisão do líder de 11/10/2026, verbatim:** *"gasta tudo. Mas se for menos de 6, ela nao funciona"*. O 6 deixa de ser custo somado: não se paga 6 para jogar a carta, precisa-se TER 6 ou mais na bateria dela para jogá-la. Usada, a carta consome a carga inteira, qualquer que seja o valor. O piso impede que a carta seja jogada com um resto inútil de carga, e consumir tudo mantém a escolha de usar agora ou guardar para depois.
 
 Duas consequências da especificação numérica, registradas e **não resolvidas aqui**: o combate por turnos ganha um elemento em tempo real, e a escolha cronometrada é barreira de acessibilidade conhecida. Detalhe completo em `_EFEITOS-ESCOLHIDOS.md` linha 14.
 
 ## Pontas soltas
 
-- ⚠️ **MARCADO PARA O LÍDER, NASCIDO DA DECISÃO MANA=BATERIA DE 31/08/2026, NÃO RESOLVIDO AQUI:** o custo fixo de **mana 6** (Ficha Rápida) pode estar superado, já que a carta consome toda a carga disponível no uso, não uma quantia fixa. Não decidido, não ajustado.
 - ⚠️ **MARCADO PARA O LÍDER, NÃO RESOLVIDO AQUI:** o princípio canônico de `cartas-hardware-pirataria-energia.md` §3 exige responder, ao planejar cada carta, **"o que muda se ela for original × pirata × homebrew?"** — essa resposta **não existe em lugar nenhum** para o Volta. Não inventada aqui.
 - ⚠️ **ACHADO ADICIONAL, MESMA CATEGORIA, TAMBÉM NÃO RESOLVIDO:** o mesmo §3 exige responder, para toda carta, uma segunda pergunta — **"o que muda se a bateria estiver nova × degradada?"** — e essa resposta também não foi encontrada em lugar nenhum para o Volta. Marcado junto, sem inventar resposta.
 - `resources/cards/volta.gw.card` usa `trigger: OnCast`, `percent: 21` (ver topo deste documento). O split 55/45 (conversão à party × perda em calor) e a escolha cronometrada por dificuldade seguem sem campo próprio no schema.

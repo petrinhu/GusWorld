@@ -159,11 +159,9 @@ que o jogador **gerencia** — escolher qual bateria gastar é decisão tática.
 regra adicional, por que a carta do Volta pode ser usada de novo tendo outra bateria disponível: ela
 consome a bateria ativa por inteiro, e trocar de bateria devolve o recurso (`docs/design/mecanicas/cartas/volta.md`).
 
-**Consequência marcada, NÃO resolvida aqui:** se cada bateria tem carga própria e uma carta pode
-consumir a ativa inteira, o custo fixo de "mana 6" que algumas cartas registram (ex.: Volta, ver
-`cartas-technomagik.md` linha 70) precisa ser lido como "6 da bateria ativa" — coerente, mas não
-escrito em lugar nenhum. A mesma dúvida já está marcada, de forma independente, em
-`docs/design/mecanicas/cartas/volta.md` ("Pontas soltas"): não decidida ali, não decidida aqui.
+**Consequência do caso Volta, decidida pelo líder em 11/10/2026:** o "mana 6" da carta é piso de
+ativação da bateria ativa (só é jogável com 6 ou mais de carga), e a carta consome a carga inteira
+dessa bateria (`docs/design/mecanicas/cartas/volta.md`, Ficha Rápida).
 
 **Duas contradições candidatas achadas na varredura de 31/08/2026, AMBAS respondidas pelo líder no
 mesmo dia (ver "Estoque e vazão", logo abaixo):**
