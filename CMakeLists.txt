@@ -7,4 +7,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(GusworldCompileOptions)
 
+add_subdirectory(core)
+add_subdirectory(content)
+add_subdirectory(domain)
+add_subdirectory(app)
+add_subdirectory(present)
+
 add_subdirectory(tests)
