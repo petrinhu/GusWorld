@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Portao de versao: uma tag so passa se casar com a versao declarada no
+# CMakeLists.txt. Nao compila nada; so confere a tag contra o texto.
+#
+# Um assunto so. O portao da LEI ZERO continua no lei-zero.yml, de proposito.
+name: version-tag
+
+on:
+  push:
+    tags:
+      - "**"
+
+permissions:
+  contents: read
+
+jobs:
+  version-tag:
+    name: A tag casa com a versao declarada
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Sem o historico e sem as tags, o script nao consegue olhar e reprova.
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Confere a tag contra o CMakeLists.txt
+        run: python3 tools/ci/check_version_matches_tag.py
