@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Volt-Leech (`volta`)
 
-**Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 31/08/2026. **Owner:** `technical-writer`; mecânica de recurso fechada por decisão do líder (dado herdado do projeto anterior via L-01 está revogado, ver abaixo).
+**Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 11/10/2026. **Owner:** `technical-writer`; mecânica de recurso fechada por decisão do líder (dado herdado do projeto anterior via L-01 está revogado, ver abaixo).
 
 Dado completo em [`resources/cards/volta.gw.card`](../../../../resources/cards/volta.gw.card): `trigger: OnCast`, `percent: 21` (energia do alvo). O split 55/45 de conversão e a escolha cronometrada por dificuldade ainda não têm campo próprio no schema — ver comentário do arquivo.
 

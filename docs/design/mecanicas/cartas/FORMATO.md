@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Especificação do formato `.gw.card`
 
-**Tipo Diátaxis:** Reference. **Audiência:** quem vai escrever o leitor/parser deste formato (`backend-engineer`, `content/` layer, L-17), e quem vai escrever ou revisar um arquivo `.gw.card` novo. **Versão do produto:** nenhuma ainda — formato nasce nesta tarefa, sem implementação de leitor. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, a pedido do orquestrador; qualquer mudança de forma passa pelo mesmo canal que aprovou esta.
+**Tipo Diátaxis:** Reference. **Audiência:** quem vai escrever o leitor/parser deste formato (`backend-engineer`, `content/` layer, L-17), e quem vai escrever ou revisar um arquivo `.gw.card` novo. **Versão do produto:** nenhuma ainda — formato nasce nesta tarefa, sem implementação de leitor. **Last-reviewed:** 11/10/2026. **Owner:** `technical-writer`, a pedido do orquestrador; qualquer mudança de forma passa pelo mesmo canal que aprovou esta.
 
 > **Por que este documento existe:** o `.gw.text` (`resources/dialogues/*.gw.text`) foi ao ar sem especificação escrita, e o próprio arquivo-fonte registra isso como falha ("A ESPECIFICAÇÃO DESTE FORMATO AINDA NÃO EXISTE ESCRITA... escrevê-la é item próprio da tabela"). Este documento nasce **junto** com o primeiro uso do `.gw.card`, para não repetir o buraco.
 
