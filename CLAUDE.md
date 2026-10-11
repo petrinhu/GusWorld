@@ -40,7 +40,7 @@ Transcrito de `GODS_LAWS.md` (38 leis, medido em 12/09/2026 por `grep -c "^## L-
 | [L-16](GODS_LAWS.md#l-16) | homenagear pessoa real, ou citar o filho do líder | Homenagem só com aceite; o filho aparece só como "Gus Dragon" |
 | [L-17](GODS_LAWS.md#l-17) | criar módulo, arquivo, ou desenhar a forma de um sistema | Espinha de cinco camadas com gate de CI; regra como comando e evento |
 | [L-18](GODS_LAWS.md#l-18) | escolher formato de arquivo de mapa, save, configuração ou item | Nada em formato de texto; máxima proteção contra edição |
-| [L-19](GODS_LAWS.md#l-19) | commitar, fechar fatia, ou pensar em cobertura e formatação | Cinco portões de qualidade; TDD estrito; sem meta de cobertura |
+| [L-19](GODS_LAWS.md#l-19) | commitar, fechar fatia, pensar em cobertura e formatação, **ou escrever ordem de serviço que vai ser revisada** | Cinco portões de qualidade; TDD estrito; sem meta de cobertura; **rigor da revisão por CAMADA (N1 a N4), declarada no cabeçalho da ordem, e o orçamento de rodadas sai dela, não do revisor** |
 | [L-20](GODS_LAWS.md#l-20) | escrever CI, ou declarar que uma plataforma funciona | Matriz das cinco plataformas desde o primeiro commit |
 | [L-21](GODS_LAWS.md#l-21) | achar que o `inicial.md` cumpriu o papel dele | Só se apaga com as quatro condições satisfeitas e o líder confirmando |
 | [L-22](GODS_LAWS.md#l-22) | nomear qualquer coisa, ou escrever comentário e commit | Identificador e comentário em inglês, `snake_case`; commit em pt-br |

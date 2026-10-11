@@ -37,7 +37,7 @@
 | [L-16](#l-16) | homenagear pessoa real, ou citar o filho do líder | Homenagem só com aceite; o filho aparece só como "Gus Dragon" ou Dragon-Drv; caso do roster fechado, não se reabre |
 | [L-17](#l-17) | criar módulo, arquivo, ou desenhar a forma de um sistema | Espinha de cinco camadas com gate de CI; regra como comando e evento |
 | [L-18](#l-18) | escolher formato de arquivo de mapa, save, configuração ou item | Nada em formato de texto; máxima proteção contra edição |
-| [L-19](#l-19) | commitar, fechar fatia, ou pensar em cobertura e formatação | Cinco portões de qualidade; TDD estrito; sem meta de cobertura |
+| [L-19](#l-19) | commitar, fechar fatia, pensar em cobertura e formatação, **ou escrever ordem de serviço que vai ser revisada** | Cinco portões de qualidade; TDD estrito; sem meta de cobertura; **rigor da revisão por CAMADA (N1 a N4), declarada no cabeçalho da ordem, e o orçamento de rodadas sai dela, não do revisor** |
 | [L-20](#l-20) | escrever CI, ou declarar que uma plataforma funciona | Matriz das cinco plataformas desde o primeiro commit |
 | [L-21](#l-21) | achar que o `inicial.md` cumpriu o papel dele | Só se apaga com as quatro condições satisfeitas e o líder confirmando |
 | [L-22](#l-22) | nomear qualquer coisa, ou escrever comentário e commit | Identificador e comentário em inglês, `snake_case`; commit em pt-br |
@@ -136,6 +136,17 @@ Nenhum dado do jogo (mapa, save, configuração ou catálogo de conteúdo) chega
 
 Nenhuma linha de comportamento entra sem um teste que falhava antes dela existir, e nenhuma ordem de serviço se fecha sem a saída real do teste vermelho e depois verde; ao escrever a asserção, pergunta-se o que o defeito produziria, nunca só o que o acerto produz. Nenhum commit de módulo de código com comportamento passa sem os cinco portões, valendo a partir do primeiro módulo desse tipo (commit de canon e de documentação fica fora deles): zero aviso de compilação tratado como erro, sanitizadores de memória e de comportamento indefinido a cada fatia fechada, análise estática automatizada, varredura de segredo cobrindo também o histórico completo do controle de versão, e o portão de mensagem de commit, que barra termo da lista cifrada, caminho de área cifrada, dado pessoal e credencial, e reprova o commit quando não consegue ler a chave, nunca aprova em silêncio. Nenhum push sai sem rodar antes, local, o mesmo script que a verificação remota roda. Nenhuma meta numérica de cobertura é perseguida: cobertura é consequência do TDD, nunca alvo. Nenhuma release 1.0 sai sem o dossiê formal de auditoria.
 
+
+**Emenda de 11/10/2026: o rigor da revisão é por CAMADA.** Adotada do projeto irmão GlintFx por ordem do líder, verbatim: *"Pode fazer igual ao aviso de glintfx"*. Lá ela nasceu quando ele viu dois dias sem código da biblioteca e cerca de 15 voltas de revisão sobre ferramentas que testam ferramentas de teste, e disse, verbatim: *"Já sao mais de DOIS DIAS de teste! Isso definitivamente não é normal. Otimize isso! Descubra como!"* e *"Está incompatível o rigor dos testes com o código. Ou os códigos estão PÉSSIMOS ou o rigor dos testes está com OE"*. Perguntado por `AskUserQuestion`, escolheu **"Por camada"**. Isso refina o rigor desta lei, que continua valendo **inteira para o código de produto**:
+
+- **N1, código de produto (as cinco camadas `core/`, `content/`, `domain/`, `app/`, `present/`):** revisão adversarial que executa e muta, até sair limpa. A mutação mira **só as linhas que a fatia mudou**, no máximo 10 por revisão (padrão do Google: "State of Mutation Testing at Google", arxiv 2102.11378).
+- **N2, portão que protege a sessão do líder** (o que a L-35 exige: nenhum teste dinâmico roda fora de container): mutação mirada na exclusão que ele protege e **uma** rodada de conserto.
+- **N3, ferramenta de teste comum** (o harness de `tests/harness/`, os autotestes, as travas de registro, os scripts de CI): revisão de leitura pelas cinco perguntas da L-33 e **um** caso vermelho conferido. O revisor **não** procura mutantes próprios. Na segunda reprovação da mesma família, o que sobra vai à INBOX ou vira limite declarado, e a fatia fecha.
+- **N4, texto** (documento, comentário, diário): sem espelho local do CI e sem revisor.
+
+Toda ordem de serviço declara a camada no cabeçalho, e o rigor e o orçamento de rodadas saem dela, e não do julgamento do revisor. Quem planeja roda os comandos de cada ordem antes do despacho e anexa a saída à ordem.
+
+**Tradução de referência declarada, porque a emenda nasceu em outro projeto:** onde o GlintFx diz `src/` e `include/`, aqui são as cinco camadas; as cinco perguntas de revisão são da L-33 deste projeto, não da L-17; o portão de isolamento é o que a L-35 exige; e o espelho local do CI é o item `C7`, ainda por fazer. A substância, os números de rodadas e a fonte do limite de dez mutantes são os mesmos do projeto irmão, de propósito.
 ## L-20
 
 Nenhuma plataforma da matriz de cinco entra depois do primeiro commit: a fundação de build e o CI são a primeira fatia do projeto. Nenhum módulo de comportamento depois dessa fundação escapa do TDD sob a alegação de ainda estar montando a base.
