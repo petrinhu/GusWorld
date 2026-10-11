@@ -9,6 +9,10 @@ resources/glb/
 
 # Build e cache
 build/
+# Tambem sem barra: `build/` casa apenas diretorio, e o `build` da raiz e um
+# LINK SIMBOLICO para /var/tmp/gw-build (o /tmp desta maquina e tmpfs). Sem esta
+# linha o link entraria versionado, levando um caminho absoluto de maquina com ele.
+/build
 cmake-build-*/
 .cache/
 CMakeFiles/
