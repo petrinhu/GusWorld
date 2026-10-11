@@ -50,9 +50,10 @@ CI e harness de teste são preocupações distintas, ainda que as quatro nasçam
 serviço.
 
 - [`ADR-022`](ADR-022-cmake-versao-minima-fixada.md) — CMake como sistema de build, com
-  `cmake_minimum_required(VERSION 3.28)` medido (não suposto) contra as cinco plataformas
-  obrigatórias (L-09, L-20); piso real é o Ubuntu 24.04 (3.28.3), e não conflita com o que o
-  GlintFx já exige. Ninja como gerador **nas cinco plataformas, Windows incluído** — divergência
+  `cmake_minimum_required(VERSION 4.1)` medido (não suposto) contra as cinco plataformas
+  obrigatórias (L-09, L-20); o piso vem do que o GlintFx exige de quem o consome, e as quatro
+  entradas Linux o atendem pelo próprio gerenciador de pacote, com o Windows pagando um passo
+  de instalação. Ninja como gerador **nas cinco plataformas, Windows incluído** — divergência
   consciente do próprio job Windows do GlintFx (que usa o gerador padrão do Visual Studio),
   declarada como consequência, não escondida. Sem piso de versão fixado para o Ninja.
 - [`ADR-023`](ADR-023-glintfx-submodulo-git-pinado.md) — o GlintFx entra no build como submódulo

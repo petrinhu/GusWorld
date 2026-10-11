@@ -10,6 +10,16 @@ O critério de entrada é **permanência**, não tema: entra decisão que, se co
 
 ---
 
+## 2026-10
+
+| Data | Assunto | A decisão | Verbatim | Onde vive |
+|---|---|---|---|---|
+| 11/10/2026 | piso de versão do CMake | O piso sobe para `cmake_minimum_required(VERSION 4.1)`, que é o que o GlintFx exige de quem o consome; as quatro entradas Linux atendem pelo próprio gerenciador de pacote e o job Windows da matriz instala CMake explicitamente | - | `docs/tech/adr/ADR-022-cmake-versao-minima-fixada.md` |
+| 11/10/2026 | momento de entrada do submódulo GlintFx | O submódulo entra na árvore **quando a camada `present/` nascer**, não na fundação de build; o mecanismo do `ADR-023` (submódulo git pinado em `framework/GlintFx`, linkado compartilhado) segue valendo integralmente, o que foi decidido aqui é o momento | - | `docs/tech/adr/ADR-023-glintfx-submodulo-git-pinado.md`; `docs/tech/adr/ADR-022-cmake-versao-minima-fixada.md` (seção do piso declarado antes de ser exercitado) |
+| 11/10/2026 | imagens de container no espelho local | Autorizado baixar `ubuntu:latest` e `archlinux:latest` para a máquina do líder, para que o espelho local do CI (`C7`) alcance as quatro entradas Linux; `fedora:latest` e `cachyos/cachyos:latest` já estavam presentes (L-28) | - | `TODO.md` itens `C4` e `C7` |
+| 11/10/2026 | o guard de TDD roda em container | O `test_command` do `.claude/tdd-guard.json` passa a invocar container, em vez de rodar `ctest` na sessão viva do líder, porque a L-35 proíbe teste dinâmico fora de container; a troca é fatia à parte, não parte da fundação de build | - | `GODS_LAWS.md` §L-35; `TODO.md` item `C8` e INBOX de 11/10/2026 |
+| 11/10/2026 | matriz de CI em `:latest` nos cinco alvos | Nenhum alvo da matriz fixa versão de imagem, inclusive o Fedora primário; o custo fica aceito de forma explícita (o CI pode ficar vermelho por atualização de distro, não só por mudança de código) | - | `GODS_LAWS.md` §L-09 |
+
 ## 2026-09
 
 | Data | Assunto | A decisão | Verbatim | Onde vive |
