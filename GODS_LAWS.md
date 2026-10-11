@@ -47,7 +47,7 @@
 | [L-26](#l-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, quatro direções cardeais, grade quadrada |
 | [L-27](#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
 | [L-28](#l-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
-| [L-29](#l-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é, incluindo o escopo fechado sem duração fixa da campanha (C-15) |
+| [L-29](#l-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é, com a campanha longa por desenho e a cerca de escopo no orçamento de cada área (C-15) |
 | [L-30](#l-30) | escrever, reordenar ou acrescentar item na tabela, ou escrever/editar checklist em qualquer outro documento do projeto | Tabela aponta para o documento que a especifica; TODO.md é a única fonte de checklist, o resto aponta de volta pelo ID, sem caixa de estado própria |
 | [L-31](#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
 | [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só ao fim da onda, aceito só quando a verificação automática daquele push sai verde e os testes estão verdes |
@@ -205,8 +205,10 @@ Nenhuma proposta de recurso, sistema ou escopo atravessa a cerca abaixo sem vira
 | **C-11** | Nenhum romance, nenhum sistema de moralidade e nenhum final além de um único com variantes mínimas; ressalvados um afeto platônico infantil nunca correspondido em texto e o placar de comedimento, que é economia de conduta. |
 | **C-12** | Nenhum simulador de namoro e nenhum medidor de afeto romântico; afinidade de personagem não jogável como reação social não é atingida. |
 | **C-14** | Nenhum conteúdo pago adicional, nenhum passe de temporada e nenhum serviço contínuo; expansão gratuita pós-lançamento não é atingida. |
-| **C-15** | Nenhum número de horas fixa a duração da campanha antes de existir cena jogável para medir, e nenhum escopo de campanha fica aberto: ela é fechada e definida por conteúdo, e mecânica nova só entra se couber num jogo com fim. |
+| **C-15** | Nenhum número de horas fixa a duração da campanha antes de existir cena jogável para medir, e nenhum conteúdo se corta por não caber num jogo curto: a campanha é **longa por desenho**, da ordem de meses de jogo e não de horas, e a duração só se mede quando houver cena jogável. Nenhum escopo de campanha fica aberto, e a cerca contra escopo infinito deixa de ser a duração total: cada uma das treze áreas e cada dungeon têm orçamento próprio de conteúdo, e mecânica nova só entra se couber no orçamento da área onde ela vive. |
 | **C-16** | Nenhum tutorial em parede de texto e nenhuma abertura cinematográfica acima de noventa segundos. |
+
+**Decisão do líder sobre o `C-15`, 11/10/2026, verbatim:** *"Ele achou muito pouco 8h e concordo com ele. Esse jogo é pra ser longo, para meses de jogo, não horas"*. O "ele" é o Gus Dragon, que levantou a questão na issue 11 do barramento. O piso de duração entra **sem número**: fixar "meses" em horas repetiria, na direção oposta, o erro de um número que ninguém mediu. E a cerca contra escopo infinito desce para o orçamento de conteúdo de cada área, porque uma cláusula de duração total calibrada para jogo curto deixa de filtrar qualquer coisa quando o alvo é longo.
 
 ## L-30
 
