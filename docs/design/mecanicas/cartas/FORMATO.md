@@ -65,7 +65,7 @@ Bloco implícito no topo do arquivo, antes de qualquer `@`. Uma chave por linha.
 | `family` | sim | `eletrico` \| `bioquimico` \| `sonico` \| `cinetico` \| `criptografico` \| `universal` | `universal` só é válido para carta, nunca para personagem/inimigo (regra herdada da fonte, não deste formato) |
 | `base_type` | sim | `pulso` \| `raiz` \| `eco` \| `fenda` \| `glifo` | tipo diegético; nas 20 especiais sempre `glifo`, marcado `//PLAYTEST` na fonte por não haver convenção fechada |
 | `target_shape` | sim | `self` \| `single` \| `linha` \| `area3x3` \| `grupo` | |
-| `charge_cost` | sim, salvo com `consumes_all_charge: true` | inteiro ≥ 0 | renomeado de `mana_cost` em 03/09/2026, decisão do líder: mana e carga de bateria são o mesmo recurso desde 02/09/2026 (`cartas-hardware-pirataria-energia.md` §5, "Mana e bateria são o mesmo recurso"), e o nome antigo dizia menos do que a coisa é |
+| `charge_cost` | sim, salvo com `consumes_all_charge: true` | inteiro ≥ 0 | o que a carta cobra por uso. Mana e carga de bateria são o mesmo recurso, com dois nomes (`cartas-hardware-pirataria-energia.md` §5, "Mana e bateria são o mesmo recurso") |
 | `activation_charge_floor` | não (default `0`) | inteiro ≥ 0 | piso de ativação: a carta só é jogável com carga disponível igual ou maior que este valor. `0` = sem piso. Vale com custo fixo e com consumo total |
 | `consumes_all_charge` | não (default `false`) | `true` \| `false` | `true`: usar a carta gasta toda a carga disponível da bateria, qualquer que seja o valor. Exige ausência de `charge_cost` (regras abaixo) |
 | `ap_cost` | sim | inteiro ≥ 0 | |
