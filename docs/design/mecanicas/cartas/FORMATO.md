@@ -65,10 +65,27 @@ Bloco implícito no topo do arquivo, antes de qualquer `@`. Uma chave por linha.
 | `family` | sim | `eletrico` \| `bioquimico` \| `sonico` \| `cinetico` \| `criptografico` \| `universal` | `universal` só é válido para carta, nunca para personagem/inimigo (regra herdada da fonte, não deste formato) |
 | `base_type` | sim | `pulso` \| `raiz` \| `eco` \| `fenda` \| `glifo` | tipo diegético; nas 20 especiais sempre `glifo`, marcado `//PLAYTEST` na fonte por não haver convenção fechada |
 | `target_shape` | sim | `self` \| `single` \| `linha` \| `area3x3` \| `grupo` | |
-| `charge_cost` | sim | inteiro ≥ 0 | renomeado de `mana_cost` em 03/09/2026, decisão do líder: mana e carga de bateria são o mesmo recurso desde 02/09/2026 (`cartas-hardware-pirataria-energia.md` §5, "Mana e bateria são o mesmo recurso"), e o nome antigo dizia menos do que a coisa é |
+| `charge_cost` | sim, salvo com `consumes_all_charge: true` | inteiro ≥ 0 | renomeado de `mana_cost` em 03/09/2026, decisão do líder: mana e carga de bateria são o mesmo recurso desde 02/09/2026 (`cartas-hardware-pirataria-energia.md` §5, "Mana e bateria são o mesmo recurso"), e o nome antigo dizia menos do que a coisa é |
+| `activation_charge_floor` | não (default `0`) | inteiro ≥ 0 | piso de ativação: a carta só é jogável com carga disponível igual ou maior que este valor. `0` = sem piso. Vale com custo fixo e com consumo total |
+| `consumes_all_charge` | não (default `false`) | `true` \| `false` | `true`: usar a carta gasta toda a carga disponível da bateria, qualquer que seja o valor. Exige ausência de `charge_cost` (regras abaixo) |
 | `ap_cost` | sim | inteiro ≥ 0 | |
 | `power` | sim | inteiro ≥ 0 | `0` quando a carta não tem dano-base próprio (a maioria das especiais); comentário explica a exceção quando `power` > 0 |
 | `ignores_weakness_wheel` | não (default `false`) | `true` \| `false` | trunfo fora-da-roda; hoje só a Gödel usa `true` |
+
+### Custo: fixo ou consumo total
+
+Uma carta usa **um** dos dois modos de custo, nunca os dois:
+
+- **Custo fixo** (todas as cartas de hoje): `charge_cost` presente, `consumes_all_charge` ausente ou `false`. Ao usar, gasta-se `charge_cost`.
+- **Consumo total**: `consumes_all_charge: true`, sem `charge_cost`. Ao usar, gasta-se toda a carga disponível, qualquer que seja o valor.
+
+Regras de leitura:
+
+- **Os dois campos novos ausentes:** a carta é lida como custo fixo, sem piso (`activation_charge_floor` = `0`). É o comportamento de hoje, e nenhuma carta existente muda.
+- **`consumes_all_charge: true` com `charge_cost` presente:** o leitor **rejeita o arquivo inteiro**, nomeando as duas chaves em conflito. Não há precedência entre elas: um arquivo que diz as duas coisas é edição inconsistente (regra da seção 7).
+- **`consumes_all_charge` ausente ou `false`, sem `charge_cost`:** rejeita, nomeando `charge_cost` como chave que falta.
+- **Piso:** nos dois modos, a carta só pode ser escolhida se a carga disponível for igual ou maior que `activation_charge_floor`. Abaixo do piso, a carta fica indisponível e nenhuma carga é gasta. No custo fixo, a carga disponível também precisa cobrir `charge_cost`.
+- Os dois campos valem para qualquer `tier`. Hoje só a Volta os usa.
 
 ## 5. `@effect`: o programa da carta (zero ou mais)
 

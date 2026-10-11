@@ -11,7 +11,8 @@
 #meta family eletrico
 #meta base_type glifo   // //PLAYTEST: sem convenção fechada de tipo-base para especiais
 #meta target_shape single
-#meta charge_cost 6   // kActiveChargeCost, //PLAYTEST: mana das ativas/hibridas
+#meta activation_charge_floor 6   // leader decision 2026-10-11: not playable below 6 charge
+#meta consumes_all_charge true   // leader decision 2026-10-11: using it drains the whole battery, whatever the amount
 #meta ap_cost 1
 #meta power 0
 #meta ignores_weakness_wheel false
