@@ -42,6 +42,33 @@ Aproximação física ao nó de combate dentro de um raio de contato dispara a t
 - Inimigo tem **cone de detecção visível** (Óculos pintam o cone no chão). Entrar no cone = inimigo investe; contornar = combate evitável (stealth opcional, coerente com GDD §6.3 patrulhas).
 - Inimigo já derrotado naquela sessão **não respawna** (anti-grind, §8).
 
+### 4.1 Contrato de detecção (o que o jogo espera enxergar)
+
+**Escopo.** Esta subseção fixa o que a lógica do GusWorld pergunta e recebe sobre detecção de inimigos no overworld. Como a visibilidade é calculada, e como a colisão por célula é resolvida, pertencem ao GlintFx (decisão do líder de 22/08/2026, `ESCOPO.md` do GlintFx). Aqui se define só o contrato entre a lógica do jogo e o framework.
+
+**Tensão que o contrato resolve.** Este documento descreve a detecção em espaço contínuo (§4 "raio de contato" e "cone pintado no chão"; §7 "atualizado em tempo real"), enquanto o mapa é uma grade de células. A lógica do jogo decide sempre sobre células: a posição contínua é apresentação, não critério.
+
+| Parte | Quem | O que é |
+|---|---|---|
+| **1. Declaração de alcance** | GusWorld | Por tipo de inimigo, o conjunto de células de detecção, expresso como deslocamentos relativos à orientação atual do inimigo (frente, trás, lados). Ex.: "frente até 3 células" é dado de design, não geometria. |
+| **2. Pergunta ao framework** | GusWorld pergunta, GlintFx responde | "Dado o inimigo na célula C com orientação O, quais células do conjunto de detecção estão visíveis a partir de C neste passo?" Resposta esperada: uma resposta booleana por célula consultada. Oclusão por parede é resposta do framework, nunca cálculo do jogo. |
+| **3. Uso da resposta** | GusWorld | Se a célula ocupada pelo Gus está entre as respostas positivas, há detecção. A lógica compara célula com célula; não recalcula visão, não usa distância em metros nem ângulo em graus. |
+
+**Regras do contrato:**
+
+- **Contato (§4):** o "raio de contato" vira um conjunto de células de contato, declarado na parte 1. A escala de metros (§3, ~8m) pertence ao Scan e não entra na detecção.
+- **Cone (§4, §7):** o cone pintado no chão é a apresentação do mesmo conjunto que a lógica consultou. Lógica e apresentação consomem a mesma resposta do mesmo passo; não existem dois cones com formas diferentes.
+- **Consequência:** detecção positiva no overworld dispara o investimento do inimigo (§4); no Gambito, o mesmo evento é a falha do puzzle (`puzzle-gambito.md` §2, reset suave D2).
+- **Forma já usada no Gambito:** `puzzle-gambito.md` §2 e §8 descrevem o cone como uma célula à frente. É o caso particular do mesmo contrato, com conjunto de tamanho um. Este contrato o generaliza sem mudar o puzzle.
+
+**Caso em diagonal (exposto pela L-26).** Quando o Gus está em célula diagonal ao inimigo, essa célula é perguntada como qualquer outra célula do conjunto, e a resposta continua booleana. O fato de o Gus ter chegado por movimento diagonal não muda a pergunta.
+
+**DECISÃO ABERTA (não decidida neste documento):**
+
+- **Forma do conjunto:** se as células diagonais à frente do inimigo entram no conjunto de detecção (parte 1). Isto define o que o jogador consegue ler no cone.
+- **Orientação do inimigo que anda em diagonal:** o cone segue o sprite cardeal mais próximo (quatro) ou o vetor exato de movimento (oito). A L-26 fixa o sprite em quatro, mas não diz qual orientação alimenta o conjunto de detecção.
+- **Frequência da consulta:** a pergunta é refeita a cada passo de célula (do Gus e do inimigo), ou a cada quadro enquanto o movimento é contínuo dentro da célula.
+
 ## 5. Gatilho do puzzle Gambito
 
 O puzzle está **integrado à exploração**, não em zona separada (decisão de coerência: o mesmo tabuleiro de combat.md §12 lê patrulhas no overworld). O nó-puzzle é um **bloqueio de passagem**: uma patrulha ou um projétil ambiental cíclico que impede o caminho. O jogador:
