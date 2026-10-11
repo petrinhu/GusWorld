@@ -82,12 +82,14 @@ A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C
 - `git rev-list --count origin/main..HEAD` responde quantos commits locais ainda não foram pushados.
 - Existe **um** workflow de CI: `.github/workflows/lei-zero.yml` (`LEI ZERO`), nascido no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. `gh run list --workflow=lei-zero.yml` responde quantas execuções há e a conclusão de cada uma. ⚠️ **Isto não é o CI de build do projeto**: a matriz das cinco plataformas do item `C4` continua por fazer, porque o LEI ZERO verifica só TEXTO, sem compilar nada.
 
-**Código-fonte: não existe.** Confirmado por comando, não por suposição:
+**Código-fonte: EXISTE desde 11/10/2026.** Medido por comando, não por suposição:
 
-- `find . -iname CMakeLists.txt` → vazio.
-- `find . -maxdepth 3 -iname "*.hpp" -o -maxdepth 3 -iname "*.cpp"` → vazio.
-- `find . -maxdepth 2 -iname tests -o -maxdepth 2 -iname test` → vazio, não existe `tests/`.
-- Não há `include/` nem `src/`.
+- `find . -name CMakeLists.txt -not -path './.git/*' | wc -l` responde quantos arquivos de build há (sete em 11/10: a raiz, as cinco camadas e `tests/`).
+- `find . -name "*.cpp" -not -path './.git/*' | wc -l` responde quantas unidades de tradução há (onze em 11/10).
+- **A espinha de cinco camadas existe como alvos:** `core/`, `content/`, `domain/`, `app/` e `present/`, cada uma com `CMakeLists.txt` próprio e dependência só para baixo (L-17). ⚠️ **`present/` nasce DESLIGADA**, atrás da opção `GUSWORLD_PRESENT`, porque a L-06 e a L-27 a mantêm bloqueada até o GlintFx ter entrada e texto.
+- **`tests/` existe**, com o harness próprio em `tests/harness/` (sem framework de terceiro, ADR-025) e os autotestes em `tests/selftest/`. `grep -cE '^add_test' tests/CMakeLists.txt` responde quantos testes estão registrados (sete em 11/10).
+- **Não há `include/` nem `src/`**, e isso é desenho, não falta: o código mora nas cinco camadas.
+- **Nada do GlintFx entra ainda.** Nenhum `find_package`, nenhum `add_subdirectory` de framework, nenhum diretório `framework/`. O submódulo entra quando `present/` for desbloqueada, por decisão do líder de 11/10/2026.
 
 **O que existe hoje, fora de código de jogo** (contado por `find`/`ls`):
 
@@ -144,12 +146,23 @@ Ao despachar um subagent, **inclua o caminho absoluto do manual no prompt da tas
 
 ## Comandos
 
-**Não há comando de build, teste ou lint a executar hoje.** Confirmado por comando, não por omissão: sem `CMakeLists.txt`, sem `src/`, sem `include/`, sem `tests/` (ver "Estado atual do repositório" acima). O único workflow existente, `LEI ZERO` (`.github/workflows/lei-zero.yml`), verifica texto e não compila nada; não é o CI de build do projeto, que nasce com a matriz de cinco plataformas do item `C4`. A fundação de build nasce como a primeira fatia de código do projeto (L-20), e esta seção é reescrita nesse momento.
+**Há build e há suíte, desde 11/10/2026.** ⚠️ **Mas nenhum deles roda na sessão do líder: a L-35 exige container, sempre.** Sem container, o resultado honesto é "não executado, falta o container".
 
-O que roda hoje é o portão 5 da L-19, local:
+O caminho medido que funciona nesta máquina, e por que cada parte dele é assim:
 
-- `tools/git-hooks/install.py` instala `tools/security/commit_gate.py` como gancho `commit-msg`.
-- `python3 tools/security/test_commit_gate.py` roda o teste próprio do gate (não é `ctest`, porque não existe build de C++ ainda).
+- **Configure e build:** `cmake -S . -B <dir> -G Ninja -DGUSWORLD_WERROR=ON`, depois `cmake --build <dir>`. O `-Werror` fica atrás de opção porque é o gancho do portão 1 da L-19, e só o CI o liga.
+- **Suíte:** `ctest --test-dir <dir> --output-on-failure`. ⚠️ **`ctest -N` num build sem teste diz `Total Tests: 0` e SAI COM CÓDIGO ZERO** (medido em 11/10): todo passo que contar teste tem de testar o VALOR, nunca só o código de saída.
+- **Volume de host em container NÃO funciona:** o SELinux desta máquina está `Enforcing` e bloqueia `container_t`. A L-60 do global manda não mexer em política; os arquivos entram por `tar` na entrada padrão e o resultado sai pela saída padrão.
+- **Cópia de trabalho em subpasta FALHA neste repositório:** o filtro de descriptografia do `git-crypt` não resolve no worktree novo e o checkout aborta nos arquivos de `docs/_secret/`. Para verificar uma fatia, extraia do blob com `git archive`, que é o que a L-27 do global manda de todo modo.
+- **Instalar a toolchain em container estoura o limite de primeiro plano:** rode em segundo plano.
+
+Os portões locais de texto, que não dependem de build e rodam desde agosto:
+
+- `tools/git-hooks/install.py` instala `tools/security/commit_gate.py` como gancho `commit-msg` e `tools/security/lei_zero_guard.py` como `pre-commit`.
+- `python3 tools/security/test_commit_gate.py` e `python3 tools/security/test_lei_zero_guard.py` rodam os autotestes dos dois.
+- `python3 tools/ci/check_version_matches_tag.py v0.0.0.1` confere a tag contra a versão declarada. ⚠️ Ele **reprova em clone raso**, de propósito: num clone raso as tags podem não ter sido buscadas, e um casamento aparente seria falso verde.
+
+**Dois workflows existem:** `lei-zero.yml` (verifica texto, não compila) e `version-tag.yml` (só dispara em push de tag). ⚠️ **Nenhum dos dois é o CI de build**, que é a matriz de **nove entradas** do item `C4`, ainda por fazer: cinco plataformas, com GCC e Clang nas quatro Linux mais MSVC no Windows.
 
 ## Restrições desta máquina que mordem este projeto
 
