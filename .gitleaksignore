@@ -1,0 +1,17 @@
+# Silencio por FINGERPRINT exato (commit:arquivo:regra:linha), nunca por regra ou termo.
+# Afrouxar regra do gitleaks e proibido: isso cegaria o portao para vazamento real.
+
+# CONTRACT.md:459 - exemplo didatico do proprio manual; a linha acima diz "INCORRECT - NEVER commit this" e a chave e um sk-... inventado.
+7df5998648184906b1290793afbb74ade9be372b:CONTRACT.md:generic-api-key:459
+
+# dossie-pixellab.md:45 - casou o caminho da URL da API; a linha seguinte traz "Authorization: Bearer YOUR_API_TOKEN", placeholder literal.
+7df5998648184906b1290793afbb74ade9be372b:docs/_processo/dossie-pixellab.md:curl-auth-header:45
+
+# ADR-017:62 - lista de nomes de efeitos de carta (ApplyStatus, Leech, ...); identificador CamelCase longo confundido com chave de alta entropia.
+7df5998648184906b1290793afbb74ade9be372b:docs/tech/adr/ADR-017-action-clock-combat-unificado.md:generic-api-key:62
+
+# Mesmos tres achados, formato de varredura de arvore (--no-git, sem prefixo de commit).
+# Mesma granularidade: arquivo, regra e linha exatos.
+CONTRACT.md:generic-api-key:459
+docs/_processo/dossie-pixellab.md:curl-auth-header:45
+docs/tech/adr/ADR-017-action-clock-combat-unificado.md:generic-api-key:62
