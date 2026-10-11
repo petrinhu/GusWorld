@@ -31,7 +31,7 @@ Os 14 tipos de efeito que uma carta especial pode declarar. Cada um é um **marc
 | `kind` | O que significa, em prosa |
 |---|---|
 | `ApplyStatus` | aplica um `status` (§5) a um alvo, com a duração e a regra de empilhamento (§6) declaradas |
-| `Leech` | drena uma fração do dano causado e devolve ao conjurador como recurso |
+| `Leech` | drena uma fração da energia do alvo e devolve ao conjurador como recurso |
 | `Reflect` | devolve uma fração do dano recebido a quem o causou |
 | `HypotenuseCombo` | quando dois aliados acertam o mesmo alvo na mesma rodada, soma os dois golpes pela raiz da soma dos quadrados (nunca a soma simples, sempre maior que cada golpe isolado e menor que a soma) |
 | `CloneAlly` | aplica ao alvo um status que, ao fim de cada turno próprio do portador, reaplica uma fração do último golpe de dano dele |

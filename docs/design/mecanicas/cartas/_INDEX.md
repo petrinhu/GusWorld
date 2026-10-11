@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 ## As 20 cartas ESPECIAIS dos mestres
 
-- **Volt-Leech** (`volta`) — Ativa, Elétrico. Dreno termodinâmico: converte dano causado em mana e HP para a party. [dado](../../../../resources/cards/volta.gw.card) · [prosa](volta.md)
+- **Volt-Leech** (`volta`) — Ativa, Elétrico, piso de ativação 6, consome toda a carga por uso. Dreno termodinâmico: drena 21% da energia do alvo; 55% chega à party como mana ou HP, e 45% se perde como calor. [dado](../../../../resources/cards/volta.gw.card) · [prosa](volta.md)
 - **Force-Law** (`newton`) — Híbrida, Universal, Grupo. Imobiliza todo o grupo inimigo ou concede Reflect a um aliado, conforme o lado do alvo. [dado](../../../../resources/cards/newton.gw.card) · [prosa](newton.md)
 - **Hypotenuse** (`pythagoras`) — Passiva, Universal. Combo cross-ator: dois aliados no mesmo alvo somam pela raiz da soma dos quadrados. [dado](../../../../resources/cards/pythagoras.gw.card) · [prosa](pythagoras.md)
 - **Fractal-Echo** (`mandelbrot`) — Ativa, Universal. Ecoa, sempre, metade do último dano de qualquer aliado nesta rodada. [dado](../../../../resources/cards/mandelbrot.gw.card) · [prosa](mandelbrot.md)

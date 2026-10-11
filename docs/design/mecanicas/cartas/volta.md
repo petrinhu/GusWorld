@@ -23,7 +23,7 @@ Isso é o dreno sobre o ALVO. Separado disso, usar a carta tem um custo para o P
 
 Especificação fechada pelo líder em 31/08/2026, por `AskUserQuestion`, verbatim: *"o volta fica como decidi agora, achei melhor"*. Fonte canônica: `docs/design/roster-analogos/_EFEITOS-ESCOLHIDOS.md` linha 14 (o item `VOLTA-LEECH-%` de `cartas-technomagik.md` §9, agora RESOLVIDO). Racional do líder: percentual em vez de absoluto, para a carta seguir relevante do início ao fim da campanha sem escalar número, e casar com a física (quanto mais energia há no sistema, mais se pode extrair); 21% e 55% são Fibonacci, coerentes com o resto da economia; a escolha cronometrada nasce de ordem direta dele — *"ele tem x segundos para escolher ou a energia dissipa e ele perde. x depende da dificuldade"*.
 
-Vale notar a garantia que já valia antes e continua valendo: este leech **não fura a regra de "sem carry-over de mana"** do jogo — é dreno do inimigo, não retenção da própria mana não-gasta (um design anterior, descartado, propunha "mana não-gasta vira Shield"; esse caminho segue morto).
+Vale notar a garantia que já valia antes e continua valendo: este leech **não fura a regra de "sem carry-over de mana"** do jogo — é dreno do inimigo, não retenção da própria mana não-gasta.
 
 O dreno é sobre a **energia do alvo**, em porcentagem, nunca sobre o dano.
 
