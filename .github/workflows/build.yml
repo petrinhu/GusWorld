@@ -27,22 +27,15 @@ jobs:
             slug: fedora
             image: fedora:latest
     steps:
-      # The image has no git, so this checkout falls back to the REST API
-      # (a tarball with no .git). That is by design: it only has to bring the
-      # prep script, and the real checkout below replaces it afterwards.
-      - name: Bootstrap checkout (prep script only)
-        uses: actions/checkout@v7
-        with:
-          path: _bootstrap
+      # The image ships without git. Install it first, with no file from this
+      # repository, so the checkout below is a real git clone. Without git,
+      # actions/checkout downloads a tarball through the REST API, and that
+      # path failed with 5xx from GitHub three times in each of two runs
+      # (run 38196743681, SHA 74fc8eb).
+      - name: Install git (before the checkout)
+        run: dnf -y install git
 
-      - name: Install toolchain
-        run: bash _bootstrap/tools/ci/env/${{ matrix.slug }}.sh
-
-      - name: Remove bootstrap checkout
-        run: rm -rf _bootstrap
-
-      # Real checkout, now that git is installed. Default depth: no test in
-      # the current suite reads history or tags.
+      # Default depth: no test in the current suite reads history or tags.
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -52,7 +45,14 @@ jobs:
       - name: Git safe.directory for the container
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      - name: Prove the checkout is git and the prep script is the repo's own
+      # Toolchain from the repository copy, now that the checkout is real. It
+      # exports CC and CXX and installs cmake, which the steps below use.
+      - name: Install toolchain
+        run: bash tools/ci/env/${{ matrix.slug }}.sh
+
+      # A tarball has no .git, so rev-parse fails under set -eu. Passing this
+      # step is the proof that the checkout was a real git clone at GITHUB_SHA.
+      - name: Prove the checkout is a git clone at GITHUB_SHA
         run: |
           set -eu
           inside="$(git rev-parse --is-inside-work-tree)"
@@ -66,14 +66,6 @@ jobs:
           echo "GITHUB_SHA=${GITHUB_SHA}"
           if [ "$head" != "$GITHUB_SHA" ]; then
             echo "FAIL: HEAD differs from GITHUB_SHA"
-            exit 1
-          fi
-          script="tools/ci/env/${{ matrix.slug }}.sh"
-          repo_sha="$(sha256sum "$script" | awk '{print $1}')"
-          echo "prep script sha256 (repository) = ${repo_sha}"
-          echo "prep script sha256 (executed)   = ${GUSWORLD_PREP_SHA:-<empty>}"
-          if [ "$repo_sha" != "${GUSWORLD_PREP_SHA:-}" ]; then
-            echo "FAIL: the prep script that ran differs from the repo copy"
             exit 1
           fi
 
