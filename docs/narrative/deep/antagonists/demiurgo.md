@@ -175,6 +175,7 @@ Decisão do líder de 11/10/2026: a recompensa são **dois itens raros de craft 
 Decisão do líder de 11/10/2026: Yaldabaoth **cria arcontes como magia dele**, com probabilidade de invocação por dificuldade, e **age também por conta própria** (seção 6).
 
 - O corpus do GusWorld não usa a palavra "arconte" (busca por palavra inteira em `docs/`, `CHARS.md` e `PLACES.md`, feita em 11/10/2026). Nome e forma dos arcontes são campo livre do líder, e a arte deles é do líder (L-02).
+- **Servos anônimos, não arcontes nomeados.** Os seres que o Yaldabaoth invoca como magia são os servos anônimos e descartáveis de `docs/narrative/deep/antagonists/arcontes.md` §6.2: sem nome, sem fala, sem ficha e sem lugar fixo. Os arcontes nomeados daquele documento (as três tradições) são outra coisa: vivem no mundo por conta própria e não são invocados por ele.
 - Como magia, o arconte não tem fala de lore. Recomendação deste documento: nenhuma linha de diálogo para arcontes.
 - Cada invocação consome o orçamento de conteúdo da área (L-29, C-15). A probabilidade por dificuldade é valor de `lead-game-designer`.
 
