@@ -28,21 +28,21 @@ import commit_gate  # noqa: E402  (import depois do sys.path, deliberado)
 TERMOS_FIXTURE = """\
 # arquivo de termos de teste, nao e o real do projeto
 ## SEGREDO_JOGO
-easter egg
-pigpen
+ovo sintetico
+xyzabc
 
 ## SPOILER_ENREDO
-carta de pyotor
+trama ficticia um
 ainda compila
 
 ## DADOS_PESSOAIS
-site_consultorio
-crm
+portal_dadoficticio
+qzx
 nome-fictício-de-teste-menor
 
 ## TECNICO_MAQUINA
-/home/petrus
-drpetrus.top
+/pasta/ficticia
+fictdominio.invalid
 """
 
 
@@ -55,7 +55,7 @@ def escrever_termos(diretorio: Path, conteudo: str = TERMOS_FIXTURE) -> Path:
 class TestNormalizacao(unittest.TestCase):
     def test_remove_acento_e_caixa(self):
         self.assertEqual(commit_gate.normalize("AINDA Compila"), "ainda compila")
-        self.assertEqual(commit_gate.normalize("Prontuário"), "prontuario")
+        self.assertEqual(commit_gate.normalize("Formulário Fictício"), "formulario ficticio")
         self.assertEqual(commit_gate.normalize("47ª proposição"), "47a proposicao")
 
     def test_colapsa_espaco_e_quebra_de_linha(self):
@@ -82,7 +82,7 @@ class TestCarregarTermos(unittest.TestCase):
                     "TECNICO_MAQUINA",
                 },
             )
-            self.assertIn(("SEGREDO_JOGO", "pigpen"), termos)
+            self.assertIn(("SEGREDO_JOGO", "xyzabc"), termos)
 
     def test_arquivo_ausente_falha(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -127,43 +127,43 @@ class TestDeteccao(unittest.TestCase):
         self.assertEqual(commit_gate.encontrar_violacoes(msg, self.padroes), [])
 
     def test_barra_termo_classe_segredo_jogo(self):
-        msg = "documenta o easter egg pro changelog"
+        msg = "documenta o ovo sintetico pro changelog"
         achados = commit_gate.encontrar_violacoes(msg, self.padroes)
         self.assertTrue(any(c == "SEGREDO_JOGO" for c, _ in achados))
 
     def test_barra_termo_classe_spoiler_enredo(self):
-        msg = "ajusta timing da cena carta de pyotor"
+        msg = "ajusta timing da cena trama ficticia um"
         achados = commit_gate.encontrar_violacoes(msg, self.padroes)
         self.assertTrue(any(c == "SPOILER_ENREDO" for c, _ in achados))
 
     def test_barra_termo_classe_dados_pessoais(self):
-        msg = "corrige script copiado sem querer do site_consultorio"
+        msg = "corrige script copiado sem querer do portal_dadoficticio"
         achados = commit_gate.encontrar_violacoes(msg, self.padroes)
         self.assertTrue(any(c == "DADOS_PESSOAIS" for c, _ in achados))
 
     def test_barra_termo_classe_tecnico_maquina(self):
-        msg = "remove caminho hardcoded /home/petrus do script de build"
+        msg = "remove caminho hardcoded /pasta/ficticia do script de build"
         achados = commit_gate.encontrar_violacoes(msg, self.padroes)
         self.assertTrue(any(c == "TECNICO_MAQUINA" for c, _ in achados))
 
     def test_barra_ignorando_acento_e_caixa(self):
-        msg = "corrige DRPETRUS.TOP no manifest de exemplo"
+        msg = "corrige FICTDOMINIO.INVALID no manifest de exemplo"
         achados = commit_gate.encontrar_violacoes(msg, self.padroes)
         self.assertTrue(any(c == "TECNICO_MAQUINA" for c, _ in achados))
 
     def test_nao_barra_termo_dentro_de_palavra_comum_real(self):
-        # "crm" (classe DADOS_PESSOAIS) embutido dentro de uma palavra
+        # "qzx" (classe DADOS_PESSOAIS) embutido dentro de uma palavra
         # portuguesa plausivel formada com o aumentativo "-zinho"; mesma
         # familia de erro do "grep -i 'eu '" que casava dentro de "seu"/
         # "meu", e do "rml" raspado de dentro de "Stormlight"/"firmly".
-        msg = "cria consultoriozinho de teste pra fixture da suite"
+        msg = "cria dadoficticiozinho de teste pra fixture da suite"
         achados = commit_gate.encontrar_violacoes(msg, self.padroes)
         self.assertEqual(achados, [], f"falso positivo: {achados}")
 
     def test_nao_barra_termo_dentro_de_palavra_comum_sintetico(self):
-        # Prova adicional, sintetica: "crm" dentro de um identificador maior
+        # Prova adicional, sintetica: "qzx" dentro de um identificador maior
         # nao pode disparar o gate.
-        msg = "renomeia variavel microcrmzao para nome_descritivo"
+        msg = "renomeia variavel microqzxzao para nome_descritivo"
         achados = commit_gate.encontrar_violacoes(msg, self.padroes)
         self.assertEqual(achados, [], f"falso positivo: {achados}")
 
@@ -196,7 +196,7 @@ class TestMainFimAFim(unittest.TestCase):
         self.assertEqual(codigo, 0)
 
     def test_main_bloqueia_mensagem_com_termo_proibido(self):
-        msg_path = self._escrever_msg("expõe o pigpen no changelog\n")
+        msg_path = self._escrever_msg("expõe o xyzabc no changelog\n")
         codigo = commit_gate.main(
             ["commit_gate.py", str(msg_path)], termos_path=self.termos_path, env={}
         )
@@ -214,7 +214,7 @@ class TestMainFimAFim(unittest.TestCase):
         )
 
     def test_main_escape_hatch_explicito_libera_mesmo_bloqueado(self):
-        msg_path = self._escrever_msg("expõe o pigpen no changelog\n")
+        msg_path = self._escrever_msg("expõe o xyzabc no changelog\n")
         codigo = commit_gate.main(
             ["commit_gate.py", str(msg_path)],
             termos_path=self.termos_path,
