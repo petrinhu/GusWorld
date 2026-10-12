@@ -5,7 +5,7 @@
 > **Origem:** aprovado pelo líder em 11/10/2026, depois de proposta do agente de narrativa. A luta não é para vencer, é para ser reconhecido. Os nomes das três fases são do líder, verbatim: *"tres vezes masculina, tres vezes mulher poderosa e tres vezes irreconhecivel"*.
 > **Companheiros:** `docs/narrative/deep/antagonists/pleroma-setiano.md` (Barbelo é o N2 da escada, e este arquivo muda o contato dela, ver seção 8), `docs/narrative/deep/antagonists/demiurgo.md` (o Yaldabaoth, que ela não percebe) e `docs/narrative/deep/antagonists/arcontes.md` (fronteira: Barbelo não é arconte nomeado, e não entra nas três listas).
 > **Camada de rigor:** N4 (documento).
-> **Leis que governam este texto:** L-13 (canon desatualizado bloqueia: `pleroma-setiano.md` ainda diz "presença, sem combate", ver seção 8), L-14 (nada declarado morto por agente), L-16 (sem homenagem a pessoa real), L-02 (sem arte nem pipeline visual), L-29 (C-02, C-15), L-33 (unidade com fronteira própria), L-34, L-38 (reconhecer não é resolver enigma: seção 10). Do GODS_LAWS global, L-76 (falas em intent, nunca prosa final).
+> **Leis que governam este texto:** L-13 (canon desatualizado bloqueia: `pleroma-setiano.md` já foi atualizado para N2, ver seção 8), L-14 (nada declarado morto por agente), L-16 (sem homenagem a pessoa real), L-02 (sem arte nem pipeline visual), L-29 (C-02, C-15), L-33 (unidade com fronteira própria), L-34, L-38 (reconhecer não é resolver enigma: seção 10). Do GODS_LAWS global, L-76 (falas em intent, nunca prosa final).
 > **Tema:** Reconhecimento.
 
 ---
@@ -21,6 +21,20 @@ Barbelo é a **primeira potência** da escada do Pleroma (`pleroma-setiano.md` �
 ### 1.1 A luta não é para vencer
 
 Um chefe normalmente tem uma barra que zera. Barbelo não tem. O que escala entre as fases não é dano, é **atenção**: o quanto ela enxerga a party. A conclusão do encontro é o reconhecimento, e ele é o ponto final, sem golpe de finalização.
+
+### 1.2 Lugar e formato: um sonho na Catedral-Mãe
+
+Decisão do líder de 11/10/2026, verbatim: *"opcao 2, mas só aparece em sonho. O sonho será rapidamente jogável apenas para saber essa parte do cânon, mas vai sumir de repente, sem um fim claro da cena, como um sonho"*.
+
+- **Lugar:** o encontro acontece na Catedral-Mãe, que segue lendária e de localização desconhecida (`PLACES.md` §2, citado em `demiurgo.md` §4). Ela **não precisa abrir como área**: o jogador a sonha, não a visita.
+- **Corte C-02 não é tocado:** sonho não é área do grafo de `docs/design/mundo-topologia.md`, e nenhum gating depende dele.
+- **Jogável, e curto:** o jogador controla, não assiste. Mas o sonho é rápido.
+- **Função:** o sonho existe para o jogador **conhecer** essa parte do cânon. Não existe para vencer nada.
+- **Sem fim claro:** o sonho some de repente, no meio, sem tela de conclusão, sem recompensa anunciada e sem "você despertou". Isto é o desenho, e não descuido.
+
+**Como as três fases e o sumiço convivem: leitura (b).** O sonho **é** o encontro, e ele acaba exatamente quando ela reconhece. As três fases cabem dentro dele. O sumiço sem fim claro é a fase três se completando: ela reconhece a party, e nesse instante o sonho termina, porque reconhecer era o fim da cena. Razão de desenho: assim o "sem fim claro" deixa de ser convenção de sonho e vira consequência da mecânica. O jogador não entende por que acabou na hora, e entende depois. Isso é exatamente o que a L-38 protege, porque nenhuma passagem é explicada no momento em que acontece. A leitura (a), em que o sonho seria só apresentação e as fases ficariam para outro encontro, foi descartada porque deixaria as duas coisas coexistindo sem arbitragem. O líder pode trocar para (a) como ponta P35.
+
+**Trava de L-38 dentro do sonho.** Sonho é o terreno mais fácil para um jogo explicar o que devia ser deduzido, porque tudo parece permitido ali. Esta trava vale dentro do sonho igual a fora dele: **Barbelo pode mostrar o que ela é, mas não pode dizer ao jogador o que fazer, não pode adiantar resposta de enigma e não pode apontar caminho.** O sonho não mostra padrão, não anuncia sequência e não abre passagem.
 
 ---
 
@@ -75,16 +89,16 @@ Em cada fase: o que a party é para ela, o que ela faz (intent, sem número), o 
 - **Leitura:** a party são pessoas. Ela reconhece cada membro como alguém que age por conta própria.
 - **Intent (stub):** [Reconhecer: responde ao que a party propôs, e não ataca]. Não há ofensiva nesta fase. Ela responde ao gesto da party.
 - **Atenção:** alta. O reconhecimento é a meta, e acontece aqui.
-- **Término:** ela para sozinha quando reconhece. Não há golpe final, não há barra que zera, e a saída do encontro é sempre possível (seção 5).
+- **Término:** o sonho acaba quando ela reconhece, sem tela de conclusão e sem golpe final (seção 5).
 
 ---
 
 ## 5. Término, sem derrota
 
 - **Não há derrota neste encontro.** Nenhum estado de party morta, nenhum game over, nenhuma barra de HP que chega a zero para ela (seção 1.1).
-- **Ela para sozinha quando reconhece.** O término é o reconhecimento da fase 3. Ele não é oferecido como vitória, e não aparece como banner de vitória.
-- **O jogador pode sair a qualquer momento.** O encontro não é gate de progressão (`C-02`, `mundo-topologia.md` §1), e nenhuma chave, área ou final depende dele. Se ele não se conclui, o jogador segue o jogo sem penalidade.
-- **Recompensa:** nenhuma definida nesta proposta. Se houver, é ponta (P32).
+- **O sonho acaba quando ela reconhece.** É o fim da fase 3, e não é oferecido como vitória: nenhuma tela de conclusão, nenhum banner, nenhum "você despertou" (seção 1.2).
+- **Não há comando de sair do sonho.** Ele acaba quando acaba. Não é gate de progressão (`C-02`, `mundo-topologia.md` §1), e nenhuma chave, área ou final depende dele. Quem não chega ao sonho segue o jogo sem penalidade.
+- **Recompensa:** nenhuma anunciada (seção 1.2, ponto de sumiço). Ponta P32 fica resolvida por isso.
 
 ---
 
@@ -123,7 +137,7 @@ Onde `pleroma-setiano.md` fala de Barbelo como presença sem combate:
 - §6, P14 (tipo de contato): a recomendação de N1 a N4 só presença passa a não valer para N2.
 - §6, P18 (falas): para Barbelo, a fala ainda não é decidida, e ver seção 9 deste arquivo.
 
-Proposta de atualização: N2 passa de presença para encontro em três fases, com o título deste arquivo como referência. O líder decide se a atualização entra agora ou depois.
+**Atualizado em 11/10/2026**, por autorização do líder: `pleroma-setiano.md` já diz que N2 é encontro em três fases, sem derrota, e aponta para este arquivo. Nos outros três seres da tríade (Pai Invisível, Autógenes e Adão Pura) não há mudança.
 
 ---
 
@@ -156,13 +170,14 @@ Qualquer solução em que o jogo aponte a resposta contradiz esta decisão. Deci
 
 Cada ponta é decisão do líder, levada por `AskUserQuestion`, com a opção recomendada primeiro.
 
-- **P29. Atualização do Pleroma.** Recomendado: atualizar `pleroma-setiano.md` agora (seção 8), porque o canon atual contradiz este encontro (L-13). Alternativa: deixar para depois, com este arquivo marcado como bloqueante.
-- **P30. Falas de Barbelo.** Recomendado: nenhuma fala, só ação (seção 9). Alternativa: intents de fala para o `narrative-writer`.
-- **P31. Mecânica de atenção.** Necessidade nova do motor, sem dano: medir a atenção por membro, com passagem por evento e sem estado de derrota (seção 6). Recomendado: abrir como item de motor com o `lead-game-designer`, e não resolver aqui. Alternativa: adiar o encontro até a mecânica existir.
-- **P32. Recompensa.** Recomendado: nenhuma recompensa definida nesta proposta, para não criar gate disfarçado. Alternativa: item de recompensa, com a mesma regra de primeira vitória da seção 7 de `demiurgo.md`.
-- **P33. Lugar do encontro.** Esta proposta não coloca Barbelo em uma das treze áreas. Recomendado: o Catedral-Mãe, que já é "lendário e de localização desconhecida" (`PLACES.md` §2, citado em `demiurgo.md` §4), pois a primeira potência não pertence às redondezas. Alternativa: uma das treze áreas. Atenção: o Catedral-Mãe não é uma das treze áreas, e a relação com o corte C-02 precisa de decisão do líder.
-- **P34. Ordem do encontro.** Recomendado: o encontro é opcional e sem ordem exigida, como o do Yaldabaoth (`demiurgo.md` §5). Alternativa: um encontro único depois de um marco narrativo, o que levanta a pergunta de gate.
+- **P29. Atualização do Pleroma: resolvida** em 11/10/2026, com `pleroma-setiano.md` atualizado para Barbelo (seção 8).
+- **P30. Falas de Barbelo.** Recomendado: nenhuma fala, só ação (seção 9). Alternativa: intents de fala para o `narrative-writer`. Continua aberta.
+- **P31. Mecânica de atenção.** Necessidade nova do motor, sem dano: medir a atenção por membro, com passagem por evento e sem estado de derrota (seção 6). Recomendado: abrir como item de motor com o `lead-game-designer`, e não resolver aqui. Continua aberta.
+- **P32. Recompensa: resolvida** pelo líder em 11/10/2026: nenhuma recompensa anunciada, porque o sonho não tem fim claro (seção 1.2).
+- **P33. Lugar do encontro: resolvido** pelo líder em 11/10/2026: sonho na Catedral-Mãe, que não precisa abrir como área (seção 1.2).
+- **P34. Gatilho do sonho.** Pergunta: como o jogador chega ao sonho? Recomendado: por presença, como os sinais de presença do Yaldabaoth (`demiurgo.md` §4), sem horário e sem sorteio. Alternativa: marco narrativo, o que levanta a pergunta de gate, e precisa de decisão do líder.
+- **P35. Leitura (b) do sonho.** Recomendado: manter (b), em que o sonho é o encontro e termina no reconhecimento (seção 1.2). Alternativa: (a), em que o sonho é só apresentação e as fases ficam para outro encontro.
 
 ---
 
-**Última revisão:** 2026-10-11. Proposta N4, com a aprovação do líder de 11/10/2026 incorporada. Aguarda o líder nas pontas P29 a P34.
+**Última revisão:** 2026-10-11. Proposta N4, com a aprovação do líder de 11/10/2026 incorporada, e o lugar em sonho na Catedral-Mãe. Aguarda o líder nas pontas P30, P31, P34 e P35.

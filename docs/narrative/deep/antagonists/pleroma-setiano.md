@@ -229,4 +229,4 @@ A caracterização de Set como salvador da raça incorruptível vem do Evangelho
 
 ---
 
-**Última revisão:** 2026-10-11. Proposta N4, aguarda o líder nas pontas P12 a P18.
+**Última revisão:** 2026-10-11. Proposta N4. Barbelo (N2) atualizada em 11/10/2026 por decisão do líder: encontro em três fases, em sonho na Catedral-Mãe, sem derrota (`barbelo.md`). O Pai Invisível, o Autógenes e o Adão Pura seguem como presença, sem mudança. Aguarda o líder nas pontas P12, P13, P15, P16, P17, e nas partes de P14 e P18 que tratam dos demais seres.
