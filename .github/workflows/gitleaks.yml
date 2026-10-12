@@ -1,0 +1,327 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Fourth gate of the L-19 of the project GODS_LAWS (item C5b): secret scanning
+# over the COMPLETE git history, guarded against a scan that read nothing.
+# This is not the build CI (item C4b) and it compiles nothing: it runs no project code.
+#
+# Review layer: N3, by the amendment of 11/10/2026 in the project GODS_LAWS.
+# This is a CI script, not product code and not a guard of the leader session.
+#
+# Layout decisions, all from the leader on 12/10/2026 (plan of C5):
+# - one workflow file per gate. This file is the only one of item C5b.
+# - no "needs". A failed gate must not skip the others, so every push shows the
+#   verdict of every gate.
+# - no matrix. The platform matrix belongs to item C4b.
+#
+# WHY THE RUNNER IS BARE UBUNTU AND NOT A CONTAINER. Do not move this job into a
+# container to tidy it up: that reopens the defect described below.
+# gitleaks issue 2129 (open, no maintainer reply, as measured in the research of
+# 12/10/2026) names two triggers for "gitleaks git" exiting 0 with "0 commits scanned".
+#   Trigger 1: the git-crypt textconv writes "git-crypt: Warning: file not encrypted"
+#   to stderr for historical commits that touched a path that is encrypted today.
+#   gitleaks logs "stderr is not empty" and aborts.
+#   Trigger 2: "dubious ownership" with HOME=/github/home. That HOME exists only
+#   inside a job container. On this bare runner HOME belongs to the runner user, so
+#   trigger 2 cannot happen by construction.
+# Whether trigger 1 fires on a CI clone with no git-crypt configured is NOT assumed
+# here. The run measures it, and the diagnostics step prints the evidence.
+#
+# THE GUARD. gitleaks is judged on three things at once, never on the exit code alone:
+# the exit code, the commit count printed in the log, and the verdict line ("no leaks
+# found" or "leaks found: N"). The GitLeaks documentation says exit 1 covers both leaks
+# and errors, and issue 2129 reports exit 0 on error, so each case is handled apart:
+#   0        accepted only with a readable commit count above zero AND the
+#            "no leaks found" line.
+#   1        "leaks found: N" is a real finding and rejects. Exit 1 without that line
+#            is a tool error and rejects. "stderr is not empty" is the pre-registered
+#            escalation and rejects.
+#   126      unknown flag or not executable, rejects.
+#   128 and up  the tool died on a signal (global GODS_LAWS L-49), rejects.
+#   any other code  unexpected, rejects.
+# A zero count is a broken sweep, not a clean tree (global GODS_LAWS L-36, and the
+# same law in the project GODS_LAWS). A count that cannot be read rejects: the guard
+# never assumes a number. The count line is parsed by its value, and both "commit" and
+# "commits" are accepted, because the wording is not fixed.
+#
+# THE SWEEP FLOOR IS A COUNT, NOT A MERE EXISTENCE. The only floor is "above zero".
+# No exact expected number is used, because the history grows with every commit. That
+# makes the floor weak: a scan of 1 commit out of 500 passes. This is a declared limit.
+# The log prints "git rev-list --count --all" beside the scan count, so a later slice
+# can tighten the floor with a number in view. It is NOT a gate in this slice.
+#
+# THE RED PROOF, BOTH HALVES, in disposable repositories created in RUNNER_TEMP:
+# - Half 1: a SYNTHETIC key, generated at runtime, never written into this file or into
+#   the repository. The scan must exit 1, report "leaks found: 1", and count one commit.
+#   The key is never printed.
+# - Half 2: a repository with no commit at all. The guard must reject it. Zero commits
+#   is a broken sweep. The log shows whether the rejection came from the zero count or
+#   from the tool exit code. The zero-count branch is also proved on its own, by
+#   fabricated log text with no secret.
+#
+# ONE SCAN COMMAND. guard.sh holds the only gitleaks invocation. A step writes it into
+# RUNNER_TEMP, and every later step calls that file. This is what "the same command
+# line" means here: the red proofs and the real scan cannot drift apart.
+#
+# SECRET RULE. No fixture that looks like a secret is committed to this repository
+# (global GODS_LAWS L-28, project GODS_LAWS L-28). The only key in this workflow is
+# generated at runtime. The scan runs with --redact, because the log of a CI run is public.
+#
+# BINARY PIN. gitleaks 8.30.1 is pinned by SHA-256, the same way layers.yml pins CMake.
+# No third-party action and no moving label. The hash of gitleaks_8.30.1_linux_x64.tar.gz
+# was read from the official checksums file of release v8.30.1, and matched against the
+# raw file saved by the fetch. The binary was NOT downloaded to the planning machine,
+# because project GODS_LAWS L-35 forbids running code there and global GODS_LAWS L-51
+# forbids installing tools without authorization. The first run proves the pin: a wrong
+# hash fails sha256sum, which is fail-closed.
+#
+# ACTIONS. actions/checkout is the only action used, as in the other workflows of this
+# repository. fetch-depth 0 brings all branches and tags. persist-credentials is off,
+# because nothing in this workflow pushes.
+#
+# DECLARED LIMITS (a limit not declared is a false sense of coverage):
+# - Rules are the built-in set of gitleaks 8.30.1. There is no .gitleaks.toml and no
+#   allowlist. An allowlist, if one is ever proposed, is a leader decision.
+# - Only git mode runs. dir mode is not run, so lacuna 14 of the research (encrypted
+#   blobs in dir mode) is NOT answered by this workflow. Adding a dir-mode step is a
+#   decision for the leader.
+# - git-crypt blobs are ciphertext. The scan cannot read inside them, so finding nothing
+#   in them is not a proof about their content.
+# - Git LFS objects are not downloaded by checkout, so binary payloads are scanned only
+#   as LFS pointers.
+# - The sweep floor is "above zero". Completeness of the sweep is not proved.
+# - The commit-message gate is not run here (item C5a), and the hook is not checked here
+#   (item C7).
+# - No Windows, no macOS, no other platform (item C4b).
+
+name: Segredo no histórico
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Varredura do histórico inteiro, com a guarda que reprova varredura vazia
+    runs-on: ubuntu-latest
+    env:
+      # Exact version, never a moving label. The hash of this version is in the install step.
+      GITLEAKS_VERSION: "8.30.1"
+    steps:
+      - name: Checkout with the full history
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install gitleaks pinned by SHA-256
+        # The hash was read from the official checksums file of release v8.30.1, and matched
+        # against the raw file saved by the fetch. Changing it is a visible diff.
+        # The binary joins PATH only if the hash matches. Without a match this step fails.
+        env:
+          GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+        run: |
+          set -eu
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          work="$RUNNER_TEMP/gitleaks-download"
+          mkdir -p "$work" "$RUNNER_TEMP/bin"
+          cd "$work"
+          curl -fsSLO "$base/$tarball"
+          echo "$GITLEAKS_SHA256  $tarball" | sha256sum -c -
+          tar -xzf "$tarball" -C "$RUNNER_TEMP/bin"
+          test -x "$RUNNER_TEMP/bin/gitleaks"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Print the gitleaks version
+        run: |
+          set -eu
+          command -v gitleaks
+          gitleaks version
+
+      - name: Write the guard, the one definition of the scan and of the verdict
+        run: |
+          set -eu
+          cat > "$RUNNER_TEMP/guard.sh" <<'GUARD'
+          #!/usr/bin/env bash
+          # Single definition of the scan and of the verdict. Every step calls this file.
+          #   guard.sh scan <repo> <log>        runs gitleaks, then judges the outcome
+          #   guard.sh judge <exit-code> <log>  judges an outcome already recorded
+          # Prints GUARD_RC, GUARD_COUNT, GUARD_VERDICT and GUARD_REASON. Exit 0 only on accept.
+          set -u
+
+          judge() {
+            local rc="$1" log="$2" count_lines count="" verdict reason
+            count_lines=$(grep -cE '[0-9]+ commits? scanned' "$log" || true)
+            if [ "$count_lines" = "1" ]; then
+              count=$(grep -oE '[0-9]+ commits? scanned' "$log" | grep -oE '^[0-9]+' || true)
+            fi
+            case "$count" in ''|*[!0-9]*) count="" ;; esac
+            if grep -q 'stderr is not empty' "$log"; then
+              verdict="escalate"
+              reason="stderr is not empty: gitleaks aborted, issue 2129 family. Escalate, do not migrate to stdin"
+            elif [ "$rc" = "0" ]; then
+              if [ -z "$count" ]; then
+                verdict="unreadable"; reason="exit 0 but the commit count is missing or not a number"
+              elif [ "$count" -eq 0 ]; then
+                verdict="zero"; reason="exit 0 with zero commits scanned: broken sweep, not a clean tree"
+              elif ! grep -q 'no leaks found' "$log"; then
+                verdict="format-unknown"; reason="exit 0 without the no leaks found line"
+              else
+                verdict="accept"; reason="commit count above zero and no leaks found"
+              fi
+            elif [ "$rc" = "1" ]; then
+              if grep -qE 'leaks found: [0-9]+' "$log"; then
+                verdict="leak"; reason="real finding: leaks found"
+              else
+                verdict="tool-error"; reason="exit 1 without a leaks found line: tool error, not a verdict"
+              fi
+            elif [ "$rc" = "126" ]; then
+              verdict="tool-error"; reason="exit 126: unknown flag or not executable"
+            elif [ "$rc" -ge 128 ]; then
+              verdict="tool-died"; reason="exit $rc: the tool died on a signal, not a verdict"
+            else
+              verdict="unknown-code"; reason="exit $rc: unexpected code, not a verdict"
+            fi
+            printf 'GUARD_RC=%s\nGUARD_COUNT=%s\nGUARD_VERDICT=%s\nGUARD_REASON=%s\n' \
+              "$rc" "${count:-unreadable}" "$verdict" "$reason"
+            [ "$verdict" = "accept" ]
+          }
+
+          scan() {
+            local repo="$1" log="$2" rc=0
+            # The one and only scan command. Every step reaches gitleaks through this file.
+            gitleaks git --redact "$repo" > "$log" 2>&1 || rc=$?
+            judge "$rc" "$log"
+          }
+
+          case "${1:-}" in
+            scan) scan "${2:?repo missing}" "${3:?log missing}" ;;
+            judge) judge "${2:?exit code missing}" "${3:?log missing}" ;;
+            *) echo "usage: guard.sh scan <repo> <log> | judge <exit-code> <log>" >&2; exit 2 ;;
+          esac
+          GUARD
+          bash -n "$RUNNER_TEMP/guard.sh"
+          echo "guard written: $RUNNER_TEMP/guard.sh"
+
+      - name: Verdict tests on fabricated log text, with no secret
+        run: |
+          set -eu
+          guard="$RUNNER_TEMP/guard.sh"
+          fx="$RUNNER_TEMP/fixtures"
+          mkdir -p "$fx"
+          printf 'INF 3 commits scanned.\nINF no leaks found\n' > "$fx/clean.log"
+          printf 'INF 1 commit scanned.\nINF no leaks found\n' > "$fx/singular.log"
+          printf 'INF 0 commits scanned.\nINF no leaks found\n' > "$fx/zero.log"
+          printf 'INF commits scanned.\nINF no leaks found\n' > "$fx/garbled.log"
+          printf 'INF 2 commits scanned.\n' > "$fx/no-verdict.log"
+          printf 'INF 1 commits scanned.\nWRN leaks found: 1\n' > "$fx/leak.log"
+          printf 'ERR stderr is not empty\nINF 1 commits scanned.\n' > "$fx/abort.log"
+          check() {
+            # check <name> <exit-code> <log> <expected judge status> <expected verdict>
+            local name="$1" rc="$2" log="$3" want_status="$4" want_verdict="$5"
+            local out status=0 got
+            out=$(bash "$guard" judge "$rc" "$log") || status=$?
+            got=$(printf '%s\n' "$out" | sed -n 's/^GUARD_VERDICT=//p')
+            echo "$name: judge status $status, verdict $got"
+            if [ "$status" != "$want_status" ] || [ "$got" != "$want_verdict" ]; then
+              echo "TEXT TEST FAILED: $name"
+              exit 1
+            fi
+          }
+          check clean-exit0 0 "$fx/clean.log" 0 accept
+          check singular-exit0 0 "$fx/singular.log" 0 accept
+          check zero-exit0 0 "$fx/zero.log" 1 zero
+          check garbled-exit0 0 "$fx/garbled.log" 1 unreadable
+          check no-verdict-exit0 0 "$fx/no-verdict.log" 1 format-unknown
+          check leak-exit1 1 "$fx/leak.log" 1 leak
+          check error-exit1 1 "$fx/clean.log" 1 tool-error
+          check abort-exit1 1 "$fx/abort.log" 1 escalate
+          check flag-exit126 126 "$fx/clean.log" 1 tool-error
+          check died-exit139 139 "$fx/clean.log" 1 tool-died
+          check odd-exit2 2 "$fx/clean.log" 1 unknown-code
+          echo "ALL TEXT TESTS PASSED"
+
+      - name: Red proof half 1, the guard must reject a repository with a synthetic key
+        run: |
+          set -eu
+          repo="$RUNNER_TEMP/red-synthetic"
+          log="$RUNNER_TEMP/red-synthetic.log"
+          mkdir "$repo"
+          git init -q -b main "$repo"
+          # Generated here, never printed, never committed to this repository.
+          key=$(python3 -c 'import secrets; print("AKIA" + "".join(secrets.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567") for _ in range(16)))')
+          if [ "${#key}" -ne 20 ]; then echo "synthetic key has the wrong length"; exit 1; fi
+          printf 'aws_access_key_id = %s\n' "$key" > "$repo/fixture.txt"
+          git -C "$repo" add fixture.txt
+          git -C "$repo" -c user.name=ci -c user.email=ci@example.invalid commit -q -m "test: synthetic fixture for the red proof"
+          gate=0
+          out=$(bash "$RUNNER_TEMP/guard.sh" scan "$repo" "$log") || gate=$?
+          cat "$log"
+          printf '%s\n' "$out"
+          val() { printf '%s\n' "$out" | sed -n "s/^$1=//p"; }
+          echo "judge exit status: $gate"
+          if [ "$gate" != "1" ]; then echo "RED PROOF 1 FAILED: the guard did not reject (status $gate)"; exit 1; fi
+          if [ "$(val GUARD_VERDICT)" != "leak" ]; then echo "RED PROOF 1 FAILED: verdict is not leak"; exit 1; fi
+          if [ "$(val GUARD_COUNT)" != "1" ]; then echo "RED PROOF 1 FAILED: the commit count is not 1"; exit 1; fi
+          if [ "$(val GUARD_RC)" != "1" ]; then echo "RED PROOF 1 FAILED: the exit code is not 1"; exit 1; fi
+          echo "RED PROOF 1 PASSED: exit 1, verdict leak, one commit counted"
+
+      - name: Red proof half 2, the guard must reject a repository with no commit
+        run: |
+          set -eu
+          repo="$RUNNER_TEMP/red-empty"
+          log="$RUNNER_TEMP/red-empty.log"
+          mkdir "$repo"
+          git init -q -b main "$repo"
+          gate=0
+          out=$(bash "$RUNNER_TEMP/guard.sh" scan "$repo" "$log") || gate=$?
+          cat "$log"
+          printf '%s\n' "$out"
+          val() { printf '%s\n' "$out" | sed -n "s/^$1=//p"; }
+          echo "judge exit status: $gate, verdict $(val GUARD_VERDICT)"
+          if [ "$gate" != "1" ]; then echo "RED PROOF 2 FAILED: the guard did not reject (status $gate)"; exit 1; fi
+          if [ "$(val GUARD_VERDICT)" = "accept" ]; then echo "RED PROOF 2 FAILED: the guard accepted an empty repository"; exit 1; fi
+          echo "RED PROOF 2 PASSED: the guard rejected a repository with no commit"
+
+      - name: Scan the real tree and its full history
+        run: |
+          set -eu
+          log="$RUNNER_TEMP/real.log"
+          gate=0
+          out=$(bash "$RUNNER_TEMP/guard.sh" scan "$GITHUB_WORKSPACE" "$log") || gate=$?
+          cat "$log"
+          printf '%s\n' "$out"
+          val() { printf '%s\n' "$out" | sed -n "s/^$1=//p"; }
+          echo "git rev-list --count --all: $(git -C "$GITHUB_WORKSPACE" rev-list --count --all || true)"
+          echo "git rev-list --count HEAD: $(git -C "$GITHUB_WORKSPACE" rev-list --count HEAD || true)"
+          if [ "$gate" != "0" ]; then
+            echo "REAL SCAN REJECTED: verdict $(val GUARD_VERDICT), reason $(val GUARD_REASON)"
+            exit 1
+          fi
+          count="$(val GUARD_COUNT)"
+          case "$count" in
+            ''|*[!0-9]*) echo "FAIL: the commit count is unreadable"; exit 1 ;;
+          esac
+          if [ "$count" -le 0 ]; then echo "FAIL: zero commits scanned, broken sweep"; exit 1; fi
+          echo "REAL SCAN ACCEPTED: $count commits scanned, above zero"
+
+      - name: Diagnostics for the open questions, never a gate
+        if: always()
+        run: |
+          set -u
+          log="$RUNNER_TEMP/real.log"
+          echo "git-crypt textconv in this clone:"
+          git -C "$GITHUB_WORKSPACE" config --get diff.git-crypt.textconv || echo "textconv not configured"
+          echo "git-crypt lines in the real log:"
+          grep -c 'git-crypt' "$log" 2>/dev/null || true
+          echo "stderr is not empty lines in the real log:"
+          grep -c 'stderr is not empty' "$log" 2>/dev/null || true
+          echo "findings that point into encrypted paths, if any:"
+          grep -nE 'docs/_secret/|docs/book/|docs/narrative/deep/stinger/|termos_proibidos' "$log" 2>/dev/null || true
+          echo "leaks found lines in the real log:"
+          grep -c 'leaks found:' "$log" 2>/dev/null || true
