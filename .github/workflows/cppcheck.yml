@@ -190,7 +190,7 @@ jobs:
       # and no --error-exitcode. cppcheck must exit 0 WITH the finding in the log. That
       # is the blind gate this job exists to prevent. If cppcheck ever exits non zero
       # here, the premise of this job has changed, and the job fails so someone reads it.
-      - name: Red proof, WITHOUT --error-exitcode (the trap: must exit 0 with the finding)
+      - name: Red proof, WITHOUT --error-exitcode (the trap, must exit 0 with the finding)
         run: |
           set -u
           fixture=tests/fixtures/cppcheck/cppcheck_fixture.cpp
