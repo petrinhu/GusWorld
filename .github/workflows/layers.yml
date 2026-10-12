@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Gate de camadas (L-17) no CI. Workflow proprio, separado do lei-zero.yml:
+# o item C4 (matriz de build) e o C5 tambem mexem em CI, e um arquivo so
+# faria os tres brigarem pela mesma linha. Este nao compila nem executa nada do
+# jogo: o compilador so roda o pre-processador, em modo de dependencia (-M).
+name: Camadas
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  layers:
+    name: As camadas puras nao incluem o GlintFx
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Autoteste do gate (um caso vermelho por forma)
+        run: python3 tools/ci/check_layers.py --selftest
+
+      - name: Configura o CMake so para gerar compile_commands.json
+        # O gate pergunta ao compilador, e o compilador precisa da linha de
+        # compilacao exata que o CMake gera. Nada e compilado nem executado.
+        run: cmake -S . -B "$RUNNER_TEMP/layers-build" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Arvore inteira, pelo compilador
+        run: python3 tools/ci/check_layers.py --build "$RUNNER_TEMP/layers-build"
