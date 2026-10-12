@@ -19,8 +19,43 @@ jobs:
   layers:
     name: As camadas puras nao incluem o GlintFx
     runs-on: ubuntu-latest
+    env:
+      # Versao exata, nunca etiqueta movel. O projeto exige CMake 4.1 ou mais
+      # (cmake_minimum_required), e o ubuntu-latest traz 3.31.6 (medido no log).
+      CMAKE_VERSION: "4.2.8"
     steps:
       - uses: actions/checkout@v7
+
+      - name: Instala CMake pinado, conferindo o SHA-256 fixado neste arquivo
+        # O hash abaixo foi lido do arquivo oficial da release (cmake-4.2.8-SHA-256.txt),
+        # por requisicao direta. Trocar este valor e mudanca visivel em diff.
+        # O tarball so entra no PATH se o hash bater; sem bater, o passo falha.
+        env:
+          CMAKE_SHA256: "fdc99bf2cc077f3a7dc783bc1a064fcb3d1deb806add09a355814ccff6e40914"
+        run: |
+          set -eu -o pipefail
+          base="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}"
+          tarball="cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz"
+          work="$RUNNER_TEMP/cmake-install"
+          mkdir -p "$work"
+          cd "$work"
+          curl -fsSLO "$base/$tarball"
+          echo "$CMAKE_SHA256  $tarball" | sha256sum -c -
+          tar -xzf "$tarball" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/cmake-${CMAKE_VERSION}-linux-x86_64/bin" >> "$GITHUB_PATH"
+
+      - name: Prova a versao do CMake no PATH (piso 4.1)
+        run: |
+          set -eu
+          cmake --version
+          version=$(cmake --version | sed -n '1s/^cmake version //p')
+          # Comparacao numerica de versao: sort -V -C passa se 4.1 vem antes ou igual a versao.
+          if printf '%s\n%s\n' 4.1 "$version" | sort -V -C; then
+            echo "CMake $version atende o piso 4.1"
+          else
+            echo "CMake $version abaixo do piso 4.1"
+            exit 1
+          fi
 
       - name: Autoteste do gate (um caso vermelho por forma)
         run: python3 tools/ci/check_layers.py --selftest
