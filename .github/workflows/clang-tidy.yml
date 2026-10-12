@@ -21,6 +21,9 @@
 #   The compile database comes from a configure that turns GUSWORLD_PRESENT on. That option
 #   is only switched on so the database describes the whole tree (11 files). present/ stays
 #   blocked for BUILD (L-06 and L-27 of the project laws). Configure only, nothing compiled.
+#   This exception was authorized by the project lead on 12/10/2026 (explicit state, L-02
+#   of the global laws). It applies ONLY to this job and ONLY to the configure step. No
+#   other file, job or step inherits this permission: whoever needs it again asks again.
 #   One clang-tidy process per file, so each file has its own exit code and the count of
 #   analysed files is real (L-36 of the global laws). That is 11 processes for the tree and
 #   2 for the fixtures. 13 in total, accepted by L-11 of the global laws for 11 files.
