@@ -82,3 +82,41 @@ add_test(NAME harness_selftest_empty_registry_fails
     -DEXPECT_RC=2
     -DREQUIRED_TEXT=no\ test\ case\ registered
     -P ${expect_exit_script})
+
+# Warnings-as-errors gate (L-19 portao 1), proved on a fixture with deliberate
+# warnings. Registered only when GUSWORLD_WERROR is ON, because only then is the
+# red case a fact to expect: with the switch OFF it could never pass. Each case
+# builds in its own directory, so the two sub-builds cannot contaminate each other.
+#
+# Diagnostic needles were measured on neither compiler here (L-35: nothing runs
+# in this session). GCC prints "error: unused parameter 'x' [-Werror=unused-parameter]"
+# and Clang prints "error: unused parameter 'x' [-Werror,-Wunused-parameter]", so
+# "error: unused parameter" and "[-Werror" are the same text on both. Declared
+# unverified until the CI runs them (GCC on Fedora is the CI compiler).
+if(GUSWORLD_WERROR)
+  set(werror_fixture_dir ${CMAKE_CURRENT_SOURCE_DIR}/fixtures/werror)
+  set(expect_build_script ${CMAKE_CURRENT_SOURCE_DIR}/cmake/expect_build.cmake)
+
+  # Red: the same source must fail, and fail because a warning was promoted.
+  add_test(NAME werror_gate_red_fails_on_warning
+    COMMAND ${CMAKE_COMMAND}
+      -DSOURCE_DIR=${werror_fixture_dir}
+      -DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}/werror_red
+      -DWERROR=ON
+      -DEXPECT_OK=FALSE
+      -DCXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DREQUIRED_TEXT=error:\ unused\ parameter|[-Werror
+      -P ${expect_build_script})
+
+  # Control: the same source with the switch OFF must pass, and must still
+  # print the warning. Without it, a red could be blamed on a fixture that never compiled.
+  add_test(NAME werror_gate_control_passes_without_werror
+    COMMAND ${CMAKE_COMMAND}
+      -DSOURCE_DIR=${werror_fixture_dir}
+      -DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}/werror_control
+      -DWERROR=OFF
+      -DEXPECT_OK=TRUE
+      -DCXX_COMPILER=${CMAKE_CXX_COMPILER}
+      -DREQUIRED_TEXT=warning:\ unused\ parameter
+      -P ${expect_build_script})
+endif()
