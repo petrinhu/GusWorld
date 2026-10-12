@@ -1,0 +1,274 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Static analysis gate, clang-tidy half (L-19 portao 3; cppcheck is the other half, see
+# cppcheck.yml). A separate job in its own file, like cppcheck.yml and sanitizers.yml.
+#
+# Why the job is written this way:
+#   No CMake integration of the tool. The CMake documentation says a warning is
+#   reported when the tool reports a problem, and it does not say whether that stops the
+#   build. A job that calls clang-tidy directly controls the exit code itself.
+#   --warnings-as-errors is on the COMMAND LINE only. The .clang-tidy file never sets
+#   WarningsAsErrors, so the editor of a developer keeps warnings as warnings.
+#   The exit code of clang-tidy is NOT in its documentation (the page is silent). It is
+#   MEASURED here and printed. Nothing in this file assumes 1 or 0 for a finding.
+#   Exit 1 is also what a parser or header error can return, so exit 1 alone never proves a
+#   finding: the log must also carry the check id in brackets, like uninitvar in cppcheck.yml.
+#   Exit 126 (not executable) and 128 and above (death by signal, L-49 of the global laws)
+#   are named apart from a finding, because they need opposite fixes.
+#   A "fatal error" or "file not found" line is a parser or header problem, not a finding,
+#   and is counted and printed on its own line.
+#   The compile database comes from a configure that turns GUSWORLD_PRESENT on. That option
+#   is only switched on so the database describes the whole tree (11 files). present/ stays
+#   blocked for BUILD (L-06 and L-27 of the project laws). Configure only, nothing compiled.
+#   One clang-tidy process per file, so each file has its own exit code and the count of
+#   analysed files is real (L-36 of the global laws). That is 11 processes for the tree and
+#   2 for the fixtures. 13 in total, accepted by L-11 of the global laws for 11 files.
+#   The fixture is analysed WITHOUT the database, with its own flags after "--", so the
+#   compile database cannot hide it.
+name: Análise estática com clang-tidy
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clang-tidy:
+    name: clang-tidy sobre a árvore real, com provas vermelhas nos dois casos
+    runs-on: ubuntu-latest
+    # The job runs inside the distro image. The runner is only the host.
+    container: fedora:latest
+    steps:
+      # The image ships without git. Install it first, so the checkout is a real git
+      # clone (same reason as build.yml, runs 38196743681 and 74fc8eb).
+      - name: Install git (before the checkout)
+        run: dnf -y install git
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Container jobs run as root, and root sees the workspace as "dubious ownership".
+      - name: Git safe.directory for the container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # Toolchain from the repository copy. It exports CC and CXX and installs cmake,
+      # which the configure step below uses.
+      - name: Install toolchain
+        run: bash tools/ci/env/fedora.sh
+
+      # Floor from the project's cmake_minimum_required(4.1). Same check as build.yml.
+      - name: Version floor (CMake 4.1)
+        run: |
+          set -eu
+          cmake --version > cmake_version.txt
+          version="$(sed -n '1s/^cmake version //p' cmake_version.txt)"
+          echo "CMake read: ${version:-<unreadable>}"
+          case "$version" in
+            ''|*[!0-9.]*)
+              echo "FAIL: could not read the CMake version"
+              exit 1
+              ;;
+          esac
+          if printf '%s\n%s\n' 4.1 "$version" | sort -V -C; then
+            echo "CMake ${version} meets the 4.1 floor"
+          else
+            echo "FAIL: CMake ${version} is below the 4.1 floor"
+            exit 1
+          fi
+
+      # Installed in its own step, so a missing package fails here and not in the gate.
+      # The version is printed, so the log shows which clang-tidy ran. The package name
+      # is not documented by clang-tidy itself; on Fedora clang-tools-extra provides it.
+      - name: Install clang-tidy
+        run: |
+          set -eu
+          dnf -y install clang clang-tools-extra
+          rpm -q clang clang-tools-extra
+          clang-tidy --version
+
+      # Configure only, to generate the compile database. GUSWORLD_PRESENT is ON here
+      # for the database alone (see the header): nothing is compiled.
+      - name: Configure only, with present/ in the database
+        run: |
+          set -eu
+          cmake -S . -B "$RUNNER_TEMP/clang-tidy-build" \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGUSWORLD_PRESENT=ON
+          test -s "$RUNNER_TEMP/clang-tidy-build/compile_commands.json"
+
+      # Every .cpp of the tree, fixtures excluded. Zero is a failure: an empty scan is a
+      # broken scan, not a clean tree (L-36).
+      - name: Enumerate the sources (zero is a failure)
+        run: |
+          set -eu
+          find . -name '*.cpp' -not -path './.git/*' -not -path './tests/fixtures/*' \
+            | sort > "$RUNNER_TEMP/sources.txt"
+          found="$(wc -l < "$RUNNER_TEMP/sources.txt")"
+          echo "encontrados (.cpp fora dos fixtures): ${found}"
+          cat "$RUNNER_TEMP/sources.txt"
+          case "$found" in
+            ''|*[!0-9]*)
+              echo "FAIL: the source count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$found" -eq 0 ]; then
+            echo "FAIL: zero sources found"
+            exit 1
+          fi
+
+      # clang-tidy does NOT fail on a file that is missing from the database: the
+      # documentation is silent on that case, and it falls back to default flags, so a
+      # file left out would be analysed in silence. The database must match the tree
+      # exactly, in both directions, before the gate runs.
+      - name: Compile database matches the tree exactly (both directions)
+        run: |
+          set -eu
+          export LC_ALL=C
+          db="$RUNNER_TEMP/clang-tidy-build/compile_commands.json"
+          grep -o '"file": *"[^"]*"' "$db" | sed 's/^"file": *"//; s/"$//' | sort -u \
+            > "$RUNNER_TEMP/db-files.txt"
+          sed "s#^\./#$(pwd -P)/#" "$RUNNER_TEMP/sources.txt" | sort -u \
+            > "$RUNNER_TEMP/expected-files.txt"
+          expected="$(wc -l < "$RUNNER_TEMP/expected-files.txt")"
+          in_db="$(wc -l < "$RUNNER_TEMP/db-files.txt")"
+          missing="$(comm -23 "$RUNNER_TEMP/expected-files.txt" "$RUNNER_TEMP/db-files.txt" | wc -l)"
+          extra="$(comm -13 "$RUNNER_TEMP/expected-files.txt" "$RUNNER_TEMP/db-files.txt" | wc -l)"
+          echo "na arvore: ${expected}, na receita: ${in_db}, faltando na receita: ${missing}, sobrando na receita: ${extra}"
+          if [ "$missing" -ne 0 ] || [ "$extra" -ne 0 ]; then
+            echo "FAIL: the compile database does not match the tree"
+            comm -3 "$RUNNER_TEMP/expected-files.txt" "$RUNNER_TEMP/db-files.txt"
+            exit 1
+          fi
+
+      # The gate on the real tree: one clang-tidy process per file, each with its own exit
+      # code, written to records. Warnings are promoted to errors on the command line only.
+      # The loop keeps going after a failure, so the counts are complete (L-36).
+      - name: Gate, clang-tidy on the real tree, one process per file
+        run: |
+          set -u
+          build="$RUNNER_TEMP/clang-tidy-build"
+          records="$RUNNER_TEMP/tidy-records.txt"
+          log="$RUNNER_TEMP/tidy-real.log"
+          : > "$records"
+          : > "$log"
+          while IFS= read -r src; do
+            rc=0
+            clang-tidy -p "$build" --warnings-as-errors='*' "$src" >> "$log" 2>&1 || rc=$?
+            echo "exit ${rc} ${src}" >> "$records"
+          done < "$RUNNER_TEMP/sources.txt"
+          cat "$log"
+          found="$(wc -l < "$RUNNER_TEMP/sources.txt")"
+          analysed="$(wc -l < "$records")"
+          falharam="$(grep -cv '^exit 0 ' "$records")" || true
+          parser="$(grep -cE 'fatal error|file not found' "$log")" || true
+          stray="$(grep -E ' (warning|error): ' "$log" | grep -vc '\[')" || true
+          echo "encontrados: ${found}, analisados (linhas em records): ${analysed}, falharam (exit diferente de 0): ${falharam:-<unreadable>}"
+          echo "erro de parser ou header, nao achado (fatal error, file not found): ${parser:-<unreadable>}"
+          echo "avisos ou erros sem id de verificacao entre colchetes: ${stray:-<unreadable>}"
+          case "$found" in
+            ''|*[!0-9]*)
+              echo "FAIL: the source count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$found" -eq 0 ]; then
+            echo "FAIL: zero sources found"
+            exit 1
+          fi
+          if [ "$analysed" -ne "$found" ]; then
+            echo "FAIL: analysed ${analysed} differs from found ${found}, coverage lost"
+            exit 1
+          fi
+          if [ "${falharam:-1}" -ne 0 ]; then
+            echo "FAIL: files with a non-zero exit, listed below (1 is a finding or a parser error, read the log; 126 or 128 and above is a broken tool, not a finding)"
+            grep -v '^exit 0 ' "$records"
+            exit 1
+          fi
+          if [ "${stray:-1}" -ne 0 ] || [ "${parser:-1}" -ne 0 ]; then
+            echo "FAIL: the log has a parser or header error, or a message without a check id"
+            exit 1
+          fi
+          echo "PASS: all ${found} sources analysed, no finding"
+
+      # Red proof, case WITH the option. The fixture has one deliberate defect, outside
+      # the compile database, with its own flags after "--". The gate must exit non-zero
+      # AND print the check id in brackets. The exit code is printed on its own line,
+      # because it is measured here and not documented.
+      - name: Red proof, WITH --warnings-as-errors (must fail and name the check)
+        run: |
+          set -u
+          fixture=tests/fixtures/clang_tidy/clang_tidy_fixture.cpp
+          rc=0
+          clang-tidy --warnings-as-errors='*' "$fixture" -- -std=c++23 \
+            > "$RUNNER_TEMP/with.log" 2>&1 || rc=$?
+          cat "$RUNNER_TEMP/with.log"
+          echo "CODIGO MEDIDO, com --warnings-as-errors: ${rc}"
+          hits="$(grep -c 'bugprone-macro-parentheses' "$RUNNER_TEMP/with.log")" || true
+          parser="$(grep -cE 'fatal error|file not found' "$RUNNER_TEMP/with.log")" || true
+          echo "WITH: exit ${rc}, bugprone-macro-parentheses lines: ${hits:-<unreadable>}, parser errors: ${parser:-<unreadable>}"
+          case "$hits" in
+            ''|*[!0-9]*)
+              echo "FAIL: the check count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$rc" -eq 126 ]; then
+            echo "FAIL: exit 126, clang-tidy is not executable"
+            exit 1
+          fi
+          if [ "$rc" -ge 128 ]; then
+            echo "FAIL: exit ${rc} is death by signal ($((rc - 128))), not a finding"
+            exit 1
+          fi
+          if [ "$rc" -eq 0 ] || [ "$hits" -lt 1 ]; then
+            echo "FAIL: expected a non-zero exit and the check id, got exit ${rc} and ${hits}"
+            exit 1
+          fi
+          if [ "${parser:-1}" -ne 0 ]; then
+            echo "FAIL: the non-zero exit comes with a parser or header error, not with the finding"
+            exit 1
+          fi
+          echo "PASS: the red proof is red, by a non-zero exit and by the check id"
+
+      # Red proof, case WITHOUT the option: the trap. The same fixture, the same defect,
+      # and no --warnings-as-errors. clang-tidy must exit 0 WITH the finding in the log.
+      # That is the blind gate the option exists to prevent. The documentation does not
+      # promise exit 0 here, so the measured code is printed and the job decides by it.
+      - name: Red proof, WITHOUT --warnings-as-errors (the trap, must exit 0 with the finding)
+        run: |
+          set -u
+          fixture=tests/fixtures/clang_tidy/clang_tidy_fixture.cpp
+          rc=0
+          clang-tidy "$fixture" -- -std=c++23 > "$RUNNER_TEMP/without.log" 2>&1 || rc=$?
+          cat "$RUNNER_TEMP/without.log"
+          echo "CODIGO MEDIDO, sem --warnings-as-errors: ${rc}"
+          hits="$(grep -c 'bugprone-macro-parentheses' "$RUNNER_TEMP/without.log")" || true
+          parser="$(grep -cE 'fatal error|file not found' "$RUNNER_TEMP/without.log")" || true
+          echo "WITHOUT: exit ${rc}, bugprone-macro-parentheses lines: ${hits:-<unreadable>}, parser errors: ${parser:-<unreadable>}"
+          case "$hits" in
+            ''|*[!0-9]*)
+              echo "FAIL: the check count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$rc" -eq 126 ]; then
+            echo "FAIL: exit 126, clang-tidy is not executable"
+            exit 1
+          fi
+          if [ "$rc" -ge 128 ]; then
+            echo "FAIL: exit ${rc} is death by signal ($((rc - 128))), not a finding"
+            exit 1
+          fi
+          if [ "$rc" -ne 0 ] || [ "$hits" -lt 1 ]; then
+            echo "FAIL: expected exit 0 with the check id, got exit ${rc} and ${hits}"
+            exit 1
+          fi
+          if [ "${parser:-1}" -ne 0 ]; then
+            echo "FAIL: a parser or header error in the trap case, the premise of this proof is broken"
+            exit 1
+          fi
+          echo "PASS: without the option the finding is there and the exit is 0, the trap is real"

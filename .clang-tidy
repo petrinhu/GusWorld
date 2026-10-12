@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# clang-tidy configuration, the clang half of L-19 portao 3 (cppcheck is the other half,
+# see .github/workflows/cppcheck.yml). The set is CONSERVATIVE and is declared here so it
+# is versioned. It grows only by an explicit decision of the project lead, never as a
+# side effect of a cleanup.
+#
+# Why these checks:
+#   bugprone-macro-parentheses          a macro argument used without parentheses changes meaning
+#   bugprone-use-after-move             a moved-from object is read again
+#   bugprone-unused-return-value        a result that carries the error is dropped
+#   clang-analyzer-core.NullDereference a path-sensitive analyzer check, a real crash path
+#   performance-unnecessary-value-param a by-value parameter that forces a copy for nothing
+#   readability-braces-around-statements a branch without braces is where edits go wrong
+#   readability-container-size-empty   size() == 0 is the wrong idiom for an empty test
+#
+# WarningsAsErrors is deliberately NOT set here. Setting it in this file would turn the
+# warnings into errors in the developer's editor too. The CI job passes
+# --warnings-as-errors on the command line only, so the promotion affects the gate and
+# nothing else.
+Checks: '-*,bugprone-macro-parentheses,bugprone-use-after-move,bugprone-unused-return-value,clang-analyzer-core.NullDereference,performance-unnecessary-value-param,readability-braces-around-statements,readability-container-size-empty'
