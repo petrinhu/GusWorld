@@ -52,7 +52,8 @@ endif()
 
 cmake_path(ABSOLUTE_PATH BUILD_DIR NORMALIZE OUTPUT_VARIABLE build_norm)
 cmake_path(ABSOLUTE_PATH SOURCE_DIR NORMALIZE OUTPUT_VARIABLE source_norm)
-cmake_path(ABSOLUTE_PATH "${CMAKE_CURRENT_LIST_DIR}/../.." NORMALIZE OUTPUT_VARIABLE repo_norm)
+set(repo_root_raw "${CMAKE_CURRENT_LIST_DIR}/../..")
+cmake_path(ABSOLUTE_PATH repo_root_raw NORMALIZE OUTPUT_VARIABLE repo_norm)
 
 # A trailing separator would make "/a/b/" and "/a/b" compare unequal. The filesystem
 # root "/" becomes empty here, and that empty value is refused as the root below.
@@ -67,7 +68,8 @@ if("${build_norm}" STREQUAL "${repo_norm}")
   message(FATAL_ERROR "refuses BUILD_DIR equal to the repository root")
 endif()
 if(NOT "$ENV{HOME}" STREQUAL "")
-  cmake_path(ABSOLUTE_PATH "$ENV{HOME}" NORMALIZE OUTPUT_VARIABLE home_norm)
+  set(home_raw "$ENV{HOME}")
+  cmake_path(ABSOLUTE_PATH home_raw NORMALIZE OUTPUT_VARIABLE home_norm)
   string(REGEX REPLACE "/+$" "" home_norm "${home_norm}")
   if("${build_norm}" STREQUAL "${home_norm}")
     message(FATAL_ERROR "refuses BUILD_DIR equal to the home directory")
