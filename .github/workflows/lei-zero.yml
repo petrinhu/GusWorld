@@ -5,7 +5,7 @@
 # commita; este morde no servidor, para quem commitou sem o gancho instalado.
 #
 # ATENCAO, para ninguem confundir: este NAO e o CI do projeto. A matriz das
-# cinco plataformas com nove entradas e o item C4, e continua por fazer. Este
+# cinco plataformas com nove entradas. A Fedora ja esta feita (C4a), e as oito restantes sao o item C4b, que continua por fazer. Este
 # workflow existe antes dela porque a LEI ZERO se verifica em TEXTO, sem
 # compilar nada -- e o unico portao que pode valer antes de existir build.
 name: LEI ZERO

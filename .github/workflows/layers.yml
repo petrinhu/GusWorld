@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Gate de camadas (L-17) no CI. Workflow proprio, separado do lei-zero.yml:
-# o item C4 (matriz de build) e o C5 tambem mexem em CI, e um arquivo so
-# faria os tres brigarem pela mesma linha. Este nao compila nem executa nada do
+# os itens C4a e C4b (matriz de build) e o C5 tambem mexem em CI, e um arquivo so
+# faria os quatro brigarem pela mesma linha. Este nao compila nem executa nada do
 # jogo: o compilador so roda o pre-processador, em modo de dependencia (-M).
 name: Camadas
 

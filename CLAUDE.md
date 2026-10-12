@@ -80,7 +80,7 @@ A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C
 - `git rev-list --count HEAD` responde quantos commits tem o branch local `main`.
 - `git ls-remote git@github.com:petrinhu/GusWorld.git main` responde o SHA do `main` no remoto.
 - `git rev-list --count origin/main..HEAD` responde quantos commits locais ainda não foram pushados.
-- Existe **um** workflow de CI: `.github/workflows/lei-zero.yml` (`LEI ZERO`), nascido no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. `gh run list --workflow=lei-zero.yml` responde quantas execuções há e a conclusão de cada uma. ⚠️ **Isto não é o CI de build do projeto**: a matriz das cinco plataformas do item `C4` continua por fazer, porque o LEI ZERO verifica só TEXTO, sem compilar nada.
+- Existem **quatro** workflows de CI, cada um com o `name:` declarado: `Build` (`build.yml`, o CI de build), `Camadas` (`layers.yml`), `LEI ZERO` (`lei-zero.yml`) e `version-tag` (`version-tag.yml`). O `lei-zero.yml` nasceu no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. `gh run list --workflow=lei-zero.yml` responde quantas execuções há e a conclusão de cada uma. ⚠️ **Isto não é o CI de build do projeto**: o build é o workflow `Build`. O LEI ZERO verifica só TEXTO, sem compilar nada.
 
 **Código-fonte: EXISTE desde 11/10/2026.** Medido por comando, não por suposição:
 
@@ -162,7 +162,7 @@ Os portões locais de texto, que não dependem de build e rodam desde agosto:
 - `python3 tools/security/test_commit_gate.py` e `python3 tools/security/test_lei_zero_guard.py` rodam os autotestes dos dois.
 - `python3 tools/ci/check_version_matches_tag.py v0.0.0.1` confere a tag contra a versão declarada. ⚠️ Ele **reprova em clone raso**, de propósito: num clone raso as tags podem não ter sido buscadas, e um casamento aparente seria falso verde.
 
-**Dois workflows existem:** `lei-zero.yml` (verifica texto, não compila) e `version-tag.yml` (só dispara em push de tag). ⚠️ **Nenhum dos dois é o CI de build**, que é a matriz de **nove entradas** do item `C4`, ainda por fazer: cinco plataformas, com GCC e Clang nas quatro Linux mais MSVC no Windows.
+**Quatro workflows existem:** `build.yml` (`Build`, o CI de build), `layers.yml` (`Camadas`, gate de camadas da L-17, que só roda o pré-processador), `lei-zero.yml` (`LEI ZERO`, verifica texto, não compila) e `version-tag.yml` (`version-tag`, só dispara em push de tag). O `Build` **é** o CI de build e **passou**: run `38198558806`, SHA `1abee36`, 12 passos verdes na entrada Fedora (`fedora:latest`), com `git version 2.56.0`, `cmake version 4.3.0` e `Total Tests: 7` (`100% tests passed, 0 tests failed out of 7`). A matriz tem **nove** entradas e **uma** está provada: o Fedora, com `cc` e `c++` (GCC no Fedora), item `C4a`. As **oito** entradas que faltam são o item `C4b`: o Clang do Fedora, GCC e Clang em Ubuntu (`ubuntu:latest`), Arch (`archlinux:latest`) e CachyOS (`cachyos/cachyos:latest`, job próprio, não é Arch renomeado), e MSVC no Windows (`windows-latest`).
 
 ## Restrições desta máquina que mordem este projeto
 
