@@ -1,0 +1,134 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Build and ctest, Fedora target only (item C4, first slice). Each other
+# target (Ubuntu, Arch, CachyOS, Windows) lands in its own slice as one more
+# matrix entry, and none of them is declared supported until its own job runs.
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    # The job runs inside the distro image. The runner is only the host.
+    container: ${{ matrix.image }}
+    strategy:
+      matrix:
+        include:
+          - name: Fedora (primary)
+            slug: fedora
+            image: fedora:latest
+    steps:
+      # The image has no git, so this checkout falls back to the REST API
+      # (a tarball with no .git). That is by design: it only has to bring the
+      # prep script, and the real checkout below replaces it afterwards.
+      - name: Bootstrap checkout (prep script only)
+        uses: actions/checkout@v7
+        with:
+          path: _bootstrap
+
+      - name: Install toolchain
+        run: bash _bootstrap/tools/ci/env/${{ matrix.slug }}.sh
+
+      - name: Remove bootstrap checkout
+        run: rm -rf _bootstrap
+
+      # Real checkout, now that git is installed. Default depth: no test in
+      # the current suite reads history or tags.
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Container jobs run as root, and root sees the workspace owned by the
+      # runner user as "dubious ownership" (CVE-2022-24765). Set this before
+      # any git call in this job.
+      - name: Git safe.directory for the container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Prove the checkout is git and the prep script is the repo's own
+        run: |
+          set -eu
+          inside="$(git rev-parse --is-inside-work-tree)"
+          echo "is-inside-work-tree=${inside}"
+          if [ "$inside" != true ]; then
+            echo "FAIL: the workspace is not a git work tree"
+            exit 1
+          fi
+          head="$(git rev-parse HEAD)"
+          echo "HEAD=${head}"
+          echo "GITHUB_SHA=${GITHUB_SHA}"
+          if [ "$head" != "$GITHUB_SHA" ]; then
+            echo "FAIL: HEAD differs from GITHUB_SHA"
+            exit 1
+          fi
+          script="tools/ci/env/${{ matrix.slug }}.sh"
+          repo_sha="$(sha256sum "$script" | awk '{print $1}')"
+          echo "prep script sha256 (repository) = ${repo_sha}"
+          echo "prep script sha256 (executed)   = ${GUSWORLD_PREP_SHA:-<empty>}"
+          if [ "$repo_sha" != "${GUSWORLD_PREP_SHA:-}" ]; then
+            echo "FAIL: the prep script that ran differs from the repo copy"
+            exit 1
+          fi
+
+      # Floor from the project's cmake_minimum_required(4.1). The version is
+      # read from a file, not from a pipe, so a failing cmake cannot hide
+      # behind the sed that follows it.
+      - name: Version floor (CMake 4.1)
+        run: |
+          set -eu
+          cmake --version > cmake_version.txt
+          version="$(sed -n '1s/^cmake version //p' cmake_version.txt)"
+          echo "CMake read: ${version:-<unreadable>}"
+          case "$version" in
+            ''|*[!0-9.]*)
+              echo "FAIL: could not read the CMake version"
+              exit 1
+              ;;
+          esac
+          if printf '%s\n%s\n' 4.1 "$version" | sort -V -C; then
+            echo "CMake ${version} meets the 4.1 floor"
+          else
+            echo "FAIL: CMake ${version} is below the 4.1 floor"
+            exit 1
+          fi
+
+      # -DGUSWORLD_WERROR=ON is the gate for L-19 (portao 1): zero warnings.
+      - name: Configure
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DGUSWORLD_WERROR=ON -DCMAKE_CXX_COMPILER="$CXX"
+
+      - name: Build
+        run: cmake --build build
+
+      # ctest -N exits 0 even with zero tests, so the exit code alone proves
+      # nothing. The count is read from the value, and zero fails on purpose:
+      # an empty scan is a broken scan, not a clean tree (L-36).
+      - name: Count registered tests (zero is a failure)
+        run: |
+          set -eu
+          ctest --test-dir build -N > inventory.txt 2>&1 \
+            || { cat inventory.txt; exit 1; }
+          cat inventory.txt
+          total="$(sed -n 's/^Total Tests: //p' inventory.txt)"
+          echo "registered tests: ${total:-<unreadable>}"
+          case "$total" in
+            ''|*[!0-9]*)
+              echo "FAIL: the test count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$total" -eq 0 ]; then
+            echo "FAIL: zero tests registered"
+            exit 1
+          fi
+
+      - name: Run tests (ctest)
+        run: ctest --test-dir build --output-on-failure
