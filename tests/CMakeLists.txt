@@ -120,3 +120,41 @@ if(GUSWORLD_WERROR)
       -DREQUIRED_TEXT=warning:\ unused\ parameter
       -P ${expect_build_script})
 endif()
+
+# Sanitizer gate (L-19 portao 2), proved on three fixtures, one deliberate defect each.
+# Off by default: a plain configure must never build a defective program. Only the
+# sanitizers job turns it on, together with the sanitizer flags in CMAKE_CXX_FLAGS.
+#
+# Each red case names the exit code it expects and the text the sanitizer prints.
+# The codes come from sanitizers.yml: ASAN_OPTIONS exitcode=55 and UBSAN_OPTIONS
+# exitcode=89. Text is required too, because a crash by another cause must not pass.
+option(GUSWORLD_SANITIZER_FIXTURES "Build the deliberate-defect fixtures of the sanitizer gate" OFF)
+
+if(GUSWORLD_SANITIZER_FIXTURES)
+  add_subdirectory(fixtures/sanitizers)
+
+  add_test(NAME sanitizer_heap_buffer_overflow_is_detected
+    COMMAND ${CMAKE_COMMAND}
+      -DEXE=$<TARGET_FILE:gusworld_sanitizer_fixture_heap_buffer_overflow>
+      -DEXPECT_RC=55
+      -DREQUIRED_TEXT=ERROR:\ AddressSanitizer:\ heap-buffer-overflow
+      -P ${expect_exit_script})
+
+  # Undefined behavior: without -fno-sanitize-recover=all this case exits 0.
+  add_test(NAME sanitizer_signed_overflow_is_detected
+    COMMAND ${CMAKE_COMMAND}
+      -DEXE=$<TARGET_FILE:gusworld_sanitizer_fixture_signed_overflow>
+      -DEXPECT_RC=89
+      -DREQUIRED_TEXT=runtime\ error:\ signed\ integer\ overflow
+      -P ${expect_exit_script})
+
+  # The leak code is an INFERENCE, not a measurement: LeakSanitizer may use the ASan
+  # code (55) or its own default (23, per its source). The sanitizers job prints the
+  # real code in its Diagnostic step, and a mismatch here is the red that shows it.
+  add_test(NAME sanitizer_leak_is_detected
+    COMMAND ${CMAKE_COMMAND}
+      -DEXE=$<TARGET_FILE:gusworld_sanitizer_fixture_leak>
+      -DEXPECT_RC=55
+      -DREQUIRED_TEXT=ERROR:\ LeakSanitizer:\ detected\ memory\ leaks
+      -P ${expect_exit_script})
+endif()

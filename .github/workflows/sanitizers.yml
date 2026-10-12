@@ -1,0 +1,144 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Sanitizers job (L-19 portao 2). A separate build in build-sanitizers/, never in
+# build/, so the platform build of build.yml stays free of instrumentation. The whole
+# suite runs under AddressSanitizer and UndefinedBehaviorSanitizer, and the gate is
+# proved by three deliberate-defect fixtures (tests/fixtures/sanitizers).
+#
+# Why the flags and codes are written this way:
+#   -fno-sanitize-recover=all  UBSan recovers by default: it prints the report and
+#                              keeps running, and the process can exit 0. Without this
+#                              flag, undefined behavior passes the gate in silence.
+#   exitcode=55 / exitcode=89  Fibonacci numbers, the numeric idiom of this project.
+#                              Both lie outside 0, 1 and 2, which the harness tests
+#                              already assert, and below 128, the range the global
+#                              L-49 reserves for death by signal (139 = SIGSEGV).
+#
+# The sanitizer runtimes are libasan and libubsan, subpackages of Fedora's gcc source
+# package. fedora.sh is not changed, so the runtime install is a step of this job.
+name: Sanitizadores
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sanitizers:
+    name: Suite sob AddressSanitizer e UBSan, com tres provas vermelhas
+    runs-on: ubuntu-latest
+    # The job runs inside the distro image. The runner is only the host.
+    container: fedora:latest
+    env:
+      ASAN_OPTIONS: exitcode=55
+      UBSAN_OPTIONS: exitcode=89
+    steps:
+      # The image ships without git. Install it first, so the checkout is a real git
+      # clone (same reason as build.yml, runs 38196743681 and 74fc8eb).
+      - name: Install git (before the checkout)
+        run: dnf -y install git
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Container jobs run as root, and root sees the workspace as "dubious ownership".
+      - name: Git safe.directory for the container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # Toolchain from the repository copy. It exports CC and CXX and installs cmake.
+      - name: Install toolchain
+        run: bash tools/ci/env/fedora.sh
+
+      # gcc-c++ does not bring the sanitizer runtimes on its own in the package
+      # list fedora.sh uses. Installed here, and printed, so the log shows what ran.
+      # rpm -q exits non-zero for a missing package, which fails the step under set -e.
+      - name: Install the sanitizer runtimes
+        run: |
+          set -eu
+          dnf -y install libasan libubsan
+          rpm -q gcc-c++ libasan libubsan
+
+      - name: Print the sanitized toolchain
+        run: |
+          set -eu
+          "$CXX" --version
+          cmake --version
+
+      # Floor from the project's cmake_minimum_required(4.1). Same check as build.yml.
+      - name: Version floor (CMake 4.1)
+        run: |
+          set -eu
+          cmake --version > cmake_version.txt
+          version="$(sed -n '1s/^cmake version //p' cmake_version.txt)"
+          echo "CMake read: ${version:-<unreadable>}"
+          case "$version" in
+            ''|*[!0-9.]*)
+              echo "FAIL: could not read the CMake version"
+              exit 1
+              ;;
+          esac
+          if printf '%s\n%s\n' 4.1 "$version" | sort -V -C; then
+            echo "CMake ${version} meets the 4.1 floor"
+          else
+            echo "FAIL: CMake ${version} is below the 4.1 floor"
+            exit 1
+          fi
+
+      # Sanitizer flags go in CMAKE_CXX_FLAGS and CMAKE_EXE_LINKER_FLAGS, so every
+      # target of the build, the fixtures included, is instrumented. GUSWORLD_WERROR
+      # stays OFF on purpose: the warnings gate is the build.yml job (portao 1), and a
+      # new instrumentation warning here must not hide the sanitizer result.
+      - name: Configure with sanitizers
+        run: |
+          cmake -S . -B build-sanitizers -G Ninja \
+            -DCMAKE_CXX_COMPILER="$CXX" \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -g" \
+            -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined" \
+            -DGUSWORLD_SANITIZER_FIXTURES=ON
+
+      - name: Build
+        run: cmake --build build-sanitizers
+
+      # Diagnostic, never a gate. Runs the three fixtures directly and prints the exit
+      # code each one really gives, so the expected codes in tests/CMakeLists.txt are
+      # read from the log and not taken on trust. The leak code is still an inference.
+      - name: Diagnostic, the three fixture exit codes as measured (never a gate)
+        run: |
+          set +e
+          dir=build-sanitizers/tests/fixtures/sanitizers
+          for name in heap_buffer_overflow signed_overflow leak; do
+            "$dir/gusworld_sanitizer_fixture_$name" > "diag_$name.txt" 2>&1
+            echo "$name: exit code $?"
+            grep -m1 -E 'ERROR: |runtime error' "diag_$name.txt" || true
+          done
+          true
+
+      # ctest -N exits 0 even with zero tests, so the count is read from the value,
+      # and zero fails on purpose: an empty scan is a broken scan (L-36).
+      - name: Count registered tests (zero is a failure)
+        run: |
+          set -eu
+          ctest --test-dir build-sanitizers -N > inventory.txt 2>&1 \
+            || { cat inventory.txt; exit 1; }
+          cat inventory.txt
+          total="$(sed -n 's/^Total Tests: //p' inventory.txt)"
+          echo "registered tests: ${total:-<unreadable>}"
+          case "$total" in
+            ''|*[!0-9]*)
+              echo "FAIL: the test count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$total" -eq 0 ]; then
+            echo "FAIL: zero tests registered"
+            exit 1
+          fi
+
+      # The whole suite must be green under the sanitizers, and the three red proofs
+      # must fail by their expected code and text.
+      - name: Run tests under sanitizers (ctest)
+        run: ctest --test-dir build-sanitizers --output-on-failure
