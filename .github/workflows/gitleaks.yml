@@ -85,6 +85,9 @@
 # - Only git mode runs. dir mode is not run, so lacuna 14 of the research (encrypted
 #   blobs in dir mode) is NOT answered by this workflow. Adding a dir-mode step is a
 #   decision for the leader.
+#   Update of 12/10/2026, by decision of the leader (project GODS_LAWS, item C5b): a dir
+#   mode step now runs as a DIAGNOSTIC that never rejects (see DIAGNOSTIC STEPS below).
+#   The sentence above is therefore stale. It is left as it was, on purpose.
 # - git-crypt blobs are ciphertext. The scan cannot read inside them, so finding nothing
 #   in them is not a proof about their content.
 # - Git LFS objects are not downloaded by checkout, so binary payloads are scanned only
@@ -93,6 +96,18 @@
 # - The commit-message gate is not run here (item C5a), and the hook is not checked here
 #   (item C7).
 # - No Windows, no macOS, no other platform (item C4b).
+#
+# DIAGNOSTIC STEPS, added on 12/10/2026 by decision of the leader (project GODS_LAWS, item C5b).
+# - Diagnostic 1 lists the commits the sweep did not examine. The sweep reported 421
+#   commits, the repository has 434, and 6 of them are merges. These numbers are measured
+#   by the CI run and are not explained yet. The leader decided to measure the list before
+#   any change to the floor, and the floor stays as it is. The candidate list comes from
+#   git alone (non-merge commits with no hunk in git log -p) and is labelled as a candidate.
+# - Diagnostic 2 runs the tree mode over the files, to measure how gitleaks reads blobs
+#   encrypted by git-crypt. Findings in ciphertext are expected and do not reject.
+# Both diagnostics print and never reject: they have no floor and no verdict. The gate
+# rules (global GODS_LAWS L-36) apply to gates, and a diagnostic is not a gate. Both use
+# --redact, because the log of a run is public, and neither prints a debug or trace log.
 
 name: Segredo no histórico
 
@@ -309,6 +324,137 @@ jobs:
           esac
           if [ "$count" -le 0 ]; then echo "FAIL: zero commits scanned, broken sweep"; exit 1; fi
           echo "REAL SCAN ACCEPTED: $count commits scanned, above zero"
+
+      - name: Diagnostic 1, which commits the sweep did not examine (never a gate)
+        if: always()
+        run: |
+          # Diagnostic only: no floor, no verdict, and no exit call in this step.
+          # Every gitleaks call is tolerant and its status is printed, never judged.
+          # Pipes and grep -c are closed with || true, per global GODS_LAWS L-45.
+          set -u
+          ws="$GITHUB_WORKSPACE"
+          echo "--- 1a. commit totals, by git alone ---"
+          echo "rev-list --count HEAD: $(git -C "$ws" rev-list --count HEAD 2>&1 || true)"
+          echo "rev-list --count --all: $(git -C "$ws" rev-list --count --all 2>&1 || true)"
+          echo "rev-list --count --merges HEAD: $(git -C "$ws" rev-list --count --merges HEAD 2>&1 || true)"
+          echo "rev-list --count --no-merges HEAD: $(git -C "$ws" rev-list --count --no-merges HEAD 2>&1 || true)"
+          echo "--- 1b. gitleaks help, in full, with the status of each call ---"
+          root_help=$(gitleaks --help 2>&1); root_rc=$?
+          git_help=$(gitleaks git --help 2>&1); git_rc=$?
+          printf '%s\n' "$root_help"
+          echo "rc of gitleaks --help: $root_rc"
+          printf '%s\n' "$git_help"
+          echo "rc of gitleaks git --help: $git_rc"
+          echo "--- 1c. flags in the help that could name commits or write a report ---"
+          printf '%s\n' "$root_help" "$git_help" | grep -E -- '--log-level|--report-path|--report-format|--log-opts' || echo "none of these flags appears in the help"
+          echo "--- 1d. candidate list by git alone: non-merge commits without a hunk ---"
+          nohunk="$RUNNER_TEMP/diag-nohunk.txt"
+          binonly="$RUNNER_TEMP/diag-binonly.txt"
+          : > "$nohunk"
+          : > "$binonly"
+          git -C "$ws" log --all --no-merges -p -U0 --full-history --format='COMMIT %h %s' 2>/dev/null \
+            | awk -v nohunk="$nohunk" -v binonly="$binonly" '
+              function classify() {
+                if (cur == "") return
+                if (hunks > 0) withhunk++
+                else if (bin > 0) { binonly_n++; print cur " " subj > binonly }
+                else { nohunk_n++; print cur " " subj > nohunk }
+              }
+              /^COMMIT / { classify(); cur = $2; subj = $0; sub(/^COMMIT [^ ]+ /, "", subj); hunks = 0; bin = 0; next }
+              /^@@/ { hunks++ }
+              /^Binary files / { bin++ }
+              END {
+                classify()
+                printf "non-merge commits seen by the awk pass: %d, with a hunk: %d, binary only: %d, no hunk: %d\n", withhunk + binonly_n + nohunk_n, withhunk + 0, binonly_n + 0, nohunk_n + 0
+              }' || true
+          echo "no hunk, by SHA and subject (first 100):"
+          head -n 100 "$nohunk" || true
+          echo "binary only, by SHA and subject (first 100):"
+          head -n 100 "$binonly" || true
+          echo "--- 1e. commits named by gitleaks at debug or trace log level, if any ---"
+          git -C "$ws" rev-list --all | LC_ALL=C sort -u > "$RUNNER_TEMP/diag-all.txt" || true
+          echo "commits in the repository (rev-list --all): $(wc -l < "$RUNNER_TEMP/diag-all.txt" || true)"
+          named="$RUNNER_TEMP/diag-named.txt"
+          : > "$named"
+          if printf '%s\n' "$root_help" | grep -q -- '--log-level'; then
+            for level in debug trace; do
+              dlog="$RUNNER_TEMP/diag-gitleaks-$level.log"
+              rc=0
+              gitleaks git --redact --log-level "$level" "$ws" > "$dlog" 2>&1 || rc=$?
+              grep -oE '[0-9a-f]{40}' "$dlog" 2>/dev/null | LC_ALL=C sort -u > "$RUNNER_TEMP/diag-hex-$level.txt" || true
+              LC_ALL=C comm -12 "$RUNNER_TEMP/diag-hex-$level.txt" "$RUNNER_TEMP/diag-all.txt" > "$RUNNER_TEMP/diag-named-$level.txt" || true
+              echo "log level $level: gitleaks exit $rc, commit SHAs named in its log: $(wc -l < "$RUNNER_TEMP/diag-named-$level.txt" || true)"
+              if [ -s "$RUNNER_TEMP/diag-named-$level.txt" ]; then
+                cp "$RUNNER_TEMP/diag-named-$level.txt" "$named"
+                break
+              fi
+            done
+          else
+            echo "no --log-level flag in the help: the debug and trace route is not run"
+          fi
+          if [ -s "$named" ]; then
+            LC_ALL=C comm -23 "$RUNNER_TEMP/diag-all.txt" "$named" > "$RUNNER_TEMP/diag-unnamed.txt" || true
+            echo "commits in the repository that the gitleaks log does NOT name: $(wc -l < "$RUNNER_TEMP/diag-unnamed.txt" || true)"
+            if [ -s "$RUNNER_TEMP/diag-unnamed.txt" ]; then
+              git -C "$ws" log --no-walk=unsorted --format='%h %s' $(cat "$RUNNER_TEMP/diag-unnamed.txt") 2>&1 || true
+            fi
+          else
+            echo "NOT OBTAINABLE here: no log level of gitleaks 8.30.1 names commit SHAs in its log."
+            echo "Compare the candidate list of 1d with the scan count in the real scan log above."
+          fi
+          echo "--- 1f. local copy scanned by the same guard, to see whether the path changes the count ---"
+          copy="$RUNNER_TEMP/diag-copy"
+          copy_rc=0
+          GIT_LFS_SKIP_SMUDGE=1 git clone -q "$ws" "$copy" > /dev/null 2> "$RUNNER_TEMP/diag-copy-clone.err" || copy_rc=$?
+          echo "clone of the workspace into RUNNER_TEMP: exit $copy_rc"
+          if [ "$copy_rc" = "0" ]; then
+            echo "rev-list --count --all in the copy: $(git -C "$copy" rev-list --count --all 2>&1 || true)"
+            bash "$RUNNER_TEMP/guard.sh" scan "$copy" "$RUNNER_TEMP/diag-copy.log" 2>&1 | grep -E '^GUARD_(RC|COUNT|VERDICT)=' || true
+          fi
+          echo "diagnostic 1 finished: it printed, and it has no verdict"
+
+      - name: Diagnostic 2, tree mode over the files, encrypted paths measured (never a gate)
+        if: always()
+        run: |
+          # Diagnostic only: no floor, no verdict, and no exit call in this step.
+          # Findings in ciphertext are expected. Exit codes are read per global GODS_LAWS L-49:
+          # 0 or 1 means the tool ran, 126 means an unknown flag or a file not executable,
+          # and 128 or more means the tool died on a signal. The code is printed, never judged.
+          set -u
+          root_help=$(gitleaks --help 2>&1) || true
+          dir_help=$(gitleaks dir --help 2>&1); dir_rc=$?
+          echo "rc of gitleaks dir --help: $dir_rc"
+          run_tree=no
+          if printf '%s\n' "$root_help" | grep -qE '^[[:space:]]+dir[[:space:]]'; then
+            run_tree=yes
+            echo "tree subcommand name used: dir (listed in gitleaks --help)"
+          else
+            echo "no dir subcommand listed in gitleaks --help"
+          fi
+          have_flags=no
+          if printf '%s\n' "$dir_help" | grep -q -- '--redact' && printf '%s\n' "$dir_help" | grep -q -- '--report-path' && printf '%s\n' "$dir_help" | grep -q -- '--report-format'; then
+            have_flags=yes
+          fi
+          echo "dir help has --redact, --report-path and --report-format: $have_flags"
+          if [ "$run_tree" = yes ] && [ "$have_flags" = yes ]; then
+            json="$RUNNER_TEMP/diag-tree.json"
+            tlog="$RUNNER_TEMP/diag-tree.log"
+            rc=0
+            gitleaks dir --redact --report-format json --report-path "$json" "$GITHUB_WORKSPACE" > "$tlog" 2>&1 || rc=$?
+            echo "gitleaks dir exit code: $rc"
+            echo "verdict line of the tree log:"
+            grep -E 'leaks found|no leaks found' "$tlog" || echo "no verdict line in the tree log"
+            echo "findings per file, top 50 (paths only, secrets are redacted):"
+            grep -oE '"File": *"[^"]*"' "$json" 2>/dev/null | sed -E 's/^"File": *"//; s/"$//' | LC_ALL=C sort | uniq -c | LC_ALL=C sort -rn | head -n 50 || true
+            total=$(grep -cE '"File": *"' "$json" 2>/dev/null || true)
+            enc=$(grep -cE '"File": *"(docs/_secret/|docs/book/|docs/narrative/deep/stinger/|tools/security/termos_proibidos)' "$json" 2>/dev/null || true)
+            echo "findings in the json: ${total:-0}; under the encrypted paths of .gitattributes: ${enc:-0}; outside them: $(( ${total:-0} - ${enc:-0} ))"
+            echo "findings under the encrypted paths, by path:"
+            grep -oE '"File": *"(docs/_secret/|docs/book/|docs/narrative/deep/stinger/|tools/security/termos_proibidos)[^"]*"' "$json" 2>/dev/null | sed -E 's/^"File": *"//; s/"$//' | LC_ALL=C sort | uniq -c || true
+          else
+            echo "tree mode NOT run: run_tree=$run_tree, flags present=$have_flags"
+          fi
+          echo "diagnostic 2 finished: it printed, and it has no verdict"
 
       - name: Diagnostics for the open questions, never a gate
         if: always()
