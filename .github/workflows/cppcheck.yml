@@ -1,0 +1,215 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Static analysis gate (L-19 portao 3, cppcheck half; clang-tidy is slice C5f). A
+# separate job, in its own workflow file, like sanitizers.yml and layers.yml.
+#
+# Why the flags and codes are written this way:
+#   --error-exitcode=1  Without it cppcheck exits 0 even when it reports findings, and
+#                       the gate would be green with a defect inside. Required.
+#   Exit code 1 is also what cppcheck returns for invalid arguments (cppcheck manual,
+#   --error-exitcode: EXIT_FAILURE). So exit 1 alone never proves a finding: the log
+#   must also carry the finding id, uninitvar.
+#   The trap is shown on purpose: the fixture is scanned WITHOUT the option too, and that
+#   case must exit 0 with the finding in the log. The log then shows the blind gate.
+#   The real tree is scanned from a file list built by find, not with --project: the
+#   root build keeps present/ off (GUSWORLD_PRESENT=OFF), so a compile database would
+#   silently skip present/layer.cpp. The find count is compared with the analysed count.
+name: Análise estática
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cppcheck:
+    name: cppcheck sobre a árvore real, com provas vermelhas nos dois casos
+    runs-on: ubuntu-latest
+    # The job runs inside the distro image. The runner is only the host.
+    container: fedora:latest
+    steps:
+      # The image ships without git. Install it first, so the checkout is a real git
+      # clone (same reason as build.yml, runs 38196743681 and 74fc8eb).
+      - name: Install git (before the checkout)
+        run: dnf -y install git
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Container jobs run as root, and root sees the workspace as "dubious ownership".
+      - name: Git safe.directory for the container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # Toolchain from the repository copy. It exports CC and CXX and installs cmake,
+      # which the configure step below uses.
+      - name: Install toolchain
+        run: bash tools/ci/env/fedora.sh
+
+      # Floor from the project's cmake_minimum_required(4.1). Same check as build.yml.
+      - name: Version floor (CMake 4.1)
+        run: |
+          set -eu
+          cmake --version > cmake_version.txt
+          version="$(sed -n '1s/^cmake version //p' cmake_version.txt)"
+          echo "CMake read: ${version:-<unreadable>}"
+          case "$version" in
+            ''|*[!0-9.]*)
+              echo "FAIL: could not read the CMake version"
+              exit 1
+              ;;
+          esac
+          if printf '%s\n%s\n' 4.1 "$version" | sort -V -C; then
+            echo "CMake ${version} meets the 4.1 floor"
+          else
+            echo "FAIL: CMake ${version} is below the 4.1 floor"
+            exit 1
+          fi
+
+      # Installed in its own step, so a missing package fails here and not in the gate.
+      # The version is printed, so the log shows which cppcheck ran.
+      - name: Install cppcheck
+        run: |
+          set -eu
+          dnf -y install cppcheck
+          rpm -q cppcheck
+          cppcheck --version
+
+      # Configure only, no build. This proves the tree still configures and leaves the
+      # compile database in a directory of its own, outside the checkout.
+      - name: Configure only, to generate compile_commands.json
+        run: |
+          set -eu
+          cmake -S . -B "$RUNNER_TEMP/cppcheck-build" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          test -s "$RUNNER_TEMP/cppcheck-build/compile_commands.json"
+          entries="$(grep -c '"file"' "$RUNNER_TEMP/cppcheck-build/compile_commands.json")" || true
+          echo "compile database entries (informative, root build without present/): ${entries:-<unreadable>}"
+
+      # Every .cpp of the tree, fixtures excluded. Zero is a failure: an empty scan is a
+      # broken scan, not a clean tree (L-36).
+      - name: Enumerate the sources (zero is a failure)
+        run: |
+          set -eu
+          find . -name '*.cpp' -not -path './.git/*' -not -path './tests/fixtures/*' \
+            | sort > "$RUNNER_TEMP/sources.txt"
+          found="$(wc -l < "$RUNNER_TEMP/sources.txt")"
+          echo "encontrados (.cpp outside the fixtures): ${found}"
+          cat "$RUNNER_TEMP/sources.txt"
+          case "$found" in
+            ''|*[!0-9]*)
+              echo "FAIL: the source count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$found" -eq 0 ]; then
+            echo "FAIL: zero sources found"
+            exit 1
+          fi
+
+      # The gate on the real tree: one cppcheck process over the whole file list.
+      # rc is taken with "|| rc=$?", so the real exit code is kept.
+      # Exit 1 is a finding OR an invalid argument; the log is printed for either.
+      # Checking lines are read from the log: the manual does not document their format,
+      # so the count is a measurement that the CI log has to confirm.
+      - name: Gate, cppcheck on the real tree
+        run: |
+          set -u
+          rc=0
+          cppcheck --std=c++23 --error-exitcode=1 \
+            --file-list="$RUNNER_TEMP/sources.txt" > "$RUNNER_TEMP/real.log" 2>&1 || rc=$?
+          cat "$RUNNER_TEMP/real.log"
+          analysed="$(grep -c '^Checking ' "$RUNNER_TEMP/real.log")" || true
+          found="$(wc -l < "$RUNNER_TEMP/sources.txt")"
+          echo "exit code: ${rc}"
+          echo "encontrados: ${found}, analisados (Checking lines): ${analysed:-<unreadable>}"
+          case "$rc" in
+            0) ;;
+            1)
+              echo "FAIL: cppcheck exit 1, a finding or an invalid argument (read the log above)"
+              exit 1
+              ;;
+            126)
+              echo "FAIL: exit 126, cppcheck is not executable or the option is unknown"
+              exit 1
+              ;;
+            *)
+              if [ "$rc" -ge 128 ]; then
+                echo "FAIL: exit ${rc}, cppcheck died by signal $((rc - 128)), not a finding"
+              else
+                echo "FAIL: unexpected exit ${rc}"
+              fi
+              exit 1
+              ;;
+          esac
+          case "$analysed" in
+            ''|*[!0-9]*)
+              echo "FAIL: the analysed count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$analysed" -eq 0 ]; then
+            echo "FAIL: zero files analysed, a broken scan (L-36)"
+            exit 1
+          fi
+          if [ "$analysed" -ne "$found" ]; then
+            echo "FAIL: analysed ${analysed} differs from found ${found}, coverage lost"
+            exit 1
+          fi
+          echo "PASS: all ${found} sources analysed, no finding"
+
+      # Red proof, case WITH the option. The fixture has one deliberate defect, uninitvar.
+      # The gate must exit 1 AND print the finding id. Exit 1 alone is not enough.
+      - name: Red proof, WITH --error-exitcode=1 (must exit 1 and name uninitvar)
+        run: |
+          set -u
+          fixture=tests/fixtures/cppcheck/cppcheck_fixture.cpp
+          rc=0
+          cppcheck --std=c++23 --error-exitcode=1 "$fixture" > "$RUNNER_TEMP/with.log" 2>&1 || rc=$?
+          cat "$RUNNER_TEMP/with.log"
+          hits="$(grep -c 'uninitvar' "$RUNNER_TEMP/with.log")" || true
+          echo "WITH --error-exitcode=1: exit ${rc}, uninitvar lines: ${hits:-<unreadable>}"
+          if [ "$rc" -ge 128 ]; then
+            echo "NOTE: exit ${rc} is death by signal, not a finding"
+          fi
+          case "$hits" in
+            ''|*[!0-9]*)
+              echo "FAIL: the uninitvar count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$rc" -ne 1 ] || [ "$hits" -lt 1 ]; then
+            echo "FAIL: expected exit 1 and an uninitvar finding, got exit ${rc} and ${hits}"
+            exit 1
+          fi
+          echo "PASS: the red proof is red, by code 1 and by the finding id"
+
+      # Red proof, case WITHOUT the option: THE TRAP. The same fixture, the same defect,
+      # and no --error-exitcode. cppcheck must exit 0 WITH the finding in the log. That
+      # is the blind gate this job exists to prevent. If cppcheck ever exits non zero
+      # here, the premise of this job has changed, and the job fails so someone reads it.
+      - name: Red proof, WITHOUT --error-exitcode (the trap: must exit 0 with the finding)
+        run: |
+          set -u
+          fixture=tests/fixtures/cppcheck/cppcheck_fixture.cpp
+          rc=0
+          cppcheck --std=c++23 "$fixture" > "$RUNNER_TEMP/without.log" 2>&1 || rc=$?
+          cat "$RUNNER_TEMP/without.log"
+          hits="$(grep -c 'uninitvar' "$RUNNER_TEMP/without.log")" || true
+          echo "WITHOUT --error-exitcode: exit ${rc}, uninitvar lines: ${hits:-<unreadable>}"
+          if [ "$rc" -ge 128 ]; then
+            echo "NOTE: exit ${rc} is death by signal, not a finding"
+          fi
+          case "$hits" in
+            ''|*[!0-9]*)
+              echo "FAIL: the uninitvar count is missing or not a number"
+              exit 1
+              ;;
+          esac
+          if [ "$rc" -ne 0 ] || [ "$hits" -lt 1 ]; then
+            echo "FAIL: expected exit 0 with an uninitvar finding, got exit ${rc} and ${hits}"
+            exit 1
+          fi
+          echo "PASS: without the option the finding is there and the exit is 0, the trap is real"
