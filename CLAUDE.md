@@ -73,7 +73,7 @@ Jogo **2D pixel-art**, single-player e offline, em **C++23**, assentado sobre o 
 
 A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C-16` com os buracos do `C-03` e do `C-13`, revogados em 25/08/2026) está na L-29. Os números revogados **não se reaproveitam**.
 
-## Estado atual do repositório (25/08/2026)
+## Estado atual do repositório (12/10/2026)
 
 **Git e remoto:**
 
@@ -168,7 +168,7 @@ Os portões locais de texto, que não dependem de build e rodam desde agosto:
 
 - **Build pesado vai para `/var/tmp`, com `export TMPDIR=/var/tmp`.** `/tmp` aqui é tmpfs (sai da RAM); build C++ grande enche o tmpfs e o link falha com "no space on device".
 - **Espaço em disco se mede com `btrfs filesystem usage /`** (sem `sudo`), lendo `Device unallocated` e o `min` de `Free (estimated)`. O `df` mente em btrfs.
-- **Nenhum teste dinâmico roda na sessão do líder — é a L-35, lei desde 29/08/2026, e não mais "prática observada".** Vale para todo teste que EXECUTA código (suíte, integração, fuzzing, sanitizer, mutation testing, benchmark, sonda de janela/teclado/mouse/tela), não só para os que tocam a tela: **sempre em container**. Sem container disponível, o resultado honesto é **"não executado, falta o container"** — nunca rodar fora e reportar sucesso. ⚠️ **Subir o container não basta:** `wl_display_connect(NULL)` cai no nome embutido `wayland-0` dentro do `XDG_RUNTIME_DIR`, e desligar a variável **não protege** — a proteção real é trocar o `XDG_RUNTIME_DIR` por diretório próprio `chmod 700` só no processo sob teste, e provar antes de interagir. O compositor aninhado (`kwin_wayland`, `Xvfb`) continua valendo como **piso dentro** do container, nunca como alternativa a ele. O GusWorld ainda não tem código nem suíte, e a camada `present/` nasce bloqueada pelo GlintFx (L-06, L-27) — a lei está escrita **antes** do primeiro teste existir, de propósito.
+- **Nenhum teste dinâmico roda na sessão do líder — é a L-35, lei desde 29/08/2026, e não mais "prática observada".** Vale para todo teste que EXECUTA código (suíte, integração, fuzzing, sanitizer, mutation testing, benchmark, sonda de janela/teclado/mouse/tela), não só para os que tocam a tela: **sempre em container**. Sem container disponível, o resultado honesto é **"não executado, falta o container"** — nunca rodar fora e reportar sucesso. ⚠️ **Subir o container não basta:** `wl_display_connect(NULL)` cai no nome embutido `wayland-0` dentro do `XDG_RUNTIME_DIR`, e desligar a variável **não protege** — a proteção real é trocar o `XDG_RUNTIME_DIR` por diretório próprio `chmod 700` só no processo sob teste, e provar antes de interagir. O compositor aninhado (`kwin_wayland`, `Xvfb`) continua valendo como **piso dentro** do container, nunca como alternativa a ele. O GusWorld tem código e suíte (sete testes registrados, desde 11/10/2026), e a suíte roda no CI, não na sessão do líder. A camada `present/` continua bloqueada pelo GlintFx (L-06, L-27), e a lei foi escrita **antes** do primeiro teste, de propósito.
 - **Verificação de entregável visual é do `qa-engineer`**, independente de quem implementou, com o orquestrador reconferindo o relatório do QA — ainda não se aplica, porque não há interface nem tela.
 
 ## Pendências
