@@ -140,5 +140,30 @@ jobs:
 
       # The whole suite must be green under the sanitizers, and the three red proofs
       # must fail by their expected code and text.
+      # Measurement only, never a gate. Installed apart from the runtimes, so a missing
+      # package here cannot fail the job. Without /usr/bin/time the suite runs bare.
+      - name: Install time for the memory measurement (never a gate)
+        run: dnf -y install time || true
+
+      # The suite is the last command of each branch, so the step's exit code is
+      # ctest's alone. The peak memory is that of the ctest process: the test
+      # executables are its children and are not counted here.
       - name: Run tests under sanitizers (ctest)
-        run: ctest --test-dir build-sanitizers --output-on-failure
+        run: |
+          if [ -x /usr/bin/time ]; then
+            /usr/bin/time -v -o suite_time.txt ctest --test-dir build-sanitizers --output-on-failure
+          else
+            echo "NOTE: /usr/bin/time is missing, the suite runs without a memory reading"
+            ctest --test-dir build-sanitizers --output-on-failure
+          fi
+
+      # Reads the peak resident memory of the suite. Runs even when the suite fails,
+      # and never fails itself: a number for the record, not a verdict.
+      - name: Report the suite peak memory (never a gate)
+        if: always()
+        run: |
+          echo "Meaning: peak resident memory of the ctest process that drives the suite,"
+          echo "under the sanitizers. It is not the memory of the build, and it does not"
+          echo "include the test executables, which are children of ctest."
+          grep -m1 'Maximum resident set size' suite_time.txt || echo "peak memory not read"
+          true
