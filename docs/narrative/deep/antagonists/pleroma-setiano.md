@@ -32,7 +32,7 @@ Ordem doutrinal, do mais alto ao mais baixo. A tradução dessa ordem em tier é
 | Ordem | Ser (nome de jogo; doutrinal) | Papel na doutrina | Contato (proposta, P14) | Hostilidade sem maldade, em uma linha |
 |---|---|---|---|---|
 | N1 | Pai Invisível (Espírito Invisível, Mônada) | Primeiro princípio, inominável | Presença, sem combate | A fronteira desfaz o que está onde não pertence, sem que ninguém decida. |
-| N2 | Barbelo (Mãe) | Primeira potência, a glória | Presença, sem combate | Ordena: repõe cada coisa no lugar, e a party está fora do lugar. |
+| N2 | Barbelo (Mãe) | Primeira potência, a glória | Encontro em três fases, sem derrota (decisão do líder de 11/10/2026; ver `docs/narrative/deep/antagonists/barbelo.md`) | Ordena: repõe cada coisa no lugar, e a party está fora do lugar. |
 | N3 | Autógenes (Filho) | Filho da Mônada e de Barbelo | Presença, sem combate | Salva os seus e não reconhece um estranho como um dos seus. |
 | N4 | Adão Pura (Pigeradamas, Adão celeste) | Modelo celeste do Adão terreno; posição disputada (§7.2) | Presença, sem combate | Reage à semelhança com a cópia sem ver quem é a cópia. |
 | N5 | Harmozel (Armozel) | Luminar, guarda de um éon | Combate | Guarda a fronteira: barra quem a cruza, sem odiar. |
@@ -42,6 +42,8 @@ Ordem doutrinal, do mais alto ao mais baixo. A tradução dessa ordem em tier é
 | fora | Set | Figura de salvação da linhagem | Combate, individual | Guarda a semente e testa todo estranho antes de confiar. |
 | fora | Semente | Linhagem eleita, descendência de Set | Combate, em grupo | Protege um segredo que a exporia: afastar é medo, não ódio. |
 | fora | Almas | Coletivo capturado na matéria | Combate, em grupo | Atacar é tentar sair pela mesma passagem por onde a party entrou. |
+
+**Tríade suprema, decisão do líder de 11/10/2026.** Barbelo (N2) deixa a presença sem combate e ganha encontro em três fases, descrito em `docs/narrative/deep/antagonists/barbelo.md`. A razão está na doutrina: ela é a primeira potência e a que **age**, enquanto o Pai Invisível (N1) é inominável e o Autógenes (N3) é gerado. **O patamar da tríade não cai com essa mudança.** Barbelo interage porque é a que age, e não é rebaixada: o Pai Invisível e o Autógenes continuam presença, sem combate, sem perda de posição na escada.
 
 **Fora da escada:** Set, Semente e Almas não são seres do Pleroma. Set é uma figura de salvação de linhagem humana; Semente e Almas são coletivos, e por isso não cabem numa escada de indivíduos (ponta P16 trata Set).
 
@@ -70,9 +72,9 @@ Ordem doutrinal, do mais alto ao mais baixo. A tradução dessa ordem em tier é
 - **Doutrina.** Emanação primeira, chamada de "a primeira potência, a glória", e de Mãe, em algumas leituras Mãe-Pai. O epíteto "três vezes macho" não foi conferido em fonte primária (§7.4).
 - **Hostil sem maldade.** Ela ordena. Não pune: repõe cada coisa no lugar de origem, e a party está fora do lugar. A reposição pode ser lida como hostilidade, mas a intenção é restaurar.
 - **Ordem.** N2, logo abaixo do Pai.
-- **Contato (proposta).** Presença sem combate.
+- **Contato (decisão do líder de 11/10/2026).** Encontro em três fases, sem derrota: a luta não é para vencer, é para ser reconhecida. O desenho completo está em `docs/narrative/deep/antagonists/barbelo.md`. Esta mudança não rebaixa o patamar da tríade suprema (ver §2).
 - **O que o jogador observa.** Objetos deslocados voltam à posição de origem, sem aviso. É o contrário do deslocamento do Yaldabaoth (`docs/narrative/deep/antagonists/demiurgo.md`, §4): mesmo tipo de sinal, sentido oposto. Quem ordena repõe; quem é cego desloca.
-- **Fala.** Nenhuma nesta proposta.
+- **Fala.** Nenhuma neste arquivo. Se Barbelo tiver fala, é a ponta P30 de `barbelo.md`.
 
 ### N3. Autógenes (Filho)
 
@@ -178,11 +180,11 @@ Cada ponta é decisão do líder, levada por `AskUserQuestion`, com a opção re
 
 - **P12. Tradução em tier.** Recomendado: todos do Pleroma no tier Boss, sem ruído Perlin, hierarquia por outro eixo (§2.1). Pergunta: o rótulo Boss é exclusivo do Patch-Zero, ou só o ruído?
 - **P13. Custódia no mundo.** Quem guarda os textos: Ordem Recursiva, anciãs, Underground, outro, ou ninguém. Nenhuma opção proposta. Só se pergunta porque a resposta muda o que o jogador pode encontrar.
-- **P14. Tipo de contato.** Recomendado: N1 a N4 só presença; N5 a N8 e Set em combate; Semente e Almas em grupo. Alternativa: todos em combate.
+- **P14. Tipo de contato.** Barbelo (N2): **resolvido pelo líder em 11/10/2026**, com encontro em três fases (`barbelo.md`, ponta P29 lá). Para os demais, recomendado: N1, N3 e N4 só presença; N5 a N8 e Set em combate; Semente e Almas em grupo. Alternativa: todos em combate.
 - **P15. Almas e o Yaldabaoth.** Recomendado: só presença. Alternativa: mecânica de captura, que é mudança de escopo.
 - **P16. Posição de Set.** Recomendado: mesmo tier do Yaldabaoth, por ser figura humana-mítica fora do Pleroma. Alternativa: abaixo dele.
 - **P17. Grafia de jogo.** Recomendado: "Pai Invisível", "Oriael" e "Adão Pura" como nomes de jogo, com a grafia doutrinal ao lado. Alternativa: grafia doutrinal no jogo.
-- **P18. Falas.** Recomendado: nenhum dos onze tem fala nesta proposta. Alternativa: Barbelo e Autógenes com intents de fala, para o `narrative-writer`.
+- **P18. Falas.** Para Barbelo, a pergunta vai à ponta P30 de `barbelo.md`, com recomendação de só ação. Para os demais, recomendado: nenhum tem fala nesta proposta. Alternativa: Autógenes com intents de fala, para o `narrative-writer`.
 
 ---
 
