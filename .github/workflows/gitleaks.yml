@@ -81,17 +81,25 @@
 #
 # DECLARED LIMITS (a limit not declared is a false sense of coverage):
 # - Rules are the built-in set of gitleaks 8.30.1. There is no .gitleaks.toml. The
-#   allowlist is .gitleaksignore, tracked, created before this slice, with 3 entries
-#   matched by exact fingerprint (commit, path, rule, line). They cover 3 documentation
-#   files: CONTRACT.md (rule generic-api-key), docs/_processo/dossie-pixellab.md (rule
-#   curl-auth-header) and docs/tech/adr/ADR-017-action-clock-combat-unificado.md (rule
-#   generic-api-key). Each one is an example or a placeholder in documentation, as the
-#   reason written beside it in the file says. The allowlist was confirmed by the leader on
-#   12/10/2026. Any new entry is a leader decision. The allowlist gate below checks that
-#   the count of entries equals GITLEAKS_ALLOWLIST_ENTRIES. An exact fingerprint is the
-#   narrow target that the global L-02 requires. The result of the git mode is produced
-#   with this allowlist active. This workflow does not claim that the allowlist is the
-#   cause of the zero leaks found.
+#   allowlist is .gitleaksignore, tracked, with 6 entries matched by exact fingerprint.
+#   The entries come in two forms, and each form takes effect in one mode of gitleaks:
+#   - 3 entries with a commit prefix (commit, path, rule, line): they take effect in git
+#     mode, the history gate.
+#   - 3 entries without a commit prefix (path, rule, line): they take effect in dir mode,
+#     and only when the path given to gitleaks is RELATIVE to the repository root. Measured
+#     in run 38321628636 with the same 6 entries: relative path gives 0 findings, absolute
+#     path gives 3.
+#   They cover 3 documentation files: CONTRACT.md (rule generic-api-key),
+#   docs/_processo/dossie-pixellab.md (rule curl-auth-header) and
+#   docs/tech/adr/ADR-017-action-clock-combat-unificado.md (rule generic-api-key). Each one
+#   is an example or a placeholder in documentation, as the reason written beside it in the
+#   file says. The allowlist was confirmed by the leader on 12/10/2026. Any new entry is a
+#   leader decision. The allowlist gate below checks that the count of entries equals
+#   GITLEAKS_ALLOWLIST_ENTRIES (6). An exact fingerprint is the narrow target that the
+#   global L-02 requires.
+#   The history gate passes the ABSOLUTE path $GITHUB_WORKSPACE to gitleaks git, on purpose:
+#   measured as working in that mode with the commit-prefixed entries, so it stays as it is.
+#   The dir-mode diagnostic (Diagnostic 2) passes the RELATIVE path ".", from the root.
 # - Only git mode gates. The tree (dir) mode runs as a DIAGNOSTIC that never rejects, so
 #   lacuna 14 of the research (encrypted blobs in dir mode) is answered only by a
 #   measurement, not by a gate (see DIAGNOSTIC STEPS below).
@@ -137,7 +145,7 @@ jobs:
       # Exact version, never a moving label. The hash of this version is in the install step.
       GITLEAKS_VERSION: "8.30.1"
       # Declared count of entries in .gitleaksignore. The allowlist gate rejects any other count.
-      GITLEAKS_ALLOWLIST_ENTRIES: "3"
+      GITLEAKS_ALLOWLIST_ENTRIES: "6"
     steps:
       - name: Checkout with the full history
         uses: actions/checkout@v7
@@ -484,6 +492,11 @@ jobs:
           # 0 or 1 means the tool ran, 126 means an unknown flag or a file not executable,
           # and 128 or more means the tool died on a signal. The code is printed, never judged.
           set -u
+          # The tree scan takes the RELATIVE path ".", from the repository root, so the
+          # allowlist of the repository takes effect (measured in run 38321628636).
+          cd "$GITHUB_WORKSPACE" || echo "cannot enter the workspace: $GITHUB_WORKSPACE"
+          echo "working directory: $(pwd)"
+          echo "git toplevel: $(git rev-parse --show-toplevel 2>&1 || true)"
           root_help=$(gitleaks --help 2>&1) || true
           dir_help=$(gitleaks dir --help 2>&1) && dir_rc=0 || dir_rc=$?
           echo "rc of gitleaks dir --help: $dir_rc"
@@ -503,7 +516,7 @@ jobs:
             json="$RUNNER_TEMP/diag-tree.json"
             tlog="$RUNNER_TEMP/diag-tree.log"
             rc=0
-            gitleaks dir --redact --report-format json --report-path "$json" "$GITHUB_WORKSPACE" > "$tlog" 2>&1 || rc=$?
+            gitleaks dir --redact --report-format json --report-path "$json" "." > "$tlog" 2>&1 || rc=$?
             echo "gitleaks dir exit code: $rc"
             echo "verdict line of the tree log:"
             grep -E 'leaks found|no leaks found' "$tlog" || echo "no verdict line in the tree log"

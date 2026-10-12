@@ -1,4 +1,6 @@
-# Silencio por FINGERPRINT exato (commit:arquivo:regra:linha), nunca por regra ou termo.
+# Silencio por FINGERPRINT exato, nunca por regra ou termo. Duas formas, uma por modo do gitleaks:
+# - com prefixo de commit (commit:arquivo:regra:linha): vale no modo de historico (git).
+# - sem prefixo (arquivo:regra:linha): vale no modo de arvore (dir), com caminho RELATIVO.
 # Afrouxar regra do gitleaks e proibido: isso cegaria o portao para vazamento real.
 
 # CONTRACT.md:459 - exemplo didatico do proprio manual; a linha acima diz "INCORRECT - NEVER commit this" e a chave e um sk-... inventado.
@@ -10,6 +12,8 @@
 # ADR-017:62 - lista de nomes de efeitos de carta (ApplyStatus, Leech, ...); identificador CamelCase longo confundido com chave de alta entropia.
 7df5998648184906b1290793afbb74ade9be372b:docs/tech/adr/ADR-017-action-clock-combat-unificado.md:generic-api-key:62
 
-# The tree-mode entries that stood here (no commit prefix) were measured with no effect
-# in the directory mode of gitleaks 8.30.1, so they were removed. The commit-prefixed
-# entries above are the ones that take effect.
+# Mesmos tres achados, formato de varredura de arvore (--no-git, sem prefixo de commit).
+# Mesma granularidade: arquivo, regra e linha exatos.
+CONTRACT.md:generic-api-key:459
+docs/_processo/dossie-pixellab.md:curl-auth-header:45
+docs/tech/adr/ADR-017-action-clock-combat-unificado.md:generic-api-key:62
