@@ -119,6 +119,20 @@ if(GUSWORLD_WERROR)
       -DCXX_COMPILER=${CMAKE_CXX_COMPILER}
       -DREQUIRED_TEXT=warning:\ unused\ parameter
       -P ${expect_build_script})
+
+  # Guard self-test (L-36: a trap is born proved red). The guard must refuse a
+  # BUILD_DIR equal to SOURCE_DIR before any deletion. The probe is a scratch
+  # directory in the build tree, never a source path, so a guard that failed to
+  # refuse would delete only scratch. Run through expect_exit.cmake: the refusal
+  # exits 1 and prints the reason.
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/werror_guard_probe)
+  add_test(NAME werror_guard_refuses_build_equal_source
+    COMMAND ${CMAKE_COMMAND}
+      -DEXE=${CMAKE_COMMAND}
+      -DARGS_TEXT=-DSOURCE_DIR=${CMAKE_CURRENT_BINARY_DIR}/werror_guard_probe\ -DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}/werror_guard_probe\ -DWERROR=ON\ -DEXPECT_OK=FALSE\ -P\ ${expect_build_script}
+      -DEXPECT_RC=1
+      -DREQUIRED_TEXT=refuses\ BUILD_DIR\ equal\ to\ SOURCE_DIR
+      -P ${expect_exit_script})
 endif()
 
 # Sanitizer gate (L-19 portao 2), proved on three fixtures, one deliberate defect each.
