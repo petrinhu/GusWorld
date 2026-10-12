@@ -105,12 +105,14 @@
 # - No Windows, no macOS, no other platform (item C4b).
 #
 # DIAGNOSTIC STEPS, added on 12/10/2026 by decision of the leader (project GODS_LAWS, item C5b).
-# - Diagnostic 1 lists the commits the sweep did not examine. The sweep reported 422
-#   commits and the repository has 435, so 13 were not examined: 6 are merges, 6 touch
-#   binary files only, and 1 is not explained yet. These numbers are measured by the CI
-#   run. The leader decided to measure the list before any change to the floor, and the
-#   floor stays as it is. The candidate list comes from
-#   git alone (non-merge commits with no hunk in git log -p) and is labelled as a candidate.
+# - Diagnostic 1 lists the commits the sweep did not examine. The count of the sweep is
+#   below the count of the repository: the measured gap is made of merge commits, of
+#   commits that touch binary files only, and of one commit with a hunk that is not
+#   identified yet. The measured values, with the run and the SHA where they were read,
+#   live in the C5b row of TODO.md. The log of every run prints the current values. The
+#   leader decided to measure the list before any change to the floor, and the floor
+#   stays as it is. The candidate list comes from git alone (non-merge commits with no
+#   hunk in git log -p) and is labelled as a candidate.
 # - Diagnostic 2 runs the tree mode over the files, to measure how gitleaks reads blobs
 #   encrypted by git-crypt. Findings in ciphertext are expected and do not reject.
 # Both diagnostics print and never reject: they have no floor and no verdict. The gate
