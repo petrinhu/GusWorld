@@ -1,0 +1,179 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Fifth gate of L-19, half (a): the self-test of the commit-message gate runs
+# in CI, and this job proves that the gate really rejects. Item C5a, first of
+# the six slices of C5. Half (b), failing when the commit-msg hook is not
+# installed in a clone, is NOT checked here: a CI clone never carries hooks or
+# local config, so that check lives in item C7 (decision of the leader,
+# 12/10/2026).
+#
+# Facts behind this design. They are kept in this file because the planning
+# notes that produced it live outside the repository:
+# - tools/security/test_commit_gate.py is stdlib unittest only, and it builds
+#   its fixtures in tempfile.TemporaryDirectory(). It never reads
+#   tools/security/termos_proibidos.txt, so it needs neither the git-crypt key
+#   nor any package installed on the runner.
+# - The git-crypt key does NOT go to CI (decision of the leader, 12/10/2026).
+# - The gate is NOT run against the messages of the pushed commits. Without the
+#   key it raises TermosIndisponiveis, which would reject every commit, and
+#   L-19 forbids approving in silence when the gate cannot read its list.
+# - The runner is the bare ubuntu-latest image, with no container. lei-zero.yml
+#   and layers.yml already run python3 there with no install step, so this job
+#   has none either. The job prints python3 --version, so the interpreter is
+#   proved in the log and not assumed.
+# - Red proof (L-36, L-27): commit_gate.py and its self-test are extracted from
+#   the committed blob with git archive HEAD into RUNNER_TEMP, and only the copy
+#   is mutated. The tracked file is never touched. The control on the intact
+#   tree runs first and must be green with a non-empty sweep. On the mutated
+#   copy the suite must exit 1 (unittest's failure code) AND name the case
+#   test_remove_acento_e_caixa in its FAIL line. Exit 1 alone proves nothing:
+#   an import error also exits 1 (L-49).
+# - The suite loads commit_gate by inserting its own directory at sys.path[0],
+#   so the copy is the module it loads. A probe prints the module path and the
+#   mutated behaviour before the suite runs, so the mutation is shown to arrive.
+name: Mensagem de commit
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  commit-gate:
+    name: O gate de mensagem de commit reprova termo proibido, e o job prova isso
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Print the Python that runs the self-test
+        run: |
+          set -eu -o pipefail
+          command -v python3
+          python3 --version
+
+      - name: Control, the intact tree must be green with a non-empty sweep
+        run: |
+          set -eu -o pipefail
+          log="$RUNNER_TEMP/green.log"
+          rc=0
+          python3 tools/security/test_commit_gate.py -v > "$log" 2>&1 || rc=$?
+          cat "$log"
+          echo "exit code on the intact tree: $rc"
+          if [ "$rc" -ge 128 ]; then
+            echo "interpreter died with code $rc: not a test verdict"
+            exit 1
+          fi
+          if [ "$rc" -ne 0 ]; then
+            echo "intact tree is red: the gate or its self-test is broken"
+            exit 1
+          fi
+          ran=$(sed -n 's/^Ran \([0-9][0-9]*\) tests.*/\1/p' "$log")
+          echo "tests run on the intact tree: ${ran:-none}"
+          if [ -z "$ran" ] || [ "$ran" -le 0 ]; then
+            echo "empty sweep: zero tests ran, which is a broken sweep, not a pass"
+            exit 1
+          fi
+          grep -qx 'OK' "$log" || { echo "no OK line in the log"; exit 1; }
+
+      - name: Extract the gate and its self-test from the committed blob
+        run: |
+          set -eu -o pipefail
+          copy="$RUNNER_TEMP/gate-copy"
+          mkdir -p "$copy"
+          git archive HEAD tools/security/commit_gate.py tools/security/test_commit_gate.py | tar -x -C "$copy"
+          for f in commit_gate.py test_commit_gate.py; do
+            blob=$(git show "HEAD:tools/security/$f" | sha256sum)
+            copied=$(sha256sum "$copy/tools/security/$f")
+            if [ "${blob%% *}" != "${copied%% *}" ]; then
+              echo "copy of $f differs from the committed blob"
+              exit 1
+            fi
+            echo "copy equals blob: $f ${blob%% *}"
+          done
+
+      - name: Mutate the copy, never the tracked file
+        run: |
+          set -eu -o pipefail
+          target="$RUNNER_TEMP/gate-copy/tools/security/commit_gate.py"
+          before=$(grep -c 'casefold()' "$target" || true)
+          echo "casefold() occurrences before the mutation: $before"
+          if [ "$before" != "1" ]; then
+            echo "mutation anchor is not unique: refusing to mutate"
+            exit 1
+          fi
+          python3 -I - "$target" <<'PY'
+          import sys
+
+          path = sys.argv[1]
+          anchor = "sem_acento = strip_accents(texto).casefold()"
+          with open(path, encoding="utf-8") as fh:
+              text = fh.read()
+          found = text.count(anchor)
+          if found != 1:
+              sys.exit(f"anchor found {found} times, expected exactly 1")
+          with open(path, "w", encoding="utf-8") as fh:
+              fh.write(text.replace(anchor, "sem_acento = strip_accents(texto)", 1))
+          print("mutation applied to the copy:", path)
+          PY
+          after=$(grep -c 'casefold()' "$target" || true)
+          echo "casefold() occurrences after the mutation: $after"
+          if [ "$after" != "0" ]; then
+            echo "mutation did not apply: refusing to run the red proof"
+            exit 1
+          fi
+
+      - name: Prove the mutation reached the module the suite loads
+        run: |
+          set -eu -o pipefail
+          dir="$RUNNER_TEMP/gate-copy/tools/security"
+          python3 -I - "$dir" <<'PY'
+          import sys
+
+          dir_copy = sys.argv[1]
+          sys.path.insert(0, dir_copy)
+          import commit_gate
+
+          print("module file:", commit_gate.__file__)
+          out = commit_gate.normalize("AINDA Compila")
+          print("normalize('AINDA Compila') =", repr(out))
+          if not commit_gate.__file__.startswith(dir_copy):
+              sys.exit("the import did not resolve to the mutated copy")
+          if out != "AINDA Compila":
+              sys.exit("the mutation is not in the loaded module")
+          print("the mutated copy is the module the suite loads")
+          PY
+
+      - name: Red proof, the suite must FAIL on the mutated copy by name
+        run: |
+          set -eu -o pipefail
+          log="$RUNNER_TEMP/red.log"
+          rc=0
+          python3 "$RUNNER_TEMP/gate-copy/tools/security/test_commit_gate.py" -v > "$log" 2>&1 || rc=$?
+          cat "$log"
+          echo "exit code on the mutated copy: $rc"
+          if [ "$rc" -ge 128 ]; then
+            echo "interpreter died with code $rc: not a detection"
+            exit 1
+          fi
+          if [ "$rc" -eq 0 ]; then
+            echo "mutant SURVIVED: the suite passed on the mutated copy"
+            exit 1
+          fi
+          if ! grep -qE '^FAIL: test_remove_acento_e_caixa \(' "$log"; then
+            echo "exit $rc, but the named case did not FAIL: a crash or an import error, not a detection"
+            exit 1
+          fi
+          grep -q '^FAILED (failures=' "$log" || { echo "no FAILED summary line"; exit 1; }
+          echo "PROVED: the suite reds on the mutation, by the name test_remove_acento_e_caixa"
+
+      - name: Confirm the tracked gate files are intact after the proof
+        run: |
+          set -eu -o pipefail
+          git status --porcelain -- tools/security/commit_gate.py tools/security/test_commit_gate.py
+          git diff --exit-code -- tools/security/commit_gate.py tools/security/test_commit_gate.py
+          echo "tracked gate files untouched by the red proof"
