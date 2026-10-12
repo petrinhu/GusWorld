@@ -137,6 +137,25 @@ jobs:
             echo "FAIL: zero tests registered"
             exit 1
           fi
+          # The three red proofs must be registered by name. Without them the suite
+          # runs under the sanitizers and the gate can pass with no red proof (L-36).
+          proofs=0
+          for name in sanitizer_heap_buffer_overflow_is_detected \
+                      sanitizer_signed_overflow_is_detected \
+                      sanitizer_leak_is_detected; do
+            found="$(grep -c ": $name\$" inventory.txt || true)"
+            if [ "${found:-0}" -eq 1 ]; then
+              proofs=$((proofs + 1))
+              echo "proof found: $name"
+            else
+              echo "proof MISSING: $name (matches: ${found:-0})"
+            fi
+          done
+          echo "proof tests found: $proofs of 3"
+          if [ "$proofs" -ne 3 ]; then
+            echo "FAIL: a proof test is not registered"
+            exit 1
+          fi
 
       # The whole suite must be green under the sanitizers, and the three red proofs
       # must fail by their expected code and text.
@@ -146,8 +165,10 @@ jobs:
         run: dnf -y install time || true
 
       # The suite is the last command of each branch, so the step's exit code is
-      # ctest's alone. The peak memory is that of the ctest process: the test
-      # executables are its children and are not counted here.
+      # ctest's alone. /usr/bin/time reads the peak resident memory with wait4. From
+      # the Linux kernel source on master (read, not checked on this machine, nor in
+      # the source of time itself), that figure is the larger of ctest and its children
+      # already waited for, so it MAY include the test executables.
       - name: Run tests under sanitizers (ctest)
         run: |
           if [ -x /usr/bin/time ]; then
@@ -162,8 +183,9 @@ jobs:
       - name: Report the suite peak memory (never a gate)
         if: always()
         run: |
-          echo "Meaning: peak resident memory of the ctest process that drives the suite,"
-          echo "under the sanitizers. It is not the memory of the build, and it does not"
-          echo "include the test executables, which are children of ctest."
+          echo "Meaning: peak resident memory reported for the ctest run that drives the suite,"
+          echo "under the sanitizers. It measures the ctest run only, not the build step."
+          echo "It MAY include the test executables that ctest started: the kernel reading is"
+          echo "stated above, with its limit."
           grep -m1 'Maximum resident set size' suite_time.txt || echo "peak memory not read"
           true
