@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Fifth gate of L-19, half (a): the self-test of the commit-message gate runs
+# Fifth gate of L-19 (project GODS_LAWS), half (a): the self-test of the commit-message gate runs
 # in CI, and this job proves that the gate really rejects. Item C5a, first of
 # the six slices of C5. Half (b), failing when the commit-msg hook is not
 # installed in a clone, is NOT checked here: a CI clone never carries hooks or
@@ -17,21 +17,28 @@
 # - The git-crypt key does NOT go to CI (decision of the leader, 12/10/2026).
 # - The gate is NOT run against the messages of the pushed commits. Without the
 #   key it raises TermosIndisponiveis, which would reject every commit, and
-#   L-19 forbids approving in silence when the gate cannot read its list.
+#   L-19 (project GODS_LAWS) forbids approving in silence when the gate cannot
+#   read its list.
 # - The runner is the bare ubuntu-latest image, with no container. lei-zero.yml
 #   and layers.yml already run python3 there with no install step, so this job
 #   has none either. The job prints python3 --version, so the interpreter is
 #   proved in the log and not assumed.
-# - Red proof (L-36, L-27): commit_gate.py and its self-test are extracted from
+# - Red proof (global GODS_LAWS L-36 and L-27): commit_gate.py and its self-test are extracted from
 #   the committed blob with git archive HEAD into RUNNER_TEMP, and only the copy
 #   is mutated. The tracked file is never touched. The control on the intact
-#   tree runs first and must be green with a non-empty sweep. On the mutated
+#   tree runs first and must be green and run exactly the declared cases. On the mutated
 #   copy the suite must exit 1 (unittest's failure code) AND name the case
 #   test_remove_acento_e_caixa in its FAIL line. Exit 1 alone proves nothing:
-#   an import error also exits 1 (L-49).
+#   an import error also exits 1 (global GODS_LAWS L-49).
 # - The suite loads commit_gate by inserting its own directory at sys.path[0],
 #   so the copy is the module it loads. A probe prints the module path and the
 #   mutated behaviour before the suite runs, so the mutation is shown to arrive.
+# - The sweep floor is the declared count, not non-emptiness: a TestCase
+#   declared after the __main__ block is never collected, and "Ran N > 0"
+#   would still pass with fewer cases. The count of "def test_" in the file
+#   must equal the "Ran N" of the log, on the control and on the mutated copy.
+#   Global GODS_LAWS L-45: grep -c exits 1 on zero matches, so each count is
+#   closed with || true and its value is tested, never trusted by exit code.
 name: Mensagem de commit
 
 on:
@@ -56,7 +63,7 @@ jobs:
           command -v python3
           python3 --version
 
-      - name: Control, the intact tree must be green with a non-empty sweep
+      - name: Control, the intact tree must be green and run every declared case
         run: |
           set -eu -o pipefail
           log="$RUNNER_TEMP/green.log"
@@ -76,6 +83,17 @@ jobs:
           echo "tests run on the intact tree: ${ran:-none}"
           if [ -z "$ran" ] || [ "$ran" -le 0 ]; then
             echo "empty sweep: zero tests ran, which is a broken sweep, not a pass"
+            exit 1
+          fi
+          declared=$(grep -c '^\s*def test_' tools/security/test_commit_gate.py || true)
+          echo "cases declared in the file: ${declared:-unreadable}"
+          case "$declared" in ''|*[!0-9]*) echo "declared count unreadable: broken sweep"; exit 1 ;; esac
+          if [ "$declared" -le 0 ]; then
+            echo "zero declared cases: broken sweep, not a pass"
+            exit 1
+          fi
+          if [ "$ran" -ne "$declared" ]; then
+            echo "ran $ran of $declared declared cases: a case is not collected"
             exit 1
           fi
           grep -qx 'OK' "$log" || { echo "no OK line in the log"; exit 1; }
@@ -169,6 +187,16 @@ jobs:
             exit 1
           fi
           grep -q '^FAILED (failures=' "$log" || { echo "no FAILED summary line"; exit 1; }
+          suite="$RUNNER_TEMP/gate-copy/tools/security/test_commit_gate.py"
+          ran=$(sed -n 's/^Ran \([0-9][0-9]*\) tests.*/\1/p' "$log")
+          declared=$(grep -c '^\s*def test_' "$suite" || true)
+          echo "cases ran on the mutated copy: ${ran:-none}, declared in the copy: ${declared:-unreadable}"
+          case "$ran" in ''|*[!0-9]*) echo "run count unreadable on the mutated copy: not a detection"; exit 1 ;; esac
+          case "$declared" in ''|*[!0-9]*) echo "declared count unreadable: broken sweep"; exit 1 ;; esac
+          if [ "$declared" -le 0 ] || [ "$ran" -ne "$declared" ]; then
+            echo "ran $ran of $declared declared cases on the mutated copy: not a full sweep"
+            exit 1
+          fi
           echo "PROVED: the suite reds on the mutation, by the name test_remove_acento_e_caixa"
 
       - name: Confirm the tracked gate files are intact after the proof
