@@ -519,6 +519,107 @@ jobs:
           fi
           echo "diagnostic 2 finished: it printed, and it has no verdict"
 
+      - name: Diagnostic 3, does the absolute path defeat the allowlist (never a gate)
+        if: always()
+        run: |
+          # Diagnostic only. It prints counts and never judges them. It rejects only when the
+          # workspace ends different from its baseline, or when gitleaks dies (exit code other
+          # than 0 or 1). The four measurements below are all gitleaks dir with --redact:
+          #   1 relative path ".", the allowlist of the repository
+          #   2 absolute path, the allowlist of the repository
+          #   3 relative path ".", the allowlist file of e03bee7^ copied over the workspace
+          #   4 absolute path, the allowlist file of e03bee7^ copied over the workspace
+          # Before each measurement the entries of the live file are printed by kind, so a
+          # failed swap cannot pass as a restored one. The working directory is the repository
+          # root for all four, so "." is the root.
+          # The count comes from the verdict line and is cross-checked with the JSON report.
+          set -u
+          ws="$GITHUB_WORKSPACE"
+          cd "$ws" || { echo "cannot enter the workspace: $ws"; exit 1; }
+          echo "working directory: $(pwd)"
+          echo "git toplevel: $(git rev-parse --show-toplevel 2>&1 || true)"
+          live="$ws/.gitleaksignore"
+          saved="$RUNNER_TEMP/diag3-allowlist-repo.txt"
+          tree="$RUNNER_TEMP/diag3-allowlist-tree.txt"
+          cp "$live" "$saved" || { echo "cannot save the allowlist of the repository"; exit 1; }
+          restore() { cp "$saved" "$live"; }
+          trap restore EXIT
+          baseline=$(git -C "$ws" diff --stat 2>&1 || true)
+          # The full file of e03bee7^, as it was before the removal: 3 entries with a commit
+          # prefix and 3 without. Nothing is filtered, so the only variable is the prefix.
+          git show e03bee7^:.gitleaksignore > "$tree" 2>/dev/null || true
+          tool_failed=no
+          # Prints the entries of a file by kind: total, with a commit prefix, without one.
+          # A count that cannot be read is printed as such, and never assumed.
+          entries_of() {
+            local file="$1" total prefixed
+            total=$(grep -cvE '^[[:space:]]*(#|$)' "$file" 2>/dev/null || true)
+            prefixed=$(grep -cE '^[0-9a-f]{40}:' "$file" 2>/dev/null || true)
+            case "$total" in ''|*[!0-9]*) echo "entries UNREADABLE"; return 0 ;; esac
+            case "$prefixed" in ''|*[!0-9]*) echo "entries UNREADABLE"; return 0 ;; esac
+            echo "entries total=$total prefixed=$prefixed unprefixed=$(( total - prefixed ))"
+          }
+          echo "tree file read from e03bee7^: $(entries_of "$tree")"
+          measure() {
+            # measure <label> <path argument>: runs gitleaks dir from the root and prints its outcome.
+            local label="$1" target="$2" rc=0 log json verdict count jcount
+            echo "[$label] live allowlist before the run: $(entries_of "$live")"
+            log="$RUNNER_TEMP/diag3-$label.log"
+            json="$RUNNER_TEMP/diag3-$label.json"
+            rm -f "$json"
+            gitleaks dir --redact --report-format json --report-path "$json" "$target" > "$log" 2>&1 || rc=$?
+            if [ "$rc" != "0" ] && [ "$rc" != "1" ]; then
+              echo "[$label] TOOL FAILED: exit $rc"
+              tool_failed=yes
+              return 0
+            fi
+            verdict=$(grep -oE 'leaks found: [0-9]+|no leaks found' "$log" | tail -n 1 || true)
+            count="NOT MEASURED"
+            if [ "$verdict" = "no leaks found" ]; then count=0; fi
+            case "$verdict" in "leaks found: "*) count="${verdict##*: }" ;; esac
+            if [ -s "$json" ]; then
+              jcount=$(python3 -I -c 'import json, sys; d = json.load(open(sys.argv[1])); print(len(d) if isinstance(d, list) else 0)' "$json" 2>/dev/null || true)
+              [ -n "$jcount" ] || jcount="UNREADABLE"
+            else
+              jcount="ABSENT"
+            fi
+            echo "[$label] exit $rc | count from verdict line: $count | count from JSON report: $jcount"
+            if [ -s "$json" ]; then
+              python3 -I -c '
+          import collections, json, sys
+          rows = json.load(open(sys.argv[1]))
+          rows = rows if isinstance(rows, list) else []
+          counts = collections.Counter((r.get("File", "?"), r.get("RuleID", "?")) for r in rows)
+          for (path, rule), n in sorted(counts.items()):
+              print("[%s]   %s rule=%s: %d" % (sys.argv[2], path, rule, n))
+          ' "$json" "$label" 2>/dev/null || true
+            fi
+          }
+          measure rel-repo "."
+          measure abs-repo "$ws"
+          if cp "$tree" "$live"; then
+            measure rel-tree "."
+            measure abs-tree "$ws"
+          else
+            echo "swap failed: the tree-mode cases are not measured"
+            tool_failed=yes
+          fi
+          restore
+          trap - EXIT
+          after=$(git -C "$ws" diff --stat 2>&1 || true)
+          echo "git diff --stat before the measurements (baseline, printed for information):"
+          printf '%s\n' "$baseline"
+          echo "git diff --stat after the restore (must be empty):"
+          printf '%s\n' "$after"
+          workspace_ok=yes
+          if [ -n "$after" ]; then workspace_ok=no; fi
+          echo "workspace clean after the restore: $workspace_ok"
+          if [ "$workspace_ok" != "yes" ] || [ "$tool_failed" = "yes" ]; then
+            echo "DIAGNOSTIC 3 REJECTED: workspace dirty, swap failed or gitleaks died"
+            exit 1
+          fi
+          echo "diagnostic 3 finished: it printed the four counts, and it has no verdict"
+
       - name: Diagnostics for the open questions, never a gate
         if: always()
         run: |
