@@ -80,14 +80,21 @@
 # because nothing in this workflow pushes.
 #
 # DECLARED LIMITS (a limit not declared is a false sense of coverage):
-# - Rules are the built-in set of gitleaks 8.30.1. There is no .gitleaks.toml and no
-#   allowlist. An allowlist, if one is ever proposed, is a leader decision.
-# - Only git mode runs. dir mode is not run, so lacuna 14 of the research (encrypted
-#   blobs in dir mode) is NOT answered by this workflow. Adding a dir-mode step is a
-#   decision for the leader.
-#   Update of 12/10/2026, by decision of the leader (project GODS_LAWS, item C5b): a dir
-#   mode step now runs as a DIAGNOSTIC that never rejects (see DIAGNOSTIC STEPS below).
-#   The sentence above is therefore stale. It is left as it was, on purpose.
+# - Rules are the built-in set of gitleaks 8.30.1. There is no .gitleaks.toml. The
+#   allowlist is .gitleaksignore, tracked, created before this slice, with 3 entries
+#   matched by exact fingerprint (commit, path, rule, line). They cover 3 documentation
+#   files: CONTRACT.md (rule generic-api-key), docs/_processo/dossie-pixellab.md (rule
+#   curl-auth-header) and docs/tech/adr/ADR-017-action-clock-combat-unificado.md (rule
+#   generic-api-key). Each one is an example or a placeholder in documentation, as the
+#   reason written beside it in the file says. The allowlist was confirmed by the leader on
+#   12/10/2026. Any new entry is a leader decision. The allowlist gate below checks that
+#   the count of entries equals GITLEAKS_ALLOWLIST_ENTRIES. An exact fingerprint is the
+#   narrow target that the global L-02 requires. The result of the git mode is produced
+#   with this allowlist active. This workflow does not claim that the allowlist is the
+#   cause of the zero leaks found.
+# - Only git mode gates. The tree (dir) mode runs as a DIAGNOSTIC that never rejects, so
+#   lacuna 14 of the research (encrypted blobs in dir mode) is answered only by a
+#   measurement, not by a gate (see DIAGNOSTIC STEPS below).
 # - git-crypt blobs are ciphertext. The scan cannot read inside them, so finding nothing
 #   in them is not a proof about their content.
 # - Git LFS objects are not downloaded by checkout, so binary payloads are scanned only
@@ -98,10 +105,11 @@
 # - No Windows, no macOS, no other platform (item C4b).
 #
 # DIAGNOSTIC STEPS, added on 12/10/2026 by decision of the leader (project GODS_LAWS, item C5b).
-# - Diagnostic 1 lists the commits the sweep did not examine. The sweep reported 421
-#   commits, the repository has 434, and 6 of them are merges. These numbers are measured
-#   by the CI run and are not explained yet. The leader decided to measure the list before
-#   any change to the floor, and the floor stays as it is. The candidate list comes from
+# - Diagnostic 1 lists the commits the sweep did not examine. The sweep reported 422
+#   commits and the repository has 435, so 13 were not examined: 6 are merges, 6 touch
+#   binary files only, and 1 is not explained yet. These numbers are measured by the CI
+#   run. The leader decided to measure the list before any change to the floor, and the
+#   floor stays as it is. The candidate list comes from
 #   git alone (non-merge commits with no hunk in git log -p) and is labelled as a candidate.
 # - Diagnostic 2 runs the tree mode over the files, to measure how gitleaks reads blobs
 #   encrypted by git-crypt. Findings in ciphertext are expected and do not reject.
@@ -126,6 +134,8 @@ jobs:
     env:
       # Exact version, never a moving label. The hash of this version is in the install step.
       GITLEAKS_VERSION: "8.30.1"
+      # Declared count of entries in .gitleaksignore. The allowlist gate rejects any other count.
+      GITLEAKS_ALLOWLIST_ENTRIES: "3"
     steps:
       - name: Checkout with the full history
         uses: actions/checkout@v7
@@ -184,6 +194,8 @@ jobs:
                 verdict="unreadable"; reason="exit 0 but the commit count is missing or not a number"
               elif [ "$count" -eq 0 ]; then
                 verdict="zero"; reason="exit 0 with zero commits scanned: broken sweep, not a clean tree"
+              elif grep -qE 'leaks found: [0-9]+' "$log"; then
+                verdict="leak"; reason="exit 0 but the log reports leaks found: a real finding"
               elif ! grep -q 'no leaks found' "$log"; then
                 verdict="format-unknown"; reason="exit 0 without the no leaks found line"
               else
@@ -236,6 +248,12 @@ jobs:
           printf 'INF 2 commits scanned.\n' > "$fx/no-verdict.log"
           printf 'INF 1 commits scanned.\nWRN leaks found: 1\n' > "$fx/leak.log"
           printf 'ERR stderr is not empty\nINF 1 commits scanned.\n' > "$fx/abort.log"
+          printf 'INF 3 commits scanned.\nINF no leaks found\nWRN leaks found: 2\n' > "$fx/leak-count.log"
+          printf 'INF 0 commits scanned.\nWRN leaks found: 1\n' > "$fx/zero-leak.log"
+          : > "$fx/empty.log"
+          printf 'ERR stderr is not empty\n' > "$fx/stderr-only.log"
+          printf 'INF 2 commits scanned.\nINF 5 commits scanned.\n' > "$fx/two-counts.log"
+          printf 'WRN leaks found: 1\n' > "$fx/leak-only.log"
           check() {
             # check <name> <exit-code> <log> <expected judge status> <expected verdict>
             local name="$1" rc="$2" log="$3" want_status="$4" want_verdict="$5"
@@ -259,6 +277,13 @@ jobs:
           check flag-exit126 126 "$fx/clean.log" 1 tool-error
           check died-exit139 139 "$fx/clean.log" 1 tool-died
           check odd-exit2 2 "$fx/clean.log" 1 unknown-code
+          check leak-with-count-exit0 0 "$fx/leak-count.log" 1 leak
+          check zero-with-leak-exit0 0 "$fx/zero-leak.log" 1 zero
+          check empty-exit0 0 "$fx/empty.log" 1 unreadable
+          check empty-exit1 1 "$fx/empty.log" 1 tool-error
+          check stderr-only-exit0 0 "$fx/stderr-only.log" 1 escalate
+          check two-counts-exit0 0 "$fx/two-counts.log" 1 unreadable
+          check leak-only-exit1 1 "$fx/leak-only.log" 1 leak
           echo "ALL TEXT TESTS PASSED"
 
       - name: Red proof half 1, the guard must reject a repository with a synthetic key
@@ -300,8 +325,44 @@ jobs:
           val() { printf '%s\n' "$out" | sed -n "s/^$1=//p"; }
           echo "judge exit status: $gate, verdict $(val GUARD_VERDICT)"
           if [ "$gate" != "1" ]; then echo "RED PROOF 2 FAILED: the guard did not reject (status $gate)"; exit 1; fi
-          if [ "$(val GUARD_VERDICT)" = "accept" ]; then echo "RED PROOF 2 FAILED: the guard accepted an empty repository"; exit 1; fi
+          if [ "$(val GUARD_VERDICT)" != "zero" ]; then echo "RED PROOF 2 FAILED: the verdict is not zero, it is $(val GUARD_VERDICT)"; exit 1; fi
           echo "RED PROOF 2 PASSED: the guard rejected a repository with no commit"
+
+      - name: Allowlist gate, the allowlist does not grow in silence
+        run: |
+          set -eu
+          allow="$GITHUB_WORKSPACE/.gitleaksignore"
+          # Counts the entries: non-comment, non-blank lines. Entries are never printed whole.
+          count_entries() {
+            local file="$1" n
+            if [ ! -f "$file" ]; then echo "allowlist file is missing: $file" >&2; return 1; fi
+            n=$(grep -cvE '^[[:space:]]*(#|$)' "$file" || true)
+            case "$n" in ''|*[!0-9]*) echo "allowlist count is unreadable" >&2; return 1 ;; esac
+            printf '%s\n' "$n"
+          }
+          # Prints the path and the rule of each entry (never the commit, never the line),
+          # then compares the count with the declared one.
+          allowlist_gate() {
+            local file="$1" declared="$2" n
+            n=$(count_entries "$file") || return 1
+            grep -vE '^[[:space:]]*(#|$)' "$file" | awk -F: '{ print "entry: path=" $(NF-2) " rule=" $(NF-1) }' || true
+            if [ "$n" != "$declared" ]; then
+              echo "ALLOWLIST GATE REJECTED: $n entries in $file, declared $declared" >&2
+              return 1
+            fi
+            echo "allowlist gate: $n entries, declared $declared, equal"
+          }
+          # Red proof first: a fabricated file with a different count must be rejected.
+          # This proves the comparison can fail before the real file is trusted.
+          fake="$RUNNER_TEMP/allowlist-fake"
+          printf '# fabricated for the red proof, no secret\nfake/one.txt:fake-rule:1\nfake/two.txt:fake-rule:2\n' > "$fake"
+          red_status=0
+          red_out=$(allowlist_gate "$fake" "$GITLEAKS_ALLOWLIST_ENTRIES" 2>&1) || red_status=$?
+          printf '%s\n' "$red_out"
+          if [ "$red_status" != "1" ]; then echo "ALLOWLIST RED PROOF FAILED: status $red_status"; exit 1; fi
+          case "$red_out" in *REJECTED*) ;; *) echo "ALLOWLIST RED PROOF FAILED: no rejection line"; exit 1 ;; esac
+          echo "ALLOWLIST RED PROOF PASSED: 2 fabricated entries against a declared 3 are rejected"
+          allowlist_gate "$allow" "$GITLEAKS_ALLOWLIST_ENTRIES" || { echo "ALLOWLIST GATE FAILED: the real allowlist differs from the declared count"; exit 1; }
 
       - name: Scan the real tree and its full history
         run: |
@@ -339,8 +400,8 @@ jobs:
           echo "rev-list --count --merges HEAD: $(git -C "$ws" rev-list --count --merges HEAD 2>&1 || true)"
           echo "rev-list --count --no-merges HEAD: $(git -C "$ws" rev-list --count --no-merges HEAD 2>&1 || true)"
           echo "--- 1b. gitleaks help, in full, with the status of each call ---"
-          root_help=$(gitleaks --help 2>&1); root_rc=$?
-          git_help=$(gitleaks git --help 2>&1); git_rc=$?
+          root_help=$(gitleaks --help 2>&1) && root_rc=0 || root_rc=$?
+          git_help=$(gitleaks git --help 2>&1) && git_rc=0 || git_rc=$?
           printf '%s\n' "$root_help"
           echo "rc of gitleaks --help: $root_rc"
           printf '%s\n' "$git_help"
@@ -422,7 +483,7 @@ jobs:
           # and 128 or more means the tool died on a signal. The code is printed, never judged.
           set -u
           root_help=$(gitleaks --help 2>&1) || true
-          dir_help=$(gitleaks dir --help 2>&1); dir_rc=$?
+          dir_help=$(gitleaks dir --help 2>&1) && dir_rc=0 || dir_rc=$?
           echo "rc of gitleaks dir --help: $dir_rc"
           run_tree=no
           if printf '%s\n' "$root_help" | grep -qE '^[[:space:]]+dir[[:space:]]'; then
