@@ -3,8 +3,9 @@
 # Two forms, one per gitleaks mode:
 # - with a commit prefix (commit:path:rule:line): takes effect in git mode (history).
 # - without a commit prefix (path:rule:line): takes effect in dir mode, with a RELATIVE path.
-# The line number is an anchor that moves when the file above it is edited. The anchor
-# gate in the workflow checks every entry against the SHA-256 of its target line.
+# The line number is an anchor that moves when the file above it is edited. A move shows
+# up as a non-zero count in the dir-mode diagnostic (Diagnostic 2), which expects zero.
+# Do not unify the two forms: each covers one gitleaks mode, and removing either blinds that mode.
 
 # CONTRACT.md:459 - didactic example from the manual itself; the line above says "INCORRECT - NEVER commit this", and the key is an invented sk-... value.
 7df5998648184906b1290793afbb74ade9be372b:CONTRACT.md:generic-api-key:459
