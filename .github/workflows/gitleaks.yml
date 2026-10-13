@@ -100,6 +100,14 @@
 #   The history gate passes the ABSOLUTE path $GITHUB_WORKSPACE to gitleaks git, on purpose:
 #   measured as working in that mode with the commit-prefixed entries, so it stays as it is.
 #   The dir-mode diagnostic (Diagnostic 2) passes the RELATIVE path ".", from the root.
+#   ANCHOR CONTROL (the "Allowlist anchors" step). A line number moves when the file above
+#   it is edited, and a moved anchor silently stops covering its example, or covers another
+#   line. Each run compares the SHA-256 of the line each entry names with the hash declared
+#   in that step, and rejects naming the entry and what changed (MOVED to line N, or CHANGED).
+#   The hash covers a line already public in this repository, and no line value is printed.
+#   How this stays active (global L-77): the step is a gate on every push and pull request,
+#   its red proof runs on every run before the real check, and the declared hashes must match
+#   the entries (a target without an entry rejects, and an entry without a target rejects).
 # - Only git mode gates. The tree (dir) mode runs as a DIAGNOSTIC that never rejects, so
 #   lacuna 14 of the research (encrypted blobs in dir mode) is answered only by a
 #   measurement, not by a gate (see DIAGNOSTIC STEPS below).
@@ -373,6 +381,159 @@ jobs:
           case "$red_out" in *REJECTED*) ;; *) echo "ALLOWLIST RED PROOF FAILED: no rejection line"; exit 1 ;; esac
           echo "ALLOWLIST RED PROOF PASSED: 2 fabricated entries against a declared 3 are rejected"
           allowlist_gate "$allow" "$GITLEAKS_ALLOWLIST_ENTRIES" || { echo "ALLOWLIST GATE FAILED: the real allowlist differs from the declared count"; exit 1; }
+
+      - name: Allowlist anchors, every entry still points to the line it declares
+        # Each entry is an exact fingerprint with a line number, and a line number moves when
+        # the file above it is edited. This gate compares the SHA-256 of the line that each
+        # entry names with the hash declared below. A commit-prefixed entry is read from its
+        # commit blob, which does not move. A tree entry is read from the working tree.
+        # The hash is of a line already public in this repository, and no line value is ever
+        # printed. A declared hash is a leader decision, the same as the count of entries.
+        run: |
+          set -eu
+          checker="$RUNNER_TEMP/anchor_check.py"
+          cat > "$checker" <<'PY'
+          import hashlib
+          import io
+          import os
+          import re
+          import subprocess
+          import sys
+
+          root, allow_path, targets_path = sys.argv[1], sys.argv[2], sys.argv[3]
+
+
+          def read_meaningful(path):
+              # Non-comment, non-blank lines, in file order.
+              with open(path, encoding="utf-8") as handle:
+                  stripped = [raw.strip() for raw in handle]
+              return [item for item in stripped if item and not item.startswith("#")]
+
+
+          def parse_declared(path):
+              # Each line: <fingerprint> <sha256 of the target line>.
+              declared = {}
+              for item in read_meaningful(path):
+                  fingerprint, digest = item.rsplit(" ", 1)
+                  declared[fingerprint] = digest
+              return declared
+
+
+          def split_fingerprint(fingerprint):
+              # Forms: commit:path:rule:line (the commit is 40 hex), or path:rule:line.
+              commit = None
+              head, sep, tail = fingerprint.partition(":")
+              if sep and re.fullmatch(r"[0-9a-f]{40}", head):
+                  commit, fingerprint = head, tail
+              path_rule, _, line = fingerprint.rpartition(":")
+              path, _, rule = path_rule.rpartition(":")
+              return commit, path, rule, int(line)
+
+
+          def file_lines(commit, path):
+              # The lines the fingerprint points into: the commit blob, or the working tree file.
+              if commit is None:
+                  try:
+                      with open(os.path.join(root, path), "rb") as handle:
+                          return handle.readlines()
+                  except OSError:
+                      return None
+              blob = subprocess.run(["git", "-C", root, "show", commit + ":" + path], capture_output=True)
+              if blob.returncode != 0:
+                  return None
+              return io.BytesIO(blob.stdout).readlines()
+
+
+          def digest(line):
+              return hashlib.sha256(line).hexdigest()
+
+
+          def check(fingerprint, declared, commit, path, line):
+              if fingerprint not in declared:
+                  return "REJECTED: no declared target for this entry"
+              lines = file_lines(commit, path)
+              if lines is None:
+                  return "REJECTED: the file is missing in the reference"
+              want = declared[fingerprint]
+              if 0 < line <= len(lines) and digest(lines[line - 1]) == want:
+                  return "CONFIRMED"
+              moved = [str(number) for number, text in enumerate(lines, 1) if digest(text) == want]
+              if moved:
+                  return "REJECTED: MOVED, the declared content is now at line " + ", ".join(moved) + ", the entry says " + str(line)
+              return "REJECTED: CHANGED, no line of the file has the declared content"
+
+
+          def main():
+              entries = read_meaningful(allow_path)
+              declared = parse_declared(targets_path)
+              failures = 0
+              for number, fingerprint in enumerate(entries, 1):
+                  commit, path, rule, line = split_fingerprint(fingerprint)
+                  form = "commit" if commit else "tree"
+                  verdict = check(fingerprint, declared, commit, path, line)
+                  if verdict != "CONFIRMED":
+                      failures += 1
+                  print("anchor %d: %s %s rule=%s line=%d -> %s" % (number, form, path, rule, line, verdict))
+              for fingerprint in declared:
+                  if fingerprint not in entries:
+                      failures += 1
+                      commit, path, rule, line = split_fingerprint(fingerprint)
+                      print("REJECTED: declared target %s rule=%s line=%d has no entry in the allowlist" % (path, rule, line))
+              print("anchor check: %d entries, %d failed" % (len(entries), failures))
+              return 1 if failures else 0
+
+
+          sys.exit(main())
+          PY
+          python3 -I -c 'import ast, sys; ast.parse(open(sys.argv[1]).read())' "$checker"
+          echo "anchor checker written: $checker"
+
+          # Red proof first, in a fabricated copy under RUNNER_TEMP, never in the workspace.
+          # The good anchor must pass. A moved anchor and a changed one must be rejected.
+          proof="$RUNNER_TEMP/anchor-proof"
+          rm -rf "$proof"
+          mkdir -p "$proof"
+          printf 'line one, benign\nline two, benign\nline three\n' > "$proof/doc.txt"
+          h2=$(sed -n 2p "$proof/doc.txt" | sha256sum | cut -c1-64)
+          bogus=$(printf 'x\n' | sha256sum | cut -c1-64)
+          # Good: the entry names line 2 and the declared hash is the hash of line 2.
+          printf 'doc.txt:proof-rule:2\n' > "$proof/allow-good.txt"
+          printf 'doc.txt:proof-rule:2 %s\n' "$h2" > "$proof/targets-good.txt"
+          # Moved: the entry names line 1, but the declared content (line 2) is now at line 2.
+          printf 'doc.txt:proof-rule:1\n' > "$proof/allow-moved.txt"
+          printf 'doc.txt:proof-rule:1 %s\n' "$h2" > "$proof/targets-moved.txt"
+          # Changed: the entry names line 2, and the declared hash matches no line of the file.
+          printf 'doc.txt:proof-rule:2 %s\n' "$bogus" > "$proof/targets-changed.txt"
+          good_status=0
+          python3 -I "$checker" "$proof" "$proof/allow-good.txt" "$proof/targets-good.txt" || good_status=$?
+          if [ "$good_status" != "0" ]; then echo "ANCHOR RED PROOF FAILED: the good anchor was rejected"; exit 1; fi
+          moved_status=0
+          moved_out=$(python3 -I "$checker" "$proof" "$proof/allow-moved.txt" "$proof/targets-moved.txt" 2>&1) || moved_status=$?
+          printf '%s\n' "$moved_out"
+          if [ "$moved_status" = "0" ]; then echo "ANCHOR RED PROOF FAILED: a moved anchor was accepted"; exit 1; fi
+          case "$moved_out" in *"MOVED"*"now at line 2"*) ;; *) echo "ANCHOR RED PROOF FAILED: the rejection does not name the move"; exit 1 ;; esac
+          changed_status=0
+          changed_out=$(python3 -I "$checker" "$proof" "$proof/allow-good.txt" "$proof/targets-changed.txt" 2>&1) || changed_status=$?
+          printf '%s\n' "$changed_out"
+          if [ "$changed_status" = "0" ]; then echo "ANCHOR RED PROOF FAILED: a changed anchor was accepted"; exit 1; fi
+          case "$changed_out" in *"CHANGED"*) ;; *) echo "ANCHOR RED PROOF FAILED: the rejection does not name the change"; exit 1 ;; esac
+          echo "ANCHOR RED PROOF PASSED: a good anchor passes, a moved one and a changed one are rejected"
+
+          # Declared hashes of the six entries. Each one must match an entry in .gitleaksignore.
+          targets="$RUNNER_TEMP/allow-targets.txt"
+          cat > "$targets" <<'TARGETS'
+          7df5998648184906b1290793afbb74ade9be372b:CONTRACT.md:generic-api-key:459 fd26e6105ac7d7c4406c0bb59ef52b5681f5960ebbbf85aa939bfdda20c9e569
+          7df5998648184906b1290793afbb74ade9be372b:docs/_processo/dossie-pixellab.md:curl-auth-header:45 9d7a732645cada7a9bc503a615cb0811c9fe32a5d8a43dd3d804c8491480f33e
+          7df5998648184906b1290793afbb74ade9be372b:docs/tech/adr/ADR-017-action-clock-combat-unificado.md:generic-api-key:62 131f243a85720f567c66fac569cba682d815b14007e938d8af2bdd789655681c
+          CONTRACT.md:generic-api-key:459 fd26e6105ac7d7c4406c0bb59ef52b5681f5960ebbbf85aa939bfdda20c9e569
+          docs/_processo/dossie-pixellab.md:curl-auth-header:45 9d7a732645cada7a9bc503a615cb0811c9fe32a5d8a43dd3d804c8491480f33e
+          docs/tech/adr/ADR-017-action-clock-combat-unificado.md:generic-api-key:62 131f243a85720f567c66fac569cba682d815b14007e938d8af2bdd789655681c
+          TARGETS
+
+          anchor_status=0
+          python3 -I "$checker" "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/.gitleaksignore" "$targets" || anchor_status=$?
+          if [ "$anchor_status" != "0" ]; then echo "ANCHOR GATE REJECTED: an entry no longer points to the line it declares"; exit 1; fi
+          echo "anchor gate: every entry confirmed"
 
       - name: Scan the real tree and its full history
         run: |

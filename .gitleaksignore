@@ -1,19 +1,22 @@
-# Silencio por FINGERPRINT exato, nunca por regra ou termo. Duas formas, uma por modo do gitleaks:
-# - com prefixo de commit (commit:arquivo:regra:linha): vale no modo de historico (git).
-# - sem prefixo (arquivo:regra:linha): vale no modo de arvore (dir), com caminho RELATIVO.
-# Afrouxar regra do gitleaks e proibido: isso cegaria o portao para vazamento real.
+# Silence by EXACT FINGERPRINT, never by rule or term.
+# Loosening a gitleaks rule is forbidden: it would blind the gate to a real leak.
+# Two forms, one per gitleaks mode:
+# - with a commit prefix (commit:path:rule:line): takes effect in git mode (history).
+# - without a commit prefix (path:rule:line): takes effect in dir mode, with a RELATIVE path.
+# The line number is an anchor that moves when the file above it is edited. The anchor
+# gate in the workflow checks every entry against the SHA-256 of its target line.
 
-# CONTRACT.md:459 - exemplo didatico do proprio manual; a linha acima diz "INCORRECT - NEVER commit this" e a chave e um sk-... inventado.
+# CONTRACT.md:459 - didactic example from the manual itself; the line above says "INCORRECT - NEVER commit this", and the key is an invented sk-... value.
 7df5998648184906b1290793afbb74ade9be372b:CONTRACT.md:generic-api-key:459
 
-# dossie-pixellab.md:45 - casou o caminho da URL da API; a linha seguinte traz "Authorization: Bearer YOUR_API_TOKEN", placeholder literal.
+# dossie-pixellab.md:45 - matched the path of the API URL; the next line carries "Authorization: Bearer YOUR_API_TOKEN", a literal placeholder.
 7df5998648184906b1290793afbb74ade9be372b:docs/_processo/dossie-pixellab.md:curl-auth-header:45
 
-# ADR-017:62 - lista de nomes de efeitos de carta (ApplyStatus, Leech, ...); identificador CamelCase longo confundido com chave de alta entropia.
+# ADR-017:62 - list of card effect names (ApplyStatus, Leech, ...); a long CamelCase identifier mistaken for a high-entropy key.
 7df5998648184906b1290793afbb74ade9be372b:docs/tech/adr/ADR-017-action-clock-combat-unificado.md:generic-api-key:62
 
-# Mesmos tres achados, formato de varredura de arvore (--no-git, sem prefixo de commit).
-# Mesma granularidade: arquivo, regra e linha exatos.
+# The same three findings, in dir-scan format (no commit prefix).
+# Same granularity: exact file, rule and line.
 CONTRACT.md:generic-api-key:459
 docs/_processo/dossie-pixellab.md:curl-auth-header:45
 docs/tech/adr/ADR-017-action-clock-combat-unificado.md:generic-api-key:62
