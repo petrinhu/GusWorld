@@ -239,7 +239,9 @@ Nenhuma aprovação, rejeição ou mudança de ideia do Gus Dragon, e nenhum fec
 
 ## L-32
 
-Nenhuma fatia fecha sem commit local citando o identificador do item e tocando o status dele no mesmo commit. Nenhum push sai antes de a onda inteira fechar, com todos os testes verdes; nenhum push se considera aceito antes de a verificação automática remota daquele push sair verde, e reprovação nela bloqueia o que vem depois. Nenhum merge na branch principal e nenhuma tag saem sem aval explícito no contexto, e nenhum push se dá por confirmado sem checar o estado publicado no remoto, nunca só a mensagem do comando.
+Nenhuma fatia fecha sem commit local citando o ID do item e tocando o status dele no mesmo commit. Push para ramo de trabalho sai a qualquer hora, porque é ele que dispara o CI. Nenhum push se considera aceito antes de a verificação remota daquele push sair verde, e reprovação nela bloqueia o que vem depois. Merge no main e tag só com a onda fechada e com aval explícito do líder no contexto. Nenhum push se dá por confirmado sem checar o remoto.
+
+**Emenda de 20/11/2026.** Verbatim do líder na primeira resposta: "Push para ramo de trabalho a qualquer hora, porque é ele que dispara o CI. Merge no main e tag só com a onda fechada e com o seu aval. A L-32 do projeto passa a dizer isso. O argumento contra é que o push cedo publica no repositório público trabalho ainda não revisado. O ramo de teste existe justamente para isso, e o portal de segredo roda em todo push." Confirmação, depois do argumento contra, por AskUserQuestion, verbatim do líder: "Confirmar o texto (Recomendado)".
 
 ## L-33
 
