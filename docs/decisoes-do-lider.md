@@ -32,6 +32,7 @@ O critério de entrada é **permanência**, não tema: entra decisão que, se co
 | 20/11/2026 | estreitar a isenção da guarda LEI ZERO para o arquivo | A guarda da LEI ZERO deixa de isentar o diretório `tools/security/` inteiro, e a isenção fica só no arquivo que a pede. | *"Estreitar para só o arquivo"* | `tools/security/lei_zero_guard.py` (linha 83) |
 | 20/11/2026 | marcador de glifo só no mockup | Os marcadores `GLYPH_BLOCK_START` e `GLYPH_BLOCK_END` valem só no arquivo do mockup. | *"Pode marcar só esse arquivo"* | `docs/design/mockups/11-terminal-glitch-glyphs.html` |
 | 20/11/2026 | medição caso a caso do termo protegido em 16 arquivos | A exposição do termo protegido volta ao líder, caso a caso. Reescrita de histórico só com autorização expressa. | *"Medir caso a caso"* | `TODO.md` (INBOX, bullet de 12/10/2026 sobre o termo em 16 arquivos) |
+| 20/11/2026 | C10 cita a raiz e o arquivo de cima, sem a linha | a especificação do C10 deixa de exigir a linha da diretiva; o achado cita a raiz e o arquivo de cima, porque só o -M decide e ele não dá linha | *"Ajustar a especificação (Recomendado)"* | `TODO.md` (C10) |
 
 ## 2026-10
 
