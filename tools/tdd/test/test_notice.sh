@@ -55,10 +55,16 @@ run_notice() {
     RC=$?
 }
 
-# expect_mute NAME: exit 0 and an empty stdout, in one comparison.
+# expect_mute NAME: exit 0 and an empty stdout, in one comparison. A failure also
+# shows the notice's stderr, so a silent notice says why it was silent.
 expect_mute() {
     run_notice
-    expect_eq "$1" "rc0|" "rc$RC|$(cat "$CASE_ROOT/out.txt")"
+    local got="rc$RC|$(cat "$CASE_ROOT/out.txt")"
+    if [ "$got" = "rc0|" ]; then
+        pass_case "$1"
+    else
+        fail_case "$1" "esperado [rc0|], veio [$got], stderr: $(head -c 300 "$CASE_ROOT/err.txt")"
+    fi
 }
 
 # expect_text NAME TEXT: exit 0, and the stdout is the PreToolUse JSON whose
@@ -81,7 +87,7 @@ PY
     then
         pass_case "$1"
     else
-        fail_case "$1" "rc $RC, saida: $(head -c 300 "$CASE_ROOT/out.txt")"
+        fail_case "$1" "rc $RC, saida: $(head -c 300 "$CASE_ROOT/out.txt"), stderr: $(head -c 300 "$CASE_ROOT/err.txt")"
     fi
 }
 
@@ -101,14 +107,22 @@ write_state '{"ran": false, "reason": "comando nao executavel (exit 126)"}'
 write_reason 'sem execucao: docker: daemon fora do ar'
 expect_notice "ran=false gera JSON com o motivo do run_suite" "docker: daemon fora do ar"
 
-# Case 2: ran=true stays mute, with exit 0.
+# Case 2: a control on one digest. ran=false must warn first, which proves the notice
+# read this state at this digest. Only then does ran=true on the same digest count as
+# mute, so a notice that is silent for everything cannot pass.
 new_case
+write_state '{"ran": false, "reason": "timeout"}'
+expect_notice "controle: ran=false no mesmo digest avisa (o notice leu o estado)" "timeout"
 write_state '{"ran": true, "has_red": true, "exit_code": 1}'
-expect_mute "ran=true fica mudo"
+expect_mute "ran=true no mesmo digest fica mudo"
 
-# Case 3: no state at all stays mute, with exit 0.
+# Case 3: the same control for "no state": warn with ran=false, remove the state file,
+# and the same digest must now be mute.
 new_case
-expect_mute "sem estado fica mudo"
+write_state '{"ran": false, "reason": "timeout"}'
+expect_notice "controle: ran=false antes de remover o estado avisa" "timeout"
+rm -f -- "$CASE_STATE"
+expect_mute "sem estado no mesmo digest fica mudo"
 
 # Case 4: a state that is not valid JSON. The guard reads it as no state and blocks
 # production edits, so the notice says so (the blocking text, not "liberada").
