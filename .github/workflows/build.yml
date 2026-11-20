@@ -20,12 +20,23 @@ jobs:
     runs-on: ubuntu-latest
     # The job runs inside the distro image. The runner is only the host.
     container: ${{ matrix.image }}
+    # The matrix picks the compiler for each entry; the toolchain step installs both.
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
     strategy:
       matrix:
         include:
-          - name: Fedora (primary)
+          - name: Fedora (GCC)
             slug: fedora
             image: fedora:latest
+            cc: gcc
+            cxx: g++
+          - name: Fedora (Clang)
+            slug: fedora
+            image: fedora:latest
+            cc: clang
+            cxx: clang++
     steps:
       # The image ships without git. Install it first, with no file from this
       # repository, so the checkout below is a real git clone. Without git,
@@ -94,7 +105,7 @@ jobs:
       # -DGUSWORLD_WERROR=ON is the gate for L-19 (portao 1): zero warnings.
       - name: Configure
         run: |
-          cmake -S . -B build -G Ninja \
+          cmake -S . -B build \
             -DGUSWORLD_WERROR=ON -DCMAKE_CXX_COMPILER="$CXX"
 
       - name: Build

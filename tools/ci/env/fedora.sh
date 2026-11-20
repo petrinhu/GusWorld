@@ -4,9 +4,13 @@
 #
 # Setup for the Fedora target (primary, L-09) of the build job in CI.
 # Three responsibilities and nothing else:
-#   1. install the toolchain from the distro repository;
-#   2. export CC and CXX to the next steps via $GITHUB_ENV;
+#   1. install both compilers, GCC and Clang, from the distro repository;
+#   2. export CMAKE_GENERATOR=Ninja to the next steps via $GITHUB_ENV;
 #   3. print the tool versions, so the CI log proves what actually ran.
+#
+# The compiler is not chosen here. The workflow matrix sets CC and CXX for each
+# entry (GCC or Clang), and this script only installs the packages. Running it
+# alone therefore needs CC and CXX already set in the environment.
 #
 # Measured 11/10/2026 in fedora:latest (Fedora 44, local cache, no pull):
 # dnf provides cmake 4.3.0, above the 4.1 floor, so no SHA-pinned download
@@ -25,18 +29,15 @@
 
 set -eu
 
-cc_bin="cc"
-cxx_bin="c++"
-
-dnf -y install gcc-c++ cmake ninja-build git
+dnf -y install gcc-c++ clang cmake ninja-build git
 
 {
-    echo "CC=${cc_bin}"
-    echo "CXX=${cxx_bin}"
+    echo "CMAKE_GENERATOR=Ninja"
 } >> "$GITHUB_ENV"
 
-"$cc_bin" --version
-"$cxx_bin" --version
+cat /etc/os-release
+"$CC" --version
+"$CXX" --version
 cmake --version
 ninja --version
 git --version
