@@ -1,15 +1,18 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# CVE gate over the build environment (item TST-3a). Orchestration only: every
-# judgement lives in tools/ci/cve/, one responsibility per script.
-#   tools/ci/cve/install_grype.sh  fetch grype, check its SHA-256, place it
-#   tools/ci/cve/scan.sh           run grype once, then judge it
-#   tools/ci/cve/judge.sh          map exit code, packages, distro and findings to one verdict
+# CVE gate over the build environment (item TST-3a). Orchestration only: no step here
+# judges anything. Every judgement lives in tools/ci/cve/, one responsibility per script.
+#   install_grype.sh  fetch grype, check its SHA-256, place it
+#   expect.sh         assert one verdict (the proof and the real scan both use it)
+#   scan.sh           run grype once with the policy, print the report, judge
+#   report.sh         print the summary: packages, distro, CVEs by severity
+#   judge.sh          map exit code, packages, distro and findings to one verdict
 #
 # WHAT THE GATE BARS (leader, 20/11/2026): only CRITICAL with a published fix.
 # The verdict comes from grype's exit code 2 (--fail-on), never from counting "Critical"
-# in the JSON, because ignoredMatches also carry severities. Everything else goes to the log.
+# in the JSON, because ignored matches also carry severities. Everything else goes to the log.
+# The full grype JSON of the real scan is attached to the run as an artifact.
 #
 # COVERAGE (leader: "only where it is supported"): Fedora, grype only. Trivy has no
 # Fedora coverage and is NOT run here. Ubuntu, Arch and CachyOS belong to TST-3b,
@@ -18,28 +21,29 @@
 # DATABASE SOURCES (leader: "covered by both"): NVD is covered through grype's database.
 # OSV is NOT confirmed: a declared limit, not a claim of coverage.
 #
-# WHY NOT A THIRD-PARTY ACTION: a marketplace action runs code we do not read and tracks
-# a moving tag. The grype tarball is fetched from the official release, checked against a
-# literal SHA-256, and only then placed on PATH.
+# WHY NOT A THIRD-PARTY ACTION FOR THE SCAN: a marketplace action runs code we do not read
+# and tracks a moving tag. The grype tarball is fetched from the official release, checked
+# against a literal SHA-256, and only then placed on PATH. The artifact upload uses the
+# official actions/upload-artifact, pinned by commit SHA.
 #
 # THE PROOF OF STRENGTH (L-36 global): a gate never seen failing proves nothing.
 # - Case A: alpine:3.12.7 by digest sha256:de25c7fc6c4f3a27c7f0c2dff454e4671823a34d88abd533f210848d527e0fbb
-#   (registry API; Docker Hub last_updated 2021-07-30). Its openssl is older than
-#   1.1.1l-r0. CVE-2021-3711 (NVD CVSS 3.1 9.8 CRITICAL, published 2021-08-24) is fixed in
-#   1.1.1l-r0 (Alpine secdb, branch v3.12). Must yield VERDICT=finding.
-#   INFERENCE to measure on the first run: that grype reads it through the "registry:"
-#   source with a digest reference, and that its Alpine data flags the CVE as critical.
-# - Case B: an empty directory must yield VERDICT=zero (the package floor).
-# Both check the VERDICT VALUE, not only the exit code. Both call the same scan.sh and
-# judge.sh as the real scan (DRY).
+#   (registry API; Docker Hub last_updated 2021-07-30). Its openssl is older than 1.1.1l-r0.
+#   CVE-2021-3711 (NVD CVSS 3.1 9.8 CRITICAL, published 2021-08-24) is fixed in 1.1.1l-r0
+#   (Alpine secdb, branch v3.12). Expected VERDICT=finding.
+# - Case B: an empty directory. Expected VERDICT=zero (the package floor).
+# Both assert the verdict VALUE. Both go through expect.sh and scan.sh, the same path as
+# the real scan (DRY).
+# Measured on the first run (20/11/2026, run 44755957346): the registry: source with a
+# digest reference works, the CVE is judged critical with a fix, and the package-count
+# regex matches grype 0.122.1.
 #
 # DECLARED LIMITS
-# - Package count comes from the INFO log line "gathered packages" (-v). Its format is
-#   INFERENCE; an unreadable count rejects (fail closed).
-# - fedora:latest is Fedora 46 on Docker Hub (updated 2026-11-02). grype coverage of
-#   Fedora 46 is not confirmed; an unrecognized distro rejects (fail closed). Leader
-#   decision: keep :latest and measure (L-09 project).
-# - grype's exclude globs are relative to the scan root (./proc/**). INFERENCE to measure.
+# - fedora:latest is Fedora 45 (VERSION_ID=45 measured on 20/11/2026). The tag moves: when
+#   Fedora 46 becomes :latest, the gate measures it again. An unrecognized distro rejects
+#   (fail closed). Leader decision: keep :latest and measure (L-09 project).
+# - The exclude globs (./proc/**, and so on) are relative to the scan root. A passing run
+#   does not prove the excludes worked, so they stay under measurement.
 # - A package in no database is invisible to the gate.
 
 name: Portão de CVE
@@ -82,6 +86,10 @@ jobs:
       - name: Install the build toolchain
         run: bash tools/ci/env/fedora.sh
 
+      # report.sh reads the grype JSON with jq. Installed in the CI container only.
+      - name: Install jq for the report
+        run: dnf -y install jq
+
       # The job-level env cannot read the runner context (GitHub contexts table, jobs.<job_id>.env),
       # so the cache path is written from a step, where runner.temp is available.
       # The cache lives under the runner temp dir, which the real scan excludes.
@@ -97,48 +105,42 @@ jobs:
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
           "$RUNNER_TEMP/bin/grype" version
 
-      - name: Proof of strength, the gate must reject an old vulnerable image and an empty directory
-        # Runs even if the real scan below rejects, so the proof is always reported.
+      # always() here does not depend on the real scan, which runs later. It makes the proof
+      # run even if an earlier step failed, so a red run still shows whether the gate works.
+      - name: Proof of strength, the gate must judge an old vulnerable image and an empty directory
         if: always()
         run: |
           set -u
-          scan="$GITHUB_WORKSPACE/tools/ci/cve/scan.sh"
-
-          # Case A: Alpine 3.12.7 by digest, openssl older than 1.1.1l-r0 (CVE-2021-3711, CVSS 9.8).
-          gate=0
-          outA=$(bash "$scan" alpine "$RUNNER_TEMP/proof-alpine" "registry:alpine@sha256:de25c7fc6c4f3a27c7f0c2dff454e4671823a34d88abd533f210848d527e0fbb" --only-fixed --fail-on critical) || gate=$?
-          printf '%s\n' "$outA"
-          if [ "$gate" = "0" ] || [ "$outA" != "VERDICT=finding" ]; then
-            echo "PROOF A FAILED: the old Alpine image was not judged a finding (gate $gate)"
+          expect="$GITHUB_WORKSPACE/tools/ci/cve/expect.sh"
+          if ! bash "$expect" finding alpine "$RUNNER_TEMP/proof-alpine" "registry:alpine@sha256:de25c7fc6c4f3a27c7f0c2dff454e4671823a34d88abd533f210848d527e0fbb"; then
+            echo "PROOF A FAILED: the old Alpine image was not judged a finding"
             exit 1
           fi
-          echo "PROOF A PASSED: old Alpine image judged a finding"
-
-          # Case B: an empty directory must be judged by the package floor.
-          empty="$RUNNER_TEMP/proof-empty-dir"
-          mkdir -p "$empty"
-          gate=0
-          outB=$(bash "$scan" fedora "$RUNNER_TEMP/proof-empty" "dir:$empty" --only-fixed --fail-on critical) || gate=$?
-          printf '%s\n' "$outB"
-          if [ "$gate" = "0" ] || [ "$outB" != "VERDICT=zero" ]; then
-            echo "PROOF B FAILED: the empty directory was not judged zero (gate $gate)"
+          mkdir -p "$RUNNER_TEMP/proof-empty-dir"
+          if ! bash "$expect" zero fedora "$RUNNER_TEMP/proof-empty" "dir:$RUNNER_TEMP/proof-empty-dir"; then
+            echo "PROOF B FAILED: the empty directory was not judged zero"
             exit 1
           fi
-          echo "PROOF B PASSED: empty directory judged zero"
+          echo "PROOF PASSED: A judged finding, B judged zero"
 
       - name: Scan the real build environment
         run: |
           set -u
-          scan="$GITHUB_WORKSPACE/tools/ci/cve/scan.sh"
-          gate=0
-          out=$(bash "$scan" fedora "$RUNNER_TEMP/scan-fedora" "dir:/" \
-            --only-fixed --fail-on critical \
+          expect="$GITHUB_WORKSPACE/tools/ci/cve/expect.sh"
+          if ! bash "$expect" accept fedora "$RUNNER_TEMP/scan-fedora" "dir:/" \
             --exclude './proc/**' --exclude './sys/**' --exclude './dev/**' \
             --exclude './__e/**' --exclude './__w/**' --exclude './__t/**' \
-            --exclude './github/**') || gate=$?
-          printf '%s\n' "$out"
-          if [ "$gate" != "0" ]; then
+            --exclude './github/**'; then
             echo "CVE GATE REJECTED"
             exit 1
           fi
           echo "CVE GATE ACCEPTED"
+
+      # Attached even when the scan rejects, so the full list is in the run for download.
+      - name: Attach the full grype JSON of the real scan
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: grype-fedora-real-scan
+          path: ${{ runner.temp }}/scan-fedora/grype.json
+          if-no-files-found: warn

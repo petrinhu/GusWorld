@@ -8,6 +8,7 @@
 #
 # Order matters: the exit-code class first, then the package floor, then the distro,
 # then the finding. A zero package count must report "zero", not "distro".
+# The package-count regex was measured on grype 0.122.1 in CI (run 44755957346).
 set -u
 
 rc="${1:?exit code missing}"
@@ -15,10 +16,8 @@ json="${2:?json path missing}"
 log="${3:?log path missing}"
 want="${4:?expected distro missing}"
 
-# The package count is in the INFO line "gathered packages" (grype -v). Format not yet measured.
 pkgs=$(grep -E 'gathered packages' "$log" 2>/dev/null | head -n 1 \
   | grep -oE 'packages[=:][ "]*[0-9]+' | grep -oE '[0-9]+$' | head -n 1 || true)
-# The distro is the first "name" inside the "distro" object of the JSON.
 distro=$(tr -d ' \n' < "$json" 2>/dev/null \
   | grep -oE '"distro":\{"name":"[^"]*"' | head -n 1 \
   | sed 's/.*"name":"//; s/"$//' || true)

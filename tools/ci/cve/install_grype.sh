@@ -5,7 +5,7 @@
 # Installs grype pinned by SHA-256 into a directory. Single responsibility: fetch, check, place.
 # Usage: install_grype.sh <destination-dir>
 # The hash was read from the official checksums file of release v0.122.1
-# (grype_0.122.1_checksums.txt) and matches the tarball. Any other tarball is rejected.
+# (grype_0.122.1_checksums.txt). Any other tarball is rejected.
 # No third-party action is used, and no moving label.
 set -eu
 
@@ -16,6 +16,8 @@ tarball="grype_${version}_linux_amd64.tar.gz"
 base="https://github.com/anchore/grype/releases/download/v${version}"
 
 work="$(mktemp -d "${RUNNER_TEMP:-/var/tmp}/grype-download.XXXXXX")"
+# The download directory is removed on every exit, success or failure, by its own path.
+trap 'rm -rf "$work"' EXIT
 cd "$work"
 curl -fsSLO "$base/$tarball"
 echo "$sha256  $tarball" | sha256sum -c -
