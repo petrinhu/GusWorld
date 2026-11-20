@@ -51,23 +51,7 @@ jobs:
 
       # Floor from the project's cmake_minimum_required(4.1). Same check as build.yml.
       - name: Version floor (CMake 4.1)
-        run: |
-          set -eu
-          cmake --version > cmake_version.txt
-          version="$(sed -n '1s/^cmake version //p' cmake_version.txt)"
-          echo "CMake read: ${version:-<unreadable>}"
-          case "$version" in
-            ''|*[!0-9.]*)
-              echo "FAIL: could not read the CMake version"
-              exit 1
-              ;;
-          esac
-          if printf '%s\n%s\n' 4.1 "$version" | sort -V -C; then
-            echo "CMake ${version} meets the 4.1 floor"
-          else
-            echo "FAIL: CMake ${version} is below the 4.1 floor"
-            exit 1
-          fi
+        run: bash tools/ci/cmake_floor.sh
 
       # Installed in its own step, so a missing package fails here and not in the gate.
       # The version is printed, so the log shows which cppcheck ran.

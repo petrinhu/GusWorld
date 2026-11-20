@@ -144,23 +144,7 @@ jobs:
       # read from a file, not from a pipe, so a failing cmake cannot hide
       # behind the sed that follows it.
       - name: Version floor (CMake 4.1)
-        run: |
-          set -eu
-          cmake --version > cmake_version.txt
-          version="$(sed -n '1s/^cmake version //p' cmake_version.txt)"
-          echo "CMake read: ${version:-<unreadable>}"
-          case "$version" in
-            ''|*[!0-9.]*)
-              echo "FAIL: could not read the CMake version"
-              exit 1
-              ;;
-          esac
-          if printf '%s\n%s\n' 4.1 "$version" | sort -V -C; then
-            echo "CMake ${version} meets the 4.1 floor"
-          else
-            echo "FAIL: CMake ${version} is below the 4.1 floor"
-            exit 1
-          fi
+        run: bash tools/ci/cmake_floor.sh
 
       # -DGUSWORLD_WERROR=ON is the gate for L-19 (portao 1): zero warnings.
       - name: Configure

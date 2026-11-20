@@ -45,17 +45,7 @@ jobs:
           echo "$RUNNER_TEMP/cmake-${CMAKE_VERSION}-linux-x86_64/bin" >> "$GITHUB_PATH"
 
       - name: Prova a versao do CMake no PATH (piso 4.1)
-        run: |
-          set -eu
-          cmake --version
-          version=$(cmake --version | sed -n '1s/^cmake version //p')
-          # Comparacao numerica de versao: sort -V -C passa se 4.1 vem antes ou igual a versao.
-          if printf '%s\n%s\n' 4.1 "$version" | sort -V -C; then
-            echo "CMake $version atende o piso 4.1"
-          else
-            echo "CMake $version abaixo do piso 4.1"
-            exit 1
-          fi
+        run: bash tools/ci/cmake_floor.sh
 
       - name: Autoteste do gate (um caso vermelho por forma)
         run: python3 tools/ci/check_layers.py --selftest
