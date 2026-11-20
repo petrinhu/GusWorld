@@ -14,6 +14,7 @@
 #   trivy/judge.sh    map exit code, packages, distro and findings to one verdict
 #   trivy/db_status.sh  print trivy's version and database metadata
 #   env/<distro>.sh   the gate's own prerequisites (jq, and curl where the image lacks it)
+#   assert_os_id.sh  fail closed unless the ID in /etc/os-release is the one the matrix names
 #
 # WHAT THE GATE BARS (leader, 20/11/2026): only CRITICAL with a published fix.
 # grype: the verdict comes from grype's exit code 2 (--fail-on critical with --only-fixed),
@@ -95,6 +96,10 @@
 #   The judge expects archlinux (scan_distro), by the leader's decision of 20/11/2026: accept the
 #   Arch feed. Declared limit: the CVE is measured against the Arch feed, and packages rebuilt by the
 #   CachyOS repositories may not match that feed. Trivy does not cover this entry.
+# - Arch and CachyOS: the scanned state is the repository at the minute of the run, after the
+#   pacman -Syu of the toolchain step, not an image digest. The scan is a superset of the build
+#   (curl, jq and ca-certificates are added), and it is not reproducible: a rerun may see other
+#   package versions. Declared limit.
 # - The exclude globs (./proc/**, and so on) are relative to the scan root. For trivy they are
 #   passed as --skip-dirs in both the relative and the absolute spelling, because the docs do
 #   not confirm which one matches. Which spelling matched is read from the Targets line of the
@@ -129,24 +134,28 @@ jobs:
           - name: Fedora (grype)
             image: fedora:latest
             distro: fedora
+            os_id: fedora
             scan_distro: fedora
             trivy: false
             git_install: "dnf -y install git"
           - name: Ubuntu (trivy e grype)
             image: ubuntu:latest
             distro: ubuntu
+            os_id: ubuntu
             scan_distro: ubuntu
             trivy: true
             git_install: "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git"
           - name: Arch (grype)
             image: archlinux:latest
             distro: arch
+            os_id: arch
             scan_distro: archlinux
             trivy: false
             git_install: "pacman -Syu --noconfirm --needed git"
           - name: CachyOS (grype)
             image: cachyos/cachyos:latest
             distro: cachyos
+            os_id: cachyos
             scan_distro: archlinux
             trivy: false
             git_install: "pacman -Syu --noconfirm --needed git"
@@ -166,6 +175,19 @@ jobs:
       # as "dubious ownership" (CVE-2022-24765). Set this before any git call.
       - name: Git safe.directory for the container
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # The job must scan the OS it names. os-release is only printed elsewhere, so this step
+      # asserts its ID. The proof runs first with a wrong ID, which must fail, so the assertion
+      # is seen working before it is trusted.
+      - name: Assert the OS ID of the image before the scan
+        run: |
+          set -u
+          assert="$GITHUB_WORKSPACE/tools/ci/cve/assert_os_id.sh"
+          if bash "$assert" not-this-os; then
+            echo "OS ID PROOF FAILED: the wrong ID was accepted"
+            exit 1
+          fi
+          bash "$assert" "${{ matrix.os_id }}"
 
       # The same toolchain as the build, so the scan covers the real build environment.
       # The script is only read here, never edited.

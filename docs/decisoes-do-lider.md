@@ -33,7 +33,7 @@ O critério de entrada é **permanência**, não tema: entra decisão que, se co
 | 20/11/2026 | marcador de glifo só no mockup | Os marcadores `GLYPH_BLOCK_START` e `GLYPH_BLOCK_END` valem só no arquivo do mockup. | *"Pode marcar só esse arquivo"* | `docs/design/mockups/11-terminal-glitch-glyphs.html` |
 | 20/11/2026 | medição caso a caso do termo protegido em 16 arquivos | A exposição do termo protegido volta ao líder, caso a caso. Reescrita de histórico só com autorização expressa. | *"Medir caso a caso"* | `TODO.md` (INBOX, bullet de 12/10/2026 sobre o termo em 16 arquivos) |
 | 20/11/2026 | C10 cita a raiz e o arquivo de cima, sem a linha | a especificação do C10 deixa de exigir a linha da diretiva; o achado cita a raiz e o arquivo de cima, porque só o -M decide e ele não dá linha | *"Ajustar a especificação (Recomendado)"* | `TODO.md` (C10) |
-| 20/11/2026 | CVE do CachyOS medido pelo feed do Arch | O grype identifica o CachyOS como `archlinux` pelo `ID_LIKE`; a entrada fica própria na matriz e o julgador espera `archlinux`, com o limite declarado de que pacotes recompilados do CachyOS podem não casar com o feed do Arch. | *"Aceitar o feed do Arch (Recomendado)"* | `.github/workflows/cve.yml`; `TODO.md` (TST-3d) |
+| 20/11/2026 | CVE do CachyOS medido pelo feed do Arch | O grype identifica o CachyOS como `archlinux`; a entrada fica própria na matriz e o julgador espera `archlinux`, com o limite declarado de que pacotes recompilados do CachyOS podem não casar com o feed do Arch. | *"Aceitar o feed do Arch (Recomendado)"* | `.github/workflows/cve.yml`; `TODO.md` (TST-3d) |
 
 ## 2026-10
 
