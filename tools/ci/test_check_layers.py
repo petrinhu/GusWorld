@@ -16,10 +16,12 @@ Declared gap, not covered here: a branch of #if that is NOT taken in the
 configuration the build uses is not seen by the compiler. c09 proves the taken
 branch is caught; the untaken one is an open limit.
 
-Direction (C10): d01 to d04 are an upward include in each of the three borders
-between pure layers, one through a transitive header; g01 is a clean tree with
-downward and same-layer includes. The site of an include is read from the
-compiler's own -E linemarkers, and the test asserts the arquivo:linha it cites.
+Direction (C10): d01 to d03 are an upward include in each of the three borders
+between pure layers; d04 is one through a transitive header. r01 to r04 are the
+review cases: a #line directive, a header that no unit opens, a target already
+opened by the unit, and a forced -include from an upper layer. g01 is a clean tree
+with downward and same-layer includes. Every verdict comes from the compiler's -M
+of each root, never from reading the text of the source.
 
 Usage: python3 tools/ci/test_check_layers.py -v
 """
@@ -256,8 +258,8 @@ class TestStructureAndEnvironment(LayerGateTest):
 
 
 class TestDirection(LayerGateTest):
-    def assert_upward(self, files, path, child, site):
-        root, build_dir = self.build(files)
+    def assert_upward(self, files, path, child, **options):
+        root, build_dir = self.build(files, **options)
         report = gate.scan(root, build_dir)
         self.assertEqual(
             gate.verdict(report), 2,
@@ -265,27 +267,27 @@ class TestDirection(LayerGateTest):
         )
         hits = [
             f for f in report.findings
-            if f.path == path and "include para cima" in f.form and child in f.detail and site in f.detail
+            if f.path == path and "include para cima" in f.form and child in f.detail
         ]
-        self.assertTrue(hits, f"nenhum include para cima de {child} citando {site}; findings={report.findings}")
+        self.assertTrue(hits, f"nenhum include para cima de {child} na raiz {path}; findings={report.findings}")
 
-    def test_d01_core_including_content_rejected_with_line(self):
+    def test_d01_core_including_content_rejected(self):
         self.assert_upward(
             {"core/a.cpp": b'#include <string_view>\n#include "../content/c.hpp"\n',
              "content/c.hpp": b"#pragma once\n"},
-            "core/a.cpp", "content/c.hpp", "core/a.cpp:2",
+            "core/a.cpp", "content/c.hpp",
         )
 
     def test_d02_content_including_domain_with_comment_before_hash(self):
         self.assert_upward(
             {"content/c.cpp": b'/**/#include "../domain/d.hpp"\n', "domain/d.hpp": b"#pragma once\n"},
-            "content/c.cpp", "domain/d.hpp", "content/c.cpp:1",
+            "content/c.cpp", "domain/d.hpp",
         )
 
     def test_d03_domain_including_app_with_digraph(self):
         self.assert_upward(
             {"domain/d.cpp": b'%:include "../app/e.hpp"\n', "app/e.hpp": b"#pragma once\n"},
-            "domain/d.cpp", "app/e.hpp", "domain/d.cpp:1",
+            "domain/d.cpp", "app/e.hpp",
         )
 
     def test_d04_upward_include_through_intermediate_header(self):
@@ -293,7 +295,35 @@ class TestDirection(LayerGateTest):
             {"core/a.cpp": b'#include "k.hpp"\n',
              "core/k.hpp": b'#include "../content/c.hpp"\n',
              "content/c.hpp": b"#pragma once\n"},
-            "core/k.hpp", "content/c.hpp", "core/k.hpp:1",
+            "core/k.hpp", "content/c.hpp",
+        )
+
+    def test_r01_line_directive_does_not_hide_upward_include(self):
+        self.assert_upward(
+            {"core/a.cpp": b'#include <string_view>\n#line 1 "vazio.hpp"\n#include "../content/c.hpp"\n',
+             "content/c.hpp": b"#pragma once\n"},
+            "core/a.cpp", "content/c.hpp",
+        )
+
+    def test_r02_header_no_unit_opens_is_still_checked(self):
+        self.assert_upward(
+            {"core/h.hpp": b'#include "../app/e.hpp"\n', "app/e.hpp": b"#pragma once\n"},
+            "core/h.hpp", "app/e.hpp",
+        )
+
+    def test_r03_target_already_opened_by_the_unit_is_still_checked(self):
+        self.assert_upward(
+            {"app/x.cpp": b'#include "../content/c.hpp"\n#include "../core/k.hpp"\n',
+             "core/k.hpp": b'#include "../content/c.hpp"\n',
+             "content/c.hpp": b"#pragma once\n"},
+            "core/k.hpp", "content/c.hpp",
+        )
+
+    def test_r04_forced_include_from_upper_layer_rejected(self):
+        self.assert_upward(
+            {"app/f.hpp": b"#pragma once\n"},
+            "core/a.cpp", "app/f.hpp",
+            flags=("-include{root}/app/f.hpp",),
         )
 
     def test_g01_downward_and_own_layer_pass(self):
