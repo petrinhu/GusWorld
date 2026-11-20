@@ -67,11 +67,14 @@ verdict_set() {
 }
 
 # guard_on REL: the real guard's answer for a Write of PROJ/REL. Sets G_RC and G_ERR.
+# The guard speaks on two channels: stderr when it blocks (exit 2), and stdout as a JSON
+# warning when it fails open with exit 0 (tdd_guard.py 2.0.0, emite_aviso). G_ERR holds both,
+# so a check reads the message whichever channel the guard used.
 guard_on() {
     payload "$1" | env -u TDD_GUARD -u TDD_PHASE python3 -I "$PLUGIN_HOOKS/tdd_guard.py" \
         > "$FX/guard.out" 2> "$FX/guard.err"
     G_RC=$?
-    G_ERR="$(cat "$FX/guard.err")"
+    G_ERR="$(cat "$FX/guard.err" "$FX/guard.out")"
 }
 
 # runner_on REL: the real runner runs the sentinel and writes last-run.json.
