@@ -32,6 +32,21 @@ Declared limits, not covered here:
   by the compiler (c09 proves the taken branch is caught; the untaken one is open);
 - C++ modules (import, .ixx, .cppm) are outside both policies: the preprocessor does
   not follow module imports.
+- C-01: a file whose suffix is not in HEADER_SUFFIXES (.inc, .tcc, .def, .C, .c++, or
+  no suffix) is not a root of its own; it is checked only when a unit's -M opens it.
+  core/k.inc, included only from app/x.cpp, is opened by no core root, so it is not
+  judged.
+- C-02: direction is measured against the layer of the root, not of the file that
+  includes. An edge F -> G with rank(F) < rank(G) <= rank(root) is not reported. When
+  F is not a root (core/f.inc includes content/g.hpp, and app/x.cpp includes f.inc),
+  the edge escapes.
+- C-03: a header root takes the flags of the first compile unit of its layer. An
+  include that resolves only through another unit's -I (a directory the consumer adds)
+  is not seen by the gate.
+- C-04: the walks of the layer directories have no onerror. An unreadable
+  subdirectory is skipped without a finding, so the gate fails open there.
+- C-06: the header-root path (command_for_header, header_roots) has no real case in
+  the tree (4 .cpp and 0 headers in the pure layers). Only the self-test exercises it.
 
 The -w flag is set on every dependency run: warnings never change what the compiler
 opens, and a build with -Werror would otherwise fail a header on a pragma warning.
@@ -57,7 +72,6 @@ from pathlib import Path
 
 REPO_ROOT = Path(os.path.realpath(Path(__file__).resolve().parents[2]))
 PURE_LAYERS = ("core", "content", "domain", "app")
-CPP_SUFFIXES = (".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx", ".ipp", ".inl", ".tpp", ".ixx", ".cppm")
 # Translation-unit suffixes: a source of these in a pure layer that CMake does not compile is an orphan.
 SOURCE_SUFFIXES = (".c", ".cc", ".cpp", ".cxx", ".ixx", ".cppm")
 # Headers become roots of their own, so an include that no unit opens is still judged.
