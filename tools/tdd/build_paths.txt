@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Whitelist of the test tar (ADR-026, decision 2). One git pathspec per line.
+# Lines starting with # are comments. Not listed on purpose: docs/ (it holds the
+# git-crypt areas), tools/security/, tools/ci/, tools/container/ and .claude/.
+CMakeLists.txt
+cmake/
+core/
+content/
+domain/
+app/
+present/
+tests/
+tools/tdd/

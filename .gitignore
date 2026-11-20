@@ -40,3 +40,6 @@ Thumbs.db
 .venv/
 __pycache__/
 *.pyc
+
+# Prova do guard de TDD (ADR-026): fixture descartavel, nunca versionado
+/.tdd-proof/
