@@ -10,6 +10,29 @@ O critério de entrada é **permanência**, não tema: entra decisão que, se co
 
 ---
 
+## 2026-11
+
+| Data | Assunto | A decisão | Verbatim | Onde vive |
+|---|---|---|---|---|
+| 20/11/2026 | push em ramo de trabalho livre; merge e tag só com onda fechada e aval do líder (L-32 do projeto) | Push para ramo de trabalho sai a qualquer hora, porque é ele que dispara o CI. Merge no main e tag só com a onda fechada e com aval explícito do líder. Substitui a regra de 23/08/2026 ("push só ao fim da onda"), que sai deste índice. | *"Push para ramo de trabalho a qualquer hora, porque é ele que dispara o CI. Merge no main e tag só com a onda fechada e com o seu aval."*; *"Alinhar a L-32 à L-24 global (Recomendado)"*; *"Confirmar o texto (Recomendado)"* | `GODS_LAWS.md` §L-32; commits `ea1b3f8` e `02aa549` |
+| 20/11/2026 | onda 7 fechada; ondas 7 e 8 divididas por plataforma e CVE | A onda 7 fecha inteira, com os doze itens concluídos. As plataformas ficam na onda 7 e o restante do CVE vai para a onda 8. | *"Sim, fechar agora (Recomendado)"*; *"ondas 7 com as plataformas, 8 com o resto do CVE"* | `TODO.md`; commit `46ac6e1` |
+| 20/11/2026 | tag `v0.0.0.2` publicada | Tag anotada na versão 0.0.0.2, apontando para o `main` em `46ac6e1`. O checklist de deploy é alinhado e a versão marcada. | *"Sim, publicar a tag (Recomendado)"*; *"Alinhar o checklist e marcar v0.0.0.2"* | `DEPLOY_CHECKLIST.md`; `GODS_LAWS.md` §L-23; tag `v0.0.0.2` (objeto `ca8ba45`, aponta para `46ac6e1`) |
+| 20/11/2026 | limite declarado do portão de segredo: modo git | O portão de segredo fica no modo git, e o limite fica escrito no workflow e no checklist de deploy. | *"Não, o modo git basta (Recomendado)"* | `.github/workflows/gitleaks.yml`; `DEPLOY_CHECKLIST.md`; commit `bd0af91` |
+| 20/11/2026 | guardas antigas do `build.yml` ficam como limite declarado | As guardas do `build.yml` ficam como limite declarado. | *"Ratifico, fica como limite (Recomendado)"* | `.github/workflows/build.yml` |
+| 20/11/2026 | gate de travessão não se estende a `.yml` | O gate de travessão segue restrito ao conteúdo renderizado ao usuário final. A L-32 global não muda. | *"Não estender"* | `GODS_LAWS.md` global §L-32 |
+| 20/11/2026 | parse de YAML só em contêiner, leis intactas | Nenhuma lei muda. O parse de YAML roda só em contêiner. A autorização para instalar `python3-pyyaml` numa imagem local ainda não foi dada. | *"Leis intactas, parse só em contêiner"* | `GODS_LAWS.md` §L-35 (projeto); `GODS_LAWS.md` global §L-50 e §L-51 |
+| 20/11/2026 | leitura operacional do portão N3 da L-19, lei intacta | A lei fica como está. Conferir caso vermelho em N3 significa rodar no CI. | *"Lei intacta, leitura operacional"* | `GODS_LAWS.md` §L-19 |
+| 20/11/2026 | delegação de decisões técnicas ao C-level | O C-level decide as questões técnicas e as registra para ratificação do líder. Lei, dinheiro, ato irreversível e conteúdo aprovado do Gus original seguem com o líder. | *"Vale, inclusive as pendentes"* | `GODS_LAWS.md` global §L-15 |
+| 20/11/2026 | monolitos da onda 7 antes do fechamento | A atomização vira critério de fechamento dos C5, e os monolitos da onda 7 são atomizados antes de a onda fechar. As respostas por monolito (P1 a P7) não se repetem aqui. | *"Antes de fechar a onda 7"* | `TODO.md` (critério dos C5); commit `3dd22e9` |
+| 20/11/2026 | política de CVE dos portões TST-3a e TST-3b | Portão de CVE em workflow próprio, `cve.yml`, com matriz. Reprovação só por CRÍTICA com correção. O binário do trivy fica fixado por SHA. | *"Só CRÍTICA com correção"*; *"cve.yml próprio, com matriz"*; *"Binário fixado por SHA"* | `TODO.md` (TST-3a, TST-3b); commit `ab60ae6` |
+| 20/11/2026 | OSV como limite declarado do TST-3a | O TST-3a fecha com o OSV como limite declarado. A conferência do OSV no grype vai à INBOX, junto com as distros da onda 8. | *"Fecha, com o OSV como limite declarado (Recomendado)"* | `TODO.md` (TST-3a e INBOX); commit `14f9c8e` |
+| 20/11/2026 | limite declarado do clang-format no C5c | O C5c fecha com a metade clang-format declarada como limite. O portão de formatação vai à INBOX. | *"Limite declarado, o C5c fecha (Recomendado)"* | `TODO.md` (C5c e INBOX); commit `e32f5c0` |
+| 20/11/2026 | Windows do C4b5 ratificado | As quatro decisões técnicas do Windows do C4b5 ficam ratificadas. O detalhe mora no item. | - | `TODO.md` (C4b5); commit `105dc49` |
+| 20/11/2026 | decisões técnicas da onda 7 ratificadas em multiselect | Ratificadas: técnicas da onda 7 (Ninja pelo ambiente, `_common.sh`, clang-tidy sem módulos, sonda única e fatias em série), TRI-20, TRI-17b(i), TRI-29(a), KOLA-2, KOLA-3, KOLA-7, D59 (rota), D67-P1, D67-P2, D67-P3, D67-P4, D67-P6, D68-P2b e D68-P5. | - | `TODO.md` (itens C5a a C5f); commits `af48738` e `32551c9` |
+| 20/11/2026 | estreitar a isenção da guarda LEI ZERO para o arquivo | A guarda da LEI ZERO deixa de isentar o diretório `tools/security/` inteiro, e a isenção fica só no arquivo que a pede. | *"Estreitar para só o arquivo"* | `tools/security/lei_zero_guard.py` (linha 83) |
+| 20/11/2026 | marcador de glifo só no mockup | Os marcadores `GLYPH_BLOCK_START` e `GLYPH_BLOCK_END` valem só no arquivo do mockup. | *"Pode marcar só esse arquivo"* | `docs/design/mockups/11-terminal-glitch-glyphs.html` |
+| 20/11/2026 | medição caso a caso do termo protegido em 16 arquivos | A exposição do termo protegido volta ao líder, caso a caso. Reescrita de histórico só com autorização expressa. | *"Medir caso a caso"* | `TODO.md` (INBOX, bullet de 12/10/2026 sobre o termo em 16 arquivos) |
+
 ## 2026-10
 
 | Data | Assunto | A decisão | Verbatim | Onde vive |
@@ -114,7 +137,6 @@ O critério de entrada é **permanência**, não tema: entra decisão que, se co
 | 24/08/2026 | convenção de formatos `.gw.*` | A extensão é nossa; o formato de mapa em si é do GlintFx | "extensão nossa, formato do GlintFx." | `docs/tech/convencao-formatos-gw.md` |
 | 24/08/2026 | schema de diálogo binário | Registro fechado `{warm, terminal}`; `speaker_id` validado contra `CHARS.md` mais allowlist de sistema; chave de escolha nomeada por nó | "Nome por nó, mais seguro" | `docs/tech/spec-gw-text.md`; `docs/tech/spec-catalogo-dialogo-binario.md` |
 | 24/08/2026 | relógio de missão cronometrada só corre em combate a partir do Difícil | Resolve a tensão com o Pilar 1 ("active turn-based sem timer no turno do jogador") | - | `docs/design/mecanicas/missoes-cronometradas.md` (item `G5`) |
-| 23/08/2026 | commit por fatia, push só ao fim da onda | Nenhuma fatia fecha sem commit citando o ID e tocando o status; nenhum push sai antes da onda inteira fechar com testes verdes | - | `GODS_LAWS.md` §L-32 |
 | 23/08/2026 | aviso proativo ao Gus Dragon | Toda aprovação, rejeição ou mudança de ideia do Gus Dragon, e todo fechamento de item de alta prioridade, é avisado a ele sem que precise perguntar | - | `GODS_LAWS.md` §L-31 |
 | 22/08/2026 | LEI DAS LEIS | Só o líder pode quebrar ou alterar uma lei do `GODS_LAWS.md`; pedido de alteração/revogação exige contra-argumento do agente antes da confirmação | - | `GODS_LAWS.md` (topo) |
 | 22/08/2026 | prédios do demo ficam como placeholder | A arte fica como está (perspectiva isométrica sobre mundo ortogonal); os prédios podem se repetir no demo, como numa cidade de verdade; a arte definitiva é trabalho do jogo, não do demo | "como é um demo, deixe esses prédios assim como placeholders. Pode repetir os prédios, como em uma cidade de verdade, no jogo vamos fazer certo as imagens." | `docs/design/levels/blockout-distritos-inferiores.md` |
