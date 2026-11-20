@@ -3,8 +3,6 @@
 
 namespace gusworld::present {
 
-[[nodiscard]] std::string_view layer_name() noexcept {
-  return "present";
-}
+[[nodiscard]] std::string_view layer_name() noexcept { return "present"; }
 
-}  // namespace gusworld::present
+} // namespace gusworld::present

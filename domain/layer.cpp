@@ -3,8 +3,6 @@
 
 namespace gusworld::domain {
 
-[[nodiscard]] std::string_view layer_name() noexcept {
-  return "domain";
-}
+[[nodiscard]] std::string_view layer_name() noexcept { return "domain"; }
 
-}  // namespace gusworld::domain
+} // namespace gusworld::domain

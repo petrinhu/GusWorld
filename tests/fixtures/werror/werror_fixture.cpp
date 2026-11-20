@@ -9,17 +9,13 @@
 namespace {
 
 // Deliberate: the parameter `unused` is never read (-Wunused-parameter, from -Wextra).
-int unused_parameter_probe(int used, int unused) {
-  return used;
-}
+int unused_parameter_probe(int used, int unused) { return used; }
 
 // Deliberate: signed against unsigned comparison (-Wsign-compare, from -Wextra).
-bool sign_compare_probe(int value, std::size_t size) {
-  return value < size;
-}
+bool sign_compare_probe(int value, std::size_t size) { return value < size; }
 
-}  // namespace
+} // namespace
 
 int werror_fixture_entry() {
-  return unused_parameter_probe(1, 2) + (sign_compare_probe(1, 2) ? 1 : 0);
+    return unused_parameter_probe(1, 2) + (sign_compare_probe(1, 2) ? 1 : 0);
 }

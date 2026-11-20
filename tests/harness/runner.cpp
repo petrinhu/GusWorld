@@ -20,15 +20,15 @@ constexpr int exit_usage = 2;
 
 // A case fails when its body throws anything, or when a check was recorded
 // even though the body did not throw (a caught case_check_failed, for example).
-bool run_case(const test_case& c) {
+bool run_case(const test_case &c) {
     reset_failure_count();
     bool completed = true;
     try {
         c.fn();
-    } catch (const case_check_failed&) {
+    } catch (const case_check_failed &) {
         // GUSWORLD_CHECK already printed where and what; only the unwind lands here.
         completed = false;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cerr << "unexpected std::exception: " << e.what() << '\n';
         completed = false;
     } catch (...) {
@@ -38,7 +38,7 @@ bool run_case(const test_case& c) {
     return completed && failure_count() == 0;
 }
 
-bool run_and_report(const test_case& c) {
+bool run_and_report(const test_case &c) {
     const bool passed = run_case(c);
     std::cout << (passed ? "[ PASS ] " : "[ FAIL ] ") << c.name << '\n';
     return passed;
@@ -51,7 +51,7 @@ int summarize(std::size_t run, int failed) {
 
 int run_every_case() {
     int failed = 0;
-    for (const test_case& c : all_cases()) {
+    for (const test_case &c : all_cases()) {
         if (!run_and_report(c)) {
             ++failed;
         }
@@ -62,7 +62,7 @@ int run_every_case() {
 // An unknown name is an error, never a silent zero: a filter that matches
 // nothing must not exit with success.
 int run_named_case(std::string_view name) {
-    for (const test_case& c : all_cases()) {
+    for (const test_case &c : all_cases()) {
         if (c.name == name) {
             return summarize(1, run_and_report(c) ? 0 : 1);
         }
@@ -72,14 +72,14 @@ int run_named_case(std::string_view name) {
 }
 
 void list_cases() {
-    for (const test_case& c : all_cases()) {
+    for (const test_case &c : all_cases()) {
         std::cout << c.name << '\n';
     }
 }
 
 } // namespace
 
-int run_main(int argc, char** argv) {
+int run_main(int argc, char **argv) {
     // A binary that registered nothing is broken, not green: refuse to run.
     if (all_cases().empty()) {
         std::cerr << "[ ERROR ] no test case registered\n";

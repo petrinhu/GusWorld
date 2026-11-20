@@ -3,8 +3,6 @@
 
 namespace gusworld::core {
 
-[[nodiscard]] std::string_view layer_name() noexcept {
-  return "core";
-}
+[[nodiscard]] std::string_view layer_name() noexcept { return "core"; }
 
-}  // namespace gusworld::core
+} // namespace gusworld::core

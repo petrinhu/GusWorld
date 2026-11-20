@@ -11,12 +11,10 @@ namespace {
 // Deliberate: `value` is read before any assignment. cppcheck reports this as
 // uninitvar, an error-severity finding that is on by default.
 int uninitialized_read_probe() {
-  int value;
-  return value;
+    int value;
+    return value;
 }
 
-}  // namespace
+} // namespace
 
-int cppcheck_fixture_entry() {
-  return uninitialized_read_probe();
-}
+int cppcheck_fixture_entry() { return uninitialized_read_probe(); }

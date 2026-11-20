@@ -12,15 +12,15 @@ namespace {
 // argc is 1 under ctest, so the sum leaves the range of int. The value is not a
 // constant, so static analysis cannot flag the overflow before the sanitizer runs.
 int add_argc_to_int_max(int argc) {
-  int value = std::numeric_limits<int>::max();
-  value += argc;  // Deliberate: signed integer overflow.
-  return value;
+    int value = std::numeric_limits<int>::max();
+    value += argc; // Deliberate: signed integer overflow.
+    return value;
 }
 
-}  // namespace
+} // namespace
 
-int main(int argc, char** argv) {
-  (void)argv;
-  std::printf("%d\n", add_argc_to_int_max(argc));
-  return 0;
+int main(int argc, char **argv) {
+    (void)argv;
+    std::printf("%d\n", add_argc_to_int_max(argc));
+    return 0;
 }

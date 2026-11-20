@@ -13,12 +13,8 @@ namespace {
 // Deliberate: the macro argument `value` is not enclosed in parentheses, so the
 // expansion of DELIBERATE_SCALE(x + 1) is x + 1 * 2. clang-tidy reports this as
 // bugprone-macro-parentheses, which is enabled in .clang-tidy.
-int deliberate_macro_probe(int x) {
-  return DELIBERATE_SCALE(x + 1);
-}
+int deliberate_macro_probe(int x) { return DELIBERATE_SCALE(x + 1); }
 
-}  // namespace
+} // namespace
 
-int clang_tidy_fixture_entry() {
-  return deliberate_macro_probe(1);
-}
+int clang_tidy_fixture_entry() { return deliberate_macro_probe(1); }

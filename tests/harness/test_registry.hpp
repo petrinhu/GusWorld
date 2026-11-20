@@ -20,7 +20,7 @@ struct test_case {
 };
 
 void register_case(test_case c);
-[[nodiscard]] const std::vector<test_case>& all_cases();
+[[nodiscard]] const std::vector<test_case> &all_cases();
 
 struct case_registrar {
     explicit case_registrar(std::string_view name, case_fn fn);

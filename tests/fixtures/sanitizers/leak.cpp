@@ -12,16 +12,16 @@ namespace {
 // The block is never freed, and the pointer does not outlive this function: no
 // global or static holds it, so LeakSanitizer finds it unreachable at exit.
 int allocate_and_forget(int argc) {
-  const auto count = static_cast<std::size_t>(16 * argc);
-  int* block = new int[count];
-  block[0] = argc;
-  return block[0];  // Deliberate: the block is dropped and never deleted.
+    const auto count = static_cast<std::size_t>(16 * argc);
+    int *block = new int[count];
+    block[0] = argc;
+    return block[0]; // Deliberate: the block is dropped and never deleted.
 }
 
-}  // namespace
+} // namespace
 
-int main(int argc, char** argv) {
-  (void)argv;
-  std::printf("%d\n", allocate_and_forget(argc));
-  return 0;
+int main(int argc, char **argv) {
+    (void)argv;
+    std::printf("%d\n", allocate_and_forget(argc));
+    return 0;
 }
