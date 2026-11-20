@@ -179,9 +179,9 @@ if(GUSWORLD_SANITIZER_FIXTURES)
       -DREQUIRED_TEXT=runtime\ error:\ signed\ integer\ overflow
       -P ${expect_exit_script})
 
-  # The leak code is an INFERENCE, not a measurement: LeakSanitizer may use the ASan
-  # code (55) or its own default (23, per its source). The sanitizers job prints the
-  # real code in its Diagnostic step, and a mismatch here is the red that shows it.
+  # The leak code 55 was measured on CI, not inferred: run 38316074878 (2026-10-12)
+  # printed exit code 55 for the leak fixture. If that code ever changes, this
+  # assertion is the red that denounces it.
   add_test(NAME sanitizer_leak_is_detected
     COMMAND ${CMAKE_COMMAND}
       -DEXE=$<TARGET_FILE:gusworld_sanitizer_fixture_leak>
