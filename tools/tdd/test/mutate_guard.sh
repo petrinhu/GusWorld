@@ -62,16 +62,48 @@ run_case() {
     sel="$("$root/tools/tdd/image_select.sh" "$root")" || { echo "caso $id: imagem defasada" >&2; return 1; }
     image="$(printf '%s\n' "$sel" | sed -n 's/^IMAGE_REF=//p')"
     [ -n "$image" ] || { echo "caso $id: sem IMAGE_REF" >&2; return 1; }
-    docker run --rm -i --pull never \
+    local cname="gusworld-mut-$id-$$"
+    docker run --rm -i --pull never --name "$cname" \
         --network none \
         --memory 2g --memory-swap 2g --pids-limit 80 \
         --cap-drop ALL --security-opt no-new-privileges \
         --user builder \
         "$image" \
         bash -c 'd="$(mktemp -d)" && tar -x -f - -C "$d" && cd "$d" && for t in '"$suites"'; do echo "== $t"; bash "$t" || echo "FALHA arquivo $t"; done' \
-        < "$tar_file" > "$log" 2>&1
-    echo "caso $id: contêiner terminou, log em $log"
+        < "$tar_file" > "$log" 2>&1 &
+    local run_pid=$!
+    sample_pids "$cname" "$work/$id.pids"
+    wait "$run_pid"
+    echo "caso $id: contêiner saiu com $?, log em $log"
+    echo "caso $id: pids $(cat "$work/$id.pids")"
     return 0
+}
+
+# sample_pids NAME OUT: while the container runs, keeps the highest pids.peak and the last
+# pids.events read from its cgroup v2 (found through /proc/<pid>/cgroup). The cgroup
+# vanishes with the container, so the last read before that is the final one.
+sample_pids() {
+    local name="$1" out="$2" pid cg dir peak=0 events="(nao lido)" p seen=0 waited=0
+    : > "$out"
+    while :; do
+        pid="$(docker inspect -f '{{.State.Pid}}' "$name" 2>/dev/null)" || {
+            # Not started yet: wait up to 30 s for it. Once seen, its absence means it ended.
+            if [ "$seen" -eq 1 ] || [ "$waited" -ge 600 ]; then break; fi
+            waited=$((waited + 1)); sleep 0.05; continue
+        }
+        seen=1
+        if [ -n "$pid" ] && [ "$pid" != 0 ]; then
+            cg="$(awk -F: '$1 == "0" { print $3 }' "/proc/$pid/cgroup" 2>/dev/null)"
+            dir="/sys/fs/cgroup${cg}"
+            if [ -r "$dir/pids.peak" ]; then
+                p="$(cat "$dir/pids.peak")"
+                [ "$p" -gt "$peak" ] 2>/dev/null && peak="$p"
+                events="$(tr '\n' ' ' < "$dir/pids.events" 2>/dev/null)"
+            fi
+        fi
+        sleep 0.05
+    done
+    printf 'pids.peak=%s pids.events=[%s] (limite 80)\n' "$peak" "$events" > "$out"
 }
 
 run_case baseline || { echo "linha de base nao executada: nada a comparar" >&2; exit 1; }
