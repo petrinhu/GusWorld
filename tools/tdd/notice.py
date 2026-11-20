@@ -29,6 +29,8 @@ UNKNOWN = "desconhecido"
 # Written by run_suite.sh (ASCII, as the invoker writes it), before the motive.
 NO_EXEC_PREFIX = "sem execucao: "
 PLUGIN_ID = "bigtech@petrinhu"
+PLUGIN_NAME = "bigtech"
+MARKETPLACE_ID = "petrinhu"
 GUARD_BLOCK = 2
 # /var/tmp is writable by every local user: last-reason is text from outside the trust
 # boundary, so it is read only when its folder and file pass trusted_stat, and it is
@@ -51,29 +53,98 @@ def trusted_stat(info, want_dir):
             and not info.st_mode & (stat.S_IWGRP | stat.S_IWOTH))
 
 
-def plugin_hooks_dir():
-    """The hooks/ of the user-scope bigtech plugin, from installed_plugins.json."""
-    registry = Path(os.path.expanduser("~")) / ".claude" / "plugins" / "installed_plugins.json"
+def claude_home():
+    return Path(os.path.expanduser("~")) / ".claude"
+
+
+def read_json(path):
+    """The parsed JSON object at path, or None when it is absent or unreadable."""
     try:
-        with open(registry, encoding="utf-8") as f:
-            entries = json.load(f)["plugins"][PLUGIN_ID]
-    except (OSError, ValueError, KeyError, TypeError):
-        raise PluginUnavailable()
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def marketplace_location():
+    """installLocation of the petrinhu marketplace when its source is a `directory`. The
+    known_marketplaces.json entry comes first; the settings' extraKnownMarketplaces path
+    is the fallback. None when neither applies."""
+    known = read_json(claude_home() / "plugins" / "known_marketplaces.json") or {}
+    entry = known.get(MARKETPLACE_ID)
+    if isinstance(entry, dict) and _is_directory_source(entry.get("source")):
+        location = entry.get("installLocation")
+        if isinstance(location, str):
+            return location
+    settings = read_json(claude_home() / "settings.json") or {}
+    known_extra = settings.get("extraKnownMarketplaces")
+    extra = known_extra.get(MARKETPLACE_ID) if isinstance(known_extra, dict) else None
+    if isinstance(extra, dict) and _is_directory_source(extra.get("source")):
+        path = (extra.get("source") or {}).get("path")
+        if isinstance(path, str):
+            return path
+    return None
+
+
+def _is_directory_source(source):
+    return isinstance(source, dict) and source.get("source") == "directory"
+
+
+def bigtech_relative_source(location):
+    """The relative `source` of the bigtech entry in the marketplace's marketplace.json,
+    such as "./". None when the entry is absent or its source is not relative."""
+    data = read_json(Path(location) / ".claude-plugin" / "marketplace.json") or {}
+    plugins = data.get("plugins")
+    for entry in plugins if isinstance(plugins, list) else []:
+        if isinstance(entry, dict) and entry.get("name") == PLUGIN_NAME:
+            source = entry.get("source")
+            if isinstance(source, str) and not os.path.isabs(source) and source.startswith("."):
+                return source
+    return None
+
+
+def marketplace_plugin_root():
+    """The bigtech root as Claude Code loads it from a `directory` marketplace: loaded in
+    place, so the root is installLocation + the relative source. None when the rule does
+    not apply (no directory marketplace, or no relative source for bigtech)."""
+    location = marketplace_location()
+    if location is None:
+        return None
+    source = bigtech_relative_source(location)
+    if source is None:
+        return None
+    return os.path.join(location, source)
+
+
+def installed_plugin_root():
+    """installPath of the user-scope bigtech entry in installed_plugins.json."""
+    registry = read_json(claude_home() / "plugins" / "installed_plugins.json") or {}
+    entries = (registry.get("plugins") or {}).get(PLUGIN_ID)
     for entry in entries if isinstance(entries, list) else []:
-        if not isinstance(entry, dict) or entry.get("scope") != "user":
-            continue
-        install = entry.get("installPath")
-        if not isinstance(install, str):
-            continue
-        hooks = Path(install) / "hooks"
-        try:
-            if not (trusted_stat(os.lstat(install), want_dir=True)
-                    and trusted_stat(os.lstat(hooks), want_dir=True)):
-                raise PluginUnavailable()
-        except OSError:
-            raise PluginUnavailable()
-        return hooks
+        if isinstance(entry, dict) and entry.get("scope") == "user":
+            install = entry.get("installPath")
+            if isinstance(install, str):
+                return install
     raise PluginUnavailable()
+
+
+def plugin_hooks_dir():
+    """The hooks/ of the bigtech plugin that Claude Code runs. This is the single resolver:
+    the contract test and the launcher call it too. Every root is realpath()'d before the
+    trust check, so a symlinked marketplace is judged by its target (review F2)."""
+    root = marketplace_plugin_root()
+    if root is None:
+        root = installed_plugin_root()
+    real = os.path.realpath(root)
+    hooks = Path(real) / "hooks"
+    try:
+        if not (trusted_stat(os.lstat(real), want_dir=True)
+                and trusted_stat(os.lstat(hooks), want_dir=True)):
+            raise PluginUnavailable()
+    except OSError:
+        raise PluginUnavailable()
+    return hooks
 
 
 def load_plugin():
