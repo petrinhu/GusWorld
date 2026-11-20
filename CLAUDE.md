@@ -73,21 +73,21 @@ Jogo **2D pixel-art**, single-player e offline, em **C++23**, assentado sobre o 
 
 A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C-16` com os buracos do `C-03` e do `C-13`, revogados em 25/08/2026) está na L-29. Os números revogados **não se reaproveitam**.
 
-## Estado atual do repositório (12/10/2026)
+## Estado atual do repositório (20/11/2026)
 
 **Git e remoto:**
 
 - `git rev-list --count HEAD` responde quantos commits tem o branch local `main`.
 - `git ls-remote git@github.com:petrinhu/GusWorld.git main` responde o SHA do `main` no remoto.
 - `git rev-list --count origin/main..HEAD` responde quantos commits locais ainda não foram pushados.
-- Existem **quatro** workflows de CI, cada um com o `name:` declarado: `Build` (`build.yml`, o CI de build), `Camadas` (`layers.yml`), `LEI ZERO` (`lei-zero.yml`) e `version-tag` (`version-tag.yml`). O `lei-zero.yml` nasceu no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. `gh run list --workflow=lei-zero.yml` responde quantas execuções há e a conclusão de cada uma. ⚠️ **Isto não é o CI de build do projeto**: o build é o workflow `Build`. O LEI ZERO verifica só TEXTO, sem compilar nada.
+- Existem dez workflows de CI em `.github/workflows/`, cada um com o `name:` declarado. `ls .github/workflows/*.yml | wc -l` responde quantos são, e `grep -H '^name:' .github/workflows/*.yml` responde o nome de cada um: `Build` (`build.yml`), `Camadas` (`layers.yml`), `LEI ZERO` (`lei-zero.yml`), `version-tag` (`version-tag.yml`), `Segredo no histórico` (`gitleaks.yml`), `Mensagem de commit` (`commit-gate.yml`), `Análise estática` (`cppcheck.yml`), `Análise estática com clang-tidy` (`clang-tidy.yml`), `Sanitizadores` (`sanitizers.yml`) e `Portão de CVE` (`cve.yml`). O `lei-zero.yml` nasceu no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à L-32 (push só com o GHA verde) o que checar**. `gh run list --workflow=lei-zero.yml` responde quantas execuções há e a conclusão de cada uma. ⚠️ **Isto não é o CI de build do projeto**: o build é o workflow `Build`. O LEI ZERO verifica só TEXTO, sem compilar nada.
 
 **Código-fonte: EXISTE desde 11/10/2026.** Medido por comando, não por suposição:
 
-- `find . -name CMakeLists.txt -not -path './.git/*' | wc -l` responde quantos arquivos de build há (sete em 11/10: a raiz, as cinco camadas e `tests/`).
-- `find . -name "*.cpp" -not -path './.git/*' | wc -l` responde quantas unidades de tradução há (onze em 11/10).
+- `find . -name CMakeLists.txt -not -path './.git/*' | wc -l` responde quantos arquivos de build há, `tests/` e os fixtures incluídos.
+- `find . -name "*.cpp" -not -path './.git/*' | wc -l` responde quantas unidades de tradução há.
 - **A espinha de cinco camadas existe como alvos:** `core/`, `content/`, `domain/`, `app/` e `present/`, cada uma com `CMakeLists.txt` próprio e dependência só para baixo (L-17). ⚠️ **`present/` nasce DESLIGADA**, atrás da opção `GUSWORLD_PRESENT`, porque a L-06 e a L-27 a mantêm bloqueada até o GlintFx ter entrada e texto.
-- **`tests/` existe**, com o harness próprio em `tests/harness/` (sem framework de terceiro, ADR-025) e os autotestes em `tests/selftest/`. `grep -cE '^add_test' tests/CMakeLists.txt` responde quantos testes estão registrados (sete em 11/10).
+- **`tests/` existe**, com o harness próprio em `tests/harness/` (sem framework de terceiro, ADR-025) e os autotestes em `tests/selftest/`. `grep -cE '^add_test' tests/CMakeLists.txt` responde quantos testes são registrados sem condição. Os testes do `-Werror` e dos sanitizadores ficam dentro de `if(...)` e indentados, então essa conta não os inclui. O total depende das opções de configuração, e o número que vale é o do `ctest -N` sobre o build configurado.
 - **Não há `include/` nem `src/`**, e isso é desenho, não falta: o código mora nas cinco camadas.
 - **Nada do GlintFx entra ainda.** Nenhum `find_package`, nenhum `add_subdirectory` de framework, nenhum diretório `framework/`. O submódulo entra quando `present/` for desbloqueada, por decisão do líder de 11/10/2026.
 
@@ -97,7 +97,8 @@ A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C
 - `LICENSE` (AGPL-3.0), `NOTICE`, `REUSE.toml`, `.gitattributes`, `.gitignore`, `.bigtech-porte` (`porte=bigtech`), `LICENSES/` (textos integrais SPDX).
 - `docs/`: diretórios de primeiro nível (`art`, `audio`, `book`, `design`, `narrative`, `_processo`, `production`, `qa`, `_secret`, `security`, `specs`, `tech`; `find docs -maxdepth 1 -mindepth 1 -type d | wc -l` responde quantos há; sem o `-mindepth 1` o comando conta também o próprio `docs/`, um a mais) mais `docs/licoes-aprendidas.md` na raiz de `docs/`. `docs/_secret/` é área cifrada por `git-crypt` (L-25) — só o caminho é citável, nunca o conteúdo.
 - `docs/tech/adr/`: ADRs (`ls docs/tech/adr/ADR-*.md | wc -l` responde quantos existem), com **11 números ausentes** (`002`, `003`, `008`, `009`, `010`, `011`, `012`, `013`, `014`, `015`, `018`). Eram 25 até 28/08/2026, quando o líder mandou extirpar do corpus toda dependência que a LEI ZERO proíbe — verbatim: *"extirpe essas pragas daqui do projeto!"* — e onze ADRs foram apagados por descreverem, inteiros ou quase, arquitetura ou biblioteca revogadas. ⚠️ **Número de ADR não se reaproveita**, e a linha "números aposentados" no `_INDEX.md` daquele diretório existe para impedir isso.
-- `tools/`: o portão 5 da L-19 (`tools/security/commit_gate.py`, `tools/security/test_commit_gate.py`, `tools/security/termos_proibidos.txt` cifrado, `tools/git-hooks/commit-msg`, `tools/git-hooks/install.py`).
+- `tools/ci/`: os portões de CI atomizados, um diretório por portão (`cve`, `gitleaks`, `commit_gate`, `cppcheck`, `clang_tidy`, `sanitizers`), mais `tools/ci/cmake_floor.sh`, `tools/ci/fetch_verified.sh` e `tools/ci/env/`, um script de toolchain por ambiente de build.
+- `tools/security/`: o portão 5 da L-19 (`tools/security/commit_gate.py`, `tools/security/test_commit_gate.py`, `tools/security/termos_proibidos.txt` cifrado) e os ganchos `tools/git-hooks/commit-msg` e `tools/git-hooks/install.py`.
 - `resources/` e `assets/`: existem (`ls` confirma), não inventariados aqui — fora do escopo desta tarefa.
 
 ## Decisões fechadas pelo líder
@@ -162,7 +163,16 @@ Os portões locais de texto, que não dependem de build e rodam desde agosto:
 - `python3 tools/security/test_commit_gate.py` e `python3 tools/security/test_lei_zero_guard.py` rodam os autotestes dos dois.
 - `python3 tools/ci/check_version_matches_tag.py v0.0.0.1` confere a tag contra a versão declarada. ⚠️ Ele **reprova em clone raso**, de propósito: num clone raso as tags podem não ter sido buscadas, e um casamento aparente seria falso verde.
 
-**Quatro workflows existem:** `build.yml` (`Build`, o CI de build), `layers.yml` (`Camadas`, gate de camadas da L-17, que só roda o pré-processador), `lei-zero.yml` (`LEI ZERO`, verifica texto, não compila) e `version-tag.yml` (`version-tag`, só dispara em push de tag). O `Build` **é** o CI de build e **passou**: run `38198558806`, SHA `1abee36`, 12 passos verdes na entrada Fedora (`fedora:latest`), com `git version 2.56.0`, `cmake version 4.3.0` e `Total Tests: 7` (`100% tests passed, 0 tests failed out of 7`). A matriz tem **nove** entradas e **uma** está provada: o Fedora, com `cc` e `c++` (GCC no Fedora), item `C4a`. As **oito** entradas que faltam são o item `C4b`: o Clang do Fedora, GCC e Clang em Ubuntu (`ubuntu:latest`), Arch (`archlinux:latest`) e CachyOS (`cachyos/cachyos:latest`, job próprio, não é Arch renomeado), e MSVC no Windows (`windows-latest`).
+**Dez workflows existem** (a lista de nomes está na seção de estado). Os que provam o build:
+
+- `build.yml` (`Build`) configura com `cmake -S . -B build -DGUSWORLD_WERROR=ON` e roda `ctest` em nove entradas de matriz (`grep -c '^          - name:' .github/workflows/build.yml` responde quantas são). As plataformas são Fedora (`fedora:latest`), Ubuntu, Arch, CachyOS (`cachyos/cachyos:latest`, job próprio, não é Arch renomeado), cada uma com GCC e Clang, e Windows com MSVC (`windows-latest`). Todas as imagens Linux estão em `:latest`.
+- Prova medida: run `44737723604`, `headSha` `e9be1a0`, nove jobs com `conclusion` `success`. Cada job mostra `100% tests passed` sobre `Total Tests: 10`. Esse run não é prova do HEAD atual, que é outro commit.
+- `sanitizers.yml` (`Sanitizadores`) configura com `-DGUSWORLD_SANITIZER_FIXTURES=ON`, o que acrescenta os testes dos fixtures de sanitizadores. O total desse job não foi medido aqui.
+- `cve.yml` (`Portão de CVE`) é o sexto portão, fora dos cinco da L-19, e roda só no Fedora (TST-3a). Usa grype `0.122.1` com SHA-256 fixo e barra só CVE crítica com correção publicada. Prova medida: run `44755957346`, `headSha` `89ba42e`, `conclusion` `success`, com veredictos `finding` (caso positivo), `zero` (piso) e `accept` (varredura real), e `VERSION_ID=45` no log.
+
+Os demais workflows (`layers.yml`, `lei-zero.yml`, `version-tag.yml`, `gitleaks.yml`, `commit-gate.yml`, `cppcheck.yml` e `clang-tidy.yml`) não entram nesta prova. Para o estado deles, use `gh run list --workflow=<arquivo>`. O `Build` é o CI de build, e o `LEI ZERO` verifica só texto, sem compilar nada.
+
+Os portões de CI em `tools/ci/<portão>/` são scripts de uma responsabilidade cada. O workflow só orquestra, e cada veredicto sai de um script.
 
 ## Restrições desta máquina que mordem este projeto
 
