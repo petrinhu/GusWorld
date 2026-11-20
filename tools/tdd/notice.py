@@ -199,8 +199,12 @@ def clean_text(text):
 
 
 def fresh_enough(mtime, state):
-    """A last-reason older than the state's ts belongs to an earlier run: it is ignored."""
-    ts = state.get("ts") if isinstance(state, dict) else None
+    """A last-reason older than the state's ts belongs to an earlier run: it is ignored.
+    Without a state there is no ts to compare with, so the last-reason is not trusted
+    (R2): no state never lets an old last-reason become the motive."""
+    if not isinstance(state, dict):
+        return False
+    ts = state.get("ts")
     if not isinstance(ts, (int, float)) or isinstance(ts, bool):
         return True
     return mtime >= ts
@@ -233,7 +237,9 @@ def motive_for(data, common, msg):
     try:
         state = common.read_state(root)
     except OSError:
-        state = None
+        # R2: the state cannot be read, so the motive is the guard's own I/O message and
+        # never a last-reason left by an earlier run.
+        return clean_text(msg).rstrip(".")[:MAX_MOTIVE] or UNKNOWN
     return motive(state, msg, root)
 
 
