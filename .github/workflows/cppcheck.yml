@@ -92,7 +92,7 @@ jobs:
       # broken scan, not a clean tree (L-36).
       - name: Enumerate the sources (zero is a failure)
         run: |
-          set -eu
+          set -eu -o pipefail
           find . -name '*.cpp' -not -path './.git/*' -not -path './tests/fixtures/*' \
             | sort > "$RUNNER_TEMP/sources.txt"
           found="$(wc -l < "$RUNNER_TEMP/sources.txt")"
@@ -114,6 +114,7 @@ jobs:
       # Exit 1 is a finding OR an invalid argument; the log is printed for either.
       # Checking lines are read from the log: the manual does not document their format,
       # so the count is a measurement that the CI log has to confirm.
+      # Limit: cppcheck runs without --enable, so a clean result covers only the default checks (error severity).
       - name: Gate, cppcheck on the real tree
         run: |
           set -u

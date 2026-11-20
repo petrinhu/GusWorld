@@ -106,7 +106,7 @@ jobs:
       # broken scan, not a clean tree (L-36).
       - name: Enumerate the sources (zero is a failure)
         run: |
-          set -eu
+          set -eu -o pipefail
           find . -name '*.cpp' -not -path './.git/*' -not -path './tests/fixtures/*' \
             | sort > "$RUNNER_TEMP/sources.txt"
           found="$(wc -l < "$RUNNER_TEMP/sources.txt")"
@@ -129,7 +129,7 @@ jobs:
       # exactly, in both directions, before the gate runs.
       - name: Compile database matches the tree exactly (both directions)
         run: |
-          set -eu
+          set -eu -o pipefail
           export LC_ALL=C
           db="$RUNNER_TEMP/clang-tidy-build/compile_commands.json"
           grep -o '"file": *"[^"]*"' "$db" | sed 's/^"file": *"//; s/"$//' | sort -u \
