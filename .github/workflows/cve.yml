@@ -66,10 +66,20 @@ jobs:
         include:
           - name: Fedora (grype)
             image: fedora:latest
+            distro: fedora
+            trivy: false
+            git_install: "dnf -y install git"
+          - name: Ubuntu (trivy e grype)
+            image: ubuntu:latest
+            distro: ubuntu
+            trivy: true
+            git_install: "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git"
     steps:
       # The image ships without git. Install it first, so the checkout is a real git clone.
+      # The command comes from the matrix because the repository (and so any script in it)
+      # does not exist yet at this step. It is the same per-image data as build.yml.
       - name: Install git before the checkout
-        run: dnf -y install git
+        run: ${{ matrix.git_install }}
 
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -84,17 +94,20 @@ jobs:
       # The same toolchain as the build, so the scan covers the real build environment.
       # The script is only read here, never edited.
       - name: Install the build toolchain
-        run: bash tools/ci/env/fedora.sh
+        run: bash tools/ci/env/${{ matrix.distro }}.sh
 
-      # report.sh reads the grype JSON with jq. Installed in the CI container only.
-      - name: Install jq for the report
-        run: dnf -y install jq
+      # The gate's own prerequisites (jq for the report, curl and ca-certificates where the
+      # image lacks them). Per distro, in tools/ci/cve/env/, not in the shared build toolchain.
+      - name: Install the CVE gate prerequisites
+        run: bash tools/ci/cve/env/${{ matrix.distro }}.sh
 
       # The job-level env cannot read the runner context (GitHub contexts table, jobs.<job_id>.env),
-      # so the cache path is written from a step, where runner.temp is available.
-      # The cache lives under the runner temp dir, which the real scan excludes.
-      - name: Point the grype database cache under the runner temp dir
-        run: echo "GRYPE_DB_CACHE_DIR=$RUNNER_TEMP/grype-db" >> "$GITHUB_ENV"
+      # so the cache paths are written from a step, where runner.temp is available.
+      # The caches live under the runner temp dir, which the real scan excludes.
+      - name: Point the grype and trivy database caches under the runner temp dir
+        run: |
+          echo "GRYPE_DB_CACHE_DIR=$RUNNER_TEMP/grype-db" >> "$GITHUB_ENV"
+          echo "TRIVY_CACHE_DIR=$RUNNER_TEMP/trivy-cache" >> "$GITHUB_ENV"
 
       - name: Install grype pinned by SHA-256
         run: bash tools/ci/cve/install_grype.sh "$RUNNER_TEMP/bin"
@@ -104,6 +117,11 @@ jobs:
           set -eu
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
           "$RUNNER_TEMP/bin/grype" version
+
+      # trivy goes to the same bin directory, which is already on PATH. Only the Ubuntu entry runs it.
+      - name: Install trivy pinned by SHA-256
+        if: matrix.trivy
+        run: bash tools/ci/cve/trivy/install_trivy.sh "$RUNNER_TEMP/bin"
 
       # always() here does not depend on the real scan, which runs later. It makes the proof
       # run even if an earlier step failed, so a red run still shows whether the gate works.
@@ -117,17 +135,47 @@ jobs:
             exit 1
           fi
           mkdir -p "$RUNNER_TEMP/proof-empty-dir"
-          if ! bash "$expect" zero fedora "$RUNNER_TEMP/proof-empty" "dir:$RUNNER_TEMP/proof-empty-dir"; then
+          if ! bash "$expect" zero "${{ matrix.distro }}" "$RUNNER_TEMP/proof-empty" "dir:$RUNNER_TEMP/proof-empty-dir"; then
             echo "PROOF B FAILED: the empty directory was not judged zero"
             exit 1
           fi
           echo "PROOF PASSED: A judged finding, B judged zero"
 
+      # The trivy proof has the same two cases and the same expect.sh path, with the trivy
+      # scan selected through CVE_SCAN. Both cases run before the verdict, so a red run shows
+      # the raw facts of each one, and the message names the case that failed.
+      - name: Trivy proof of strength, the gate must judge an old vulnerable image and an empty directory
+        if: always() && matrix.trivy
+        run: |
+          set -u
+          expect="$GITHUB_WORKSPACE/tools/ci/cve/expect.sh"
+          export CVE_SCAN="$GITHUB_WORKSPACE/tools/ci/cve/trivy/scan.sh"
+          a=0
+          bash "$expect" finding alpine "$RUNNER_TEMP/proof-trivy-alpine" "registry:alpine@sha256:de25c7fc6c4f3a27c7f0c2dff454e4671823a34d88abd533f210848d527e0fbb" || a=1
+          mkdir -p "$RUNNER_TEMP/proof-trivy-empty-dir"
+          b=0
+          bash "$expect" zero "${{ matrix.distro }}" "$RUNNER_TEMP/proof-trivy-empty" "dir:$RUNNER_TEMP/proof-trivy-empty-dir" || b=1
+          if [ "$a" -ne 0 ]; then echo "TRIVY PROOF A FAILED: the old Alpine image was not judged a finding"; fi
+          if [ "$b" -ne 0 ]; then echo "TRIVY PROOF B FAILED: the empty directory was not judged zero"; fi
+          if [ "$a" -ne 0 ] || [ "$b" -ne 0 ]; then exit 1; fi
+          echo "TRIVY PROOF PASSED: A judged finding, B judged zero"
+
+      # The grype database sources are read here: grype db status prints where the database
+      # lives and when it was built. It does not list the upstream feeds, so the sources of
+      # each match are printed by the grype report (namespace and dataSource).
+      - name: Print the grype database status
+        if: always()
+        run: grype db status || echo "grype db status failed"
+
+      - name: Print the trivy version and database status
+        if: always() && matrix.trivy
+        run: bash tools/ci/cve/trivy/db_status.sh
+
       - name: Scan the real build environment
         run: |
           set -u
           expect="$GITHUB_WORKSPACE/tools/ci/cve/expect.sh"
-          if ! bash "$expect" accept fedora "$RUNNER_TEMP/scan-fedora" "dir:/" \
+          if ! bash "$expect" accept "${{ matrix.distro }}" "$RUNNER_TEMP/scan-${{ matrix.distro }}" "dir:/" \
             --exclude './proc/**' --exclude './sys/**' --exclude './dev/**' \
             --exclude './__e/**' --exclude './__w/**' --exclude './__t/**' \
             --exclude './github/**'; then
@@ -141,6 +189,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: grype-fedora-real-scan
-          path: ${{ runner.temp }}/scan-fedora/grype.json
+          name: grype-${{ matrix.distro }}-real-scan
+          path: ${{ runner.temp }}/scan-${{ matrix.distro }}/grype.json
           if-no-files-found: warn
