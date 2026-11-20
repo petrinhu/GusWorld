@@ -28,7 +28,7 @@ jobs:
         run: dnf -y install git
 
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Container jobs run as root, and root sees the workspace as "dubious ownership".
       - name: Git safe.directory for the container

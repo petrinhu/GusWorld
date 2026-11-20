@@ -72,7 +72,7 @@ jobs:
         run: dnf -y install git
 
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -139,7 +139,7 @@ jobs:
       # Attached even when the scan rejects, so the full list is in the run for download.
       - name: Attach the full grype JSON of the real scan
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: grype-fedora-real-scan
           path: ${{ runner.temp }}/scan-fedora/grype.json

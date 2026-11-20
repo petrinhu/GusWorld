@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Third-party actions are pinned by full commit SHA, never by a moving tag (C12).
+# A pin does not update itself, so this file is what keeps them current: once a
+# month Dependabot opens a pull request that bumps the SHA and the "# vX.Y.Z"
+# comment beside it together. The single "actions" group puts every action bump
+# into one pull request, so the review is one diff. No cooldown is set on purpose:
+# a fresh release is reviewed the day it arrives, not held back.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]

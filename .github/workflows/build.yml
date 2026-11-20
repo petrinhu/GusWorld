@@ -108,7 +108,7 @@ jobs:
 
       # Default depth: no test in the current suite reads history or tags.
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Container jobs run as root, and root sees the workspace owned by the
       # runner user as "dubious ownership" (CVE-2022-24765). Set this before
