@@ -29,6 +29,7 @@ case "$mode" in
   *) policy=(--error-exitcode=1) ;;
 esac
 
+# rc is taken with "|| rc=$?", so the real exit code is kept under set -e.
 rc=0
 cppcheck --std=c++23 "${policy[@]}" "${inputs[@]}" > "$log" 2>&1 || rc=$?
 cat "$log"

@@ -69,8 +69,6 @@ jobs:
           set -eu
           cmake -S . -B "$RUNNER_TEMP/cppcheck-build" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           test -s "$RUNNER_TEMP/cppcheck-build/compile_commands.json"
-          entries="$(grep -c '"file"' "$RUNNER_TEMP/cppcheck-build/compile_commands.json")" || true
-          echo "compile database entries (informative, root build without present/): ${entries:-<unreadable>}"
 
       # Every .cpp of the tree, fixtures excluded, into the list file. The script
       # refuses an empty list (zero is a failure, L-36).

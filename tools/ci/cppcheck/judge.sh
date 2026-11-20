@@ -18,12 +18,15 @@ target="${4:?target missing}"
 judge_real() {
   local found analysed
   found="$(wc -l < "$target")"
+  # Checking lines are read from the log: the manual does not document their format,
+  # so the count is a measurement that the CI log has to confirm.
   analysed="$(grep -c '^Checking ' "$log")" || true
   echo "exit code: ${rc}"
   echo "encontrados: ${found}, analisados (Checking lines): ${analysed:-<unreadable>}"
   case "$rc" in
     0) ;;
     1)
+      # Exit 1 is a finding OR an invalid argument; the log is printed for either.
       echo "FAIL: cppcheck exit 1, a finding or an invalid argument (read the log above)"
       exit 1
       ;;
@@ -81,6 +84,10 @@ judge_proof() {
       exit 1
       ;;
   esac
+  # The gate must exit 1 AND print the finding id (with). Exit 1 alone is not enough.
+  # Without the option the trap must exit 0 WITH the finding in the log. If cppcheck ever
+  # exits non zero there, the premise of this job has changed, and the job fails so
+  # someone reads it.
   if [ "$rc" -ne "$want_rc" ] || [ "$hits" -lt 1 ]; then
     echo "FAIL: ${want_text}, got exit ${rc} and ${hits}"
     exit 1
