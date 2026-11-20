@@ -10,10 +10,10 @@
 #
 # The compiler comes from the workflow matrix when the workflow has one (the
 # build job sets CC and CXX per entry, GCC or Clang). A workflow without a
-# matrix gets the default: cc and c++, the compilers this script used before
-# the matrix existed. Set CC and CXX in the environment to override it.
+# matrix gets the default: cc and c++. Set CC and CXX in the environment to
+# override it.
 #
-# Measured 11/10/2026 in fedora:latest (Fedora 44, local cache, no pull):
+# Measured 20/11/2026 in fedora:latest (Fedora 45, cmake 4.3.0 from dnf):
 # dnf provides cmake 4.3.0, above the 4.1 floor, so no SHA-pinned download
 # is needed here (that path exists in layers.yml only because the bare
 # ubuntu-latest runner ships cmake 3.31.6). The image ships WITHOUT git and
