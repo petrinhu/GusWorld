@@ -96,7 +96,7 @@ A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C
 - Arquivos `.md` na raiz (`ls *.md | wc -l` responde quantos há; inclui este `CLAUDE.md`): os manuais listados em "Autoridade documental" abaixo, mais `GODS_LAWS.md`, `TODO.md`, `inicial.md`, `README.md`, `sinopse.md`, `CHARS.md`, `PLACES.md`.
 - `LICENSE` (AGPL-3.0), `NOTICE`, `REUSE.toml`, `.gitattributes`, `.gitignore`, `.bigtech-porte` (`porte=bigtech`), `LICENSES/` (textos integrais SPDX).
 - `docs/`: diretórios de primeiro nível (`art`, `audio`, `book`, `design`, `narrative`, `_processo`, `production`, `qa`, `_secret`, `security`, `specs`, `tech`; `find docs -maxdepth 1 -mindepth 1 -type d | wc -l` responde quantos há; sem o `-mindepth 1` o comando conta também o próprio `docs/`, um a mais) mais `docs/licoes-aprendidas.md` na raiz de `docs/`. `docs/_secret/` é área cifrada por `git-crypt` (L-25) — só o caminho é citável, nunca o conteúdo.
-- `docs/tech/adr/`: ADRs (`ls docs/tech/adr/ADR-*.md | wc -l` responde quantos existem), com **11 números ausentes** (`002`, `003`, `008`, `009`, `010`, `011`, `012`, `013`, `014`, `015`, `018`). Eram 25 até 28/08/2026, quando o líder mandou extirpar do corpus toda dependência que a LEI ZERO proíbe — verbatim: *"extirpe essas pragas daqui do projeto!"* — e onze ADRs foram apagados por descreverem, inteiros ou quase, arquitetura ou biblioteca revogadas. ⚠️ **Número de ADR não se reaproveita**, e a linha "números aposentados" no `_INDEX.md` daquele diretório existe para impedir isso.
+- `docs/tech/adr/`: ADRs (`ls docs/tech/adr/ADR-*.md | wc -l` responde quantos existem). Os números ausentes estão na linha **Não presentes** (números aposentados) de `docs/tech/adr/_INDEX.md`. ⚠️ **Número de ADR não se reaproveita.**
 - `tools/ci/`: os portões de CI atomizados, um diretório por portão (`cve`, `gitleaks`, `commit_gate`, `cppcheck`, `clang_tidy`, `sanitizers`), mais `tools/ci/cmake_floor.sh`, `tools/ci/fetch_verified.sh` e `tools/ci/env/`, um script de toolchain por ambiente de build.
 - `tools/security/`: o portão 5 da L-19 (`tools/security/commit_gate.py`, `tools/security/test_commit_gate.py`, `tools/security/termos_proibidos.txt` cifrado) e os ganchos `tools/git-hooks/commit-msg` e `tools/git-hooks/install.py`.
 - `resources/` e `assets/`: existem (`ls` confirma), não inventariados aqui — fora do escopo desta tarefa.
@@ -161,7 +161,7 @@ Os portões locais de texto, que não dependem de build e rodam desde agosto:
 
 - `tools/git-hooks/install.py` instala `tools/security/commit_gate.py` como gancho `commit-msg` e `tools/security/lei_zero_guard.py` como `pre-commit`.
 - `python3 tools/security/test_commit_gate.py` e `python3 tools/security/test_lei_zero_guard.py` rodam os autotestes dos dois.
-- `python3 tools/ci/check_version_matches_tag.py v0.0.0.1` confere a tag contra a versão declarada. ⚠️ Ele **reprova em clone raso**, de propósito: num clone raso as tags podem não ter sido buscadas, e um casamento aparente seria falso verde.
+- `python3 tools/ci/check_version_matches_tag.py vA.B.C.D` confere a tag contra a versão declarada. ⚠️ Ele **reprova em clone raso**, de propósito: num clone raso as tags podem não ter sido buscadas, e um casamento aparente seria falso verde.
 
 **Dez workflows existem** (a lista de nomes está na seção de estado). Os que provam o build:
 
