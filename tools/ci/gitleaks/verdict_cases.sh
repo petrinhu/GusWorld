@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Text tests of the guard verdict: 18 fabricated logs, with no secret and no scan.
-# Single responsibility: assert each judge outcome. It calls the same guard.sh that the
-# red proofs and the real scan call, found beside this file.
+# Single responsibility: assert each judge outcome. It calls the same guard.sh that expect.sh
+# calls for the red proofs and the real scan, found beside this file.
 # Usage: verdict_cases.sh   (reads RUNNER_TEMP, which the CI runner always sets)
 set -eu -o pipefail
 

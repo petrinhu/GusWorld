@@ -59,8 +59,10 @@
 #   from the tool exit code. The zero-count branch is also proved on its own, by
 #   fabricated log text with no secret.
 #
-# ONE SCAN COMMAND. tools/ci/gitleaks/guard.sh holds the only gitleaks invocation. Every step
-# calls that file, so the red proofs and the real scan cannot drift apart.
+# ONE SCAN COMMAND. tools/ci/gitleaks/guard.sh holds the only gitleaks invocation. The verdict
+# steps reach it through tools/ci/gitleaks/expect.sh. The allowlist red proof runs
+# tools/ci/gitleaks/expect_allowlist_rejects.sh, which calls allowlist_gate.sh. So the red
+# proofs and the real scan cannot drift apart.
 #
 # SECRET RULE. No fixture that looks like a secret is committed to this repository
 # (global GODS_LAWS L-28, project GODS_LAWS L-28). The only key in this workflow is

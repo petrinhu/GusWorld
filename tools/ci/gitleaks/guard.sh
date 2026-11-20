@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Single definition of the scan and of the verdict. Every step calls this file.
+# Single definition of the scan and of the verdict. The steps reach it through expect.sh.
 #   guard.sh scan <repo> <log>        runs gitleaks, then judges the outcome
 #   guard.sh judge <exit-code> <log>  judges an outcome already recorded
 # Prints GUARD_RC, GUARD_COUNT, GUARD_VERDICT and GUARD_REASON. Exit 0 only on accept.
