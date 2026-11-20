@@ -20,7 +20,19 @@ log="$state/last.log"
 list="$state/src.list"
 tar_file="$state/src.tar"
 
-mkdir -p "$state" || exit 126
+# The state directory must be private to this uid, not a link, not writable by others
+# (state_dir.sh, review of the notice.py finding). Anything else is no run: 126.
+"$here/state_dir.sh" "$state" || exit 126
+
+# No state file may be a link: a write through a link would reach its target. Checked
+# before any write, so a planted link refuses the run and touches nothing.
+for f in "$reason_file" "$log" "$list" "$tar_file"; do
+    if [ -L "$f" ]; then
+        echo "tdd run_suite: sem execucao, $f e link simbolico, recusado" >&2
+        exit 126
+    fi
+done
+
 : > "$log" || exit 126
 
 record() {

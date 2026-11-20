@@ -42,7 +42,16 @@ detail_of() {
     printf '%s\n' "$1" | sed -n 's/^tdd: //p' | sed -n '$p'
 }
 
-mkdir -p "$state" || refuse "estado $state inacessivel"
+# The spec of the container (ADR-026, decision 7) is read from its single source.
+# shellcheck source=container_spec.sh
+. "$here/container_spec.sh"
+
+# The state directory is private to this uid, not a link, not writable by others (state_dir.sh,
+# review of the notice.py finding). The files this script writes there are never links.
+"$here/state_dir.sh" "$state" || refuse "estado $state inseguro"
+for f in "$list" "$tar_file" "$work_tar"; do
+    [ ! -L "$f" ] || refuse "estado: $f e link simbolico, recusado"
+done
 
 msg="$("$here/docker_ready.sh" 2>&1)" || refuse "docker: $msg"
 
@@ -61,9 +70,10 @@ if timeout 20 docker container inspect --format '{{.Id}}' "$ctr" >/dev/null 2>&1
         || refuse "contêiner $ctr existente reprovado: $msg"
     echo "prepare: contêiner $ctr reaproveitado, aprovado pelo container_ready"
 else
-    timeout 60 docker create --name "$ctr" --pull never --network none \
-        --cap-drop ALL --security-opt no-new-privileges --user builder \
-        --memory 4g --memory-swap 4g --pids-limit 233 --cpus 4 \
+    timeout 60 docker create --name "$ctr" --pull never --network "$SPEC_NETWORK" \
+        --cap-drop ALL --security-opt no-new-privileges --user "$SPEC_USER" \
+        --memory "$SPEC_MEMORY" --memory-swap "$SPEC_MEMORY_SWAP" \
+        --pids-limit "$SPEC_PIDS" --cpus "$SPEC_CPUS" \
         "$image_id" sleep infinity >/dev/null 2>&1 || refuse "docker create falhou para $ctr"
     timeout 60 docker start "$ctr" >/dev/null 2>&1 || refuse "docker start falhou para $ctr"
     echo "prepare: contêiner $ctr criado da imagem $image_id"
@@ -79,6 +89,10 @@ ensure_work() {
     uid="$(timeout 20 docker exec "$ctr" id -u)" || refuse "id -u no contêiner falhou"
     gid="$(timeout 20 docker exec "$ctr" id -g)" || refuse "id -g no contêiner falhou"
     mkdir -p "$seed/work" || refuse "seed de /work inacessivel"
+    # The seed must be empty before the tar is built: a leftover file would go in (BAIXA-5).
+    if [ -n "$(ls -A "$seed/work")" ]; then
+        refuse "seed de /work nao esta vazio: $seed/work"
+    fi
     tar --owner="$uid" --group="$gid" -C "$seed" -cf "$work_tar" work || refuse "tar de /work falhou"
     timeout 60 docker cp - "$ctr:/" < "$work_tar" || refuse "docker cp de /work falhou"
     timeout 20 docker exec "$ctr" test -w /work >/dev/null 2>&1 \
@@ -101,7 +115,11 @@ verdict="$(printf '%s\n' "$warm_out" | sed -n 's/^tdd-verdict: //p' | sed -n '$p
 det="$(detail_of "$warm_out")"
 
 if [ "$cache_before" = no ]; then
-    [ "$verdict" = 3 ] || refuse "aquecimento frio devolveu veredito ${verdict:-nenhum}, esperado 3${det:+: $det}"
+# A cold verdict 3 is accepted only with the cold marker of in_container.sh (MÉDIA-1).
+    # Any other 3 (busy lock, broken extraction, CMake regeneration) is a refusal with its reason.
+    if [ "$verdict" != 3 ] || ! printf '%s\n' "$warm_out" | grep -qF 'tdd: contêiner frio, sem CMakeCache'; then
+        refuse "aquecimento frio devolveu veredito ${verdict:-nenhum}, sem a linha de contêiner frio${det:+: $det}"
+    fi
 
     cfg_out="$(timeout 300 docker exec "$ctr" cmake -S /work/src -B /work/build -G Ninja 2>&1)" || {
         printf '%s\n' "$cfg_out" >&2

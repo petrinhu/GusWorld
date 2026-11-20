@@ -64,11 +64,25 @@ passa a avisar o agente.
 3. **Contêiner de vida longa, sem volume (opção A).** A árvore entra por
    `docker exec -i` num contêiner `gusworld-tdd-<hash16>`. A opção B seria um
    volume nomeado, não adotada agora.
-4. **Dentro do contêiner.** `tools/tdd/in_container.sh` faz a trava por `mkdir`
-   (34 s), define `XDG_RUNTIME_DIR` com permissão 700, confere que `ctest -N`
-   tem valor maior que zero e roda build e `ctest` (89 s).
+4. **Dentro do contêiner.** `tools/tdd/in_container.sh` faz a trava por `ln -s`
+   (34 s): o alvo do link é o pid do dono, e um dono morto expira na hora. Define
+   `XDG_RUNTIME_DIR` com permissão 700, confere que `ctest -N` tem valor maior que
+   zero e roda build e `ctest` (89 s). A extração e o `touch_changed.sh` também
+   contam no mesmo orçamento de 89 s, cada um sob `timeout` com o que sobra (revisão,
+   MÉDIA-3). Ao fim de cada execução, a linha `tdd-tempo: N` diz quantos segundos
+   passaram desde a trava; é o relógio que o prazo limita, e o veredito vem logo depois.
 5. **Prazos.** `timeout_sec` de 144 s. O trabalho interno cabe em 89 s, e a trava
-   em 34 s.
+   em 34 s. A variável `GUSWORLD_TDD_BUDGET`, que o `run_suite.sh` repassa ao
+   `docker exec` só quando o host a define, **só aperta** o orçamento: aceita inteiro
+   positivo menor que 89, e qualquer outro valor é ignorado. Nunca afrouxa.
+   **Nota de desenho:** apertar o prazo faz o guard devolver `126` (não rodou) nos
+   trabalhos que passam do novo limite. Isso é fail-open por construção: o guard não
+   libera produção por prazo apertado, e a falha aparece no motivo do `last-reason`.
+   A fonte única dos valores do contêiner (memória, swap, pids, CPUs, usuário, rede)
+   é `tools/tdd/container_spec.sh`, lido por `prepare.sh`, `container_ready.sh` e pelos
+   testes. O `container_ready.sh` confere o HostConfig com esses valores exatos
+   (incluindo CapAdd vazio e PidMode, IpcMode, UTSMode e UsernsMode vazios ou
+   privados) antes de qualquer `docker start`.
 6. **Contêiner frio.** Quando o contêiner não existe, o guard devolve `126`, que
    o runner trata como "não rodou". O aquecimento é feito por
    `tools/tdd/prepare.sh`, em segundo plano.

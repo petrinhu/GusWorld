@@ -106,7 +106,16 @@ budget_left() {
 # Extract beside the live tree, then swap. A failed extraction never touches src.
 rm -rf "$W/src.new" || finish 3
 mkdir -p "$W/src.new" || finish 3
-tar -x -f - -C "$W/src.new" || { echo "tdd: extracao da arvore falhou" >&2; finish 3; }
+# The extraction is inside the budget too (review MÉDIA-3): what is left of the 89 s bounds it.
+left="$(budget_left)"
+[ "$left" -gt 0 ] || { echo "tdd: estouro de prazo antes da extracao" >&2; finish 3; }
+timeout "$left" tar -x -f - -C "$W/src.new"
+rc=$?
+case "$rc" in
+    0) ;;
+    124|137) echo "tdd: estouro de prazo na extracao" >&2; finish 3 ;;
+    *) echo "tdd: extracao da arvore falhou" >&2; finish 3 ;;
+esac
 rm -rf "$W/src.old" || finish 3
 if [ -d "$W/src" ]; then
     mv "$W/src" "$W/src.old" || finish 3
@@ -116,8 +125,16 @@ rm -rf "$W/src.old"
 
 # tar keeps host mtimes: touch the files whose content changed since the last run, or
 # the build would skip them (a false green). The manifest lives beside src, not in it.
-"$W/src/tools/tdd/touch_changed.sh" "$W/src" "$W/manifest.sha256" \
-    || { echo "tdd: deteccao de mudanca falhou" >&2; finish 3; }
+# The touch runs inside the same budget (review MÉDIA-3), with what is left of it.
+left="$(budget_left)"
+[ "$left" -gt 0 ] || { echo "tdd: estouro de prazo antes da deteccao de mudanca" >&2; finish 3; }
+timeout "$left" "$W/src/tools/tdd/touch_changed.sh" "$W/src" "$W/manifest.sha256"
+rc=$?
+case "$rc" in
+    0) ;;
+    124|137) echo "tdd: estouro de prazo na deteccao de mudanca" >&2; finish 3 ;;
+    *) echo "tdd: deteccao de mudanca falhou" >&2; finish 3 ;;
+esac
 
 # shellcheck source=xdg_check.sh
 . "$W/src/tools/tdd/xdg_check.sh" || finish 3
