@@ -74,29 +74,67 @@ PY
 }
 
 mkdir -p "$(dirname "$REASON")"
-printf '%s' '{"ran": false, "reason": "timeout", "ts": 0}' > "$STATE"
 printf '%s' 'sem execucao: docker: daemon fora do ar' > "$REASON"
 
-# Control first: a production file with ran=false must warn with the real guard. Only
-# then do the mute cases below prove anything.
-text_case "controle: producao com ran=false avisa com o motivo do run_suite" "$NO_RUN" core/a.cpp
+# set_state CONTENT: the guard's state file, with its folder created first. (Before this
+# fix the folder was missing, the write failed, and the mute cases passed for free.)
+set_state() {
+    mkdir -p "$(dirname "$STATE")"
+    printf '%s' "$1" > "$STATE"
+}
 
-# The guard's own silences: the notice mirrors them and stays mute.
-mute_case "TDD_GUARD=off fica mudo" core/a.cpp TDD_GUARD=off
-mute_case "TDD_PHASE=refactor fica mudo" core/a.cpp TDD_PHASE=refactor
-mute_case "edicao em docs/ fica muda" docs/x.md
-mute_case "edicao em tools/ fica muda" tools/tdd/x.py
+# state_is CONTENT: the state file exists and holds exactly CONTENT.
+state_is() {
+    [ -f "$STATE" ] && [ "$(cat "$STATE")" = "$1" ]
+}
+
+# mute_with_state NAME REL CONTENT [VAR=VAL...]: a mute case runs only after its state
+# precondition holds, so a missing or wrong file can never make the case pass by itself.
+mute_with_state() {
+    local name="$1" rel="$2" content="$3"
+    shift 3
+    if state_is "$content"; then
+        mute_case "$name" "$rel" "$@"
+    else
+        fail_case "$name" "precondicao: estado [$content] nao gravado em $STATE"
+    fi
+}
+
+RUN_STATE='{"ran": false, "reason": "timeout", "ts": 0}'
+
+# Control first: a production file with ran=false must warn with the real guard. The
+# state precondition is checked before the warning, and only then do the mute cases
+# below prove anything.
+set_state "$RUN_STATE"
+if state_is "$RUN_STATE"; then
+    text_case "controle: producao com ran=false avisa com o motivo do run_suite" "$NO_RUN" core/a.cpp
+else
+    fail_case "controle: estado ran=false gravado antes do aviso" "estado nao gravado em $STATE"
+fi
+
+# The guard's own silences: the notice mirrors them and stays mute. Each runs with the
+# ran=false state present, so the silence is the guard's classification, not a missing file.
+mute_with_state "TDD_GUARD=off fica mudo" core/a.cpp "$RUN_STATE" TDD_GUARD=off
+mute_with_state "TDD_PHASE=refactor fica mudo" core/a.cpp "$RUN_STATE" TDD_PHASE=refactor
+mute_with_state "edicao em docs/ fica muda" docs/x.md "$RUN_STATE"
+mute_with_state "edicao em tools/ fica muda" tools/tdd/x.py "$RUN_STATE"
 
 # The guard blocks production without a state, so the notice stays mute and does not
-# repeat the block (the guard speaks for itself, exit 2).
+# repeat the block (the guard speaks for itself, exit 2). The precondition is that the
+# state file does not exist.
 rm -f -- "$STATE"
-mute_case "producao sem estado: guard bloqueia, notice mudo" core/a.cpp
+if [ -e "$STATE" ]; then
+    fail_case "producao sem estado: precondicao, arquivo nao deve existir" "$STATE existe"
+else
+    mute_case "producao sem estado: guard bloqueia, notice mudo" core/a.cpp
+fi
 
-printf '%s' 'null' > "$STATE"
-mute_case "estado null com producao: guard bloqueia, notice mudo" core/a.cpp
+set_state 'null'
+mute_with_state "estado null com producao: guard bloqueia, notice mudo" core/a.cpp 'null'
 
-printf '%s' '{"ran": true, "has_red": true, "exit_code": 1}' > "$STATE"
-mute_case "ran=true com vermelho: guard deixa passar, notice mudo" core/a.cpp
+set_state '{"ran": true, "has_red": true, "exit_code": 1}'
+mute_with_state "ran=true com vermelho: guard deixa passar, notice mudo" core/a.cpp \
+    '{"ran": true, "has_red": true, "exit_code": 1}'
 
 rm -rf -- "$FX" "/var/tmp/gusworld-tdd/$DIGEST"
 suite_done
