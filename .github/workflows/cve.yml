@@ -1,0 +1,141 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# CVE gate over the build environment (item TST-3a). Orchestration only: every
+# judgement lives in tools/ci/cve/, one responsibility per script.
+#   tools/ci/cve/install_grype.sh  fetch grype, check its SHA-256, place it
+#   tools/ci/cve/scan.sh           run grype once, then judge it
+#   tools/ci/cve/judge.sh          map exit code, packages, distro and findings to one verdict
+#
+# WHAT THE GATE BARS (leader, 20/11/2026): only CRITICAL with a published fix.
+# The verdict comes from grype's exit code 2 (--fail-on), never from counting "Critical"
+# in the JSON, because ignoredMatches also carry severities. Everything else goes to the log.
+#
+# COVERAGE (leader: "only where it is supported"): Fedora, grype only. Trivy has no
+# Fedora coverage and is NOT run here. Ubuntu, Arch and CachyOS belong to TST-3b,
+# TST-3c and TST-3d (wave 8). Windows and macOS have no coverage.
+#
+# DATABASE SOURCES (leader: "covered by both"): NVD is covered through grype's database.
+# OSV is NOT confirmed: a declared limit, not a claim of coverage.
+#
+# WHY NOT A THIRD-PARTY ACTION: a marketplace action runs code we do not read and tracks
+# a moving tag. The grype tarball is fetched from the official release, checked against a
+# literal SHA-256, and only then placed on PATH.
+#
+# THE PROOF OF STRENGTH (L-36 global): a gate never seen failing proves nothing.
+# - Case A: alpine:3.12.7 by digest sha256:de25c7fc6c4f3a27c7f0c2dff454e4671823a34d88abd533f210848d527e0fbb
+#   (registry API; Docker Hub last_updated 2021-07-30). Its openssl is older than
+#   1.1.1l-r0. CVE-2021-3711 (NVD CVSS 3.1 9.8 CRITICAL, published 2021-08-24) is fixed in
+#   1.1.1l-r0 (Alpine secdb, branch v3.12). Must yield VERDICT=finding.
+#   INFERENCE to measure on the first run: that grype reads it through the "registry:"
+#   source with a digest reference, and that its Alpine data flags the CVE as critical.
+# - Case B: an empty directory must yield VERDICT=zero (the package floor).
+# Both check the VERDICT VALUE, not only the exit code. Both call the same scan.sh and
+# judge.sh as the real scan (DRY).
+#
+# DECLARED LIMITS
+# - Package count comes from the INFO log line "gathered packages" (-v). Its format is
+#   INFERENCE; an unreadable count rejects (fail closed).
+# - fedora:latest is Fedora 46 on Docker Hub (updated 2026-11-02). grype coverage of
+#   Fedora 46 is not confirmed; an unrecognized distro rejects (fail closed). Leader
+#   decision: keep :latest and measure (L-09 project).
+# - grype's exclude globs are relative to the scan root (./proc/**). INFERENCE to measure.
+# - A package in no database is invisible to the gate.
+
+name: Portão de CVE
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cve:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.image }}
+    env:
+      # The grype database cache lives under the runner temp dir, which is excluded from the scan.
+      GRYPE_DB_CACHE_DIR: ${{ runner.temp }}/grype-db
+    strategy:
+      matrix:
+        include:
+          - name: Fedora (grype)
+            image: fedora:latest
+    steps:
+      # The image ships without git. Install it first, so the checkout is a real git clone.
+      - name: Install git before the checkout
+        run: dnf -y install git
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Container jobs run as root, and root sees the workspace owned by the runner user
+      # as "dubious ownership" (CVE-2022-24765). Set this before any git call.
+      - name: Git safe.directory for the container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # The same toolchain as the build, so the scan covers the real build environment.
+      # The script is only read here, never edited.
+      - name: Install the build toolchain
+        run: bash tools/ci/env/fedora.sh
+
+      - name: Install grype pinned by SHA-256
+        run: bash tools/ci/cve/install_grype.sh "$RUNNER_TEMP/bin"
+
+      - name: Put grype on PATH and print its version
+        run: |
+          set -eu
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          "$RUNNER_TEMP/bin/grype" version
+
+      - name: Proof of strength, the gate must reject an old vulnerable image and an empty directory
+        # Runs even if the real scan below rejects, so the proof is always reported.
+        if: always()
+        run: |
+          set -u
+          scan="$GITHUB_WORKSPACE/tools/ci/cve/scan.sh"
+
+          # Case A: Alpine 3.12.7 by digest, openssl older than 1.1.1l-r0 (CVE-2021-3711, CVSS 9.8).
+          gate=0
+          outA=$(bash "$scan" alpine "$RUNNER_TEMP/proof-alpine" "registry:alpine@sha256:de25c7fc6c4f3a27c7f0c2dff454e4671823a34d88abd533f210848d527e0fbb" --only-fixed --fail-on critical) || gate=$?
+          printf '%s\n' "$outA"
+          if [ "$gate" = "0" ] || [ "$outA" != "VERDICT=finding" ]; then
+            echo "PROOF A FAILED: the old Alpine image was not judged a finding (gate $gate)"
+            exit 1
+          fi
+          echo "PROOF A PASSED: old Alpine image judged a finding"
+
+          # Case B: an empty directory must be judged by the package floor.
+          empty="$RUNNER_TEMP/proof-empty-dir"
+          mkdir -p "$empty"
+          gate=0
+          outB=$(bash "$scan" fedora "$RUNNER_TEMP/proof-empty" "dir:$empty" --only-fixed --fail-on critical) || gate=$?
+          printf '%s\n' "$outB"
+          if [ "$gate" = "0" ] || [ "$outB" != "VERDICT=zero" ]; then
+            echo "PROOF B FAILED: the empty directory was not judged zero (gate $gate)"
+            exit 1
+          fi
+          echo "PROOF B PASSED: empty directory judged zero"
+
+      - name: Scan the real build environment
+        run: |
+          set -u
+          scan="$GITHUB_WORKSPACE/tools/ci/cve/scan.sh"
+          gate=0
+          out=$(bash "$scan" fedora "$RUNNER_TEMP/scan-fedora" "dir:/" \
+            --only-fixed --fail-on critical \
+            --exclude './proc/**' --exclude './sys/**' --exclude './dev/**' \
+            --exclude './__e/**' --exclude './__w/**' --exclude './__t/**' \
+            --exclude './github/**') || gate=$?
+          printf '%s\n' "$out"
+          if [ "$gate" != "0" ]; then
+            echo "CVE GATE REJECTED"
+            exit 1
+          fi
+          echo "CVE GATE ACCEPTED"
