@@ -65,7 +65,8 @@ expect_eq "prazo do host chega ao docker exec" 1 "$(grep -c -- '-e GUSWORLD_TDD_
 rm -f "$BUDGET_LOG"
 env -u GUSWORLD_TDD_BUDGET FAKE_DOCKER_LOG="$BUDGET_LOG" FAKE_EXEC_RC=0 FAKE_EXEC_OUT="tdd-verdict: 0" \
     bash "$FX/tools/tdd/run_suite.sh" >/dev/null 2>&1
-expect_eq "sem prazo no host nada e repassado" 0 "$(grep -c 'GUSWORLD_TDD_BUDGET' "$BUDGET_LOG")"
+# The script itself, sent inline, names the variable too: the check is the -e flag only.
+expect_eq "sem prazo no host nada e repassado" 0 "$(grep -c -- '-e GUSWORLD_TDD_BUDGET' "$BUDGET_LOG")"
 
 # A verdict 3 keeps the reason of the infrastructure: the deadline line reaches last-reason.
 PRAZO_OUT="$(printf 'tdd: estouro de prazo na suite\ntdd-verdict: 3')"

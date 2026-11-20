@@ -67,9 +67,14 @@ case "$rc" in
     *) refuse "tar da arvore: $msg" ;;
 esac
 
-# The script goes inline, so it is the host version. The tar is the stdin.
+# The script goes inline, so it is the host version. The tar is the stdin. The host
+# budget, when set, reaches the container: in_container.sh only lets it shorten the run.
+exec_env=()
+if [ -n "${GUSWORLD_TDD_BUDGET:-}" ]; then
+    exec_env=(-e "GUSWORLD_TDD_BUDGET=$GUSWORLD_TDD_BUDGET")
+fi
 script="$(cat "$here/in_container.sh")" || refuse "in_container.sh ilegivel"
-timeout --kill-after=5 123 docker exec -i "$ctr" bash -c "$script" < "$tar_file" > "$log" 2>&1 &
+timeout --kill-after=5 123 docker exec -i "${exec_env[@]}" "$ctr" bash -c "$script" < "$tar_file" > "$log" 2>&1 &
 exec_pid=$!
 wait "$exec_pid"
 rc=$?
@@ -91,7 +96,11 @@ code="$("$here/map_exit.sh" "$rc")"
 case "$code" in
     0) record "verde: suite passou (veredito 0)" ;;
     1) record "vermelho: build ou testes falharam (veredito 1)" ;;
-    *) refuse "infraestrutura, veredito $rc" ;;
+    *)
+        # The last "tdd:" line of the container says why: deadline, cold cache, lock.
+        detail="$(sed -n 's/^tdd: //p' "$log" | sed -n '$p')"
+        refuse "infraestrutura, veredito $rc${detail:+: $detail}"
+        ;;
 esac
 
 cat "$log"

@@ -12,6 +12,10 @@
 #   3  infrastructure: lock, extraction, cold or foreign cache, CMake regeneration
 #      error, unparsed ctest total, timeout, any unexpected exit code
 # The host maps 0 and 1 to the guard and anything else to 126.
+# Before the verdict, "tdd-tempo: N" gives the seconds spent after the lock, which is
+# the clock the 89 s budget bounds (C8 measurement, fatia 4).
+# GUSWORLD_TDD_BUDGET, passed by run_suite.sh, can only SHORTEN that budget: a positive
+# integer below 89. Any other value is ignored, so it never loosens the guard.
 set -u
 
 W="${TDD_WORK:-/work}"
@@ -19,7 +23,14 @@ BUILD_BUDGET=89
 LOCK_WAIT=34
 me="$$"
 
+if [[ "${GUSWORLD_TDD_BUDGET:-}" =~ ^[1-9][0-9]*$ ]] && (( GUSWORLD_TDD_BUDGET < BUILD_BUDGET )); then
+    BUILD_BUDGET=$GUSWORLD_TDD_BUDGET
+fi
+
 finish() {
+    if [ -n "${start:-}" ]; then
+        printf 'tdd-tempo: %s\n' "$(( $(date +%s) - start ))"
+    fi
     printf 'tdd-verdict: %s\n' "$1"
     exit "$1"
 }
@@ -146,7 +157,7 @@ classify_build_failure() {
 }
 
 left="$(budget_left)"
-[ "$left" -gt 0 ] || finish 3
+[ "$left" -gt 0 ] || { echo "tdd: estouro de prazo antes do build" >&2; finish 3; }
 timeout "$left" cmake --build "$W/build" > "$build_log" 2>&1
 rc=$?
 cat "$build_log"
@@ -159,15 +170,16 @@ if [ "$rc" -ne 0 ]; then
 fi
 
 left="$(budget_left)"
-[ "$left" -gt 0 ] || finish 3
-timeout "$left" ctest --test-dir "$W/build" -N > "$W/ctest-list.txt" 2>&1 || finish 3
+[ "$left" -gt 0 ] || { echo "tdd: estouro de prazo antes da listagem de testes" >&2; finish 3; }
+timeout "$left" ctest --test-dir "$W/build" -N > "$W/ctest-list.txt" 2>&1 \
+    || { echo "tdd: ctest -N falhou" >&2; finish 3; }
 if ! "$W/src/tools/tdd/ctest_total.sh" < "$W/ctest-list.txt" > /dev/null; then
     echo "tdd: ctest -N sem total positivo" >&2
     finish 3
 fi
 
 left="$(budget_left)"
-[ "$left" -gt 0 ] || finish 3
+[ "$left" -gt 0 ] || { echo "tdd: estouro de prazo antes da suite" >&2; finish 3; }
 timeout "$left" ctest --test-dir "$W/build" --output-on-failure
 rc=$?
 case "$rc" in
