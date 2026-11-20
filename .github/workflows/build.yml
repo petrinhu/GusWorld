@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Build and ctest for the Fedora and Ubuntu targets (items C4a, C4b1 and C4b2). Each
-# other target (Arch, CachyOS, Windows) lands in its own slice as one more
-# matrix entry, and none is declared supported before its own job has run.
+# Build and ctest for the Fedora, Ubuntu and Arch targets (items C4a, C4b1,
+# C4b2 and C4b3). Each other target (CachyOS, Windows) lands in its own slice as
+# one more matrix entry, and none is declared supported before its own job has run.
 name: Build
 
 on:
@@ -51,6 +51,18 @@ jobs:
             cc: clang
             cxx: clang++
             git_install: "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git"
+          - name: Arch (GCC)
+            slug: arch
+            image: archlinux:latest
+            cc: gcc
+            cxx: g++
+            git_install: "pacman -Syu --noconfirm --needed git"
+          - name: Arch (Clang)
+            slug: arch
+            image: archlinux:latest
+            cc: clang
+            cxx: clang++
+            git_install: "pacman -Syu --noconfirm --needed git"
     steps:
       # The image ships without git. Install it first, with no file from this
       # repository, so the checkout below is a real git clone. Without git,

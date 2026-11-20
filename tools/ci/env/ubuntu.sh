@@ -2,16 +2,8 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Setup for the Ubuntu target (ubuntu:latest) of CI jobs.
-# Three responsibilities and nothing else:
-#   1. install the toolchain from the distro repository (g++ and clang);
-#   2. export CC, CXX and CMAKE_GENERATOR=Ninja to the next steps via $GITHUB_ENV;
-#   3. print the tool versions, so the CI log proves what actually ran.
-#
-# The compiler comes from the workflow matrix when the workflow has one (the
-# build job sets CC and CXX per entry, GCC or Clang). A workflow without a
-# matrix gets the default: cc and c++. Set CC and CXX in the environment to
-# override it.
+# Setup for the Ubuntu target (ubuntu:latest) of CI jobs: installs the
+# toolchain, then hands off to _common.sh for the CI environment.
 #
 # Measured 20/11/2026 in ubuntu:latest (Ubuntu 26.04, cmake 4.2.3 from apt),
 # above the 4.1 floor, so no SHA-pinned download is needed.
@@ -24,21 +16,7 @@
 
 set -eu
 
-CC="${CC:-cc}"
-CXX="${CXX:-c++}"
-
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y g++ clang cmake ninja-build git
 
-{
-    echo "CC=${CC}"
-    echo "CXX=${CXX}"
-    echo "CMAKE_GENERATOR=Ninja"
-} >> "$GITHUB_ENV"
-
-cat /etc/os-release
-"$CC" --version
-"$CXX" --version
-cmake --version
-ninja --version
-git --version
+. "$(dirname "$0")/_common.sh"
