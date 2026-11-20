@@ -62,12 +62,6 @@ jobs:
           dnf -y install libasan libubsan
           rpm -q gcc-c++ libasan libubsan
 
-      - name: Print the sanitized toolchain
-        run: |
-          set -eu
-          "$CXX" --version
-          cmake --version
-
       # Floor from the project's cmake_minimum_required(4.1). Same check as build.yml.
       - name: Version floor (CMake 4.1)
         run: bash tools/ci/cmake_floor.sh
@@ -87,89 +81,17 @@ jobs:
       - name: Build
         run: cmake --build build-sanitizers
 
-      # Diagnostic, never a gate. Runs the three fixtures directly and prints the exit
-      # code each one really gives, so the expected codes in tests/CMakeLists.txt are
-      # read from the log and not taken on trust. The leak code is still an inference.
-      - name: Diagnostic, the three fixture exit codes as measured (never a gate)
-        run: |
-          set +e
-          dir=build-sanitizers/tests/fixtures/sanitizers
-          for name in heap_buffer_overflow signed_overflow leak; do
-            "$dir/gusworld_sanitizer_fixture_$name" > "diag_$name.txt" 2>&1
-            echo "$name: exit code $?"
-            grep -m1 -E 'ERROR: |runtime error' "diag_$name.txt" || true
-          done
-          true
-
-      # ctest -N exits 0 even with zero tests, so the count is read from the value,
-      # and zero fails on purpose: an empty scan is a broken scan (L-36).
+      # The verdict on the inventory is in tools/ci/sanitizers/judge_inventory.sh. This
+      # step only writes the inventory and shows it.
       - name: Count registered tests (zero is a failure)
         run: |
           set -eu
           ctest --test-dir build-sanitizers -N > inventory.txt 2>&1 \
             || { cat inventory.txt; exit 1; }
           cat inventory.txt
-          total="$(sed -n 's/^Total Tests: //p' inventory.txt)"
-          echo "registered tests: ${total:-<unreadable>}"
-          case "$total" in
-            ''|*[!0-9]*)
-              echo "FAIL: the test count is missing or not a number"
-              exit 1
-              ;;
-          esac
-          if [ "$total" -eq 0 ]; then
-            echo "FAIL: zero tests registered"
-            exit 1
-          fi
-          # The three red proofs must be registered by name. Without them the suite
-          # runs under the sanitizers and the gate can pass with no red proof (L-36).
-          proofs=0
-          for name in sanitizer_heap_buffer_overflow_is_detected \
-                      sanitizer_signed_overflow_is_detected \
-                      sanitizer_leak_is_detected; do
-            found="$(grep -c ": $name\$" inventory.txt || true)"
-            if [ "${found:-0}" -eq 1 ]; then
-              proofs=$((proofs + 1))
-              echo "proof found: $name"
-            else
-              echo "proof MISSING: $name (matches: ${found:-0})"
-            fi
-          done
-          echo "proof tests found: $proofs of 3"
-          if [ "$proofs" -ne 3 ]; then
-            echo "FAIL: a proof test is not registered"
-            exit 1
-          fi
+          bash tools/ci/sanitizers/judge_inventory.sh inventory.txt
 
       # The whole suite must be green under the sanitizers, and the three red proofs
       # must fail by their expected code and text.
-      # Measurement only, never a gate. Installed apart from the runtimes, so a missing
-      # package here cannot fail the job. Without /usr/bin/time the suite runs bare.
-      - name: Install time for the memory measurement (never a gate)
-        run: dnf -y install time || true
-
-      # The suite is the last command of each branch, so the step's exit code is
-      # ctest's alone. /usr/bin/time reads the peak resident memory with wait4. From
-      # the Linux kernel source on master (read, not checked on this machine, nor in
-      # the source of time itself), that figure is the larger of ctest and its children
-      # already waited for, so it MAY include the test executables.
       - name: Run tests under sanitizers (ctest)
-        run: |
-          if [ -x /usr/bin/time ]; then
-            /usr/bin/time -v -o suite_time.txt ctest --test-dir build-sanitizers --output-on-failure
-          else
-            echo "NOTE: /usr/bin/time is missing, the suite runs without a memory reading"
-            ctest --test-dir build-sanitizers --output-on-failure
-          fi
-
-      # Reads the peak resident memory of the suite. Runs even when the suite fails,
-      # and never fails itself: a number for the record, not a verdict.
-      - name: Report the suite peak memory (never a gate)
-        if: always()
-        run: |
-          echo "Meaning: peak resident memory reported for the ctest run that drives the suite,"
-          echo "under the sanitizers. It measures the ctest run only, not the build step."
-          echo "It MAY include the test executables that ctest started: the kernel reading is"
-          echo "stated above, with its limit."
-          grep -m1 'Maximum resident set size' suite_time.txt || echo "peak memory not read"
-          true
+        run: ctest --test-dir build-sanitizers --output-on-failure
