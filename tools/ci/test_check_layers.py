@@ -16,6 +16,11 @@ Declared gap, not covered here: a branch of #if that is NOT taken in the
 configuration the build uses is not seen by the compiler. c09 proves the taken
 branch is caught; the untaken one is an open limit.
 
+Direction (C10): d01 to d04 are an upward include in each of the three borders
+between pure layers, one through a transitive header; g01 is a clean tree with
+downward and same-layer includes. The site of an include is read from the
+compiler's own -E linemarkers, and the test asserts the arquivo:linha it cites.
+
 Usage: python3 tools/ci/test_check_layers.py -v
 """
 
@@ -248,6 +253,55 @@ class TestStructureAndEnvironment(LayerGateTest):
                 {**CLEAN_LAYERS, "core/orphan.cpp": b"int o();\n"},
                 "core/orphan.cpp", "fonte C++ fora do gate", unlisted=("core/orphan.cpp",),
             )
+
+
+class TestDirection(LayerGateTest):
+    def assert_upward(self, files, path, child, site):
+        root, build_dir = self.build(files)
+        report = gate.scan(root, build_dir)
+        self.assertEqual(
+            gate.verdict(report), 2,
+            f"deveria reprovar; findings={report.findings} failed={report.failed}",
+        )
+        hits = [
+            f for f in report.findings
+            if f.path == path and "include para cima" in f.form and child in f.detail and site in f.detail
+        ]
+        self.assertTrue(hits, f"nenhum include para cima de {child} citando {site}; findings={report.findings}")
+
+    def test_d01_core_including_content_rejected_with_line(self):
+        self.assert_upward(
+            {"core/a.cpp": b'#include <string_view>\n#include "../content/c.hpp"\n',
+             "content/c.hpp": b"#pragma once\n"},
+            "core/a.cpp", "content/c.hpp", "core/a.cpp:2",
+        )
+
+    def test_d02_content_including_domain_with_comment_before_hash(self):
+        self.assert_upward(
+            {"content/c.cpp": b'/**/#include "../domain/d.hpp"\n', "domain/d.hpp": b"#pragma once\n"},
+            "content/c.cpp", "domain/d.hpp", "content/c.cpp:1",
+        )
+
+    def test_d03_domain_including_app_with_digraph(self):
+        self.assert_upward(
+            {"domain/d.cpp": b'%:include "../app/e.hpp"\n', "app/e.hpp": b"#pragma once\n"},
+            "domain/d.cpp", "app/e.hpp", "domain/d.cpp:1",
+        )
+
+    def test_d04_upward_include_through_intermediate_header(self):
+        self.assert_upward(
+            {"core/a.cpp": b'#include "k.hpp"\n',
+             "core/k.hpp": b'#include "../content/c.hpp"\n',
+             "content/c.hpp": b"#pragma once\n"},
+            "core/k.hpp", "content/c.hpp", "core/k.hpp:1",
+        )
+
+    def test_g01_downward_and_own_layer_pass(self):
+        self.assert_clean(
+            {"app/e.cpp": b'#include "../domain/d.hpp"\n#include "f.hpp"\n',
+             "domain/d.hpp": b"#pragma once\n",
+             "app/f.hpp": b"#pragma once\n"},
+        )
 
 
 if __name__ == "__main__":
