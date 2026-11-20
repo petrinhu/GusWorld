@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# CVE gate over the build environment (items TST-3a and TST-3b). Orchestration only: no step
+# CVE gate over the build environment (items TST-3a, TST-3b and TST-3c). Orchestration only: no step
 # here judges anything. Every judgement lives in tools/ci/cve/, one responsibility per script.
 #   install_grype.sh  fetch grype, check its SHA-256, place it
 #   expect.sh         assert one verdict (the proof and the real scan both use it)
@@ -69,16 +69,21 @@
 # Measured on the first run (20/11/2026, run 44755957346, grype only): the registry: source
 # with a digest reference works, the CVE is judged critical with a fix, and the package-count
 # regex matches grype 0.122.1. The trivy and Ubuntu numbers are not measured yet.
+# Measured on run 44793892079 (20/11/2026, commit 411e4ad), Arch entry: grype names the distro
+# "archlinux" with the feed arch:distro:archlinux:rolling, 190 packages, 9 matches ignored for
+# lacking a fix, and no critical with a fix. The first run was red only by name (distro-mismatch),
+# so the judge now expects scan_distro, the name grype and trivy report for the distro. It is
+# equal to matrix distro for fedora and ubuntu, and archlinux for arch. matrix.distro still picks
+# the environment scripts. The trivy name for ubuntu is NOT measured yet: the Ubuntu run measures it.
 #
 # DECLARED LIMITS
 # - fedora:latest is Fedora 45 (VERSION_ID=45 measured on 20/11/2026). ubuntu:latest is Ubuntu
 #   26.04 by the same tag rule. Both tags move: when the release changes, the gate measures it
 #   again. An unrecognized distro rejects (fail closed). Leader decision: keep :latest and
 #   measure (L-09 project).
-# - archlinux:latest is a rolling release, so there is no version to declare for it. The gate
-#   checks the distro name only ("arch"). Whether grype has an Arch vulnerability feed is NOT
-#   measured yet (TST-3c). If a run reports distro-unknown or distro-mismatch, the judge is not
-#   relaxed for this entry: no exception by distro, no if. The slice stops and goes to the leader.
+# - archlinux:latest is a rolling release. Measured on run 44793892079 (20/11/2026): os-release
+#   gives ID=arch and VERSION_ID=20261108.0.623074, and the grype distro name is "archlinux", not
+#   "arch". The matrix carries it as scan_distro. Trivy does not cover this entry.
 # - The exclude globs (./proc/**, and so on) are relative to the scan root. For trivy they are
 #   passed as --skip-dirs in both the relative and the absolute spelling, because the docs do
 #   not confirm which one matches. Which spelling matched is read from the Targets line of the
@@ -106,16 +111,19 @@ jobs:
           - name: Fedora (grype)
             image: fedora:latest
             distro: fedora
+            scan_distro: fedora
             trivy: false
             git_install: "dnf -y install git"
           - name: Ubuntu (trivy e grype)
             image: ubuntu:latest
             distro: ubuntu
+            scan_distro: ubuntu
             trivy: true
             git_install: "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git"
           - name: Arch (grype)
             image: archlinux:latest
             distro: arch
+            scan_distro: arch
             trivy: false
             git_install: "pacman -Syu --noconfirm --needed git"
     steps:
@@ -179,7 +187,7 @@ jobs:
             exit 1
           fi
           mkdir -p "$RUNNER_TEMP/proof-empty-dir"
-          if ! bash "$expect" zero "${{ matrix.distro }}" "$RUNNER_TEMP/proof-empty" "dir:$RUNNER_TEMP/proof-empty-dir"; then
+          if ! bash "$expect" zero "${{ matrix.scan_distro }}" "$RUNNER_TEMP/proof-empty" "dir:$RUNNER_TEMP/proof-empty-dir"; then
             echo "PROOF B FAILED: the empty directory was not judged zero"
             exit 1
           fi
@@ -198,7 +206,7 @@ jobs:
           bash "$expect" finding alpine "$RUNNER_TEMP/proof-trivy-alpine" "registry:alpine@sha256:de25c7fc6c4f3a27c7f0c2dff454e4671823a34d88abd533f210848d527e0fbb" || a=1
           mkdir -p "$RUNNER_TEMP/proof-trivy-empty-dir"
           b=0
-          bash "$expect" zero "${{ matrix.distro }}" "$RUNNER_TEMP/proof-trivy-empty" "dir:$RUNNER_TEMP/proof-trivy-empty-dir" || b=1
+          bash "$expect" zero "${{ matrix.scan_distro }}" "$RUNNER_TEMP/proof-trivy-empty" "dir:$RUNNER_TEMP/proof-trivy-empty-dir" || b=1
           if [ "$a" -ne 0 ]; then echo "TRIVY PROOF A FAILED: the old Alpine image was not judged a finding"; fi
           if [ "$b" -ne 0 ]; then echo "TRIVY PROOF B FAILED: the empty directory was not judged zero"; fi
           if [ "$a" -ne 0 ] || [ "$b" -ne 0 ]; then exit 1; fi
@@ -219,7 +227,7 @@ jobs:
         run: |
           set -u
           expect="$GITHUB_WORKSPACE/tools/ci/cve/expect.sh"
-          if ! bash "$expect" accept "${{ matrix.distro }}" "$RUNNER_TEMP/scan-${{ matrix.distro }}" "dir:/" \
+          if ! bash "$expect" accept "${{ matrix.scan_distro }}" "$RUNNER_TEMP/scan-${{ matrix.distro }}" "dir:/" \
             --exclude './proc/**' --exclude './sys/**' --exclude './dev/**' \
             --exclude './__e/**' --exclude './__w/**' --exclude './__t/**' \
             --exclude './github/**'; then
@@ -235,7 +243,7 @@ jobs:
           set -u
           expect="$GITHUB_WORKSPACE/tools/ci/cve/expect.sh"
           export CVE_SCAN="$GITHUB_WORKSPACE/tools/ci/cve/trivy/scan.sh"
-          if ! bash "$expect" accept "${{ matrix.distro }}" "$RUNNER_TEMP/scan-trivy-${{ matrix.distro }}" "dir:/" \
+          if ! bash "$expect" accept "${{ matrix.scan_distro }}" "$RUNNER_TEMP/scan-trivy-${{ matrix.distro }}" "dir:/" \
             --exclude './proc/**' --exclude './sys/**' --exclude './dev/**' \
             --exclude './__e/**' --exclude './__w/**' --exclude './__t/**' \
             --exclude './github/**'; then
