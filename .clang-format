@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Formatting policy for the whole tree (TODO.md item C6): LLVM base style,
-# 4-space indentation, 100-column limit. The lint gate that enforces it with
-# `clang-format --dry-run -Werror` is not wired yet (CI and local mirror items).
+# 4-space indentation, 100-column limit. The CI gate that enforces it is
+# .github/workflows/clang-format.yml (TODO.md item C11); the local mirror is item C7.
+# PointerAlignment stays LLVM's (Right): the base is fixed by C6, and the
+# `const std::string& n` example in CONTRACT.md is an illustration, not a MUST rule.
 BasedOnStyle: LLVM
 IndentWidth: 4
 ColumnLimit: 100
