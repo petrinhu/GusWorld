@@ -3,8 +3,14 @@
 #
 # Formatting gate (TODO item C11, the clang-format half of criterion (3) of C5c). A
 # separate job in its own file, like cppcheck.yml and clang-tidy.yml.
+#
+# The reformatting patch is produced HERE, in CI, because nothing runs on the lead's
+# machine (L-35 of the project). The patch is uploaded as the artifact clang-format-patch
+# and applied in a slice of its own. The gate below still fails on a non-conforming tree:
+# the patch step does not change the verdict.
+#
 # This file is orchestration only. The logic lives in tools/ci/clang_format/
-# (enumerate.sh, judge.sh, proof.sh), one responsibility each.
+# (enumerate.sh, judge.sh, proof.sh, patch.sh), one responsibility each.
 name: Formatação
 
 on:
@@ -57,7 +63,23 @@ jobs:
 
       # The gate on the real tree: one clang-format process per file. The verdict comes
       # from judge.sh, not from this file.
-      # Limit: the tree is judged as it is. A violation here is a real finding, and the
-      # reformatting of the code is a separate slice (C++), decided by the orchestrator.
+      # Limit: the tree is judged as it is. A violation here is a real finding; the
+      # reformatting is delivered as the patch below, applied in a slice of its own.
       - name: Gate, clang-format on the real tree, one process per file
         run: bash tools/ci/clang_format/judge.sh "$RUNNER_TEMP/sources.txt" "$RUNNER_TEMP/clang-format-real.log"
+
+      # Runs even when the gate is red (always): the patch is the deliverable of a red
+      # gate. patch.sh rewrites the files in place and writes the diff; it never judges.
+      - name: Reformatting patch, produced in CI
+        if: always()
+        run: bash tools/ci/clang_format/patch.sh "$RUNNER_TEMP/sources.txt" "$RUNNER_TEMP/clang-format.patch"
+
+      # The patch is attached to the run as the artifact clang-format-patch. A missing
+      # file is an error, not a silent empty upload.
+      - name: Upload the patch as the clang-format-patch artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: clang-format-patch
+          path: ${{ runner.temp }}/clang-format.patch
+          if-no-files-found: error
