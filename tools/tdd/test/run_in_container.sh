@@ -17,7 +17,7 @@ image="$("$root/tools/tdd/image_select.sh" "$root" | sed -n 's/^IMAGE_REF=//p')"
 out_dir=/var/tmp/gusworld-tdd-test
 mkdir -p "$out_dir"
 tar_file="$out_dir/test-tree.tar"
-(cd "$root" && tar -c -f "$tar_file" tools/tdd tools/container tools/ci/env tools/ci/cmake_floor.sh)
+(cd "$root" && tar -c -f "$tar_file" tools/tdd tools/container tools/ci/env tools/ci/cmake_floor.sh .claude/settings.json)
 tar -t -f "$tar_file" > /dev/null
 
 docker run --rm -i --pull never \
