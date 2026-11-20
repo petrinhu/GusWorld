@@ -23,7 +23,10 @@ fi
 head="$(git -C "$root" rev-parse HEAD)" || exit 1
 work="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/gusworld-mut-XXXXXX")" || exit 1
 trap 'rm -rf -- "${work:?}"' EXIT
-plugin_src="$HOME/.claude/plugins/cache/petrinhu/bigtech/0.2.0/hooks"
+# The plugin is the one the resolver names (review F2), not a fixed cache version.
+plugin_src="$(python3 -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import notice; print(notice.plugin_hooks_dir())' "$root/tools/tdd")" \
+    || { echo "mutate_guard: plugin nao resolvido pelo notice.py" >&2; exit 1; }
+echo "mutate_guard: plugin $plugin_src" >&2
 
 # run_case ID: one tree, one container, one log. Returns non-zero on any refusal.
 run_case() {

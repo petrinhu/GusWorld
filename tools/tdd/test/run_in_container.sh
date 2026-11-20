@@ -20,12 +20,16 @@ image="$("$root/tools/tdd/image_select.sh" "$root" | sed -n 's/^IMAGE_REF=//p')"
 out_dir="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/gusworld-tdd-test-XXXXXX")"
 trap 'rm -rf -- "${out_dir:?}"' EXIT
 tar_file="$out_dir/test-tree.tar"
-# The bigtech plugin's hooks travel as a copy under plugin/hooks, read-only from the
-# user's cache (the contract test loads the real tdd_guard from there, L-35). Nothing
-# under ~/.claude is written.
-plugin_src="$HOME/.claude/plugins/cache/petrinhu/bigtech/0.2.0/hooks"
+# The bigtech plugin's hooks travel as a copy under plugin/hooks (the contract test loads
+# the real tdd_guard from there, L-35). The copy comes from the SAME resolver the notice
+# uses (review F2: marketplace directory first, installPath as fallback), so the tests run
+# the plugin Claude Code runs, not a stale cache. Nothing under ~/.claude is written.
+plugin_src="$(python3 -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import notice; print(notice.plugin_hooks_dir())' "$root/tools/tdd")" \
+    || { echo "run_in_container: plugin nao resolvido pelo notice.py" >&2; exit 1; }
 mkdir -p "$out_dir/plugin"
 cp -a "$plugin_src" "$out_dir/plugin/hooks"
+# The log names the exact bytes that enter the container (sha256 of each .py copied).
+sha256sum "$out_dir"/plugin/hooks/*.py | sed 's/^/run_in_container: plugin sha256 /' >&2
 (cd "$root" && tar -c -f "$tar_file" tools/tdd tools/container tools/ci/env tools/ci/cmake_floor.sh .claude/settings.json -C "$out_dir" plugin)
 tar -t -f "$tar_file" > /dev/null
 
