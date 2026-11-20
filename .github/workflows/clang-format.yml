@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Formatting gate (TODO item C11, the clang-format half of criterion (3) of C5c). A
+# separate job in its own file, like cppcheck.yml and clang-tidy.yml.
+# This file is orchestration only. The logic lives in tools/ci/clang_format/
+# (enumerate.sh, judge.sh, proof.sh), one responsibility each.
+name: Formatação
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clang-format:
+    name: clang-format sobre a árvore real, com prova vermelha antes
+    runs-on: ubuntu-latest
+    # The job runs inside the distro image. The runner is only the host.
+    container: fedora:latest
+    steps:
+      # The image ships without git. Install it first, so the checkout is a real git
+      # clone (same reason as build.yml and cppcheck.yml).
+      - name: Install git (before the checkout)
+        run: dnf -y install git
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Container jobs run as root, and root sees the workspace as "dubious ownership".
+      - name: Git safe.directory for the container
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # clang-format comes from clang-tools-extra on Fedora. The version is printed, so
+      # the log shows which clang-format judged the tree. The judge refuses a version
+      # below its declared floor.
+      - name: Install clang-format
+        run: |
+          set -eu
+          dnf -y install clang-tools-extra
+          rpm -q clang-tools-extra
+          clang-format --version
+
+      # Every C and C++ source of the tree, into the list file. Zero is a failure (L-36).
+      - name: Enumerate the sources (zero is a failure)
+        run: bash tools/ci/clang_format/enumerate.sh "$RUNNER_TEMP/sources.txt"
+
+      # Red proof, before the gate: a badly formatted file generated in the runner's temp
+      # directory must be REJECTED (exit 1 and the id clang-format-violations), and the
+      # output of clang-format must be ACCEPTED. The step fails with FORMAT PROOF FAILED
+      # otherwise.
+      - name: Red proof, a badly formatted file must be rejected
+        run: bash tools/ci/clang_format/proof.sh "$RUNNER_TEMP/clang-format-proof"
+
+      # The gate on the real tree: one clang-format process per file. The verdict comes
+      # from judge.sh, not from this file.
+      # Limit: the tree is judged as it is. A violation here is a real finding, and the
+      # reformatting of the code is a separate slice (C++), decided by the orchestrator.
+      - name: Gate, clang-format on the real tree, one process per file
+        run: bash tools/ci/clang_format/judge.sh "$RUNNER_TEMP/sources.txt" "$RUNNER_TEMP/clang-format-real.log"
