@@ -68,13 +68,16 @@
 # shows the raw facts of each case.
 # Measured on the first run (20/11/2026, run 44755957346, grype only): the registry: source
 # with a digest reference works, the CVE is judged critical with a fix, and the package-count
-# regex matches grype 0.122.1. The trivy and Ubuntu numbers are not measured yet.
+# regex matches grype 0.122.1. The trivy and Ubuntu numbers were measured on run 44792180987
+# (commit 4b0996d, 20/11/2026): ubuntu:latest gives VERSION_ID="26.04", the grype feeds were
+# alpine, nvd:cpe, govulndb and ubuntu:distro:ubuntu:26.04, the trivy data source of case A was
+# alpine, and the real scans printed TRIVY CVE GATE ACCEPTED and CVE GATE ACCEPTED.
 # Measured on run 44793892079 (20/11/2026, commit 411e4ad), Arch entry: grype names the distro
 # "archlinux" with the feed arch:distro:archlinux:rolling, 190 packages, 9 matches ignored for
 # lacking a fix, and no critical with a fix. The first run was red only by name (distro-mismatch),
 # so the judge now expects scan_distro, the name grype and trivy report for the distro. It is
 # equal to matrix distro for fedora and ubuntu, and archlinux for arch. matrix.distro still picks
-# the environment scripts. The trivy name for ubuntu is NOT measured yet: the Ubuntu run measures it.
+# the environment scripts. The trivy name for ubuntu is measured on run 44792180987: trivy accepted the real scan with the name ubuntu.
 #
 # DECLARED LIMITS
 # - fedora:latest is Fedora 45 (VERSION_ID=45 measured on 20/11/2026). ubuntu:latest is Ubuntu
@@ -123,7 +126,7 @@ jobs:
           - name: Arch (grype)
             image: archlinux:latest
             distro: arch
-            scan_distro: arch
+            scan_distro: archlinux
             trivy: false
             git_install: "pacman -Syu --noconfirm --needed git"
     steps:
