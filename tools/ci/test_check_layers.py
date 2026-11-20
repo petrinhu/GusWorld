@@ -198,7 +198,8 @@ class TestExtraCases(LayerGateTest):
     def test_e01_clean_four_layers_pass(self):
         report = self.assert_clean({**CLEAN_LAYERS, "core/b.hpp": b"#include <cstdint>\n",
                                     "core/a.cpp": b'#include <string_view>\n#include "b.hpp"\n'})
-        self.assertEqual((report.found, report.analysed), (4, 4))
+        # Raizes: quatro unidades e o header core/b.hpp, que tambem e raiz (C10, por raiz).
+        self.assertEqual((report.found, report.analysed), (5, 5))
 
     def test_e02_missing_layer_hits_per_layer_floor(self):
         files = {key: value for key, value in CLEAN_LAYERS.items() if not key.startswith("app/")}

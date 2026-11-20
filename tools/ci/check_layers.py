@@ -3,40 +3,45 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Layer gate (GODS_LAWS.md L-17): the compiler decides what the pure layers include.
 
-Pure layers are core/, content/, domain/ and app/. present/ is outside this
-gate on purpose: it is the only layer allowed to touch GlintFx (L-06, L-27).
+Pure layers are core/, content/, domain/ and app/, in dependency order: core/ is the
+bottom, app/ the top. present/ is outside this gate on purpose: it is the only layer
+allowed to touch GlintFx (L-06, L-27), and the pure layers may not include it.
 
-No include directive is parsed as text. For every compile unit that lives in a
-pure layer, taken from compile_commands.json (CMAKE_EXPORT_COMPILE_COMMANDS=ON),
-the compiler runs its preprocessor in dependency mode (-M) and reports every
-file it opened, transitively. Comments before '#', digraphs, line splices,
-macros, symlinks and include paths are resolved by the compiler itself.
+No include directive is parsed as text, by either policy below. A root is a file the
+compiler is asked to preprocess in dependency mode (-M): every compile unit of
+compile_commands.json (CMAKE_EXPORT_COMPILE_COMMANDS=ON), and every header
+(.h .hh .hpp .hxx .ipp .inl .tpp) under core/, content/, domain/ and app/. For each
+root the compiler reports every file it opened, transitively, so a header that no unit
+opens is a root of its own. Comments before '#', digraphs, line splices, macros, #line,
+raw strings, symlinks and include paths are resolved by the compiler itself.
 
-A dependency passes when it is inside a pure layer, or when it is inside a
-directory the compiler lists in its own search path (asked with -v). Anything
-else is a violation. Each pure-layer file is also read as bytes, and a file in
-UTF-16 or with NUL bytes is a violation, because the compiler may be reading
-something the text does not show.
+A header root is compiled as C++ (-x c++), with the flags of the first compile unit of
+its own layer and its source swapped for the header. A layer without any compile unit
+has no flags to borrow, so its headers fail closed.
 
-Direction (C10, L-17): the layers depend only downward, core/ -> content/ -> domain/
--> app/. The same compiler runs once more in expansion mode (-E), whose linemarkers
-name every include edge (who opened which file, on which line). An edge from a
-pure layer to a pure layer above it is a violation, judged per edge.
-Declared limit, not covered here: an edge exists only when the compiler actually
-opens the included file. A second inclusion of a header guarded by an include guard
-or by #pragma once produces no edge, so an upward include that sits behind an
-already-opened header is missed unless some unit opens that header first. Closing
-this gap (expanding every pure-layer header as its own root) is an open item in the
-INBOX of TODO.md. present/ stays with the gate above: its includes are already
-refused there.
+Two policies judge the files each root opened:
+- containment: a file must be inside a pure layer, or inside a directory the compiler
+  lists in its own search path (asked with -v). Each pure-layer file is also read as
+  bytes, and a file in UTF-16 or with NUL bytes is a violation, because the compiler
+  may be reading something the text does not show.
+- direction (C10, L-17): a root must not open a pure-layer file above its own layer.
+  present/ has no rank here; it is judged by containment alone.
+
+Declared limits, not covered here:
+- a branch of #if that is NOT taken in the configuration the build uses is not seen
+  by the compiler (c09 proves the taken branch is caught; the untaken one is open);
+- C++ modules (import, .ixx, .cppm) are outside both policies: the preprocessor does
+  not follow module imports.
+
+The -w flag is set on every dependency run: warnings never change what the compiler
+opens, and a build with -Werror would otherwise fail a header on a pragma warning.
 
 Usage:
   python3 tools/ci/check_layers.py --build <dir>   gate; <dir> holds compile_commands.json
   python3 tools/ci/check_layers.py --selftest      runs tools/ci/test_check_layers.py
 
-Scan floor (L-36): every pure layer needs at least one compile unit, and
-analysed must equal found. Zero units in total means every layer is empty, so the
-per-layer floor already fails it.
+Scan floor (L-36): every pure layer needs at least one compile unit, and analysed
+must equal found, where found counts every root, units and headers alike.
 Exit codes: 0 clean | 2 violation, failure or floor | 1 execution error
 """
 
@@ -44,7 +49,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import shlex
 import subprocess
 import sys
@@ -56,6 +60,8 @@ PURE_LAYERS = ("core", "content", "domain", "app")
 CPP_SUFFIXES = (".c", ".cc", ".cpp", ".cxx", ".h", ".hh", ".hpp", ".hxx", ".ipp", ".inl", ".tpp", ".ixx", ".cppm")
 # Translation-unit suffixes: a source of these in a pure layer that CMake does not compile is an orphan.
 SOURCE_SUFFIXES = (".c", ".cc", ".cpp", ".cxx", ".ixx", ".cppm")
+# Headers become roots of their own, so an include that no unit opens is still judged.
+HEADER_SUFFIXES = (".h", ".hh", ".hpp", ".hxx", ".ipp", ".inl", ".tpp")
 # Variables that add directories to the compiler search path. Left set, a GlintFx
 # directory named by one of them would look like toolchain and pass.
 SEARCH_ENV = (
@@ -68,13 +74,20 @@ DROPPED_FLAGS = ("-c", "-M", "-MM", "-MD", "-MMD", "-MG", "-MP")
 DROPPED_WITH_VALUE = ("-o", "-MF", "-MT", "-MQ")
 DROPPED_PREFIXES = ("-fmodule", "-fdeps-", "-MF", "-MT", "-MQ")
 UTF16_BOMS = (b"\xff\xfe", b"\xfe\xff")
-# A linemarker from `-E`: `# <line> "<file>"` plus flags. Flag 1 means the file was entered, flag 2 means it was left.
-LINEMARKER = re.compile(r'^# (\d+) "(.*)"((?: \d+)*)$')
 UPWARD_FORM = "include para cima: camada de baixo nao pode depender da de cima"
 
 
 @dataclass(frozen=True)
 class Unit:
+    layer: str
+    source: str
+    directory: str
+    argv: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class Root:
+    """One file the compiler is asked to preprocess: the command is ready, without -M."""
     layer: str
     source: str
     directory: str
@@ -117,6 +130,10 @@ def layer_of(path: str, root: Path) -> str | None:
     return None
 
 
+def rank_of(layer: str) -> int:
+    return PURE_LAYERS.index(layer)
+
+
 def clean_env() -> dict[str, str]:
     return {key: value for key, value in os.environ.items() if key not in SEARCH_ENV}
 
@@ -154,7 +171,7 @@ def toolchain_dirs(compiler: str, env: dict[str, str]) -> list[str]:
 
 
 def base_arguments(unit: Unit) -> list[str]:
-    """The unit's own compile arguments, minus what writes output or scans modules. The source stays: the preprocessor reads it."""
+    """The unit's compile arguments, minus what writes output or scans modules. The source stays: the preprocessor reads it."""
     out, skip_next = [], False
     for arg in unit.argv:
         if skip_next:
@@ -169,12 +186,13 @@ def base_arguments(unit: Unit) -> list[str]:
     return out
 
 
-def plain_command(unit: Unit) -> list[str]:
-    return base_arguments(unit) + ["-M"]
-
-
-def expanded_command(unit: Unit) -> list[str]:
-    return base_arguments(unit) + ["-E"]
+def command_for_header(template: Unit, header: str) -> list[str] | None:
+    """The template unit's arguments with its source swapped for the header, compiled as C++."""
+    args = base_arguments(template)
+    for index, arg in enumerate(args):
+        if os.path.realpath(os.path.join(template.directory, arg)) == template.source:
+            return args[:index] + ["-x", "c++", header] + args[index + 1:]
+    return None
 
 
 def parse_make_deps(text: str) -> list[str]:
@@ -195,6 +213,11 @@ def violation_for(real: str, root: Path, search: list[str]) -> str | None:
     return "dependencia fora do repositorio e do toolchain"
 
 
+def direction_violation(root_layer: str, real: str, root: Path) -> bool:
+    opened = layer_of(real, root)
+    return opened is not None and rank_of(opened) > rank_of(root_layer)
+
+
 def encoding_violation(real: str) -> str | None:
     with open(real, "rb") as handle:
         data = handle.read()
@@ -203,69 +226,65 @@ def encoding_violation(real: str) -> str | None:
     return None
 
 
-def include_edges(unit: Unit, env: dict[str, str]) -> list[tuple[str, str, int]] | None:
-    """(includer, included, line) for every include, read from the -E linemarkers. None if the expansion fails.
-
-    The line is the count of output lines since the last linemarker of the includer. An
-    #include line emits nothing, so the enter marker of the included file sits on its line.
-    """
-    result = subprocess.run(expanded_command(unit), cwd=unit.directory, capture_output=True, env=env)
-    if result.returncode != 0:
-        return None
-    edges: list[tuple[str, str, int]] = []
-    current, counter = None, 0
-    for line in result.stdout.decode("utf-8", "replace").splitlines():
-        marker = LINEMARKER.match(line)
-        if marker is None:
-            counter += 1
-            continue
-        name = os.path.realpath(os.path.join(unit.directory, marker[2]))
-        if "1" in marker[3].split() and current is not None:
-            edges.append((current, name, counter))
-        current, counter = name, int(marker[1])
-    return edges
+def header_paths(root: Path, layer: str) -> list[str]:
+    base = root / layer
+    if not base.is_dir():
+        return []
+    found = []
+    for dirpath, _dirnames, filenames in os.walk(base):
+        for name in filenames:
+            full = os.path.join(dirpath, name)
+            if name.endswith(HEADER_SUFFIXES) and not os.path.islink(full):
+                found.append(full)
+    return sorted(found)
 
 
-def ranked_layer(path: str, root: Path) -> int | None:
-    layer = layer_of(path, root)
-    return None if layer is None else PURE_LAYERS.index(layer)
+def unit_roots(units: list[Unit]) -> list[tuple[str, str, Root | None, str]]:
+    return [(unit.layer, unit.source, Root(unit.layer, unit.source, unit.directory, tuple(base_arguments(unit))), "")
+            for unit in units]
 
 
-def direction_findings(root: Path, edges: list[tuple[str, str, int]]) -> list[Finding]:
-    findings = []
-    for includer, included, line in edges:
-        upper, lower = ranked_layer(includer, root), ranked_layer(included, root)
-        if upper is None or lower is None or lower <= upper:
-            continue
-        where = f"{relative(includer, root)}:{line}"
-        findings.append(Finding(relative(includer, root), UPWARD_FORM,
-                                f"{relative(included, root)} (diretiva em {where})"))
-    return findings
+def header_roots(root: Path, units: list[Unit]) -> list[tuple[str, str, Root | None, str]]:
+    entries = []
+    for layer in PURE_LAYERS:
+        templates = [unit for unit in units if unit.layer == layer]
+        for header in header_paths(root, layer):
+            real = os.path.realpath(header)
+            if not templates:
+                entries.append((layer, real, None,
+                                "camada sem unidade de compilacao para dar as flags deste header; falha fechada"))
+                continue
+            args = command_for_header(templates[0], real)
+            if args is None:
+                entries.append((layer, real, None,
+                                "o fonte do modelo nao aparece na sua linha de compilacao; falha fechada"))
+                continue
+            entries.append((layer, real, Root(layer, real, templates[0].directory, tuple(args)), ""))
+    return entries
 
 
-def analyse_unit(unit: Unit, root: Path, env: dict[str, str], search: list[str]) -> tuple[list[Finding], str | None]:
-    name = relative(unit.source, root)
-    if os.path.basename(unit.argv[0]).startswith(("ccache", "sccache")):
+def analyse_root(item: Root, root: Path, env: dict[str, str], search: list[str]) -> tuple[list[Finding], str | None]:
+    name = relative(item.source, root)
+    if os.path.basename(item.argv[0]).startswith(("ccache", "sccache")):
         return [], "launcher de cache na linha de compilacao: nao suportado pelo portao"
-    result = subprocess.run(plain_command(unit), cwd=unit.directory, capture_output=True, env=env)
+    result = subprocess.run(list(item.argv) + ["-w", "-M"], cwd=item.directory, capture_output=True, env=env)
     if result.returncode != 0:
         first = result.stderr.decode("utf-8", "replace").strip().splitlines()
         return [], f"o pre-processador falhou: {first[0] if first else 'sem mensagem'}"
     findings = []
     for listed in parse_make_deps(result.stdout.decode("utf-8", "replace")):
-        real = os.path.realpath(os.path.join(unit.directory, listed))
+        real = os.path.realpath(os.path.join(item.directory, listed))
         reason = violation_for(real, root, search)
         if reason:
             findings.append(Finding(name, reason, listed))
+            continue
+        if direction_violation(item.layer, real, root):
+            findings.append(Finding(name, UPWARD_FORM, f"{relative(real, root)} (raiz da camada {item.layer})"))
             continue
         if layer_of(real, root) is not None and os.path.isfile(real):
             encoding = encoding_violation(real)
             if encoding:
                 findings.append(Finding(name, encoding, relative(real, root)))
-    edges = include_edges(unit, env)
-    if edges is None:
-        return [], "o pre-processador falhou na expansao (-E), depois de passar no -M"
-    findings.extend(direction_findings(root, edges))
     return findings, None
 
 
@@ -298,22 +317,29 @@ def scan(root: Path, build_dir: Path) -> Report:
     env = clean_env()
     search = {compiler: toolchain_dirs(compiler, env)
               for compiler in sorted({unit.argv[0] for unit in units})}
-    report = Report(found=len(units))
+    entries = unit_roots(units) + header_roots(root, units)
+    report = Report()
     for layer in PURE_LAYERS:
-        report.layer_found[layer] = sum(1 for unit in units if unit.layer == layer)
+        report.layer_found[layer] = 0
         report.layer_analysed[layer] = 0
         report.layer_failed[layer] = 0
-    for unit in units:
-        findings, failure = analyse_unit(unit, root, env, search[unit.argv[0]])
+    for layer, path, item, reason in entries:
+        report.found += 1
+        report.layer_found[layer] += 1
+        if item is None:
+            report.failed.append((relative(path, root), reason))
+            report.layer_failed[layer] += 1
+            continue
+        findings, failure = analyse_root(item, root, env, search[item.argv[0]])
         if failure:
-            report.failed.append((relative(unit.source, root), failure))
-            report.layer_failed[unit.layer] += 1
+            report.failed.append((relative(item.source, root), failure))
+            report.layer_failed[layer] += 1
             continue
         report.analysed += 1
-        report.layer_analysed[unit.layer] += 1
+        report.layer_analysed[layer] += 1
         report.findings.extend(findings)
     for layer in PURE_LAYERS:
-        if report.layer_found[layer] == 0:
+        if not any(unit.layer == layer for unit in units):
             report.findings.append(Finding(layer, "camada sem nenhuma unidade de compilacao",
                                            "o piso de varredura exige ao menos uma por camada (L-36)"))
     report.findings.extend(structural_findings(root, units))

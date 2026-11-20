@@ -4,9 +4,9 @@
 # Gate de camadas (L-17) no CI. Workflow proprio, separado do lei-zero.yml:
 # os itens C4a e C4b (matriz de build) e o C5 tambem mexem em CI, e um arquivo so
 # faria os quatro brigarem pela mesma linha. Este nao compila nem executa nada do
-# jogo: o compilador so roda o pre-processador, em modo de dependencia (-M) e de
-# expansao (-E). O -E alimenta a politica de direcao (C10): include para cima entre
-# as camadas puras reprova, citando arquivo:linha.
+# jogo: o compilador so roda o pre-processador, em modo de dependencia (-M), uma vez
+# por raiz (cada unidade e cada header das camadas puras). Include para cima entre
+# as camadas puras reprova (C10).
 name: Camadas
 
 on:
