@@ -178,15 +178,11 @@ jobs:
           repo="$RUNNER_TEMP/red-synthetic"
           log="$RUNNER_TEMP/red-synthetic.log"
           bash "$GITHUB_WORKSPACE/tools/ci/gitleaks/fixture_synthetic_repo.sh" "$repo"
-          gate=0
-          out=$(bash "$GITHUB_WORKSPACE/tools/ci/gitleaks/guard.sh" scan "$repo" "$log") || gate=$?
-          cat "$log"
-          printf '%s\n' "$out"
-          echo "judge exit status: $gate"
-          if [ "$gate" != "1" ]; then echo "RED PROOF 1 FAILED: the guard did not reject (status $gate)"; exit 1; fi
-          if ! grep -qx 'GUARD_VERDICT=leak' <<<"$out"; then echo "RED PROOF 1 FAILED: verdict is not leak"; exit 1; fi
-          if ! grep -qx 'GUARD_COUNT=1' <<<"$out"; then echo "RED PROOF 1 FAILED: the commit count is not 1"; exit 1; fi
-          if ! grep -qx 'GUARD_RC=1' <<<"$out"; then echo "RED PROOF 1 FAILED: the exit code is not 1"; exit 1; fi
+          expect="$GITHUB_WORKSPACE/tools/ci/gitleaks/expect.sh"
+          if ! bash "$expect" leak 1 "$repo" "$log"; then
+            echo "RED PROOF 1 FAILED: the guard did not reject the synthetic key"
+            exit 1
+          fi
           echo "RED PROOF 1 PASSED: exit 1, verdict leak, one commit counted"
 
       - name: Red proof half 2, the guard must reject a repository with no commit
@@ -196,13 +192,11 @@ jobs:
           log="$RUNNER_TEMP/red-empty.log"
           mkdir "$repo"
           git init -q -b main "$repo"
-          gate=0
-          out=$(bash "$GITHUB_WORKSPACE/tools/ci/gitleaks/guard.sh" scan "$repo" "$log") || gate=$?
-          cat "$log"
-          printf '%s\n' "$out"
-          echo "judge exit status: $gate, verdict $(sed -n 's/^GUARD_VERDICT=//p' <<<"$out")"
-          if [ "$gate" != "1" ]; then echo "RED PROOF 2 FAILED: the guard did not reject (status $gate)"; exit 1; fi
-          if ! grep -qx 'GUARD_VERDICT=zero' <<<"$out"; then echo "RED PROOF 2 FAILED: the verdict is not zero, it is $(sed -n 's/^GUARD_VERDICT=//p' <<<"$out")"; exit 1; fi
+          expect="$GITHUB_WORKSPACE/tools/ci/gitleaks/expect.sh"
+          if ! bash "$expect" zero any "$repo" "$log"; then
+            echo "RED PROOF 2 FAILED: the guard did not reject the repository with no commit"
+            exit 1
+          fi
           echo "RED PROOF 2 PASSED: the guard rejected a repository with no commit"
 
       - name: Allowlist gate, the allowlist does not grow in silence
@@ -214,11 +208,10 @@ jobs:
           # This proves the comparison can fail before the real file is trusted.
           fake="$RUNNER_TEMP/allowlist-fake"
           printf '# fabricated for the red proof, no secret\nfake/one.txt:fake-rule:1\nfake/two.txt:fake-rule:2\n' > "$fake"
-          red_status=0
-          red_out=$(bash "$gate_script" "$fake" "$GITLEAKS_ALLOWLIST_ENTRIES" 2>&1) || red_status=$?
-          printf '%s\n' "$red_out"
-          if [ "$red_status" != "1" ]; then echo "ALLOWLIST RED PROOF FAILED: status $red_status"; exit 1; fi
-          case "$red_out" in *REJECTED*) ;; *) echo "ALLOWLIST RED PROOF FAILED: no rejection line"; exit 1 ;; esac
+          if ! bash "$GITHUB_WORKSPACE/tools/ci/gitleaks/expect_allowlist_rejects.sh" "$fake" "$GITLEAKS_ALLOWLIST_ENTRIES"; then
+            echo "ALLOWLIST RED PROOF FAILED: the fabricated file was not rejected"
+            exit 1
+          fi
           echo "ALLOWLIST RED PROOF PASSED: 2 fabricated entries against a declared $GITLEAKS_ALLOWLIST_ENTRIES are rejected"
           bash "$gate_script" "$allow" "$GITLEAKS_ALLOWLIST_ENTRIES" || { echo "ALLOWLIST GATE FAILED: the real allowlist differs from the declared count"; exit 1; }
 
@@ -226,16 +219,10 @@ jobs:
         run: |
           set -eu
           log="$RUNNER_TEMP/real.log"
-          gate=0
-          out=$(bash "$GITHUB_WORKSPACE/tools/ci/gitleaks/guard.sh" scan "$GITHUB_WORKSPACE" "$log") || gate=$?
-          cat "$log"
-          printf '%s\n' "$out"
-          echo "git rev-list --count --all: $(git -C "$GITHUB_WORKSPACE" rev-list --count --all || true)"
-          echo "git rev-list --count HEAD: $(git -C "$GITHUB_WORKSPACE" rev-list --count HEAD || true)"
-          if [ "$gate" != "0" ]; then
-            echo "REAL SCAN REJECTED: verdict $(sed -n 's/^GUARD_VERDICT=//p' <<<"$out"), reason $(sed -n 's/^GUARD_REASON=//p' <<<"$out")"
+          expect="$GITHUB_WORKSPACE/tools/ci/gitleaks/expect.sh"
+          if ! bash "$expect" accept any "$GITHUB_WORKSPACE" "$log"; then
+            echo "REAL SCAN REJECTED: the verdict and the reason are in the lines above"
             exit 1
           fi
-          # Exit 0 comes only from the accept verdict, which already requires a count above zero.
-          count=$(sed -n 's/^GUARD_COUNT=//p' <<<"$out")
-          echo "REAL SCAN ACCEPTED: $count commits scanned, above zero"
+          echo "git rev-list --count --all: $(git -C "$GITHUB_WORKSPACE" rev-list --count --all || true)"
+          echo "git rev-list --count HEAD: $(git -C "$GITHUB_WORKSPACE" rev-list --count HEAD || true)"
