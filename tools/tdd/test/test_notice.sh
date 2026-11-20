@@ -61,9 +61,9 @@ expect_mute() {
     expect_eq "$1" "rc0|" "rc$RC|$(cat "$CASE_ROOT/out.txt")"
 }
 
-# expect_notice NAME REASON: exit 0, and the stdout is the PreToolUse JSON with the
-# given reason in both systemMessage and additionalContext.
-expect_notice() {
+# expect_text NAME TEXT: exit 0, and the stdout is the PreToolUse JSON whose
+# systemMessage and additionalContext are exactly TEXT.
+expect_text() {
     run_notice
     if [ "$RC" -eq 0 ] && python3 - "$CASE_ROOT/out.txt" "$2" <<'PY' >/dev/null 2>&1
 import json
@@ -71,8 +71,7 @@ import sys
 
 with open(sys.argv[1], encoding="utf-8") as f:
     data = json.load(f)
-want = ("TDD guard não rodou (falha de infraestrutura): " + sys.argv[2]
-        + ". A edição foi liberada sem teste.")
+want = sys.argv[2]
 hso = data["hookSpecificOutput"]
 assert hso["hookEventName"] == "PreToolUse"
 assert data["systemMessage"] == want
@@ -85,6 +84,15 @@ PY
         fail_case "$1" "rc $RC, saida: $(head -c 300 "$CASE_ROOT/out.txt")"
     fi
 }
+
+# expect_notice NAME REASON: the "liberada sem teste" text, with REASON as the motive.
+expect_notice() {
+    expect_text "$1" "TDD guard não rodou (falha de infraestrutura): $2. A edição foi liberada sem teste."
+}
+
+# BLOCK_JSON: the text for an unreadable state that the guard reads as no state (it
+# blocks production edits until the runner writes the state again).
+BLOCK_JSON="TDD guard sem estado legível: as edições de produção ficam bloqueadas até o runner gravar o estado de novo (JSON inválido)."
 
 # Case 1: ran=false with a last-reason from run_suite.sh. The "sem execucao: " prefix
 # is the invoker's own; the motive is what follows it.
@@ -102,21 +110,29 @@ expect_mute "ran=true fica mudo"
 new_case
 expect_mute "sem estado fica mudo"
 
-# Case 4: a state that is not valid JSON warns with "estado ilegível".
+# Case 4: a state that is not valid JSON. The guard reads it as no state and blocks
+# production edits, so the notice says so (the blocking text, not "liberada").
 new_case
 write_state '{"ran": tru'
-expect_notice "JSON ilegivel avisa com estado ilegivel" "estado ilegível"
+expect_text "JSON invalido bloqueia: texto de bloqueio" "$BLOCK_JSON"
 
-# Case 5: a state that is valid JSON but not an object is treated as unreadable.
+# Case 4b: bytes that are not UTF-8 are the same case: the guard reads them as no state.
+new_case
+mkdir -p "$(dirname "$CASE_STATE")"
+printf '\377\376{' > "$CASE_STATE"
+expect_text "UTF-8 invalido bloqueia: texto de bloqueio" "$BLOCK_JSON"
+
+# Case 5: a state that is valid JSON but not an object. The guard fails open on it
+# (an AttributeError inside it, caught), so the notice keeps the "liberada" text.
 new_case
 write_state '[1, 2]'
-expect_notice "JSON que nao e objeto avisa com estado ilegivel" "estado ilegível"
+expect_notice "JSON que nao e objeto avisa como liberada" "estado ilegível"
 
-# Case 6: a state path that cannot be read as a file (a directory) also warns, and
-# never blocks.
+# Case 6: a state path that cannot be read as a file (a directory). The guard fails
+# open here (WARN_STATE_IO), so the notice keeps the "liberada" text and never blocks.
 new_case
 mkdir -p "$CASE_STATE"
-expect_notice "estado que nao le como arquivo avisa e sai com 0" "estado ilegível"
+expect_notice "estado que nao le como arquivo avisa como liberada e sai com 0" "estado ilegível"
 
 # Case 7: quotes, accents, and a backslash in the reason survive the JSON encoding.
 new_case
