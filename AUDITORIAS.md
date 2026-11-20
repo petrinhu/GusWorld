@@ -42,7 +42,7 @@ Dois níveis, os dois obrigatórios:
 
 ## 3. Auditoria de plataforma (L-09, L-20)
 
-- Matriz de **cinco entradas** verde: Fedora 44 (pinado, nunca `:latest`), Ubuntu, Arch, CachyOS, Windows.
+- Matriz de **nove entradas** verde, em **cinco plataformas**, todas em `:latest` (L-09): Fedora, Ubuntu, Arch, CachyOS, Windows.
 - Verde num alvo **não** autoriza declarar outro alvo suportado (CachyOS não é coberto pelo job de Arch).
 
 ---
