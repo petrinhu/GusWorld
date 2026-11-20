@@ -4,7 +4,9 @@
 # Gate de camadas (L-17) no CI. Workflow proprio, separado do lei-zero.yml:
 # os itens C4a e C4b (matriz de build) e o C5 tambem mexem em CI, e um arquivo so
 # faria os quatro brigarem pela mesma linha. Este nao compila nem executa nada do
-# jogo: o compilador so roda o pre-processador, em modo de dependencia (-M).
+# jogo: o compilador so roda o pre-processador, em modo de dependencia (-M) e de
+# expansao (-E). O -E alimenta a politica de direcao (C10): include para cima entre
+# as camadas puras reprova, citando arquivo:linha.
 name: Camadas
 
 on:
@@ -54,5 +56,5 @@ jobs:
         # compilacao exata que o CMake gera. Nada e compilado nem executado.
         run: cmake -S . -B "$RUNNER_TEMP/layers-build" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-      - name: Arvore inteira, pelo compilador
+      - name: Arvore inteira, pelo compilador (contencao e direcao entre as camadas)
         run: python3 tools/ci/check_layers.py --build "$RUNNER_TEMP/layers-build"

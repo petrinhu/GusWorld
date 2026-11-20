@@ -18,6 +18,13 @@ else is a violation. Each pure-layer file is also read as bytes, and a file in
 UTF-16 or with NUL bytes is a violation, because the compiler may be reading
 something the text does not show.
 
+Direction (C10, L-17): the layers depend only downward, core/ -> content/ -> domain/
+-> app/. The same compiler runs once more in expansion mode (-E), whose linemarkers
+name every include edge (who opened which file, on which line). An edge from a
+pure layer to a pure layer above it is a violation, and it is judged per edge, so a
+transitive include through a lower header is caught too. present/ stays with the
+gate above: its includes are already refused there.
+
 Usage:
   python3 tools/ci/check_layers.py --build <dir>   gate; <dir> holds compile_commands.json
   python3 tools/ci/check_layers.py --selftest      runs tools/ci/test_check_layers.py
@@ -32,6 +39,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -55,6 +63,9 @@ DROPPED_FLAGS = ("-c", "-M", "-MM", "-MD", "-MMD", "-MG", "-MP")
 DROPPED_WITH_VALUE = ("-o", "-MF", "-MT", "-MQ")
 DROPPED_PREFIXES = ("-fmodule", "-fdeps-", "-MF", "-MT", "-MQ")
 UTF16_BOMS = (b"\xff\xfe", b"\xfe\xff")
+# A linemarker from `-E`: `# <line> "<file>"` plus flags. Flag 1 means the file was entered, flag 2 means it was left.
+LINEMARKER = re.compile(r'^# (\d+) "(.*)"((?: \d+)*)$')
+UPWARD_FORM = "include para cima: camada de baixo nao pode depender da de cima"
 
 
 @dataclass(frozen=True)
@@ -137,8 +148,8 @@ def toolchain_dirs(compiler: str, env: dict[str, str]) -> list[str]:
     return dirs
 
 
-def plain_command(unit: Unit) -> list[str]:
-    """The unit's own compile command, minus what writes output or scans modules. The source stays: -M reads it."""
+def base_arguments(unit: Unit) -> list[str]:
+    """The unit's own compile arguments, minus what writes output or scans modules. The source stays: the preprocessor reads it."""
     out, skip_next = [], False
     for arg in unit.argv:
         if skip_next:
@@ -150,7 +161,15 @@ def plain_command(unit: Unit) -> list[str]:
         if arg in DROPPED_FLAGS or arg.startswith(DROPPED_PREFIXES):
             continue
         out.append(arg)
-    return out + ["-M"]
+    return out
+
+
+def plain_command(unit: Unit) -> list[str]:
+    return base_arguments(unit) + ["-M"]
+
+
+def expanded_command(unit: Unit) -> list[str]:
+    return base_arguments(unit) + ["-E"]
 
 
 def parse_make_deps(text: str) -> list[str]:
@@ -179,6 +198,46 @@ def encoding_violation(real: str) -> str | None:
     return None
 
 
+def include_edges(unit: Unit, env: dict[str, str]) -> list[tuple[str, str, int]] | None:
+    """(includer, included, line) for every include, read from the -E linemarkers. None if the expansion fails.
+
+    The line is the count of output lines since the last linemarker of the includer. An
+    #include line emits nothing, so the enter marker of the included file sits on its line.
+    """
+    result = subprocess.run(expanded_command(unit), cwd=unit.directory, capture_output=True, env=env)
+    if result.returncode != 0:
+        return None
+    edges: list[tuple[str, str, int]] = []
+    current, counter = None, 0
+    for line in result.stdout.decode("utf-8", "replace").splitlines():
+        marker = LINEMARKER.match(line)
+        if marker is None:
+            counter += 1
+            continue
+        name = os.path.realpath(os.path.join(unit.directory, marker[2]))
+        if "1" in marker[3].split() and current is not None:
+            edges.append((current, name, counter))
+        current, counter = name, int(marker[1])
+    return edges
+
+
+def ranked_layer(path: str, root: Path) -> int | None:
+    layer = layer_of(path, root)
+    return None if layer is None else PURE_LAYERS.index(layer)
+
+
+def direction_findings(root: Path, edges: list[tuple[str, str, int]]) -> list[Finding]:
+    findings = []
+    for includer, included, line in edges:
+        upper, lower = ranked_layer(includer, root), ranked_layer(included, root)
+        if upper is None or lower is None or lower <= upper:
+            continue
+        where = f"{relative(includer, root)}:{line}"
+        findings.append(Finding(relative(includer, root), UPWARD_FORM,
+                                f"{relative(included, root)} (diretiva em {where})"))
+    return findings
+
+
 def analyse_unit(unit: Unit, root: Path, env: dict[str, str], search: list[str]) -> tuple[list[Finding], str | None]:
     name = relative(unit.source, root)
     if os.path.basename(unit.argv[0]).startswith(("ccache", "sccache")):
@@ -198,6 +257,10 @@ def analyse_unit(unit: Unit, root: Path, env: dict[str, str], search: list[str])
             encoding = encoding_violation(real)
             if encoding:
                 findings.append(Finding(name, encoding, relative(real, root)))
+    edges = include_edges(unit, env)
+    if edges is None:
+        return [], "o pre-processador falhou na expansao (-E), depois de passar no -M"
+    findings.extend(direction_findings(root, edges))
     return findings, None
 
 
