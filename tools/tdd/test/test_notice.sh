@@ -211,6 +211,45 @@ else
     fail_case "PreToolUse de notice.py registrado e hooks antigos preservados"
 fi
 
+# Case 14: last-reason is a symlink. /var/tmp is writable by every local user, so the
+# symlink target is never read: the motive becomes the fixed text, and the notice still
+# warns.
+new_case
+write_state '{"ran": false}'
+printf '%s' 'sem execucao: alvo de ataque' > "$CASE_ROOT/target.txt"
+mkdir -p "$(dirname "$CASE_REASON")"
+ln -s "$CASE_ROOT/target.txt" "$CASE_REASON"
+expect_notice "last-reason simbolico vira motivo indisponivel e ainda avisa" "motivo indisponível"
+
+# Case 15: the digest folder is writable by group or others. The reason is not trusted,
+# and the notice still warns. (The owner check, uid against getuid(), cannot be tested
+# here: the container runs as builder and cannot create a file owned by another uid.)
+new_case
+write_state '{"ran": false}'
+write_reason 'sem execucao: docker: daemon fora do ar'
+chmod 0777 "$(dirname "$CASE_REASON")"
+expect_notice "pasta do digest gravavel por outros vira motivo indisponivel" "motivo indisponível"
+
+# Case 16: the reason file itself is writable by group or others.
+new_case
+write_state '{"ran": false}'
+write_reason 'sem execucao: docker: daemon fora do ar'
+chmod 0666 "$CASE_REASON"
+expect_notice "arquivo gravavel por outros vira motivo indisponivel" "motivo indisponível"
+
+# Case 17: a reason longer than 200 characters is cut to 200, and the notice still warns.
+new_case
+write_state '{"ran": false}'
+write_reason "sem execucao: $(printf 'a%.0s' $(seq 1 250))"
+expect_notice "motivo com mais de 200 caracteres sai com 200" "$(printf 'a%.0s' $(seq 1 200))"
+
+# Case 18: ANSI escape sequences and control characters are removed. Only printable
+# text stays.
+new_case
+write_state '{"ran": false}'
+write_reason "$(printf 'sem execucao: \033[31mdocker\033[0m\007 falhou\000 aqui')"
+expect_notice "controle e ANSI saem do motivo" "docker falhou aqui"
+
 for d in "${CLEAN[@]}"; do
     rm -rf -- "$d"
 done
