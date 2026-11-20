@@ -17,7 +17,10 @@ FAKE_PREP="$FIXTURES/fake_docker_prepare.sh"
 require_file "fixture do docker falso de prepare existe" "$FAKE_PREP"
 [ -f "$FAKE_PREP" ] || suite_done
 
-GOOD_HOSTCONF="none|0|0|false|4294967296|[ALL]|[no-new-privileges]|builder"
+GOOD_HOSTCONF="none|0|0|false|4294967296|4294967296|233|4000000000|[ALL]|[]|[no-new-privileges]|builder||private|||0|0"
+
+# The cold answer of in_container.sh: the marker line, then verdict 3 (MÉDIA-1).
+COLD_OUT="$(printf 'tdd: contêiner frio, sem CMakeCache apontando para /work/src\ntdd-verdict: 3')"
 
 # count REGEX: how many log lines match. Prints 0 when none does.
 count() {
@@ -67,7 +70,7 @@ fresh() {
     export FAKE_CREATE_RC=0 FAKE_START_RC=0 FAKE_CP_RC=0
     export FAKE_WORK_RC=1 FAKE_WORK_W_RC=0 FAKE_CACHE_RC=1
     export FAKE_CMAKE_RC=0 FAKE_BUILD_RC=0 FAKE_GATE_RC=0
-    export FAKE_EXEC_OUT="tdd-verdict: 3" FAKE_EXEC_RC=3
+    export FAKE_EXEC_OUT="$COLD_OUT" FAKE_EXEC_RC=3
 }
 
 # run_prepare: one run of prepare.sh of the fixture against the fake docker. Sets RC.
@@ -95,7 +98,7 @@ expect_eq "imagem defasada: nenhum create" 0 "$(count '^create ')"
 
 # C. An existing container that container_ready refuses is refused, not replaced.
 fresh
-export FAKE_CTR_RC=0 FAKE_CTR_HOSTCONF="none|1|0|false|4294967296|[ALL]|[no-new-privileges]|builder"
+export FAKE_CTR_RC=0 FAKE_CTR_HOSTCONF="none|1|0|false|4294967296|4294967296|233|4000000000|[ALL]|[]|[no-new-privileges]|builder||private|||0|0"
 run_prepare
 expect_eq "contêiner reprovado: rc 1" 1 "$RC"
 expect_in "contêiner reprovado: motivo vem do container_ready" "diverge" "$(cat "$OUT")"
@@ -199,5 +202,31 @@ run_prepare
 expect_eq "portao de recurso reprova: rc 1" 1 "$RC"
 expect_in "portao de recurso reprova: motivo cita o portao" "portao de recurso" "$(cat "$OUT")"
 expect_eq "portao de recurso reprova: nenhum create" 0 "$(count '^create ')"
+
+# L. A cold verdict 3 is accepted only with the cold marker of in_container.sh (MÉDIA-1).
+# A busy lock, a broken extraction or a CMake regeneration error answers 3 too, and must
+# be refused with its own reason, never taken for a cold cache.
+refuse_3() {
+    fresh
+    export FAKE_EXEC_OUT="$(printf '%s\ntdd-verdict: 3' "$2")" FAKE_EXEC_RC=3
+    run_prepare
+    expect_eq "$1: rc 1" 1 "$RC"
+    expect_in "$1: motivo cita $3" "$3" "$(cat "$OUT")"
+    expect_eq "$1: nenhum cmake" 0 "$(count 'cmake -S ')"
+}
+refuse_3 "trava ocupada, veredito 3" "tdd: trava ocupada por mais de 34 s" "trava"
+refuse_3 "extracao quebrada, veredito 3" "tdd: extracao da arvore falhou" "extracao"
+refuse_3 "erro de regeneracao do CMake, veredito 3" "tdd: erro de regeneracao do CMake" "regeneracao"
+refuse_3 "veredito 3 sem marcador de frio" "tdd: motivo qualquer" "motivo qualquer"
+
+# M. seed/work must be empty before the tar is built (BAIXA-5): a leftover file refuses.
+fresh
+SEED_H="$(printf '%s' "$FX" | sha256sum | cut -c1-16)"
+mkdir -p "/var/tmp/gusworld-tdd/$SEED_H/seed/work"
+: > "/var/tmp/gusworld-tdd/$SEED_H/seed/work/lixo"
+run_prepare
+expect_eq "seed com resto: rc 1" 1 "$RC"
+expect_in "seed com resto: motivo cita seed" "seed" "$(cat "$OUT")"
+expect_eq "seed com resto: nenhum cp" 0 "$(count '^cp ')"
 
 suite_done

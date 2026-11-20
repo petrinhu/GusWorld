@@ -71,7 +71,7 @@ expect_eq "contêiner de outra imagem: rc 126" 126 "$RR_RC"
 expect_eq "contêiner de outra imagem: docker exec nunca chamado" 0 "$(exec_calls "$LOG")"
 
 LOG="$BIN/bind.log"
-run_refusal "$LOG" FAKE_CTR_HOSTCONF="none|1|0|false|2147483648|[ALL]|[no-new-privileges]|builder"
+run_refusal "$LOG" FAKE_CTR_HOSTCONF="none|1|0|false|4294967296|4294967296|233|4000000000|[ALL]|[]|[no-new-privileges]|builder||private|||0|0"
 expect_eq "contêiner com bind: rc 126" 126 "$RR_RC"
 expect_rc "contêiner com bind: motivo cita HostConfig" 0 grep -q 'HostConfig' "$reason"
 expect_eq "contêiner com bind: docker exec nunca chamado" 0 "$(exec_calls "$LOG")"

@@ -44,7 +44,7 @@ case "$1" in
     container)
         if [ "$2" = inspect ]; then
             case "$*" in
-                *HostConfig*) printf '%s\n' "${FAKE_CTR_HOSTCONF:-none|0|0|false|4294967296|[ALL]|[no-new-privileges]|builder}" ;;
+                *HostConfig*) printf '%s\n' "${FAKE_CTR_HOSTCONF:-none|0|0|false|4294967296|4294967296|233|4000000000|[ALL]|[]|[no-new-privileges]|builder||private|||0|0}" ;;
                 *State.Running*) printf 'true\n' ;;
                 *) printf '%s\n' "${FAKE_CTR_IMAGE:-sha256:imagemfake}" ;;
             esac

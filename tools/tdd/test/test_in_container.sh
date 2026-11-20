@@ -121,4 +121,32 @@ ic_run "$W" "$TREES/slow"
 unset GUSWORLD_TDD_BUDGET
 expect_eq "valor invalido de prazo e ignorado: rc 0" 0 "$IC_RC"
 
+# 15. The extraction is inside the budget (MÉDIA-3). The tree arrives 3 s late, after a
+# 1 s budget has run out: the extraction is cut, and the run ends with 3 and the reason.
+W="$(new_work)"
+ic_prime "$W" "$TREES/green" Ninja
+tar -C "$TREES/green" -cf "$W/late.tar" .
+( sleep 3; cat "$W/late.tar" ) | GUSWORLD_TDD_BUDGET=1 TDD_WORK="$W" bash "$IC" > "$W/late.log" 2>&1
+late_rc=$?
+expect_eq "extracao que estoura o prazo: rc 3" 3 "$late_rc"
+expect_eq "extracao que estoura o prazo: motivo impresso" 1 \
+    "$(grep -cE '^tdd: estouro de prazo (na|antes da) extracao' "$W/late.log")"
+
+# 16. The touch of changed files is inside the budget too (MÉDIA-3). A tree whose
+# touch_changed.sh sleeps 3 s, under a 1 s budget, must end with 3 in about 1 s, not 3 s.
+TREE_TOUCH="$W/tree_slowtouch"
+mkdir -p "$TREE_TOUCH"
+cp -a "$TREES/green/." "$TREE_TOUCH/"
+printf '#!/usr/bin/env bash\nsleep 3\nexit 0\n' > "$TREE_TOUCH/tools/tdd/touch_changed.sh"
+chmod 755 "$TREE_TOUCH/tools/tdd/touch_changed.sh"
+W="$(new_work)"
+ic_prime "$W" "$TREES/green" Ninja
+t0="$(date +%s%N)"
+export GUSWORLD_TDD_BUDGET=1
+ic_run "$W" "$TREE_TOUCH"
+unset GUSWORLD_TDD_BUDGET
+t1="$(date +%s%N)"
+expect_eq "touch que estoura o prazo: rc 3" 3 "$IC_RC"
+expect_eq "touch que estoura o prazo: corta antes de 2 s" 1 "$(( (t1 - t0) < 2000000000 ? 1 : 0 ))"
+
 suite_done
