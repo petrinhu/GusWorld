@@ -9,8 +9,9 @@ set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 root="$(cd "$here/../../.." && pwd -P)"
-hash="$("$root/tools/container/env_hash.sh")"
-tag="gusworld-ci-fedora:${hash:0:12}"
+# Image pinned for this slice (the digest-labelled build of the base). Replaced by
+# image_select.sh in the fix commit, which chooses the image by its own label.
+tag="gusworld-ci-fedora:7ca9869fd9d8"
 
 out_dir=/var/tmp/gusworld-tdd-test
 mkdir -p "$out_dir"

@@ -19,6 +19,7 @@ fi
 SENT="$BIN/sentinel-ran"
 export SENTINEL_FILE="$SENT"
 export FAKE_DOCKER_LOG="$BIN/docker.log"
+setup_fake_image "$FX"
 export FAKE_DOCKER_STDIN="$BIN/exec-stdin.tar"
 export PATH="$BIN:$PATH"
 

@@ -117,3 +117,82 @@ make_fakebin() {
     fi
     printf '%s\n' "$bin"
 }
+
+# Digest of the image the fake docker reports. Its tag is the hash of the current
+# context plus this digest (env_hash.sh, A4), so the tag is computed, not typed.
+TEST_DIGEST="sha256:a7d72ba2745b100a3351087472e5ee7b2450af7cf331e7673007e3817612839c"
+
+# fixture_tag FX: the tag that the fixture's env_hash.sh gives for TEST_DIGEST.
+fixture_tag() {
+    printf 'gusworld-ci-fedora:%s\n' "$("$1/tools/container/env_hash.sh" "$TEST_DIGEST" | cut -c1-12)"
+}
+
+# setup_fake_image FX: the fake docker reports one local image, labelled with
+# TEST_DIGEST and tagged with the tag that this context gives.
+setup_fake_image() {
+    export FAKE_IMAGE_LS
+    FAKE_IMAGE_LS="$(fixture_tag "$1")"
+    export FAKE_IMAGE_DIGEST="$TEST_DIGEST"
+}
+
+# make_mini_tree KIND DIR: a tiny CMake project with the helpers in_container.sh reads.
+# KIND selects the defect: green, zero (no add_test), badcompile, failtest (test
+# returns 1), badcmake (CMakeLists that does not parse).
+make_mini_tree() {
+    local kind="$1" dir="$2" cml src
+    mkdir -p "$dir/tools/tdd"
+    cp "$TDD_DIR/xdg_check.sh" "$TDD_DIR/ctest_total.sh" "$dir/tools/tdd/"
+    chmod 755 "$dir/tools/tdd/ctest_total.sh"
+    cml="$dir/CMakeLists.txt"
+    src="$dir/t.cpp"
+    if [ "$kind" = badcmake ]; then
+        printf 'this is not cmake(\n' > "$cml"
+    else
+        {
+            printf 'cmake_minimum_required(VERSION 3.20)\n'
+            printf 'project(mini CXX)\n'
+            printf 'enable_testing()\n'
+            printf 'add_executable(t t.cpp)\n'
+            case "$kind" in
+                zero) ;;
+                failtest) printf 'add_test(NAME f COMMAND t)\n' ;;
+                *) printf 'add_test(NAME ok COMMAND t)\n' ;;
+            esac
+        } > "$cml"
+    fi
+    case "$kind" in
+        badcompile) printf 'int main( {\n' > "$src" ;;
+        failtest) printf 'int main() { return 1; }\n' > "$src" ;;
+        *) printf 'int main() { return 0; }\n' > "$src" ;;
+    esac
+}
+
+# ic_run WORK TREE: streams TREE into in_container.sh as the tar would, in WORK.
+# Sets IC_RC, IC_SECS and IC_OUT (the output file).
+ic_run() {
+    local work="$1" tree="$2" start
+    IC_OUT="$work/out.log"
+    tar -C "$tree" -cf "$work/in.tar" .
+    start="$(date +%s)"
+    TDD_WORK="$work" bash "$TDD_DIR/in_container.sh" < "$work/in.tar" > "$IC_OUT" 2>&1
+    IC_RC=$?
+    IC_SECS=$(( $(date +%s) - start ))
+}
+
+# ic_prime WORK TREE GENERATOR: the warm-up. A cold run extracts TREE (it must answer
+# 3), then the tree is configured with GENERATOR, as a warm container would be.
+ic_prime() {
+    local work="$1" tree="$2" gen="$3"
+    ic_run "$work" "$tree"
+    cmake -S "$work/src" -B "$work/build" -G "$gen" > "$work/configure.log" 2>&1
+}
+
+# verdict_of FILE: the last "tdd-verdict:" value in an output file.
+verdict_of() {
+    sed -n 's/^tdd-verdict: //p' "$1" | sed -n '$p'
+}
+
+# new_work: a fresh work directory for in_container.sh (the container's /work).
+new_work() {
+    mktemp -d /tmp/tdd-work-XXXXXX
+}

@@ -37,6 +37,18 @@ rc=$?
 state=$([ -e "$FX/leak.tar" ] && echo presente || echo ausente)
 expect_eq "make_tar recusa segredo: rc 1, sem tar" "1 ausente" "$rc $state"
 
+# Directory entries (no trailing slash, or with one): the directory itself is a
+# secret path too. Each refusal leaves no tar (MÉDIA-6).
+for entry in docs/_secret docs/_secret/ docs/book docs/narrative/deep/stinger; do
+    printf '%s\0' "$entry" > "$FX/list-dir.nul"
+    bash "$TDD_DIR/make_tar.sh" "$FX" "$FX/list-dir.nul" "$FX/dir.tar" >/dev/null 2>&1
+    rc=$?
+    state=$([ -e "$FX/dir.tar" ] && echo presente || echo ausente)
+    expect_eq "make_tar recusa diretorio $entry: rc 1, sem tar" "1 ausente" "$rc $state"
+done
+expect_rc "is_secret_path reconhece docs/book sem barra" 0 is_secret_path docs/book
+expect_rc "is_secret_path reconhece docs/_secret sem barra" 0 is_secret_path docs/_secret
+
 # Empty list: fail closed too.
 : > "$FX/list-empty.nul"
 bash "$TDD_DIR/make_tar.sh" "$FX" "$FX/list-empty.nul" "$FX/empty.tar" >/dev/null 2>&1
