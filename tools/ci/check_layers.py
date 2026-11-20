@@ -21,9 +21,14 @@ something the text does not show.
 Direction (C10, L-17): the layers depend only downward, core/ -> content/ -> domain/
 -> app/. The same compiler runs once more in expansion mode (-E), whose linemarkers
 name every include edge (who opened which file, on which line). An edge from a
-pure layer to a pure layer above it is a violation, and it is judged per edge, so a
-transitive include through a lower header is caught too. present/ stays with the
-gate above: its includes are already refused there.
+pure layer to a pure layer above it is a violation, judged per edge.
+Declared limit, not covered here: an edge exists only when the compiler actually
+opens the included file. A second inclusion of a header guarded by an include guard
+or by #pragma once produces no edge, so an upward include that sits behind an
+already-opened header is missed unless some unit opens that header first. Closing
+this gap (expanding every pure-layer header as its own root) is an open item in the
+INBOX of TODO.md. present/ stays with the gate above: its includes are already
+refused there.
 
 Usage:
   python3 tools/ci/check_layers.py --build <dir>   gate; <dir> holds compile_commands.json
