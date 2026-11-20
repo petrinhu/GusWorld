@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Shared tail of the CI environment scripts (fedora.sh, ubuntu.sh, arch.sh).
+# Shared tail of the per-distro CI environment scripts in this directory.
 # Sourced with `.` by each distro script after its install step; it is not run
 # on its own. It does two things and nothing else:
 #   1. default CC and CXX to cc and c++, and export them with CMAKE_GENERATOR=Ninja
