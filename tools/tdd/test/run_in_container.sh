@@ -14,10 +14,19 @@ root="$(cd "$here/../../.." && pwd -P)"
 image="$("$root/tools/tdd/image_select.sh" "$root" | sed -n 's/^IMAGE_REF=//p')"
 [ -n "$image" ] || { echo "run_in_container: nenhuma imagem atual, rode build_image.sh" >&2; exit 1; }
 
-out_dir=/var/tmp/gusworld-tdd-test
-mkdir -p "$out_dir"
+# A private, fresh work dir per run: mktemp creates it with a random name and mode 700.
+# No fixed path under /var/tmp, so no symlink planted there can redirect the copies or
+# the cleanup. The cleanup is confined to the exact variable, with ${out_dir:?}.
+out_dir="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/gusworld-tdd-test-XXXXXX")"
+trap 'rm -rf -- "${out_dir:?}"' EXIT
 tar_file="$out_dir/test-tree.tar"
-(cd "$root" && tar -c -f "$tar_file" tools/tdd tools/container tools/ci/env tools/ci/cmake_floor.sh .claude/settings.json)
+# The bigtech plugin's hooks travel as a copy under plugin/hooks, read-only from the
+# user's cache (the contract test loads the real tdd_guard from there, L-35). Nothing
+# under ~/.claude is written.
+plugin_src="$HOME/.claude/plugins/cache/petrinhu/bigtech/0.2.0/hooks"
+mkdir -p "$out_dir/plugin"
+cp -a "$plugin_src" "$out_dir/plugin/hooks"
+(cd "$root" && tar -c -f "$tar_file" tools/tdd tools/container tools/ci/env tools/ci/cmake_floor.sh .claude/settings.json -C "$out_dir" plugin)
 tar -t -f "$tar_file" > /dev/null
 
 docker run --rm -i --pull never \
