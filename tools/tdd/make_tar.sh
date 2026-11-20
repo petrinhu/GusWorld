@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Builds the test tar from a NUL-separated list (ADR-026, decision 2). The tar is
-# written to a file, never piped, so its status is the status of tar itself. It is
-# read back and its entry count must equal the list, or the run is refused.
+# written under a partial name, read back, and its entry count must equal the list.
+# Only then is it renamed to the real name. A failure at any step therefore leaves no
+# tar under the real name, without deleting anything (MÉDIA-6). The tar is written to
+# a file, never piped, so its status is the status of tar itself.
 # usage: make_tar.sh <repo_root> <list_nul> <out_tar>
 set -uo pipefail
 
@@ -29,13 +31,15 @@ while IFS= read -r -d '' rel; do
     fi
 done < "$list"
 
-if ! tar -C "$root" --null -T "$list" -cf "$out"; then
+partial="$out.partial"
+names="$out.partial.names"
+
+if ! tar -C "$root" --null -T "$list" -cf "$partial"; then
     echo "make_tar: tar falhou" >&2
     exit 1
 fi
 
-names="$out.names"
-if ! tar -tf "$out" > "$names"; then
+if ! tar -tf "$partial" > "$names"; then
     echo "make_tar: tar gerado nao pode ser lido" >&2
     exit 1
 fi
@@ -46,3 +50,5 @@ if [ "$expected" != "$got" ]; then
     echo "make_tar: tar tem $got entradas, a lista tem $expected" >&2
     exit 1
 fi
+
+mv "$partial" "$out" || exit 1

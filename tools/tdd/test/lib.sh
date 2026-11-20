@@ -141,8 +141,8 @@ setup_fake_image() {
 make_mini_tree() {
     local kind="$1" dir="$2" cml src
     mkdir -p "$dir/tools/tdd"
-    cp "$TDD_DIR/xdg_check.sh" "$TDD_DIR/ctest_total.sh" "$dir/tools/tdd/"
-    chmod 755 "$dir/tools/tdd/ctest_total.sh"
+    cp "$TDD_DIR/xdg_check.sh" "$TDD_DIR/ctest_total.sh" "$TDD_DIR/touch_changed.sh" "$dir/tools/tdd/"
+    chmod 755 "$dir/tools/tdd/ctest_total.sh" "$dir/tools/tdd/touch_changed.sh"
     cml="$dir/CMakeLists.txt"
     src="$dir/t.cpp"
     if [ "$kind" = badcmake ]; then

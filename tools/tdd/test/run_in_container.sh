@@ -9,9 +9,10 @@ set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 root="$(cd "$here/../../.." && pwd -P)"
-# Image pinned for this slice (the digest-labelled build of the base). Replaced by
-# image_select.sh in the fix commit, which chooses the image by its own label.
-tag="gusworld-ci-fedora:7ca9869fd9d8"
+# The image is the local one whose label digest matches the current context, the same
+# choice the guard makes (image_select.sh). No rebuild happens here.
+image="$("$root/tools/tdd/image_select.sh" "$root" | sed -n 's/^IMAGE_REF=//p')"
+[ -n "$image" ] || { echo "run_in_container: nenhuma imagem atual, rode build_image.sh" >&2; exit 1; }
 
 out_dir=/var/tmp/gusworld-tdd-test
 mkdir -p "$out_dir"
@@ -24,6 +25,6 @@ docker run --rm -i --pull never \
     --memory 2g --pids-limit 233 --cpus 4 \
     --cap-drop ALL --security-opt no-new-privileges \
     --user builder \
-    "$tag" \
+    "$image" \
     bash -c 'd="$(mktemp -d)" && tar -x -f - -C "$d" && exec bash "$d/tools/tdd/test/run_tests.sh"' \
     < "$tar_file"
