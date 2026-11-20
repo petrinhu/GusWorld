@@ -7,10 +7,24 @@
 # COMMITTED HEAD (git archive), gets at most one mutant (mutants.py), and is checked by
 # hash: the blob of HEAD must differ from the mutated file, and the tar that enters the
 # container must carry the mutated bytes. The live tree is never edited. The tests run
-# in the container (L-35), without volume and without network, under 80 pids and 2 GiB.
+# in the container (L-35), without volume and without network, under the pids limit below
+# and 2 GiB.
 # usage: mutate_guard.sh baseline M1 [M2 ... M8]
 # M8 undoes the two halves of the R2 fix (mutants.py, MULTI).
 set -u
+
+# The pids limit of each container. The default is 80. GUSWORLD_TEST_PIDS can only
+# TIGHTEN it: an integer from 1 to 80. Any other value keeps the default 80.
+pids_limit=80
+case "${GUSWORLD_TEST_PIDS:-}" in
+    ""|*[!0-9]*) ;;
+    *)
+        if [ "$GUSWORLD_TEST_PIDS" -ge 1 ] && [ "$GUSWORLD_TEST_PIDS" -le 80 ]; then
+            pids_limit="$GUSWORLD_TEST_PIDS"
+        fi
+        ;;
+esac
+echo "mutate_guard: pids-limit $pids_limit" >&2
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 root="$(cd "$here/../../.." && pwd -P)"
@@ -68,7 +82,7 @@ run_case() {
     local cname="gusworld-mut-$id-$$"
     docker run --rm -i --pull never --name "$cname" \
         --network none \
-        --memory 2g --memory-swap 2g --pids-limit 80 \
+        --memory 2g --memory-swap 2g --pids-limit "$pids_limit" \
         --cap-drop ALL --security-opt no-new-privileges \
         --user builder \
         "$image" \
@@ -106,7 +120,7 @@ sample_pids() {
         fi
         sleep 0.05
     done
-    printf 'pids.peak=%s pids.events=[%s] (limite 80)\n' "$peak" "$events" > "$out"
+    printf 'pids.peak=%s pids.events=[%s] (limite %s)\n' "$peak" "$events" "$pids_limit" > "$out"
 }
 
 run_case baseline || { echo "linha de base nao executada: nada a comparar" >&2; exit 1; }
