@@ -208,7 +208,7 @@ tar -C "$PWD" -cf - . | docker run --rm -i -w /work \
 '
 ```
 
-> Em Fedora/SELinux precisa do flag `:Z` no mount. Em Ubuntu/Debian basta `:rw`.
+> Nesta máquina, volume de host não funciona com o SELinux em `Enforcing`: a árvore entra por `tar` na entrada padrão, como no exemplo acima (fonte: `CLAUDE.md` do projeto GusWorld).
 
 ### T15.2  C++ (CMake + Ninja)
 
