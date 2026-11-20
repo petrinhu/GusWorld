@@ -14,13 +14,13 @@ version="0.122.1"
 sha256="f1ba7e2917ee1395618de20a98da0aa7c0fb1788927797651047c50502a37538"
 tarball="grype_${version}_linux_amd64.tar.gz"
 base="https://github.com/anchore/grype/releases/download/v${version}"
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 work="$(mktemp -d "${RUNNER_TEMP:-/var/tmp}/grype-download.XXXXXX")"
 # The download directory is removed on every exit, success or failure, by its own path.
 trap 'rm -rf "$work"' EXIT
 cd "$work"
-curl -fsSLO "$base/$tarball"
-echo "$sha256  $tarball" | sha256sum -c -
+bash "$here/../fetch_verified.sh" "$base/$tarball" "$sha256" "$work/$tarball"
 mkdir -p "$dest"
 tar -xzf "$tarball" -C "$dest" grype
 test -x "$dest/grype"

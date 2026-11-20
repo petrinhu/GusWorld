@@ -157,8 +157,7 @@ jobs:
           work="$RUNNER_TEMP/gitleaks-download"
           mkdir -p "$work" "$RUNNER_TEMP/bin"
           cd "$work"
-          curl -fsSLO "$base/$tarball"
-          echo "$GITLEAKS_SHA256  $tarball" | sha256sum -c -
+          bash "$GITHUB_WORKSPACE/tools/ci/fetch_verified.sh" "$base/$tarball" "$GITLEAKS_SHA256" "$work/$tarball"
           tar -xzf "$tarball" -C "$RUNNER_TEMP/bin"
           test -x "$RUNNER_TEMP/bin/gitleaks"
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
