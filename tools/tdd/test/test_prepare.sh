@@ -17,7 +17,7 @@ FAKE_PREP="$FIXTURES/fake_docker_prepare.sh"
 require_file "fixture do docker falso de prepare existe" "$FAKE_PREP"
 [ -f "$FAKE_PREP" ] || suite_done
 
-GOOD_HOSTCONF="none|0|0|false|4294967296|4294967296|233|4000000000|[ALL]|[]|[no-new-privileges]|builder||private|||0|0"
+GOOD_HOSTCONF="none|0|0|false|4294967296|4294967296|233|4000000000|[ALL]|0|[no-new-privileges]|builder||private|||0|0"
 
 # The cold answer of in_container.sh: the marker line, then verdict 3 (MÉDIA-1).
 COLD_OUT="$(printf 'tdd: contêiner frio, sem CMakeCache apontando para /work/src\ntdd-verdict: 3')"
@@ -98,7 +98,7 @@ expect_eq "imagem defasada: nenhum create" 0 "$(count '^create ')"
 
 # C. An existing container that container_ready refuses is refused, not replaced.
 fresh
-export FAKE_CTR_RC=0 FAKE_CTR_HOSTCONF="none|1|0|false|4294967296|4294967296|233|4000000000|[ALL]|[]|[no-new-privileges]|builder||private|||0|0"
+export FAKE_CTR_RC=0 FAKE_CTR_HOSTCONF="none|1|0|false|4294967296|4294967296|233|4000000000|[ALL]|0|[no-new-privileges]|builder||private|||0|0"
 run_prepare
 expect_eq "contêiner reprovado: rc 1" 1 "$RC"
 expect_in "contêiner reprovado: motivo vem do container_ready" "diverge" "$(cat "$OUT")"
@@ -228,5 +228,16 @@ run_prepare
 expect_eq "seed com resto: rc 1" 1 "$RC"
 expect_in "seed com resto: motivo cita seed" "seed" "$(cat "$OUT")"
 expect_eq "seed com resto: nenhum cp" 0 "$(count '^cp ')"
+
+# N. The state directory must be private to this uid (review of the notice.py finding): a
+# directory another local user can write to is refused before any container is created.
+fresh
+PSTATE_H="$(printf '%s' "$FX" | sha256sum | cut -c1-16)"
+mkdir -p "/var/tmp/gusworld-tdd/$PSTATE_H"
+chmod 777 "/var/tmp/gusworld-tdd/$PSTATE_H"
+run_prepare
+expect_eq "estado 0777: rc 1" 1 "$RC"
+expect_eq "estado 0777: nenhum create" 0 "$(count '^create ')"
+expect_in "estado 0777: motivo cita estado" "estado" "$(cat "$OUT")"
 
 suite_done
