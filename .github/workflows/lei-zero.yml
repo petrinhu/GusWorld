@@ -5,8 +5,8 @@
 # commita; este morde no servidor, para quem commitou sem o gancho instalado.
 #
 # ATENCAO, para ninguem confundir: este NAO e o CI do projeto. A matriz das
-# cinco plataformas com nove entradas. A Fedora, a Ubuntu, a Arch e a CachyOS ja
-# estao na matriz (C4a e C4b1 a C4b4); o Windows (C4b5) segue por fazer. Este
+# cinco plataformas com nove entradas, todas na matriz do CI de build (itens C4a
+# e C4b1 a C4b5). Este
 # workflow existe antes dela porque a LEI ZERO se verifica em TEXTO, sem
 # compilar nada -- e o unico portao que pode valer antes de existir build.
 name: LEI ZERO

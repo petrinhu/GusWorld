@@ -1,9 +1,12 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Build and ctest for the Fedora, Ubuntu, Arch and CachyOS targets (items C4a,
-# C4b1 to C4b4). Windows (C4b5) is the only target left, and it lands in its own
-# slice as one more matrix entry. None is declared supported before its own job has run.
+# Build and ctest for every target in the matrix (items C4a and C4b1 to C4b5).
+# Each target is supported only once its own entry has run green. Until then,
+# none is declared supported.
+#
+# Shell: every run step uses bash. On the Linux containers that adds pipefail
+# to each step. On Windows, bash is Git Bash.
 name: Build
 
 on:
@@ -17,9 +20,13 @@ permissions:
 jobs:
   build:
     name: ${{ matrix.name }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     # The job runs inside the distro image. The runner is only the host.
+    # The Windows entry has no image, so its job runs on the bare runner.
     container: ${{ matrix.image }}
+    defaults:
+      run:
+        shell: bash
     # The matrix picks the compiler for each entry; the toolchain step installs both.
     env:
       CC: ${{ matrix.cc }}
@@ -29,52 +36,67 @@ jobs:
         include:
           - name: Fedora (GCC)
             slug: fedora
+            runner: ubuntu-latest
             image: fedora:latest
             cc: gcc
             cxx: g++
             git_install: "dnf -y install git"
           - name: Fedora (Clang)
             slug: fedora
+            runner: ubuntu-latest
             image: fedora:latest
             cc: clang
             cxx: clang++
             git_install: "dnf -y install git"
           - name: Ubuntu (GCC)
             slug: ubuntu
+            runner: ubuntu-latest
             image: ubuntu:latest
             cc: gcc
             cxx: g++
             git_install: "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git"
           - name: Ubuntu (Clang)
             slug: ubuntu
+            runner: ubuntu-latest
             image: ubuntu:latest
             cc: clang
             cxx: clang++
             git_install: "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git"
           - name: Arch (GCC)
             slug: arch
+            runner: ubuntu-latest
             image: archlinux:latest
             cc: gcc
             cxx: g++
             git_install: "pacman -Syu --noconfirm --needed git"
           - name: Arch (Clang)
             slug: arch
+            runner: ubuntu-latest
             image: archlinux:latest
             cc: clang
             cxx: clang++
             git_install: "pacman -Syu --noconfirm --needed git"
           - name: CachyOS (GCC)
             slug: cachyos
+            runner: ubuntu-latest
             image: cachyos/cachyos:latest
             cc: gcc
             cxx: g++
             git_install: "pacman -Syu --noconfirm --needed git"
           - name: CachyOS (Clang)
             slug: cachyos
+            runner: ubuntu-latest
             image: cachyos/cachyos:latest
             cc: clang
             cxx: clang++
             git_install: "pacman -Syu --noconfirm --needed git"
+          - name: Windows (MSVC)
+            slug: windows
+            runner: windows-latest
+            image: ""
+            cc: ""
+            cxx: ""
+            git_install: "git --version"
     steps:
       # The image ships without git. Install it first, with no file from this
       # repository, so the checkout below is a real git clone. Without git,
@@ -144,10 +166,12 @@ jobs:
       - name: Configure
         run: |
           cmake -S . -B build \
-            -DGUSWORLD_WERROR=ON -DCMAKE_CXX_COMPILER="$CXX"
+            -DGUSWORLD_WERROR=ON ${CXX:+"-DCMAKE_CXX_COMPILER=$CXX"}
 
+      # The Visual Studio generator is multi-config: the configuration comes from
+      # CMAKE_CONFIG_TYPE. The variable is unset on Linux, so the flag is left out there.
       - name: Build
-        run: cmake --build build
+        run: cmake --build build ${CMAKE_CONFIG_TYPE:+--config "$CMAKE_CONFIG_TYPE"}
 
       # ctest -N exits 0 even with zero tests, so the exit code alone proves
       # nothing. The count is read from the value, and zero fails on purpose:
@@ -155,7 +179,7 @@ jobs:
       - name: Count registered tests (zero is a failure)
         run: |
           set -eu
-          ctest --test-dir build -N > inventory.txt 2>&1 \
+          ctest --test-dir build ${CMAKE_CONFIG_TYPE:+-C "$CMAKE_CONFIG_TYPE"} -N > inventory.txt 2>&1 \
             || { cat inventory.txt; exit 1; }
           cat inventory.txt
           total="$(sed -n 's/^Total Tests: //p' inventory.txt)"
@@ -172,4 +196,4 @@ jobs:
           fi
 
       - name: Run tests (ctest)
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build ${CMAKE_CONFIG_TYPE:+-C "$CMAKE_CONFIG_TYPE"} --output-on-failure

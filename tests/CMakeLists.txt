@@ -93,9 +93,25 @@ add_test(NAME harness_selftest_empty_registry_fails
 # and Clang prints "error: unused parameter 'x' [-Werror,-Wunused-parameter]", so
 # "error: unused parameter" and "[-Werror" are the same text on both. Declared
 # unverified until the CI runs them (GCC on Fedora is the CI compiler).
+# MSVC prints "warning C4100" for the unused parameter, and with /WX it adds
+# "error C2220" for the promoted warning. Those needles are declared unverified too.
 if(GUSWORLD_WERROR)
   set(werror_fixture_dir ${CMAKE_CURRENT_SOURCE_DIR}/fixtures/werror)
   set(expect_build_script ${CMAKE_CURRENT_SOURCE_DIR}/cmake/expect_build.cmake)
+
+  # REQUIRED_TEXT separates needles with "|", and expect_build.cmake demands ALL of
+  # them, so the MSVC red case needs both C4100 and C2220 in the output.
+  # The MSVC sub-build gets no CXX_COMPILER: the Visual Studio generator picks its
+  # own compiler, and the root build does the same (the Windows job sets no CXX).
+  if(MSVC)
+    set(werror_red_text "C4100|C2220")
+    set(werror_control_text "warning C4100")
+    set(werror_cxx_compiler "")
+  else()
+    set(werror_red_text "error: unused parameter|[-Werror")
+    set(werror_control_text "warning: unused parameter")
+    set(werror_cxx_compiler "${CMAKE_CXX_COMPILER}")
+  endif()
 
   # Red: the same source must fail, and fail because a warning was promoted.
   add_test(NAME werror_gate_red_fails_on_warning
@@ -104,8 +120,8 @@ if(GUSWORLD_WERROR)
       -DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}/werror_red
       -DWERROR=ON
       -DEXPECT_OK=FALSE
-      -DCXX_COMPILER=${CMAKE_CXX_COMPILER}
-      -DREQUIRED_TEXT=error:\ unused\ parameter|[-Werror
+      -DCXX_COMPILER=${werror_cxx_compiler}
+      -DREQUIRED_TEXT=${werror_red_text}
       -P ${expect_build_script})
 
   # Control: the same source with the switch OFF must pass, and must still
@@ -116,8 +132,8 @@ if(GUSWORLD_WERROR)
       -DBUILD_DIR=${CMAKE_CURRENT_BINARY_DIR}/werror_control
       -DWERROR=OFF
       -DEXPECT_OK=TRUE
-      -DCXX_COMPILER=${CMAKE_CXX_COMPILER}
-      -DREQUIRED_TEXT=warning:\ unused\ parameter
+      -DCXX_COMPILER=${werror_cxx_compiler}
+      -DREQUIRED_TEXT=${werror_control_text}
       -P ${expect_build_script})
 
   # Guard self-test (L-36: a trap is born proved red). The guard must refuse a
