@@ -34,6 +34,10 @@ O critério de entrada é **permanência**, não tema: entra decisão que, se co
 | 20/11/2026 | medição caso a caso do termo protegido em 16 arquivos | A exposição do termo protegido volta ao líder, caso a caso. Reescrita de histórico só com autorização expressa. | *"Medir caso a caso"* | `TODO.md` (INBOX, bullet de 12/10/2026 sobre o termo em 16 arquivos) |
 | 20/11/2026 | C10 cita a raiz e o arquivo de cima, sem a linha | a especificação do C10 deixa de exigir a linha da diretiva; o achado cita a raiz e o arquivo de cima, porque só o -M decide e ele não dá linha | *"Ajustar a especificação (Recomendado)"* | `TODO.md` (C10) |
 | 20/11/2026 | CVE do CachyOS medido pelo feed do Arch | O grype identifica o CachyOS como `archlinux`; a entrada fica própria na matriz e o julgador espera `archlinux`, com o limite declarado de que pacotes recompilados do CachyOS podem não casar com o feed do Arch. | *"Aceitar o feed do Arch (Recomendado)"* | `.github/workflows/cve.yml`; `TODO.md` (TST-3d) |
+| 20/11/2026 | imagem própria do guard de TDD com `fedora:latest` e `python3-pyyaml` | Autorizado o download da imagem própria com `fedora:latest`, a toolchain do `fedora.sh` e o `python3-pyyaml`. Cada rebuild futuro pergunta de novo. | *"Autorizo com pyyaml (Recomendado)"* | `docs/tech/adr/ADR-026-tdd-guard-em-conteiner.md`; `TODO.md` (C8) |
+| 20/11/2026 | runtime do contêiner do guard de TDD | Usa o Docker já instalado na máquina. | *"Docker, que já existe (Recomendado)"* | `docs/tech/adr/ADR-026-tdd-guard-em-conteiner.md`; `TODO.md` (C8) |
+| 20/11/2026 | fail-open por infraestrutura do guard de TDD com aviso visível | O fail-open por infraestrutura continua, e passa a chegar ao agente num aviso visível. | *"Hook de aviso visível (Recomendado)"* | `docs/tech/adr/ADR-026-tdd-guard-em-conteiner.md`; `TODO.md` (C8) |
+| 20/11/2026 | link pendurado `build` do guard de TDD | O link pendurado `build` sai na virada, fatia 7 do C8. | *"Apagar na virada (Recomendado)"* | `docs/tech/adr/ADR-026-tdd-guard-em-conteiner.md`; `TODO.md` (C8) |
 
 ## 2026-10
 

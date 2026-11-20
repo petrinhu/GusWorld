@@ -191,11 +191,12 @@ uv build
 echo "ALL GREEN"
 ```
 
-Replicar em container (1:1 com CI GitHub Actions):
+Replicar em container (1:1 com CI GitHub Actions). Sem volume de host: a árvore entra pela entrada padrão e o log sai pela saída de erro. O SELinux desta máquina está `Enforcing` e bloqueia `container_t`, e `-v` com `:Z` reetiqueta arquivos do host (fonte: `CLAUDE.md` do projeto GusWorld, seção de restrições desta máquina).
 
 ```bash
-docker run --rm -v "$PWD":/work:Z -w /work \
+tar -C "$PWD" -cf - . | docker run --rm -i -w /work \
   catthehacker/ubuntu:act-22.04 bash -c '
+  tar -xf - -C /work && exec 1>&2
   apt-get update -qq && apt-get install -y -qq libxcb-cursor0 libxcb-icccm4 \
     libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
     libxcb-shape0 libxcb-sync1 libxcb-xfixes0 libxcb-xinerama0 libxcb-xkb1 \

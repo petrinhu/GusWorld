@@ -75,3 +75,7 @@ serviço.
   (asserção, registro, `main`), e a correção registrada de que a LEI ZERO não fala sobre
   ferramenta de build nem de teste; a cultura de dependência zero vem da L-07 do `GODS_LAWS.md`
   do GlintFx, não de uma lei do GusWorld.
+
+## ADR de processo (20/11/2026)
+
+- [`ADR-026`](ADR-026-tdd-guard-em-conteiner.md): guard de TDD roda a suíte em contêiner, sem volume de host, e falha de infraestrutura avisa o agente. Corrige o falso vermelho medido no guard, que liberava produção. Status Proposed até a ratificação das decisões técnicas listadas no ADR.
