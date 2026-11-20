@@ -24,7 +24,7 @@
 #
 # COVERAGE (leader: "only where it is supported"): each distro is judged only by the tools that
 # recognize it, and the gaps are declared here, not relaxed.
-# - Fedora (fedora:latest): grype only. Trivy is NOT run here, by declared decision.
+# - Fedora (fedora:latest): grype only. Trivy has no Fedora coverage, so it is NOT run here.
 # - Ubuntu (ubuntu:latest): grype and trivy (TST-3b).
 # - Arch (archlinux:latest): grype only. Trivy is NOT run here, by declared decision (TST-3c).
 # - CachyOS belongs to TST-3d (wave 8). Windows and macOS have no coverage.
@@ -37,10 +37,11 @@
 #   only as a severity fallback, not as a source. So for trivy the NVD line is NOT confirmed by
 #   its docs. The log shows the data source ID of every trivy match, and the grype log shows the
 #   namespace of every grype match (for example nvd:cpe). Those lines are the measurement.
-# - OSV: NOT confirmed for grype. "grype db status" does not list the upstream feeds. The grype
-#   report shows the match namespaces, and an OSV line appears there only if a match came from
-#   OSV. For trivy, the docs name OSV only for some ecosystems (crates.io), not as a general
-#   source. OSV stays a declared limit for both tools.
+# - OSV: NOT confirmed for EITHER tool (declared limit, ratified by the leader in TST-3a).
+#   "grype db status" does not list the upstream feeds, and an OSV line appears in the grype
+#   report only if a match came from OSV. For trivy, the docs name OSV only for some ecosystems
+#   (crates.io), not as a general source. NVD is confirmed for grype only (nvd:cpe); for trivy it
+#   is NOT confirmed, as the NVD line above says.
 # - The gap is declared in the log, never assumed: a source that did not show in a run is not
 #   claimed as covered.
 #
@@ -59,9 +60,9 @@
 #   (registry API; Docker Hub last_updated 2021-07-30). Its openssl is older than 1.1.1l-r0.
 #   CVE-2021-3711 (NVD CVSS 3.1 9.8 CRITICAL, published 2021-08-24) is fixed in 1.1.1l-r0
 #   (Alpine secdb, branch v3.12). Expected VERDICT=finding, for grype and for trivy.
-#   The trivy severity of this CVE on an EOL Alpine branch is NOT measured yet: it is the first
-#   thing the trivy proof of the first run decides. If trivy does not call it CRITICAL, this
-#   case is the wrong case for trivy, and the case changes with its source documented.
+#   The trivy severity of this CVE on an EOL Alpine branch was measured on run 44792180987 (commit
+#   4b0996d, 20/11/2026): trivy exited 2 on the Alpine image, the judge gave finding, and
+#   TRIVY PROOF PASSED appeared. So case A stays the trivy case.
 # - Case B: an empty directory. Expected VERDICT=zero (the package floor), for both tools.
 # Both assert the verdict VALUE. Both go through expect.sh and the tool's scan.sh, the same
 # path as the real scan (DRY). The trivy proof runs both cases before it judges, so a red run
@@ -92,6 +93,13 @@
 #   not confirm which one matches. Which spelling matched is read from the Targets line of the
 #   trivy report. A passing run does not prove the excludes worked, so they stay under measurement.
 # - A package in no database is invisible to the gate.
+# - Ubuntu, trivy (T-01): on run 44792180987 trivy accepted the real Ubuntu scan with no finding,
+#   and its log shows "data source IDs of the matches:" empty. So that run does not prove trivy
+#   read its Ubuntu 26.04 database. The only trivy source the log shows is alpine, from proof A.
+#   Declared limit.
+# - trivy judge, distro branches (T-03): the distro-mismatch and unreadable branches of
+#   trivy/judge.sh have never been seen rejecting. The zero proof returns before the distro check,
+#   and the finding proof uses Alpine. Declared limit until a run shows them red.
 
 name: Portão de CVE
 
