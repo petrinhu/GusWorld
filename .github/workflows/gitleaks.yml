@@ -25,8 +25,7 @@
 #   inside a job container. On this bare runner HOME belongs to the runner user, so
 #   trigger 2 cannot happen by construction.
 # Whether trigger 1 fires on a CI clone with no git-crypt configured is NOT assumed
-# here. The run measures it: the log of the real scan is the evidence. The answer of the
-# removed diagnostics is recorded in TODO.md.
+# here. The run measures it: the log of the real scan is the evidence.
 #
 # THE GUARD. gitleaks is judged on three things at once, never on the exit code alone:
 # the exit code, the commit count printed in the log, and the verdict line ("no leaks
