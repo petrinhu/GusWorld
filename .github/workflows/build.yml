@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Build and ctest for the Fedora and Ubuntu targets (items C4a and C4b2). Each
+# Build and ctest for the Fedora and Ubuntu targets (items C4a, C4b1 and C4b2). Each
 # other target (Arch, CachyOS, Windows) lands in its own slice as one more
 # matrix entry, and none is declared supported before its own job has run.
 name: Build

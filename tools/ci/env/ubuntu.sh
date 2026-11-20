@@ -13,9 +13,8 @@
 # matrix gets the default: cc and c++. Set CC and CXX in the environment to
 # override it.
 #
-# Expected, not measured yet: ubuntu:latest is Ubuntu 26.04 (resolute), and
-# its apt repository ships cmake 4.2.3, above the 4.1 floor, so no SHA-pinned
-# download is needed. The CI log of the Ubuntu job is the measurement.
+# Measured 20/11/2026 in ubuntu:latest (Ubuntu 26.04, cmake 4.2.3 from apt),
+# above the 4.1 floor, so no SHA-pinned download is needed.
 # The image ships WITHOUT git. The workflow installs git before its checkout,
 # so the checkout is a real git clone. git stays in the package list below,
 # so this script is complete when it runs alone too.
