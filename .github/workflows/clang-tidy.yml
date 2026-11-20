@@ -95,11 +95,14 @@ jobs:
 
       # Configure only, to generate the compile database. GUSWORLD_PRESENT is ON here
       # for the database alone (see the header): nothing is compiled.
+      # Module scanning OFF: Ninja would otherwise write GCC module-scan flags into the
+      # database, which clang-tidy rejects. This project uses no C++ modules.
       - name: Configure only, with present/ in the database
         run: |
           set -eu
           cmake -S . -B "$RUNNER_TEMP/clang-tidy-build" \
-            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGUSWORLD_PRESENT=ON
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DGUSWORLD_PRESENT=ON \
+            -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
           test -s "$RUNNER_TEMP/clang-tidy-build/compile_commands.json"
 
       # Every .cpp of the tree, fixtures excluded. Zero is a failure: an empty scan is a
