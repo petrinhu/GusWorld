@@ -8,8 +8,8 @@
 # hash: the blob of HEAD must differ from the mutated file, and the tar that enters the
 # container must carry the mutated bytes. The live tree is never edited. The tests run
 # in the container (L-35), without volume and without network, under 80 pids and 2 GiB.
-# usage: mutate_guard.sh baseline M1 [M2 ... M7]
-# M8 (undo a fix of R2) is not applicable: R2 has no fix yet.
+# usage: mutate_guard.sh baseline M1 [M2 ... M8]
+# M8 undoes the two halves of the R2 fix (mutants.py, MULTI).
 set -u
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
