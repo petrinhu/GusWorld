@@ -1,49 +1,83 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# CVE gate over the build environment (item TST-3a). Orchestration only: no step here
-# judges anything. Every judgement lives in tools/ci/cve/, one responsibility per script.
+# CVE gate over the build environment (items TST-3a and TST-3b). Orchestration only: no step
+# here judges anything. Every judgement lives in tools/ci/cve/, one responsibility per script.
 #   install_grype.sh  fetch grype, check its SHA-256, place it
 #   expect.sh         assert one verdict (the proof and the real scan both use it)
 #   scan.sh           run grype once with the policy, print the report, judge
-#   report.sh         print the summary: packages, distro, CVEs by severity
+#   report.sh         print the summary: packages, distro, CVEs by severity, feeds
 #   judge.sh          map exit code, packages, distro and findings to one verdict
+#   trivy/install_trivy.sh  fetch trivy, check its SHA-256, place it
+#   trivy/scan.sh     run trivy once with the policy (image or rootfs), print the report, judge
+#   trivy/report.sh   print the summary: OS, packages, targets, CRITICAL matches, data sources
+#   trivy/judge.sh    map exit code, packages, distro and findings to one verdict
+#   trivy/db_status.sh  print trivy's version and database metadata
+#   env/<distro>.sh   the gate's own prerequisites (jq, and curl where the image lacks it)
 #
 # WHAT THE GATE BARS (leader, 20/11/2026): only CRITICAL with a published fix.
-# The verdict comes from grype's exit code 2 (--fail-on), never from counting "Critical"
-# in the JSON, because ignored matches also carry severities. Everything else goes to the log.
-# The full grype JSON of the real scan is attached to the run as an artifact.
+# grype: the verdict comes from grype's exit code 2 (--fail-on critical with --only-fixed),
+# never from counting "Critical" in the JSON, because ignored matches also carry severities.
+# trivy: the verdict comes from trivy's exit code 2 (--exit-code 2 with --severity CRITICAL and
+# --ignore-unfixed). Everything else goes to the log. The full grype JSON and the full trivy
+# JSON of the real scan are attached to the run as artifacts.
 #
-# COVERAGE (leader: "only where it is supported"): Fedora, grype only. Trivy has no
-# Fedora coverage and is NOT run here. Ubuntu, Arch and CachyOS belong to TST-3b,
-# TST-3c and TST-3d (wave 8). Windows and macOS have no coverage.
+# COVERAGE (leader: "only where it is supported"): each distro is judged only by the tools that
+# recognize it, and the gaps are declared here, not relaxed.
+# - Fedora (fedora:latest): grype only. Trivy is NOT run here, by declared decision.
+# - Ubuntu (ubuntu:latest): grype and trivy (TST-3b).
+# - Arch and CachyOS belong to TST-3c and TST-3d (wave 8). Windows and macOS have no coverage.
 #
-# DATABASE SOURCES (leader: "covered by both"): NVD is covered through grype's database.
-# OSV is NOT confirmed: a declared limit, not a claim of coverage.
+# DATABASE SOURCES (leader, 20/11/2026: "covered by both"). Stated here as the measured state,
+# not as a claim:
+# - NVD: through grype's database, as TST-3a declared (20/11/2026). The leader's decision says
+#   it is covered by both tools. The docs of trivy (trivy.dev,
+#   read 20/11/2026) list distro advisories and language advisories as its sources, and name NVD
+#   only as a severity fallback, not as a source. So for trivy the NVD line is NOT confirmed by
+#   its docs. The log shows the data source ID of every trivy match, and the grype log shows the
+#   namespace of every grype match (for example nvd:cpe). Those lines are the measurement.
+# - OSV: NOT confirmed for grype. "grype db status" does not list the upstream feeds. The grype
+#   report shows the match namespaces, and an OSV line appears there only if a match came from
+#   OSV. For trivy, the docs name OSV only for some ecosystems (crates.io), not as a general
+#   source. OSV stays a declared limit for both tools.
+# - The gap is declared in the log, never assumed: a source that did not show in a run is not
+#   claimed as covered.
 #
 # WHY NOT A THIRD-PARTY ACTION FOR THE SCAN: a marketplace action runs code we do not read
-# and tracks a moving tag. The grype tarball is fetched from the official release, checked
-# against a literal SHA-256, and only then placed on PATH. The artifact upload uses the
+# and tracks a moving tag. The grype and trivy tarballs are fetched from the official release,
+# checked against a literal SHA-256, and only then placed on PATH. The artifact upload uses the
 # official actions/upload-artifact, pinned by commit SHA.
+#
+# TRIVY PIN: trivy 0.76.2, SHA-256 bc0fc726e017b8927a62b2d3531d7a84ee01769daf5c99ed866dced54089fdbf,
+# read on 20/11/2026 from the official checksums file, line 7:
+#   https://github.com/aquasecurity/trivy/releases/download/v0.76.2/trivy_0.76.2_checksums.txt
+# Versions 0.69.4, 0.69.5 and 0.69.6 are vetoed by the leader and never pinned.
 #
 # THE PROOF OF STRENGTH (L-36 global): a gate never seen failing proves nothing.
 # - Case A: alpine:3.12.7 by digest sha256:de25c7fc6c4f3a27c7f0c2dff454e4671823a34d88abd533f210848d527e0fbb
 #   (registry API; Docker Hub last_updated 2021-07-30). Its openssl is older than 1.1.1l-r0.
 #   CVE-2021-3711 (NVD CVSS 3.1 9.8 CRITICAL, published 2021-08-24) is fixed in 1.1.1l-r0
-#   (Alpine secdb, branch v3.12). Expected VERDICT=finding.
-# - Case B: an empty directory. Expected VERDICT=zero (the package floor).
-# Both assert the verdict VALUE. Both go through expect.sh and scan.sh, the same path as
-# the real scan (DRY).
-# Measured on the first run (20/11/2026, run 44755957346): the registry: source with a
-# digest reference works, the CVE is judged critical with a fix, and the package-count
-# regex matches grype 0.122.1.
+#   (Alpine secdb, branch v3.12). Expected VERDICT=finding, for grype and for trivy.
+#   The trivy severity of this CVE on an EOL Alpine branch is NOT measured yet: it is the first
+#   thing the trivy proof of the first run decides. If trivy does not call it CRITICAL, this
+#   case is the wrong case for trivy, and the case changes with its source documented.
+# - Case B: an empty directory. Expected VERDICT=zero (the package floor), for both tools.
+# Both assert the verdict VALUE. Both go through expect.sh and the tool's scan.sh, the same
+# path as the real scan (DRY). The trivy proof runs both cases before it judges, so a red run
+# shows the raw facts of each case.
+# Measured on the first run (20/11/2026, run 44755957346, grype only): the registry: source
+# with a digest reference works, the CVE is judged critical with a fix, and the package-count
+# regex matches grype 0.122.1. The trivy and Ubuntu numbers are not measured yet.
 #
 # DECLARED LIMITS
-# - fedora:latest is Fedora 45 (VERSION_ID=45 measured on 20/11/2026). The tag moves: when
-#   Fedora 46 becomes :latest, the gate measures it again. An unrecognized distro rejects
-#   (fail closed). Leader decision: keep :latest and measure (L-09 project).
-# - The exclude globs (./proc/**, and so on) are relative to the scan root. A passing run
-#   does not prove the excludes worked, so they stay under measurement.
+# - fedora:latest is Fedora 45 (VERSION_ID=45 measured on 20/11/2026). ubuntu:latest is Ubuntu
+#   26.04 by the same tag rule. Both tags move: when the release changes, the gate measures it
+#   again. An unrecognized distro rejects (fail closed). Leader decision: keep :latest and
+#   measure (L-09 project).
+# - The exclude globs (./proc/**, and so on) are relative to the scan root. For trivy they are
+#   passed as --skip-dirs in both the relative and the absolute spelling, because the docs do
+#   not confirm which one matches. Which spelling matched is read from the Targets line of the
+#   trivy report. A passing run does not prove the excludes worked, so they stay under measurement.
 # - A package in no database is invisible to the gate.
 
 name: Portão de CVE
@@ -160,9 +194,9 @@ jobs:
           if [ "$a" -ne 0 ] || [ "$b" -ne 0 ]; then exit 1; fi
           echo "TRIVY PROOF PASSED: A judged finding, B judged zero"
 
-      # The grype database sources are read here: grype db status prints where the database
-      # lives and when it was built. It does not list the upstream feeds, so the sources of
-      # each match are printed by the grype report (namespace and dataSource).
+      # The database sources are read here, after the proofs have fetched the databases.
+      # grype db status prints where the database lives and when it was built. The feeds of
+      # each match are printed by the grype report (namespace) and the trivy report (data source).
       - name: Print the grype database status
         if: always()
         run: grype db status || echo "grype db status failed"
@@ -171,7 +205,7 @@ jobs:
         if: always() && matrix.trivy
         run: bash tools/ci/cve/trivy/db_status.sh
 
-      - name: Scan the real build environment
+      - name: Scan the real build environment with grype
         run: |
           set -u
           expect="$GITHUB_WORKSPACE/tools/ci/cve/expect.sh"
@@ -184,6 +218,22 @@ jobs:
           fi
           echo "CVE GATE ACCEPTED"
 
+      # The same excludes as the grype scan. The trivy scan turns each one into --skip-dirs.
+      - name: Scan the real build environment with trivy
+        if: matrix.trivy
+        run: |
+          set -u
+          expect="$GITHUB_WORKSPACE/tools/ci/cve/expect.sh"
+          export CVE_SCAN="$GITHUB_WORKSPACE/tools/ci/cve/trivy/scan.sh"
+          if ! bash "$expect" accept "${{ matrix.distro }}" "$RUNNER_TEMP/scan-trivy-${{ matrix.distro }}" "dir:/" \
+            --exclude './proc/**' --exclude './sys/**' --exclude './dev/**' \
+            --exclude './__e/**' --exclude './__w/**' --exclude './__t/**' \
+            --exclude './github/**'; then
+            echo "TRIVY CVE GATE REJECTED"
+            exit 1
+          fi
+          echo "TRIVY CVE GATE ACCEPTED"
+
       # Attached even when the scan rejects, so the full list is in the run for download.
       - name: Attach the full grype JSON of the real scan
         if: always()
@@ -191,4 +241,12 @@ jobs:
         with:
           name: grype-${{ matrix.distro }}-real-scan
           path: ${{ runner.temp }}/scan-${{ matrix.distro }}/grype.json
+          if-no-files-found: warn
+
+      - name: Attach the full trivy JSON of the real scan
+        if: always() && matrix.trivy
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: trivy-${{ matrix.distro }}-real-scan
+          path: ${{ runner.temp }}/scan-trivy-${{ matrix.distro }}/trivy.json
           if-no-files-found: warn
