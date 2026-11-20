@@ -88,9 +88,18 @@ passa a avisar o agente.
    `tools/tdd/prepare.sh`, em segundo plano.
 7. **Hardening.** `--network none`, `--cap-drop ALL`, `no-new-privileges`,
    `--user builder`, e nenhum `-v`.
-8. **Aviso visível.** Uma falha de infraestrutura continua caindo no fail-open,
-   e passa a chegar ao agente por um hook de aviso (`tools/tdd/notice.py`, via
-   `PreToolUse` no `.claude/settings.json` do projeto, com `additionalContext`).
+8. **Aviso visível (revisada em 20/11/2026).** O aviso de guard que não rodou não
+   reimplementa o guard. O `tools/tdd/notice.py`, instalado como `PreToolUse` no
+   `.claude/settings.json` do projeto, chama `tdd_guard.evaluate` do plugin bigtech
+   sobre a carga do hook, e fala só onde o guard abre (código 0 com mensagem: falha
+   de infraestrutura ou de I/O), ou quando o próprio aviso não consegue confiar no
+   plugin (registro, leitura, permissão ou import), caso em que avisa com texto
+   fixo. Com código 2 (bloqueio) fica mudo, porque o guard já fala. O motivo vem de
+   `last-reason` só se o diretório e o arquivo forem do uid do processo, não forem
+   links e não forem graváveis por grupo ou outros, e só se não forem mais antigos
+   que o `ts` do estado; caso contrário, vem do `reason` do estado ou da mensagem do
+   guard. Todo texto que chega ao agente passa por limpeza de controle e ANSI e por
+   corte de 200 caracteres. O aviso nunca bloqueia: toda saída do script é 0.
 9. **Fatias.** Canon N4 (esta fatia), imagem N3, invólucro N2, preparo e medida
    N3, aviso N3, prova do guard N2 pelo `qa-engineer`, virada N2 e fecho N4.
    O critério de medição da fatia 4 é pré-registrado: 5 execuções sem mudança,
@@ -142,6 +151,17 @@ Decididas pelo orquestrador, sem ratificação registrada ainda:
 - **Limites declarados:** edição por Bash escapa do guard. Falha de infraestrutura
   continua em fail-open, agora com aviso. A verificação de que o guard morde de
   verdade é a prova da fatia 6, não presunção.
+- **Acoplamento ao nome interno do plugin:** o `notice.py` depende de
+  `tdd_guard.evaluate` e de `tdd_common` (`find_project_root`, `read_state`,
+  `extract_file_path`) do plugin bigtech, nomes internos e não versionados. Um
+  `evaluate` público e versionado foi pedido ao plugin, registrado na INBOX do
+  acoplamento (`TODO.md`, commit `d18a7b8`). Até lá, o teste de contrato
+  `tools/tdd/test/test_notice_contract.sh` roda o plugin real e falha se o nome mudar.
+- **Checagem de dono só no código:** o `notice.py` confere `st_uid == os.getuid()`
+  no diretório e no arquivo do `last-reason`, e no diretório do plugin. Os testes do
+  contêiner cobrem só o modo gravável por grupo ou outros (0777 e 0666), porque o
+  contêiner roda como `builder` e não cria arquivo de outro dono. A checagem de dono
+  é garantia de código, sem teste de contêiner.
 - **Dependências de outros itens:** o `D1` passa a depender de `C8` e `C10`.
   O `C8` depende do `C3`, o harness de teste próprio (`ADR-025`).
 
