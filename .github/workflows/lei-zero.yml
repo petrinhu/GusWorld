@@ -4,10 +4,9 @@
 # Portao da LEI ZERO no CI. O gancho pre-commit morde na maquina de quem
 # commita; este morde no servidor, para quem commitou sem o gancho instalado.
 #
-# ATENCAO, para ninguem confundir: este NAO e o CI do projeto. A matriz das
-# cinco plataformas com nove entradas, todas na matriz do CI de build (itens C4a
-# e C4b1 a C4b5). Este
-# workflow existe antes dela porque a LEI ZERO se verifica em TEXTO, sem
+# ATENCAO, para ninguem confundir: este NAO e o CI do projeto. As cinco
+# plataformas com nove entradas estao todas na matriz do CI de build (itens C4a
+# e C4b1 a C4b5). Este workflow existe antes dela porque a LEI ZERO se verifica em TEXTO, sem
 # compilar nada -- e o unico portao que pode valer antes de existir build.
 name: LEI ZERO
 

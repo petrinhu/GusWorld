@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Setup for the Windows target (windows-latest, MSVC) of CI jobs. It installs
-# nothing: the runner image already ships Visual Studio, CMake, Ninja and Git
+# nothing: the runner image already ships Visual Studio, CMake and Git
 # Bash. It does two things and nothing else:
 #   1. export CMAKE_CONFIG_TYPE=Debug to the next steps via $GITHUB_ENV, the
 #      configuration that cmake --build and ctest use with a multi-config generator;

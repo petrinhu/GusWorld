@@ -108,7 +108,7 @@
 # - The sweep floor is "above zero". Completeness of the sweep is not proved.
 # - The commit-message gate is not run here (item C5a), and the hook is not checked here
 #   (item C7).
-# - No Windows, no macOS, no other platform (item C4b).
+# - No Windows, no macOS, no other platform.
 #
 # Lessons kept from the removed measurements (the numbers were recorded in the TODO table):
 # - The history scan misses merge commits, commits that touch only binary files, and a
