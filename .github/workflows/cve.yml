@@ -89,10 +89,12 @@
 # - archlinux:latest is a rolling release. Measured on run 44793892079 (20/11/2026): os-release
 #   gives ID=arch and VERSION_ID=20261108.0.623074, and the grype distro name is "archlinux", not
 #   "arch". The matrix carries it as scan_distro. Trivy does not cover this entry.
-# - cachyos/cachyos:latest (TST-3d), probe: name to be measured on the first run. scan_distro is
-#   set to cachyos as a guess. If grype reports another name, or none, the run is red, and the
-#   slice goes to the leader with the log in hand. Nobody relaxes the floor or the judge. Trivy
-#   does not cover this entry.
+# - cachyos/cachyos:latest (TST-3d): measured on run 44796024781 (20/11/2026, commit e1b52da).
+#   os-release gives ID=cachyos, ID_LIKE=arch, VERSION_ID=20261108.0.623074. grype identifies the
+#   distro as archlinux, with 223 packages, and 2 High and 2 Low matches ignored for lacking a fix.
+#   The judge expects archlinux (scan_distro), by the leader's decision of 20/11/2026: accept the
+#   Arch feed. Declared limit: the CVE is measured against the Arch feed, and packages rebuilt by the
+#   CachyOS repositories may not match that feed. Trivy does not cover this entry.
 # - The exclude globs (./proc/**, and so on) are relative to the scan root. For trivy they are
 #   passed as --skip-dirs in both the relative and the absolute spelling, because the docs do
 #   not confirm which one matches. Which spelling matched is read from the Targets line of the
@@ -142,10 +144,10 @@ jobs:
             scan_distro: archlinux
             trivy: false
             git_install: "pacman -Syu --noconfirm --needed git"
-          - name: CachyOS (grype, probe)
+          - name: CachyOS (grype)
             image: cachyos/cachyos:latest
             distro: cachyos
-            scan_distro: cachyos
+            scan_distro: archlinux
             trivy: false
             git_install: "pacman -Syu --noconfirm --needed git"
     steps:
