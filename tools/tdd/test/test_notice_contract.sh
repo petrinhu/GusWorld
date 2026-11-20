@@ -136,5 +136,29 @@ set_state '{"ran": true, "has_red": true, "exit_code": 1}'
 mute_with_state "ran=true com vermelho: guard deixa passar, notice mudo" core/a.cpp \
     '{"ran": true, "has_red": true, "exit_code": 1}'
 
+# F2: the notice resolves the plugin as Claude Code loads it. The marketplace petrinhu is a
+# `directory` source whose installLocation is a symlink, and the plugin loads in place, so
+# the marketplace copy is the one that runs. HOME2 also holds a STALE installPath copy that
+# answers "block" (code 2) to every production edit: a warning proves the stale copy was not
+# the one used.
+MKT="$FX/mkt"
+MKT_LINK="$FX/mkt-link"
+HOME2="$FX/home2"
+STALE="$FX/stale"
+mkdir -p "$MKT/.claude-plugin" "$MKT/hooks" "$STALE/hooks" "$HOME2/.claude/plugins" "$HOME2/.claude/state"
+cp "$PLUGIN/hooks/"*.py "$MKT/hooks/"
+printf '%s' '{"plugins": [{"name": "bigtech", "source": "./"}]}' > "$MKT/.claude-plugin/marketplace.json"
+ln -s "$MKT" "$MKT_LINK"
+cp "$PLUGIN/hooks/tdd_common.py" "$STALE/hooks/tdd_common.py"
+printf '%s\n' 'def evaluate(data, env):' '    return 2, "copia antiga"' > "$STALE/hooks/tdd_guard.py"
+printf '%s' "{\"version\": 2, \"plugins\": {\"bigtech@petrinhu\": [{\"scope\": \"user\", \"installPath\": \"$STALE\"}]}}" > "$HOME2/.claude/plugins/installed_plugins.json"
+printf '%s' "{\"petrinhu\": {\"source\": {\"source\": \"directory\", \"path\": \"$MKT\"}, \"installLocation\": \"$MKT_LINK\"}}" > "$HOME2/.claude/plugins/known_marketplaces.json"
+mkdir -p "$HOME2/.claude/state/tdd-guard/$DIGEST"
+printf '%s' '{"ran": false, "reason": "timeout", "ts": 0}' > "$HOME2/.claude/state/tdd-guard/$DIGEST/last-run.json"
+
+resolved="$(env HOME="$HOME2" python3 -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import notice; print(notice.plugin_hooks_dir())' "$TDD_DIR" 2>/dev/null)"
+expect_eq "F2: resolvedor segue o symlink do marketplace petrinhu" "$(realpath "$MKT")/hooks" "$resolved"
+text_case "F2: marketplace directory vence o installPath antigo, que bloquearia" "$NO_RUN" core/a.cpp HOME="$HOME2"
+
 rm -rf -- "$FX" "/var/tmp/gusworld-tdd/$DIGEST"
 suite_done
