@@ -3,7 +3,7 @@
 #
 # Shared tail of the CI environment scripts (fedora.sh, ubuntu.sh, arch.sh).
 # Sourced with `.` by each distro script after its install step; it is not run
-# on its own. It does three things and nothing else:
+# on its own. It does two things and nothing else:
 #   1. default CC and CXX to cc and c++, and export them with CMAKE_GENERATOR=Ninja
 #      to the next steps via $GITHUB_ENV;
 #   2. print /etc/os-release and the tool versions, so the CI log proves what ran.

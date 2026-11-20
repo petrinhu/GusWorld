@@ -9,7 +9,8 @@
 # above the 4.1 floor, so no SHA-pinned download is needed.
 # The image ships WITHOUT git. The workflow installs git before its checkout,
 # so the checkout is a real git clone. git stays in the package list below,
-# so this script is complete when it runs alone too.
+# so the install is complete when this script runs alone. The rest writes to
+# $GITHUB_ENV and assumes Actions.
 #
 # No hash of this file is compared anywhere: the workflow runs the copy from
 # its own checkout, so such a comparison would only compare the file with itself.

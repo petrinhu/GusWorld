@@ -16,7 +16,7 @@
 #                              L-49 reserves for death by signal (139 = SIGSEGV).
 #
 # The sanitizer runtimes are libasan and libubsan, subpackages of Fedora's gcc source
-# package. fedora.sh is not changed, so the runtime install is a step of this job.
+# package. The runtime install is a step of this job, because gcc does not bring them.
 name: Sanitizadores
 
 on:

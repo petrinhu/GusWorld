@@ -8,8 +8,8 @@
 # The image ships without git; pacman provides cmake from the extra repository.
 # The install is a full sync (-Syu), never -Sy alone: a partial upgrade breaks
 # Arch.
-# git is in the package list below, so this script is complete when it runs
-# alone too.
+# git is in the package list below, so the install is complete when this
+# script runs alone. The rest writes to $GITHUB_ENV and assumes Actions.
 
 set -eu
 

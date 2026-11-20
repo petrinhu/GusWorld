@@ -13,8 +13,8 @@
 # checkout is a real git clone. Without git, actions/checkout downloads a
 # tarball through the REST API instead, and that path failed with 5xx from
 # GitHub three times in each of two CI runs (run 38196743681), so it is not
-# used. git stays in the package list below, so this script is complete when
-# it runs alone too.
+# used. git stays in the package list below, so the install is complete when
+# this script runs alone. The rest writes to $GITHUB_ENV and assumes Actions.
 # python3 is left out on purpose: no CMakeLists.txt in this tree calls it.
 #
 # No hash of this file is compared anywhere: the workflow runs the copy from
