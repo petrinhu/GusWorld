@@ -17,10 +17,11 @@
 
 ## FASE 1 - Pré-condições de qualidade (antes de tocar em tag)
 
-- CI verde nas **cinco entradas** da matriz (L-09, L-20): Fedora 44 pinado, Ubuntu, Arch, CachyOS, Windows
+- CI verde nas **nove entradas** da matriz do workflow `Build`, que cobrem **cinco plataformas** (L-09, L-20): Fedora, Ubuntu, Arch, CachyOS e Windows, todas em `:latest`. O Fedora segue `fedora:latest` por decisão do líder ("Manter :latest e medir"). A versão medida é a que sai no log do run, e hoje é o Fedora 45 (`VERSION_ID=45`, run `44755957346`)
 - Os **cinco portões** da L-19 fechados: zero aviso de compilação (`-Werror`), ASan e UBSan em build separado, `clang-tidy`/`cppcheck` no CI, `gitleaks` na árvore **e** no histórico (`git log --all -p | grep -ci <termo>`, com `-i`), e o **gate de mensagem de commit** (`tools/security/commit_gate.py`) instalado e com o teste próprio verde (`python3 tools/security/test_commit_gate.py`)
+- **Sexto portão, fora dos cinco da L-19:** CVE do ambiente de build (TST-3a), só Fedora, workflow `Portão de CVE` (`cve.yml`). Barra só CVE crítica com correção publicada, com grype `0.122.1` e SHA-256 fixo. Ubuntu, Arch e CachyOS não têm cobertura ainda (TST-3b, TST-3c e TST-3d), e Windows não tem
 - ⚠️ O quinto portão é **gancho local**, não etapa de CI: ele roda na máquina de quem commita. Um clone sem `tools/git-hooks/install.py` executado **não tem o portão**, e o CI verde não prova o contrário. Antes de taggear, confirme que o gancho está instalado no clone de onde a tag vai sair
-- Suíte de **replay determinístico** (L-17: mesma semente + mesma lista de comandos reproduz o mesmo estado final) verde
+- Suíte de **replay determinístico** (L-17: mesma semente + mesma lista de comandos reproduz o mesmo estado final): **não aplicável enquanto não houver domínio com comando e evento** (a suíte nasce com a onda do núcleo `D1`, em `TODO.md`)
 - Marcação REUSE/SPDX íntegra em todo arquivo tocado (L-08)
 - `resources/livros/` e `resources/glb/` seguem fora do git; Git LFS íntegro no restante do binário pesado (L-15)
 
