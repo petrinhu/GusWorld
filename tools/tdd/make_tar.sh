@@ -7,6 +7,17 @@
 # Only then is it renamed to the real name. A failure at any step therefore leaves no
 # tar under the real name, without deleting anything (MÉDIA-6). The tar is written to
 # a file, never piped, so its status is the status of tar itself.
+#
+# Declared limits (review of 2026-11-20, open items in the INBOX of TODO.md):
+#   (a) The entry-count check between tar and list (the "expected" against "got"
+#       comparison, currently at line 49) has no test of its own. Mutant M7, which
+#       removes it, survives: no test passes a list with a parent directory such as
+#       docs or core, so the count mismatch is never exercised.
+#   (b) On refusal, the partial files (<out>.partial and <out>.partial.names) stay
+#       on disk under /var/tmp, owned by the same user on the same machine as the
+#       decrypted tree. They can hold secret content. build_list.sh cannot reach this
+#       case, because it emits only files of the whitelist; the residue is still real
+#       and is removed by the open item, not by this script.
 # usage: make_tar.sh <repo_root> <list_nul> <out_tar>
 set -uo pipefail
 
