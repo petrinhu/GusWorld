@@ -26,7 +26,8 @@
 # recognize it, and the gaps are declared here, not relaxed.
 # - Fedora (fedora:latest): grype only. Trivy is NOT run here, by declared decision.
 # - Ubuntu (ubuntu:latest): grype and trivy (TST-3b).
-# - Arch and CachyOS belong to TST-3c and TST-3d (wave 8). Windows and macOS have no coverage.
+# - Arch (archlinux:latest): grype only. Trivy is NOT run here, by declared decision (TST-3c).
+# - CachyOS belongs to TST-3d (wave 8). Windows and macOS have no coverage.
 #
 # DATABASE SOURCES (leader, 20/11/2026: "covered by both"). Stated here as the measured state,
 # not as a claim:
@@ -74,6 +75,10 @@
 #   26.04 by the same tag rule. Both tags move: when the release changes, the gate measures it
 #   again. An unrecognized distro rejects (fail closed). Leader decision: keep :latest and
 #   measure (L-09 project).
+# - archlinux:latest is a rolling release, so there is no version to declare for it. The gate
+#   checks the distro name only ("arch"). Whether grype has an Arch vulnerability feed is NOT
+#   measured yet (TST-3c). If a run reports distro-unknown or distro-mismatch, the judge is not
+#   relaxed for this entry: no exception by distro, no if. The slice stops and goes to the leader.
 # - The exclude globs (./proc/**, and so on) are relative to the scan root. For trivy they are
 #   passed as --skip-dirs in both the relative and the absolute spelling, because the docs do
 #   not confirm which one matches. Which spelling matched is read from the Targets line of the
@@ -108,6 +113,11 @@ jobs:
             distro: ubuntu
             trivy: true
             git_install: "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y git"
+          - name: Arch (grype)
+            image: archlinux:latest
+            distro: arch
+            trivy: false
+            git_install: "pacman -Syu --noconfirm --needed git"
     steps:
       # The image ships without git. Install it first, so the checkout is a real git clone.
       # The command comes from the matrix because the repository (and so any script in it)
