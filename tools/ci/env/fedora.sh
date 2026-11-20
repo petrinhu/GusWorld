@@ -15,7 +15,8 @@
 # GitHub three times in each of two CI runs (run 38196743681), so it is not
 # used. git stays in the package list below, so the install is complete when
 # this script runs alone. The rest writes to $GITHUB_ENV and assumes Actions.
-# python3 is left out on purpose: no CMakeLists.txt in this tree calls it.
+# python3 is not installed here. install_toolchain.sh installs python3-pyyaml, which
+# brings python3, in a later step of the same container install.
 #
 # No hash of this file is compared anywhere: the workflow runs the copy from
 # its own checkout, so such a comparison would only compare the file with itself.

@@ -38,12 +38,24 @@ Fatos medidos em 20/11/2026 pelo CTO:
 O guard passa a rodar a suíte dentro de contêiner, e a falha de infraestrutura
 passa a avisar o agente.
 
-1. **Imagem própria.** `tools/container/Containerfile.fedora`, com
-   `FROM fedora:latest` e `--pull`. O contexto de build é um tar com quatro
-   arquivos: o `Containerfile`, `tools/ci/env/fedora.sh`, `_common.sh` e
-   `tools/ci/cmake_floor.sh`. Instala `python3-pyyaml`, e o usuário é `builder`.
-   A tag é `gusworld-ci-fedora:<sha12 do contexto>`, calculada por
-   `tools/container/env_hash.sh`.
+1. **Imagem própria.** `tools/container/build_image.sh` monta a imagem por
+   instalação e commit, sem `docker build`. Primeiro `base_probe.sh` faz
+   `docker pull fedora:latest`, lê o digest da linha `Digest:` da saída do pull e
+   fixa a base por esse digest. Depois `container_install.sh` roda
+   `docker run --memory 4g --memory-swap 4g --pids-limit 233 --cpus 4
+   --security-opt no-new-privileges <base@digest>` com o contexto por tar na
+   entrada padrão. O contexto tem quatro arquivos: `install_toolchain.sh`,
+   `tools/ci/env/fedora.sh`, `_common.sh` e `tools/ci/cmake_floor.sh`. O
+   `install_toolchain.sh` é a receita: instala a toolchain, o `python3-pyyaml` e o
+   usuário `builder`, e grava o `rpm -q` em `/etc/gusworld/packages.txt`. A rede
+   fica aberta só nessa etapa. Ao fim, `docker commit` grava a tag e o contêiner
+   temporário sai por `trap`. A tag é `gusworld-ci-fedora:<sha12>`, e o hash cobre
+   o conteúdo do contexto mais o digest da base (`env_hash.sh <base-digest>`). Uma
+   base nova gera tag nova, e uma tag existente é recusada, nunca sobrescrita.
+   O `Containerfile.fedora` saiu: a receita única é o `install_toolchain.sh`.
+   Todo script que baixa ou constrói passa antes por `rebuild_authorized.sh`, que
+   exige a linha de autorização de rebuild do dia no `docs/decisoes-do-lider.md`
+   commitado (`git show HEAD`).
 2. **Invólucro no host.** `test_command` passa a ser `bash tools/tdd/run_suite.sh`.
    O invólucro mapeia o código de saída: `0` vira `0`, `1` vira `1`, e qualquer
    outro código vira `126`. O tar da árvore de trabalho sai de uma lista branca,
@@ -111,8 +123,8 @@ Decididas pelo orquestrador, sem ratificação registrada ainda:
 - **Positivas:** o guard deixa de liberar produção por falha de comando. A suíte
   roda fora da sessão viva do líder (L-35), e o aviso chega ao agente.
 - **Custos:** cada teste copia a árvore pelo tar. O contêiner frio devolve `126`
-  até o aquecimento. A imagem é puxada de `fedora:latest`, e cada rebuild pede
-  autorização de novo (L-51).
+  até o aquecimento. A imagem é puxada de `fedora:latest` e fixada por digest; cada rebuild pede
+  autorização nova, registrada no índice de decisões (L-51).
 - **Limites declarados:** edição por Bash escapa do guard. Falha de infraestrutura
   continua em fail-open, agora com aviso. A verificação de que o guard morde de
   verdade é a prova da fatia 6, não presunção.

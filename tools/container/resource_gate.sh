@@ -48,7 +48,7 @@ if [[ "$mem_kb" =~ ^[0-9]+$ ]] && (( mem_kb >= min_mem_kb )); then verdict=ok; f
 echo "gate memavailable_kb=${mem_kb:-unreadable} min_kb=${min_mem_kb} verdict=${verdict}"
 
 verdict=FAIL
-if awk -v l="$load1" -v m="$max_load1" 'BEGIN { exit !(l + 0 <= m + 0) }'; then verdict=ok; fi
+if [[ "$load1" =~ ^[0-9]+(\.[0-9]+)?$ ]] && awk -v l="$load1" -v m="$max_load1" 'BEGIN { exit !(l + 0 <= m + 0) }'; then verdict=ok; fi
 [ "$verdict" = ok ] || status=1
 echo "gate load1=${load1} max=${max_load1} verdict=${verdict}"
 
