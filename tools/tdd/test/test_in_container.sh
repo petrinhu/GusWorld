@@ -12,7 +12,7 @@ expect_rc "cmake disponivel no contêiner" 0 command -v cmake
 expect_rc "ninja disponivel no contêiner" 0 command -v ninja
 
 TREES="$(mktemp -d /tmp/tdd-trees-XXXXXX)"
-for kind in green zero badcompile failtest badcmake; do
+for kind in green zero badcompile failtest badcmake slow; do
     make_mini_tree "$kind" "$TREES/$kind"
 done
 
@@ -86,5 +86,39 @@ ic_run "$W" "$TREES/green"
 kill "$live" 2>/dev/null
 expect_eq "trava viva: rc 3" 3 "$IC_RC"
 expect_eq "trava viva: espera limitada a 34 s" 1 "$(( IC_SECS >= 30 && IC_SECS <= 45 ? 1 : 0 ))"
+
+# 11. Each run prints its internal time, an integer, before the verdict line (C8 medicao).
+W="$(new_work)"
+ic_prime "$W" "$TREES/green" Ninja
+ic_run "$W" "$TREES/green"
+expect_eq "tempo interno impresso como inteiro" 1 "$(grep -c '^tdd-tempo: [0-9][0-9]*$' "$IC_OUT")"
+
+# 12. GUSWORLD_TDD_BUDGET shortens the build budget: a suite of 3 s is cut at 1 s, and
+# the reason reaches the output. The cut comes at the suite or, when the clock is
+# already spent, just before it; both are the same verdict 3 by the deadline.
+W="$(new_work)"
+ic_prime "$W" "$TREES/slow" Ninja
+export GUSWORLD_TDD_BUDGET=1
+ic_run "$W" "$TREES/slow"
+unset GUSWORLD_TDD_BUDGET
+expect_eq "prazo reduzido: rc 3" 3 "$IC_RC"
+expect_eq "prazo reduzido: motivo de prazo impresso" 1 \
+    "$(grep -cE '^tdd: estouro de prazo (na|antes da) suite' "$IC_OUT")"
+
+# 13. A larger value cannot loosen the budget: the same suite is green within 89 s.
+W="$(new_work)"
+ic_prime "$W" "$TREES/slow" Ninja
+export GUSWORLD_TDD_BUDGET=900
+ic_run "$W" "$TREES/slow"
+unset GUSWORLD_TDD_BUDGET
+expect_eq "prazo maior nao afrouxa: rc 0" 0 "$IC_RC"
+
+# 14. A value that is not a positive integer is ignored: the same suite is green.
+W="$(new_work)"
+ic_prime "$W" "$TREES/slow" Ninja
+export GUSWORLD_TDD_BUDGET=abc
+ic_run "$W" "$TREES/slow"
+unset GUSWORLD_TDD_BUDGET
+expect_eq "valor invalido de prazo e ignorado: rc 0" 0 "$IC_RC"
 
 suite_done

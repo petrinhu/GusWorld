@@ -54,4 +54,22 @@ expect_rc "motivo do verde sobrescreve o anterior" 0 grep -q 'verde' "$reason"
 
 expect_rc "ctest local nunca rodou" 1 test -e "$SENT"
 
+# The budget variable of the host reaches docker exec only when the host sets it (it
+# can only shorten the budget, ADR-026 decision 5). A fresh log per case.
+BUDGET_LOG="$BIN/budget.log"
+rm -f "$BUDGET_LOG"
+env FAKE_DOCKER_LOG="$BUDGET_LOG" GUSWORLD_TDD_BUDGET=1 FAKE_EXEC_RC=0 FAKE_EXEC_OUT="tdd-verdict: 0" \
+    bash "$FX/tools/tdd/run_suite.sh" >/dev/null 2>&1
+expect_eq "prazo do host chega ao docker exec" 1 "$(grep -c -- '-e GUSWORLD_TDD_BUDGET=1' "$BUDGET_LOG")"
+
+rm -f "$BUDGET_LOG"
+env -u GUSWORLD_TDD_BUDGET FAKE_DOCKER_LOG="$BUDGET_LOG" FAKE_EXEC_RC=0 FAKE_EXEC_OUT="tdd-verdict: 0" \
+    bash "$FX/tools/tdd/run_suite.sh" >/dev/null 2>&1
+expect_eq "sem prazo no host nada e repassado" 0 "$(grep -c 'GUSWORLD_TDD_BUDGET' "$BUDGET_LOG")"
+
+# A verdict 3 keeps the reason of the infrastructure: the deadline line reaches last-reason.
+PRAZO_OUT="$(printf 'tdd: estouro de prazo na suite\ntdd-verdict: 3')"
+expect_rc "veredito 3 por prazo vira 126" 126 run_case 3 "$PRAZO_OUT"
+expect_rc "motivo do prazo chega ao last-reason" 0 grep -q 'estouro de prazo na suite' "$reason"
+
 suite_done

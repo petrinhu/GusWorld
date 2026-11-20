@@ -137,7 +137,8 @@ setup_fake_image() {
 
 # make_mini_tree KIND DIR: a tiny CMake project with the helpers in_container.sh reads.
 # KIND selects the defect: green, zero (no add_test), badcompile, failtest (test
-# returns 1), badcmake (CMakeLists that does not parse).
+# returns 1), badcmake (CMakeLists that does not parse), slow (a test that sleeps 3 s,
+# so a budget of 1 s cuts it while the default 89 s lets it pass).
 make_mini_tree() {
     local kind="$1" dir="$2" cml src
     mkdir -p "$dir/tools/tdd"
@@ -156,6 +157,7 @@ make_mini_tree() {
             case "$kind" in
                 zero) ;;
                 failtest) printf 'add_test(NAME f COMMAND t)\n' ;;
+                slow) printf 'add_test(NAME s COMMAND ${CMAKE_COMMAND} -E sleep 3)\n' ;;
                 *) printf 'add_test(NAME ok COMMAND t)\n' ;;
             esac
         } > "$cml"
