@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Builds gusworld-ci-fedora:<sha12> and nothing else. Each step is a script:
+#   0. authorization guard: refuses unless GUSWORLD_IMAGE_BUILD_AUTHORIZED is set
+#      to today's date (date +%F). The base download is authorized per build day,
+#      so a rebuild on another day needs a new authorization from the leader.
 #   1. resource_gate.sh  measures memory, load and pids now (L-11 global)
 #   2. heavy_slot.sh     takes one of three heavy-work locks (L-11 global)
 #   3. base_probe.sh     pulls the base, pins its digest, reads its VERSION_ID
@@ -10,10 +13,22 @@
 #   5. context_tar.sh    streams the four context files to docker build
 # The full build log goes to BUILD_LOG (default: a new file in /var/tmp), so a
 # failed build can be shown later. The log is evidence; keep it.
+#
+# Declared limit, L-11 global item 2(b): `docker build` has no --memory and no
+# --pids-limit, and the build runs in the docker daemon, outside any scope of this
+# script. What holds the build back is the heavy-work slot (step 2), nice -n 5 on
+# the client, and the resource gate (step 1), measured before the build starts.
 set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export TMPDIR="${TMPDIR:-/var/tmp}"
+
+today="$(date +%F)"
+if [ "${GUSWORLD_IMAGE_BUILD_AUTHORIZED:-}" != "$today" ]; then
+    echo "REBUILD NOT AUTHORIZED: ask the leader first (L-28 project), then export GUSWORLD_IMAGE_BUILD_AUTHORIZED=$(date +%F)" >&2
+    exit 1
+fi
+
 started="$(date +%s)"
 
 if ! "$here/resource_gate.sh"; then
