@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# CVE gate over the build environment (items TST-3a, TST-3b and TST-3c). Orchestration only: no step
+# CVE gate over the build environment (items TST-3a, TST-3b, TST-3c and TST-3d). Orchestration only: no step
 # here judges anything. Every judgement lives in tools/ci/cve/, one responsibility per script.
 #   install_grype.sh  fetch grype, check its SHA-256, place it
 #   expect.sh         assert one verdict (the proof and the real scan both use it)
@@ -27,7 +27,8 @@
 # - Fedora (fedora:latest): grype only. Trivy has no Fedora coverage, so it is NOT run here.
 # - Ubuntu (ubuntu:latest): grype and trivy (TST-3b).
 # - Arch (archlinux:latest): grype only. Trivy is NOT run here, by declared decision (TST-3c).
-# - CachyOS belongs to TST-3d (wave 8). Windows and macOS have no coverage.
+# - CachyOS (cachyos/cachyos:latest): grype only. Trivy is NOT run here, by declared decision (TST-3d).
+# - Windows and macOS have no coverage.
 #
 # DATABASE SOURCES (leader, 20/11/2026: "covered by both"). Stated here as the measured state,
 # not as a claim:
@@ -88,6 +89,10 @@
 # - archlinux:latest is a rolling release. Measured on run 44793892079 (20/11/2026): os-release
 #   gives ID=arch and VERSION_ID=20261108.0.623074, and the grype distro name is "archlinux", not
 #   "arch". The matrix carries it as scan_distro. Trivy does not cover this entry.
+# - cachyos/cachyos:latest (TST-3d), probe: name to be measured on the first run. scan_distro is
+#   set to cachyos as a guess. If grype reports another name, or none, the run is red, and the
+#   slice goes to the leader with the log in hand. Nobody relaxes the floor or the judge. Trivy
+#   does not cover this entry.
 # - The exclude globs (./proc/**, and so on) are relative to the scan root. For trivy they are
 #   passed as --skip-dirs in both the relative and the absolute spelling, because the docs do
 #   not confirm which one matches. Which spelling matched is read from the Targets line of the
@@ -135,6 +140,12 @@ jobs:
             image: archlinux:latest
             distro: arch
             scan_distro: archlinux
+            trivy: false
+            git_install: "pacman -Syu --noconfirm --needed git"
+          - name: CachyOS (grype, probe)
+            image: cachyos/cachyos:latest
+            distro: cachyos
+            scan_distro: cachyos
             trivy: false
             git_install: "pacman -Syu --noconfirm --needed git"
     steps:
