@@ -25,7 +25,7 @@ CTR="gusworld-tdd-0123456789abcdef"
 #  8 capdrop  9 capadd  10 secopt  11 user  12 pidmode  13 ipcmode  14 utsmode
 #  15 usernsmode  16 devices  17 tmpfs
 HC_GOOD=(none 0 0 false "$SPEC_MEMORY_BYTES" "$SPEC_MEMORY_SWAP_BYTES" "$SPEC_PIDS" \
-    "$SPEC_NANOCPUS" "[ALL]" "[]" "[no-new-privileges]" builder "" private "" "" 0 0)
+    "$SPEC_NANOCPUS" "[ALL]" 0 "[no-new-privileges]" builder "" private "" "" 0 0)
 
 # hc_with INDEX VALUE: the good HostConfig with one field replaced, joined by '|'.
 hc_with() {
@@ -53,7 +53,7 @@ check "swap de 64g reprova" 1 "$(hc_with 5 68719476736)"
 check "pids errado reprova" 1 "$(hc_with 6 100)"
 check "2 CPUs em vez de 4 reprova" 1 "$(hc_with 7 2000000000)"
 check "capabilities nao descartadas reprovam" 1 "$(hc_with 8 "[]")"
-check "CapAdd nao vazio reprova" 1 "$(hc_with 9 '[SYS_ADMIN]')"
+check "CapAdd nao vazio reprova" 1 "$(hc_with 9 1)"
 check "sem no-new-privileges reprova" 1 "$(hc_with 10 "[]")"
 check "usuario root reprova" 1 "$(hc_with 11 root)"
 check "PidMode host reprova" 1 "$(hc_with 12 host)"
