@@ -57,9 +57,6 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     container: ${{ matrix.image }}
-    env:
-      # The grype database cache lives under the runner temp dir, which is excluded from the scan.
-      GRYPE_DB_CACHE_DIR: ${{ runner.temp }}/grype-db
     strategy:
       matrix:
         include:
@@ -84,6 +81,12 @@ jobs:
       # The script is only read here, never edited.
       - name: Install the build toolchain
         run: bash tools/ci/env/fedora.sh
+
+      # The job-level env cannot read the runner context (GitHub contexts table, jobs.<job_id>.env),
+      # so the cache path is written from a step, where runner.temp is available.
+      # The cache lives under the runner temp dir, which the real scan excludes.
+      - name: Point the grype database cache under the runner temp dir
+        run: echo "GRYPE_DB_CACHE_DIR=$RUNNER_TEMP/grype-db" >> "$GITHUB_ENV"
 
       - name: Install grype pinned by SHA-256
         run: bash tools/ci/cve/install_grype.sh "$RUNNER_TEMP/bin"
