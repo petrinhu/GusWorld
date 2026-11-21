@@ -15,8 +15,15 @@
 #   readability-braces-around-statements a branch without braces is where edits go wrong
 #   readability-container-size-empty   size() == 0 is the wrong idiom for an empty test
 #
+# HeaderFilterRegex: clang-tidy reports a finding in a header only when the header path
+# matches this regex. The five layers keep their headers under <layer>/include/, so those
+# headers are analysed when a source includes them. System and third-party headers do not
+# match, and stay out of the gate. A header that no source includes is not seen by
+# clang-tidy: cppcheck, which takes the headers as input, covers that case.
+#
 # WarningsAsErrors is deliberately NOT set here. Setting it in this file would turn the
 # warnings into errors in the developer's editor too. The CI job passes
 # --warnings-as-errors on the command line only, so the promotion affects the gate and
 # nothing else.
 Checks: '-*,bugprone-macro-parentheses,bugprone-use-after-move,bugprone-unused-return-value,clang-analyzer-core.NullDereference,performance-unnecessary-value-param,readability-braces-around-statements,readability-container-size-empty'
+HeaderFilterRegex: '(^|/)(core|content|domain|app|present)/include/'

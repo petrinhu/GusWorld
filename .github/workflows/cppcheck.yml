@@ -70,8 +70,9 @@ jobs:
           cmake -S . -B "$RUNNER_TEMP/cppcheck-build" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           test -s "$RUNNER_TEMP/cppcheck-build/compile_commands.json"
 
-      # Every .cpp of the tree, fixtures excluded, into the list file. The script
-      # refuses an empty list (zero is a failure, L-36).
+      # Every .cpp and .hpp of the tree, fixtures excluded, into the list file. Headers are
+      # input too, so a header no source includes is still analysed. The script refuses an
+      # empty list (zero is a failure, L-36).
       - name: Enumerate the sources (zero is a failure)
         run: bash tools/ci/cppcheck/enumerate.sh "$RUNNER_TEMP/sources.txt"
 

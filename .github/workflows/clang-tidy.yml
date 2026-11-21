@@ -87,6 +87,12 @@ jobs:
       - name: Red proof, WITH --warnings-as-errors (must fail and name the check)
         run: bash tools/ci/clang_tidy/scan.sh with "$RUNNER_TEMP/with.log" tests/fixtures/clang_tidy/clang_tidy_fixture.cpp
 
+      # Red proof for a header: the defect sits in a header under <layer>/include/, reached
+      # only by the fixture's #include. Same check, same judge. It shows the gate reaches a
+      # header; it does not by itself prove the HeaderFilterRegex (see .clang-tidy).
+      - name: Red proof, header under <layer>/include/ with WITH --warnings-as-errors
+        run: bash tools/ci/clang_tidy/scan.sh with "$RUNNER_TEMP/header-with.log" tests/fixtures/clang_tidy/header_fixture.cpp
+
       # Red proof, case WITHOUT the option: the trap. Must exit 0 with the finding in the log.
       - name: Red proof, WITHOUT --warnings-as-errors (the trap, must exit 0 with the finding)
         run: bash tools/ci/clang_tidy/scan.sh without "$RUNNER_TEMP/without.log" tests/fixtures/clang_tidy/clang_tidy_fixture.cpp

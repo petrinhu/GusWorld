@@ -19,6 +19,16 @@ target="${3:?target missing}"
 
 here="$(cd "$(dirname "$0")" && pwd)"
 
+# Include path of each layer that exists. A source reaches its headers through these
+# directories only, so without them the #include lines do not resolve and cppcheck loses
+# the header bodies. Relative paths: this script runs from the repository root.
+includes=()
+for layer in core content domain app present; do
+  if [ -d "$layer/include" ]; then
+    includes+=("-I$layer/include")
+  fi
+done
+
 case "$mode" in
   real) inputs=(--file-list="$target") ;;
   with|without) inputs=("$target") ;;
@@ -31,6 +41,6 @@ esac
 
 # rc is taken with "|| rc=$?", so the real exit code is kept under set -e.
 rc=0
-cppcheck --std=c++23 "${policy[@]}" "${inputs[@]}" > "$log" 2>&1 || rc=$?
+cppcheck --std=c++23 "${includes[@]}" "${policy[@]}" "${inputs[@]}" > "$log" 2>&1 || rc=$?
 cat "$log"
 bash "$here/judge.sh" "$mode" "$rc" "$log" "$target"
