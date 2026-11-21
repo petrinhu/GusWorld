@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Em vigor desde a virada de 20/11/2026 (`e00d05c`), com a prova real do encadeamento na fatia 8 (respostas do líder de 20/11/2026; decisões técnicas a ratificar) |
+| **Status** | Proposed, em vigor desde a virada de 20/11/2026 (`e00d05c`), com a prova real do encadeamento na fatia 8 (respostas do líder de 20/11/2026; decisões técnicas a ratificar) |
 | **Data** | 2026-11-20 |
 | **Decisor** | petrinhu (líder supremo), por `AskUserQuestion`; desenho técnico do CTO (Caetano) |
 | **Reversibilidade** | Two-way door: a imagem, a tag e o mecanismo de volume ou de `docker exec` trocam sem mudar o contrato do guard. O que muda o contrato (prazos, veredito de cada código de saída) exige nova ratificação. |
@@ -187,7 +187,7 @@ Medidas em 20/11/2026.
 
 Limites que ficam:
 
-- **Veredito da fatia 7:** nos testes da fatia 7, o docker falso respondeu pelo contêiner; o contêiner real só entrou na fatia 8, com a suíte verde.
+- **Veredito da fatia 7:** nos testes da fatia 7, o docker falso respondeu pelo contêiner; o encadeamento do runner com o `run_suite.sh` e o contêiner real só rodou na fatia 8, com a suíte verde.
 - **Contêiner real frio:** o código 126 e o aviso do `notice.py` com o contêiner real frio não foram exercitados ao vivo, só em contêiner, com o fake.
 - **Texto do runner:** a saída do runner no `PostToolUse` não aparece no resultado do Edit para o agente; a prova saiu do `last-run.json` e do `last.log`.
 - **Tolerância de 2 s:** um `last-reason` de outra execução, gravado até 2 s antes do `ts` do estado, passa por atual (`FRESH_TOLERANCE` do `notice.py`).
