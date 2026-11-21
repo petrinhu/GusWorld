@@ -7,9 +7,9 @@
 # (LEI ZERO) must be installed for the repository. A CI clone never carries the hooks, so
 # this check is local by design (lead's decision, 12/10/2026; TODO item C7).
 #
-# For each hook named in HOOKS, both conditions must hold:
-#   1. <git-common-dir>/hooks/<hook> exists, is executable and equals the source
-#      tools/git-hooks/<hook> when that source exists (a stale copy fails).
+# For each hook named in HOOKS, both conditions must hold (the spec, as decided by the CTO
+# on 21/11/2026; a byte comparison with the source is deliberately NOT made):
+#   1. <git-common-dir>/hooks/<hook> exists and is executable.
 #   2. If core.hooksPath is set, git running the hooks from that path reaches the
 #      repository hook. Checked by behaviour: a throwaway repository gets marker hooks,
 #      and `git hook run` through the configured path must run them.
@@ -42,10 +42,6 @@ for name in $HOOKS; do
   fi
   if [ ! -x "$local_hook" ]; then
     fail "local $name hook without the execute bit: $local_hook"
-  fi
-  source_hook="$repo/tools/git-hooks/$name"
-  if [ -f "$source_hook" ] && ! cmp -s "$source_hook" "$local_hook"; then
-    fail "installed $name hook differs from tools/git-hooks/$name: run python3 tools/git-hooks/install.py"
   fi
   echo "local $name hook present and executable: $local_hook"
 done

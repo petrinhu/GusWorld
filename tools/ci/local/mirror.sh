@@ -25,8 +25,17 @@
 #
 # The work directory is printed at the end and is NOT removed: remove it by hand.
 #
+# Declared limits:
+#   - Only GCC (CXX defaults to c++) is run here. Clang, Ubuntu, Arch, CachyOS and Windows
+#     are not run by this mirror; they stay with the CI.
+#   - Portão 4 (secret scan) is NOT RUN here: the history holds encrypted docs/_secret
+#     objects the brief forbids reading. No weaker scan takes its place.
+#   - cve (network) and versao-tag (no tag at HEAD) are NOT RUN by design, listed on every
+#     run, and do not change the exit code.
+#
 # Usage: sh tools/ci/local/mirror.sh [--container]
-# Exit: 0 every gate PASSA; 1 some gate REPROVA; 2 no REPROVA but some gate NOT RUN or PARCIAL.
+# Exit: 0 every gate PASSA (or only the fixed NOT RUN above); 1 some gate REPROVA;
+#       2 some other gate NOT RUN or PARCIAL.
 set -u
 
 usage() {
@@ -75,7 +84,7 @@ git -c core.hooksPath="$W/no-hooks" -c user.name=gw-mirror -c user.email=mirror@
   -c commit.gpgsign=false commit -q -m "snapshot of HEAD for the local CI mirror" \
   || { echo "mirror.sh: cannot commit the snapshot" >&2; exit 2; }
 
-GATES="build sanitizadores estatica-cppcheck estatica-clang-tidy segredo gancho-commit formatacao piso-cmake camadas lei-zero versao-tag cve"
+GATES="build sanitizadores estatica-cppcheck estatica-clang-tidy segredo segredo-autotestes gancho-commit formatacao piso-cmake camadas lei-zero versao-tag cve"
 
 title_of() {
   case "$1" in
@@ -83,7 +92,8 @@ title_of() {
     sanitizadores) echo "portão 2, sanitizadores (sanitizers.yml)" ;;
     estatica-cppcheck) echo "portão 3, análise estática cppcheck (cppcheck.yml)" ;;
     estatica-clang-tidy) echo "portão 3, análise estática clang-tidy (clang-tidy.yml)" ;;
-    segredo) echo "portão 4, segredo com histórico (gitleaks.yml)" ;;
+    segredo) echo "portão 4, varredura de segredo com histórico (gitleaks.yml)" ;;
+    segredo-autotestes) echo "autotestes do guard de segredo e da lista de exceções (gitleaks.yml)" ;;
     gancho-commit) echo "portão 5, mensagem de commit, suíte e gancho (commit-gate.yml)" ;;
     formatacao) echo "formatação clang-format (clang-format.yml)" ;;
     piso-cmake) echo "piso do CMake 4.1 (cmake_floor.sh, em cada job)" ;;
@@ -222,13 +232,14 @@ run_host_gates() {
   elif [ "$have" != "$pin" ]; then
     not_run segredo ferramenta "não executado: gitleaks local $have difere do fixado no CI ($pin)"
   else
-    step segredo casos-do-veredito bash tools/ci/gitleaks/verdict_cases.sh
-    step segredo prova-vermelha-1 sh -c 'set -e; repo="$RUNNER_TEMP/red-synthetic"; log="$RUNNER_TEMP/red-synthetic.log"; bash tools/ci/gitleaks/fixture_synthetic_repo.sh "$repo"; bash tools/ci/gitleaks/expect.sh leak 1 "$repo" "$log"'
-    step segredo prova-vermelha-2 sh -c 'set -e; repo="$RUNNER_TEMP/red-empty"; mkdir "$repo"; git init -q -b main "$repo"; bash tools/ci/gitleaks/expect.sh zero any "$repo" "$RUNNER_TEMP/red-empty.log"'
-    step segredo prova-lista-vermelha sh -c 'set -e; fake="$RUNNER_TEMP/allowlist-fake"; printf "%s\n" "# fabricated for the red proof, no secret" "fake/one.txt:fake-rule:1" "fake/two.txt:fake-rule:2" > "$fake"; bash tools/ci/gitleaks/expect_allowlist_rejects.sh "$fake" "$ALLOW_N"'
-    step segredo lista-de-excecoes bash tools/ci/gitleaks/allowlist_gate.sh .gitleaksignore "$ALLOW_N"
-    step segredo arvore-sem-historico gitleaks dir --redact .
+    # Self-tests of the guard and the allowlist. They are not the scan: the scan is below.
+    step segredo-autotestes bash tools/ci/gitleaks/verdict_cases.sh
+    step segredo-autotestes prova-vermelha-1 sh -c 'set -e; repo="$RUNNER_TEMP/red-synthetic"; log="$RUNNER_TEMP/red-synthetic.log"; bash tools/ci/gitleaks/fixture_synthetic_repo.sh "$repo"; bash tools/ci/gitleaks/expect.sh leak 1 "$repo" "$log"'
+    step segredo-autotestes prova-vermelha-2 sh -c 'set -e; repo="$RUNNER_TEMP/red-empty"; mkdir "$repo"; git init -q -b main "$repo"; bash tools/ci/gitleaks/expect.sh zero any "$repo" "$RUNNER_TEMP/red-empty.log"'
+    step segredo-autotestes prova-lista-vermelha sh -c 'set -e; fake="$RUNNER_TEMP/allowlist-fake"; printf "%s\n" "# fabricated for the red proof, no secret" "fake/one.txt:fake-rule:1" "fake/two.txt:fake-rule:2" > "$fake"; bash tools/ci/gitleaks/expect_allowlist_rejects.sh "$fake" "$ALLOW_N"'
+    step segredo-autotestes lista-de-excecoes bash tools/ci/gitleaks/allowlist_gate.sh .gitleaksignore "$ALLOW_N"
   fi
+  # The portão 4 verdict is the history scan. It is never replaced by a weaker scan here.
   not_run segredo varredura-do-historico "vedado ao espelho: o histórico guarda objetos cifrados de docs/_secret, e o brief proíbe ler esses caminhos; roda no CI"
 
   echo "== gancho-commit (metade b, no clone real)"
@@ -293,13 +304,22 @@ gate_verdict() {
 
 echo
 echo "=== VEREDITO POR PORTÃO ==="
+# Gates that cannot run here by design: network (cve) and the absence of a tag (versao-tag).
+# They are listed on every run and do not make the exit code non-zero. Any other NÃO
+# EXECUTADO or PARCIAL does.
+FIXED_NOT_RUN="cve versao-tag"
 not_passed=0
 for g in $GATES; do
   v=$(gate_verdict "$g")
   [ -n "$v" ] || continue
   printf '  %-20s %-14s %s\n' "$g" "$v" "$(title_of "$g")"
-  [ "$v" = "PASSA" ] || not_passed=$((not_passed + 1))
+  case " $FIXED_NOT_RUN " in
+    *" $g "*) [ "$v" = "PASSA" ] || [ "$v" = "NÃO EXECUTADO" ] || not_passed=$((not_passed + 1)) ;;
+    *) [ "$v" = "PASSA" ] || not_passed=$((not_passed + 1)) ;;
+  esac
 done
+echo
+echo "NÃO EXECUTADO por desenho, fixo, em toda execução: cve (rede), versao-tag (sem tag em HEAD). Não derruba a saída."
 echo
 echo "=== DETALHE DOS QUE NÃO PASSARAM ==="
 awk -F'|' '$3 != "PASSA" { printf "  %s / %s: %s (%s)\n", $1, $2, $3, $4 }' "$VERD"
