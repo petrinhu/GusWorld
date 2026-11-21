@@ -69,6 +69,15 @@ add_test(NAME harness_selftest_usage_error_fails
     -DREQUIRED_TEXT=usage:
     -P ${expect_exit_script})
 
+add_executable(gusworld_core_tests
+  harness/main.cpp
+  core/test_error_code.cpp)
+target_link_libraries(gusworld_core_tests PRIVATE gusworld_test_harness gusworld_core)
+gusworld_apply_compile_options(gusworld_core_tests)
+
+add_test(NAME core_tests
+  COMMAND gusworld_core_tests)
+
 add_test(NAME harness_selftest_red_is_detected
   COMMAND ${CMAKE_COMMAND}
     -DEXE=$<TARGET_FILE:gusworld_harness_selftest_red>
