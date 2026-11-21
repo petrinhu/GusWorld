@@ -71,7 +71,8 @@ add_test(NAME harness_selftest_usage_error_fails
 
 add_executable(gusworld_core_tests
   harness/main.cpp
-  core/test_error_code.cpp)
+  core/test_error_code.cpp
+  core/test_error.cpp)
 target_link_libraries(gusworld_core_tests PRIVATE gusworld_test_harness gusworld_core)
 gusworld_apply_compile_options(gusworld_core_tests)
 
