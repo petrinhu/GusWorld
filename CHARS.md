@@ -280,6 +280,15 @@ A única figura VIVA do conjunto dos análogos (distinta dos 20 "históricos" §
 |---|---|---|---|---|
 | Helion Tusk | — | Near-name (arquétipo empreendedor-engenheiro real, nunca citado pelo nome verdadeiro in-game), **boa-evolução** canônica (inovação, risco assumido, livre troca; espelho estrutural invertido de Vitório Cardoso), imigrante de Polis-Vermelha que reconstruiu do zero um consórcio industrial próprio (energia, veículos autônomos, autômatos "Mãos", computação avançada), sem patrocínio de Família-Pilastra nem vínculo com Sterling Corp. Achado dormindo na Montadora Confluência; NÃO entrega a carta (empresta a bancada, e a party FORJA a carta "A Carta Perdida de Tusk", CAP-21, efeito "Consórcio", unindo as 20 cartas coletadas). **Missão Kola-SG3-12262 (Selve Profunda, canon 29/08/2026):** colabora com Brunus Vetorial, pela primeira vez, na fabricação do traje térmico que a party pede para descer à dungeon; nenhum dos dois consegue sozinho, e não há relação prévia entre eles além de arquétipo temático — espec. completa da peça em `D25`, cadeia de missão em `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md` | `docs/design/roster-analogos/21-helion-tusk.md` + (quando existir) `docs/narrative/deep/characters/mestre-cap-21-helion-tusk.md` + `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md` | 🟡 design (proposta, aguarda aprovação junto do roster; revertido de ✅ em 2026-07-14 por PS-R8 — canoniza junto dos 20 mestres + cascata facção/PLACES/Vitório Cardoso) |
 
+## 8f. Era Lendária (Era 0)
+
+Personagens da pré-história descrita em `docs/narrative/timeline.md`, seção Era 0. O detalhe fica em área cifrada.
+
+| Nome | Apelido / codinome | Características | 1ª aparição | Status |
+|---|---|---|---|---|
+| Ilmara | — | Técnica de acervo da cidade do auge, testemunha da era com voz própria. Sobrenome não fixado. Escreve um caderno pessoal, sem destinatário | `docs/_secret/timeline-era-0-complemento.md` (área cifrada) | 💀 histórico Era Lendária |
+| [sem nome] | — | Colega mais velho de Ilmara no acervo, perto de se aposentar | `docs/_secret/timeline-era-0-complemento.md` (área cifrada) | 💀 histórico Era Lendária |
+
 ## 9. Stub: personagens a auditar/adicionar
 
 **Auditoria sistemática pendente.** Varrer:

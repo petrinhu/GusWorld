@@ -9,7 +9,7 @@
 
 - **Nome:** nome próprio canônico.
 - **Tipo:** Setting principal | Cidade | Vilarejo | Catedral | Estação | Ponto geográfico | Sub-local
-- **Era:** 1 (Pré-Código / Neo-Sylvania) | 2 (Era do Compilador) | 3 (Era Sterling / presente) | Cross-eras
+- **Era:** 0 (Era Lendária) | 1 (Pré-Código / Neo-Sylvania) | 2 (Era do Compilador) | 3 (Era Sterling / presente) | Cross-eras
 - **Localização canon:** referência geográfica/relacional (ex: "borda oeste Selve Sombria")
 - **Status:** `✅ canônico` | `🟡 lendário` (mencionado mas localização hoje desconhecida) | `🔴 saqueado` | `💀 destruído` | `⚪ abandonado funcional` (mecanismos continuam operando sem habitantes)
 - **Cross-ref:** doc canônico principal
@@ -154,6 +154,13 @@ Canon F5-BK.AUDIT T2-C3 resolução "modelo dois-anéis": 10 vilarejos pós-Êxo
 |---|---|---|---|---|---|
 | **Borda oeste da Selve Sombria** | Ponto geográfico | Cross-eras | Onde se encontram cripto-glifos primários -1100 | ✅ canônico | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.1 |
 | **Leitos secos de rios (Era 1)** | Ponto geográfico | 1 (cursos mudaram) | Dentro Selve | ✅ canônico | `deep/eras/era-1-pre-codigo/capitulo-02-cronologia-material.md` §2.1 |
+
+## 6b. Era Lendária (Era 0)
+
+| Nome | Tipo | Era | Localização canon | Status | Cross-ref |
+|---|---|---|---|---|---|
+| [nome a criar]: acervo onde Ilmara trabalha | Sub-local (acervo) | 0 (Era Lendária) | Cidade do auge da era (nome a criar) | ✅ histórico Era Lendária | `docs/_secret/timeline-era-0-complemento.md` (área cifrada) |
+| [nome a criar]: subsolo do acervo de Ilmara | Sub-local (dentro do acervo) | 0 (Era Lendária) | Subsolo do acervo onde Ilmara trabalha | ✅ histórico Era Lendária | `docs/_secret/timeline-era-0-complemento.md` (área cifrada) |
 
 ## 7. Stub: lugares a auditar/adicionar
 

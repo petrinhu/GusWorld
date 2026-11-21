@@ -48,6 +48,7 @@ Eras, cronologia, linha do tempo.
 - **Soberano: `docs/narrative/timeline.md`** - a linha do tempo canônica: pré-história (Era Lendária) mais três eras estruturais (Pré-Código / Boom Técnico ou "Compilador" / Sterling).
 - `docs/narrative/deep/eras/` (25 arquivos) - expansão deep-lore de cada era: `era-1-pre-codigo.md` com sua própria subpasta de 18 capítulos (`era-1-pre-codigo/capitulo-01...10`), `era-2-boom-tecnico.md`, `era-3-sterling.md`, `transicoes-entre-eras.md`, `cosmologia-origem-deep.md`.
 - Data exata do colapso da Era Lendária e o que a dungeon final da Selve Profunda revela sobre ela ficam cifrados - ver `docs/_secret/cosmologia-origem-notas-secret.md` no eixo 12.
+- Um complemento da Era Lendária fica cifrado em `docs/_secret/timeline-era-0-complemento.md` (ver eixo 12).
 
 ## 4. Língua e escrita
 
