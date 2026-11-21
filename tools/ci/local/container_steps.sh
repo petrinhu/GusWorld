@@ -53,23 +53,9 @@ count_tests() {
 step build count count_tests
 step build ctest ctest --test-dir build --output-on-failure
 
-# --- Gate 2, sanitizers: sanitizers.yml ---
-# The image lists its packages in /etc/gusworld/packages.txt, and libasan and libubsan are
-# not among them (sanitizers.yml installs them with dnf, which needs network the container
-# does not have). Without the runtime the gate is NOT RUN, never REPROVA: the host reads the
-# NOTRUN line.
-if rpm -q libasan libubsan > "$RUNNER_TEMP/san-runtime.txt" 2>&1; then
-  step sanitizadores configure cmake -S . -B build-sanitizers -G Ninja \
-    "-DCMAKE_CXX_COMPILER=$CXX" \
-    "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer -g" \
-    "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined" \
-    -DGUSWORLD_SANITIZER_FIXTURES=ON
-  step sanitizadores build cmake --build build-sanitizers -j2
-  step sanitizadores inventory bash -c 'ctest --test-dir build-sanitizers -N > "$RUNNER_TEMP/san-inventory.txt" 2>&1 && bash tools/ci/sanitizers/judge_inventory.sh "$RUNNER_TEMP/san-inventory.txt"'
-  step sanitizadores ctest ctest --test-dir build-sanitizers --output-on-failure
-else
-  echo "NOTRUN sanitizadores runtime não executado: falta libasan/libubsan na imagem (sem rede, e instalar exige a ordem do líder, GW-28)"
-fi
+# --- Gate 2, sanitizers: NOT in this mirror. Decision of the leader, 21/11/2026: the
+# sanitizer gate stays only in the remote CI (the image has no libasan or libubsan, and
+# mirror.sh lists sanitizadores as a fixed NOT RUN).
 
 # --- Gate 5, commit message gate suite and mutation: commit-gate.yml ---
 step gancho-commit suite-verde bash tools/ci/commit_gate/run_suite.sh tools/security/test_commit_gate.py "$RUNNER_TEMP/green.log" green

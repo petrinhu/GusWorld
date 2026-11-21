@@ -30,8 +30,9 @@
 #     are not run by this mirror; they stay with the CI.
 #   - Portão 4 (secret scan) is NOT RUN here: the history holds encrypted docs/_secret
 #     objects the brief forbids reading. No weaker scan takes its place.
-#   - cve (network) and versao-tag (no tag at HEAD) are NOT RUN by design, listed on every
-#     run, and do not change the exit code.
+#   - cve (network), versao-tag (no tag at HEAD) and sanitizadores (CI only, leader's
+#     decision of 21/11/2026) are NOT RUN by design, listed on every run, and do not change
+#     the exit code.
 #
 # Usage: sh tools/ci/local/mirror.sh [--container]
 # Exit: 0 every gate PASSA (or only the fixed NOT RUN above); 1 some gate REPROVA;
@@ -138,9 +139,6 @@ container_not_run() {
   not_run build compilacao "$reason"
   not_run build contagem "$reason"
   not_run build ctest "$reason"
-  not_run sanitizadores compilacao "$reason"
-  not_run sanitizadores inventario "$reason"
-  not_run sanitizadores ctest "$reason"
   not_run gancho-commit suite-e-mutacao "$reason"
   not_run camadas selftest "$reason"
 }
@@ -197,7 +195,10 @@ run_container() {
 
 run_host_gates() {
   cd "$src" || return 1
-  echo "== piso-cmake"
+  echo "== sanitizadores (fixo, só no CI remoto)"
+not_run sanitizadores fixo "sanitizadores só no CI remoto, por decisão do líder de 21/11/2026"
+
+echo "== piso-cmake"
   step piso-cmake piso bash tools/ci/cmake_floor.sh
 
   echo "== formatacao"
@@ -307,7 +308,7 @@ echo "=== VEREDITO POR PORTÃO ==="
 # Gates that cannot run here by design: network (cve) and the absence of a tag (versao-tag).
 # They are listed on every run and do not make the exit code non-zero. Any other NÃO
 # EXECUTADO or PARCIAL does.
-FIXED_NOT_RUN="cve versao-tag"
+FIXED_NOT_RUN="cve versao-tag sanitizadores"
 not_passed=0
 for g in $GATES; do
   v=$(gate_verdict "$g")
@@ -319,7 +320,7 @@ for g in $GATES; do
   esac
 done
 echo
-echo "NÃO EXECUTADO por desenho, fixo, em toda execução: cve (rede), versao-tag (sem tag em HEAD). Não derruba a saída."
+echo "NÃO EXECUTADO por desenho, fixo, em toda execução: cve (rede), versao-tag (sem tag em HEAD), sanitizadores (só no CI remoto, por decisão do líder de 21/11/2026). Não derruba a saída."
 echo
 echo "=== DETALHE DOS QUE NÃO PASSARAM ==="
 awk -F'|' '$3 != "PASSA" { printf "  %s / %s: %s (%s)\n", $1, $2, $3, $4 }' "$VERD"
