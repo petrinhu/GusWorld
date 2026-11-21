@@ -66,41 +66,18 @@ Transcrito de `GODS_LAWS.md` (38 leis, medido em 12/09/2026 por `grep -c "^## GW
 Jogo **2D pixel-art**, single-player e offline, em **C++23**, assentado sobre o framework [GlintFx](../GlintFx) (LEI ZERO): o GusWorld não cria janela, não possui contexto gráfico e não roda laço próprio de quadro — isso é do GlintFx, e o GusWorld escreve só a lógica do jogo.
 
 - **Perspectiva:** 3/4 top-down fixa, grade quadrada; o **sprite** vive em quatro direções cardeais desenhadas à mão (sem espelhamento) e a **locomoção** aceita diagonal, exibindo o cardeal mais próximo (GW-26).
-- **Estrutura de mundo:** **sem mundo aberto e sem mundo persistente** (corte `C-02`). ⚠️ A **forma da conectividade** é do `docs/design/mundo-topologia.md` — 13 áreas em grafo, com dobradiças ligando regiões —, e **não** do corte: em 28/08/2026 o líder tirou da lei a frase que ditava "hub central mais incursões radiais". O radial sobrevive como **ritmo de missão** no `pillars.md`, não como geografia.
-- **Progressão de cartas:** por progresso narrativo **e por crafting**. O corte `C-13`, que proibia carta craftada, foi **revogado pelo líder em 25/08/2026** junto com o `C-03`, restaurando canon do projeto anterior (GW-29).
-- **Escopo da campanha:** **longa por desenho, da ordem de meses de jogo, sem número de horas fixado** (corte `C-15`, decisão do líder de 11/10/2026, levantada pelo Gus Dragon na issue 11 do barramento). Nenhum conteúdo se corta por não caber num jogo curto, e a duração só se mede quando houver cena jogável. A cerca contra escopo infinito **não** é a duração total: cada uma das treze áreas e cada dungeon têm orçamento próprio de conteúdo, e mecânica nova entra se couber no orçamento da área onde vive.
+- **Estrutura de mundo:** **sem mundo aberto e sem mundo persistente** (corte `C-02`).
+- **Progressão de cartas:** por progresso narrativo **e por crafting**.
+- **Escopo da campanha:** **longa por desenho, da ordem de meses de jogo, sem número de horas fixado** (corte `C-15`, decisão do líder de 11/10/2026, levantada pelo Gus Dragon na issue 11 do barramento).
 - **Distribuição:** FOSS, código sob AGPL-3.0-or-later; assets e lore com todos os direitos reservados (GW-08).
 
 A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C-16` com os buracos do `C-03` e do `C-13`, revogados em 25/08/2026) está na GW-29. Os números revogados **não se reaproveitam**.
 
-## Estado atual do repositório (20/11/2026)
+Antes de desenhar mapa, conectividade entre áreas ou escopo de conteúdo, leia o detalhe da estrutura de mundo e do escopo da campanha em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "O que é o GusWorld: o detalhe".
 
-**Git e remoto:**
+## Estado atual do repositório
 
-- `git rev-list --count HEAD` responde quantos commits tem o branch local `main`.
-- `git ls-remote git@github.com:petrinhu/GusWorld.git main` responde o SHA do `main` no remoto.
-- `git rev-list --count origin/main..HEAD` responde quantos commits locais ainda não foram pushados.
-- Existem dez workflows de CI em `.github/workflows/`, cada um com o `name:` declarado. `ls .github/workflows/*.yml | wc -l` responde quantos são, e `grep -H '^name:' .github/workflows/*.yml` responde o nome de cada um: `Build` (`build.yml`), `Camadas` (`layers.yml`), `LEI ZERO` (`lei-zero.yml`), `version-tag` (`version-tag.yml`), `Segredo no histórico` (`gitleaks.yml`), `Mensagem de commit` (`commit-gate.yml`), `Análise estática` (`cppcheck.yml`), `Análise estática com clang-tidy` (`clang-tidy.yml`), `Sanitizadores` (`sanitizers.yml`) e `Portão de CVE` (`cve.yml`). O `lei-zero.yml` nasceu no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à GW-32 (push só com o GHA verde) o que checar**. `gh run list --workflow=lei-zero.yml` responde quantas execuções há e a conclusão de cada uma. ⚠️ **Isto não é o CI de build do projeto**: o build é o workflow `Build`. O LEI ZERO verifica só TEXTO, sem compilar nada.
-
-**Código-fonte: EXISTE desde 11/10/2026.** Medido por comando, não por suposição:
-
-- `find . -name CMakeLists.txt -not -path './.git/*' | wc -l` responde quantos arquivos de build há, `tests/` e os fixtures incluídos.
-- `find . -name "*.cpp" -not -path './.git/*' | wc -l` responde quantas unidades de tradução há.
-- **A espinha de cinco camadas existe como alvos:** `core/`, `content/`, `domain/`, `app/` e `present/`, cada uma com `CMakeLists.txt` próprio e dependência só para baixo (GW-17). ⚠️ **`present/` nasce DESLIGADA**, atrás da opção `GUSWORLD_PRESENT`, porque a GW-06 e a GW-27 a mantêm bloqueada até o GlintFx ter entrada e texto.
-- **`tests/` existe**, com o harness próprio em `tests/harness/` (sem framework de terceiro, ADR-025) e os autotestes em `tests/selftest/`. `grep -cE '^add_test' tests/CMakeLists.txt` responde quantos testes são registrados sem condição. Os testes do `-Werror` e dos sanitizadores ficam dentro de `if(...)` e indentados, então essa conta não os inclui. O total depende das opções de configuração, e o número que vale é o do `ctest -N` sobre o build configurado.
-- **Não há `include/` nem `src/`**, e isso é desenho, não falta: o código mora nas cinco camadas.
-- **Nada do GlintFx entra ainda.** Nenhum `find_package`, nenhum `add_subdirectory` de framework, nenhum diretório `framework/`. O submódulo entra quando `present/` for desbloqueada, por decisão do líder de 11/10/2026.
-
-**O que existe hoje, fora de código de jogo** (contado por `find`/`ls`):
-
-- Arquivos `.md` na raiz (`ls *.md | wc -l` responde quantos há; inclui este `CLAUDE.md`): os manuais listados em "Autoridade documental" abaixo, mais `GODS_LAWS.md`, `TODO.md`, `inicial.md`, `README.md`, `sinopse.md`, `CHARS.md`, `PLACES.md`.
-- `LICENSE` (AGPL-3.0), `NOTICE`, `REUSE.toml`, `.gitattributes`, `.gitignore`, `.bigtech-porte` (`porte=bigtech`), `LICENSES/` (textos integrais SPDX).
-- `docs/`: diretórios de primeiro nível (`art`, `audio`, `book`, `design`, `narrative`, `_processo`, `production`, `qa`, `_secret`, `security`, `specs`, `tech`; `find docs -maxdepth 1 -mindepth 1 -type d | wc -l` responde quantos há; sem o `-mindepth 1` o comando conta também o próprio `docs/`, um a mais) mais `docs/licoes-aprendidas.md` na raiz de `docs/`. `docs/_secret/` é área cifrada por `git-crypt` (GW-25) — só o caminho é citável, nunca o conteúdo.
-- `docs/tech/adr/`: ADRs (`ls docs/tech/adr/ADR-*.md | wc -l` responde quantos existem). Os números ausentes estão na linha **Não presentes** (números aposentados) de `docs/tech/adr/_INDEX.md`. ⚠️ **Número de ADR não se reaproveita.**
-- `tools/ci/`: os portões de CI atomizados, um diretório por portão (`cve`, `gitleaks`, `commit_gate`, `cppcheck`, `clang_tidy`, `sanitizers`), mais `tools/ci/cmake_floor.sh`, `tools/ci/fetch_verified.sh` e `tools/ci/env/`, um script de toolchain por ambiente de build.
-- `tools/security/`: o portão 5 da GW-19 (`tools/security/commit_gate.py`, `tools/security/test_commit_gate.py`, `tools/security/termos_proibidos.txt` cifrado) e os ganchos `tools/git-hooks/commit-msg` e `tools/git-hooks/install.py`.
-- `tools/tdd/`, `tools/container/` e `.claude/tdd-guard.json`: o guard de TDD em contêiner, a imagem que ele usa e a configuração dele (`ADR-026`); o uso está em "Comandos".
-- `resources/` e `assets/`: existem (`ls` confirma), não inventariados aqui — fora do escopo desta tarefa.
+Antes de afirmar quantos commits, arquivos, testes, workflows ou ADRs existem, ou o que há em `docs/` e em `tools/`, leia o inventário medido por comando em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Estado atual do repositório".
 
 ## Decisões fechadas pelo líder
 
@@ -163,25 +140,16 @@ O caminho medido que funciona nesta máquina, e por que cada parte dele é assim
 - O `.claude/tdd-guard.json` chama `bash tools/tdd/run_suite.sh`, com `timeout_sec` de 144 s, e o script roda a suíte no contêiner `gusworld-tdd-<hash16>`, nunca na sessão do líder (GW-35).
 - O script sai com 0 (verde), 1 (vermelho) ou 126 (não rodou). O 126 é fail-open: a edição passa, com o aviso do plugin e o do `tools/tdd/notice.py`.
 - Rode `bash tools/tdd/prepare.sh` em segundo plano para aquecer o contêiner. Com o contêiner frio, o guard recebe 126.
-- O resultado de cada execução fica em `~/.claude/state/tdd-guard/<hash16>/last-run.json` e em `/var/tmp/gusworld-tdd/<hash16>/last.log`.
-- Os testes de `tools/tdd/` rodam com `bash tools/tdd/test/run_in_container.sh`. A variável `GUSWORLD_TEST_PIDS` só aperta o teto de pids desse contêiner, nunca o afrouxa.
 - **Protocolo de rajada, combinado com a sessão `manutencao`:** antes de editar C++, a sessão avisa "abrindo rajada do guard" e só edita se houver vaga; no fim, avisa "fechando rajada" com o pico medido. O preparo frio se pede à parte.
 - O aviso de tela (`systemMessage`) não chega ao líder quando quem edita é subagente. Por isso todo subagente cita no relatório, verbatim, o aviso do guard que receber.
+- Antes de ler o resultado de uma execução do guard ou de rodar os testes de `tools/tdd/`, veja onde ficam em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Comandos: o detalhe".
 
 Os portões locais de texto, que não dependem de build e rodam desde agosto:
 
 - `tools/git-hooks/install.py` instala `tools/security/commit_gate.py` como gancho `commit-msg` e `tools/security/lei_zero_guard.py` como `pre-commit`.
 - `python3 tools/security/test_commit_gate.py` e `python3 tools/security/test_lei_zero_guard.py` rodam os autotestes dos dois.
-- `python3 tools/ci/check_version_matches_tag.py vA.B.C.D` confere a tag contra a versão declarada. ⚠️ Ele **reprova em clone raso**, de propósito: num clone raso as tags podem não ter sido buscadas, e um casamento aparente seria falso verde.
 
-**Dez workflows existem** (a lista de nomes está na seção de estado). Os que provam o build:
-
-- `build.yml` (`Build`) configura com `cmake -S . -B build -DGUSWORLD_WERROR=ON` e roda `ctest` em nove entradas de matriz (`grep -c '^          - name:' .github/workflows/build.yml` responde quantas são). As plataformas são Fedora (`fedora:latest`), Ubuntu, Arch, CachyOS (`cachyos/cachyos:latest`, job próprio, não é Arch renomeado), cada uma com GCC e Clang, e Windows com MSVC (`windows-latest`). Todas as imagens Linux estão em `:latest`.
-- Prova medida: run `44737723604`, `headSha` `e9be1a0`, nove jobs com `conclusion` `success`. Cada job mostra `100% tests passed` sobre `Total Tests: 10`. Esse run não é prova do HEAD atual, que é outro commit.
-- `sanitizers.yml` (`Sanitizadores`) configura com `-DGUSWORLD_SANITIZER_FIXTURES=ON`, o que acrescenta os testes dos fixtures de sanitizadores. O total desse job não foi medido aqui.
-- `cve.yml` (`Portão de CVE`) é o sexto portão, fora dos cinco da GW-19, e roda só no Fedora (TST-3a). Usa grype `0.122.1` com SHA-256 fixo e barra só CVE crítica com correção publicada. Prova medida: run `44755957346`, `headSha` `89ba42e`, `conclusion` `success`, com veredictos `finding` (caso positivo), `zero` (piso) e `accept` (varredura real), e `VERSION_ID=45` no log.
-
-Os demais workflows (`layers.yml`, `lei-zero.yml`, `version-tag.yml`, `gitleaks.yml`, `commit-gate.yml`, `cppcheck.yml` e `clang-tidy.yml`) não entram nesta prova. Para o estado deles, use `gh run list --workflow=<arquivo>`. O `Build` é o CI de build, e o `LEI ZERO` verifica só texto, sem compilar nada.
+Antes de conferir tag contra a versão, de afirmar o que um workflow de CI prova ou de citar prova medida de execução, leia [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Comandos: o detalhe".
 
 Os portões de CI em `tools/ci/<portão>/` são scripts de uma responsabilidade cada. O workflow só orquestra, e cada veredicto sai de um script.
 
@@ -189,31 +157,14 @@ Os portões de CI em `tools/ci/<portão>/` são scripts de uma responsabilidade 
 
 - **Build pesado vai para `/var/tmp`, com `export TMPDIR=/var/tmp`.** `/tmp` aqui é tmpfs (sai da RAM); build C++ grande enche o tmpfs e o link falha com "no space on device".
 - **Espaço em disco se mede com `btrfs filesystem usage /`** (sem `sudo`), lendo `Device unallocated` e o `min` de `Free (estimated)`. O `df` mente em btrfs.
-- **Nenhum teste dinâmico roda na sessão do líder — é a GW-35, lei desde 29/08/2026, e não mais "prática observada".** Vale para todo teste que EXECUTA código (suíte, integração, fuzzing, sanitizer, mutation testing, benchmark, sonda de janela/teclado/mouse/tela), não só para os que tocam a tela: **sempre em container**. Sem container disponível, o resultado honesto é **"não executado, falta o container"** — nunca rodar fora e reportar sucesso. ⚠️ **Subir o container não basta:** `wl_display_connect(NULL)` cai no nome embutido `wayland-0` dentro do `XDG_RUNTIME_DIR`, e desligar a variável **não protege** — a proteção real é trocar o `XDG_RUNTIME_DIR` por diretório próprio `chmod 700` só no processo sob teste, e provar antes de interagir. O compositor aninhado (`kwin_wayland`, `Xvfb`) continua valendo como **piso dentro** do container, nunca como alternativa a ele. O GusWorld tem código e suíte (sete testes registrados, desde 11/10/2026), e a suíte roda no CI, não na sessão do líder. A camada `present/` continua bloqueada pelo GlintFx (GW-06, GW-27), e a lei foi escrita **antes** do primeiro teste, de propósito.
+- **Nenhum teste dinâmico roda na sessão do líder — é a GW-35, lei desde 29/08/2026.** Vale para todo teste que EXECUTA código (suíte, integração, fuzzing, sanitizer, mutation testing, benchmark, sonda de janela/teclado/mouse/tela), não só para os que tocam a tela: **sempre em container**. Sem container disponível, o resultado honesto é **"não executado, falta o container"** — nunca rodar fora e reportar sucesso.
+- Antes de rodar teste com janela, entrada ou tela, leia o detalhe do `XDG_RUNTIME_DIR` e do compositor aninhado em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Teste dinâmico em container (GW-35): o detalhe".
 - **Verificação de entregável visual é do `qa-engineer`**, independente de quem implementou, com o orquestrador reconferindo o relatório do QA — ainda não se aplica, porque não há interface nem tela.
 
 ## Pendências
 
-A tabela de pendências do projeto está em `TODO.md` na raiz (`grep -cE '^\| [0-9]' TODO.md` responde quantos itens há), em schema de **10 colunas** (`WSJF`, `ID`, `Onda`, `Grupo`, `Descrição Técnica`, `Prioridade`, `Pré-requisito`, `Dificuldade`, `Status`, `Estado Auditado`, com `WSJF` como primeira coluna, GW-30). A coluna `Onda` vai de `0` até o maior valor em uso, mais `—` para item que não entra em fila de execução: bloqueado sem data, ou prática contínua que por desenho nunca fecha, como o `A11b`. `awk -F'|' '/^\| [0-9]/{gsub(/^[ \t]+|[ \t]+$/,"",$4); print $4}' TODO.md | grep -E '^[0-9]+$' | sort -n | tail -1` responde o maior valor de `Onda` hoje; `awk -F'|' '/^\| [0-9]/{gsub(/^[ \t]+|[ \t]+$/,"",$4); print $4}' TODO.md | sort -u | wc -l` responde quantos valores distintos a coluna tem (contando o `—`).
-
-Não há mais nenhum status `🟡 Parcial`: o único era o `A11`, que em 25/08/2026 foi **fatiado em `A11a` e `A11b`** por decisão do líder sob a GW-33 — ele misturava o gabarito SPDX, que fecha uma vez, com a prática de aplicá-lo, que nunca fecha, e nessa forma travava o grafo do primeiro commit.
-
-O rastreio dos 28 itens do `inicial.md` — condição da GW-21 para apagá-lo — vive dentro do próprio `TODO.md`, não duplicado aqui.
+Antes de ler, contar ou editar a tabela de pendências (`TODO.md` na raiz), leia o schema dela e os comandos que contam itens e ondas em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Pendências".
 
 ## Bus entre projetos: `gusworld_ia_autocomm`
 
-Canal assíncrono entre as sessões do líder e o filho dele. Clone: `<vault>/gusworld_ia_autocomm/`, repo **privado** `petrinhu/gusworld_ia_autocomm`. **O protocolo canônico é o `PROTOCOL.md` do clone**; leia lá antes de usar, e trate a GW-07 e a GW-31 de `GODS_LAWS.md` como o resumo operacional.
-
-| Slug | Projeto |
-|---|---|
-| **`gusworld`** | **este projeto**, o jogo |
-| `glintfx` | `Projects/GlintFx`, o framework do qual o GusWorld depende (LEI ZERO) |
-| `site` | `petrinhu/site_gusworld`, a revista retro que conta o progresso do jogo |
-| `mapeditor` | `petrinhu/gusworld_mapeditor`, editor de mapas |
-| Gus Dragon (`Dragon-Drv`) | colaborador humano, filho do líder; manda ideias por issue, `.txt` no `inbox/` ou discussion (GW-07, GW-16) |
-
-Fluxo: ler o que está solto em `inbox/gusworld/`, agir, `git mv` para `inbox/gusworld/archive/`, commit `read: <arquivo>`, push. Enviar: um `.md` em `inbox/<destinatario>/` com frontmatter `de`/`para`/`assunto`/`data`, sempre depois de `git pull`. **Pedido vai sem classificação de prioridade** (quem recebe classifica).
-
-Estado em 24/08/2026 (`ls inbox/gusworld/`): **vazia**, só `archive/` e `.gitkeep`.
-
-**Aviso proativo ao Gus Dragon é obrigação permanente (GW-31):** sempre que o líder aprovar, rejeitar ou mudar algo que seja ideia dele, ou fechar item de alta prioridade da tabela, avisar **sem que ele pergunte** — na discussion 7 (o catálogo de bugs que ele mantém), com timestamp e uma das três classificações que ele fixou (**Bug Consertado**, **Bug Funcional**, **Bug Possível**).
+Antes de ler ou escrever no bus, leia o clone, o protocolo, os slugs, o fluxo e o aviso proativo ao Gus Dragon em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Bus entre projetos".
