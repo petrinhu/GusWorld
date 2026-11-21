@@ -18,6 +18,27 @@ find . \( -name '*.cpp' -o -name '*.hpp' \) -not -path './.git/*' -not -path './
 found="$(wc -l < "$list")"
 echo "encontrados (.cpp e .hpp fora dos fixtures): ${found}"
 cat "$list"
+
+# Self-check, the one that catches a dropped header. judge.sh counts found and analysed from
+# the same list, so a header missing from the list would pass green there. Here every header
+# under <layer>/include/ must be in the list. It applies only when such a header exists.
+# Layer list: the same five names as .clang-tidy (HeaderFilterRegex) and scan.sh (-I loop).
+layer_dirs=()
+for layer in core content domain app present; do
+  if [ -d "$layer/include" ]; then
+    layer_dirs+=("./$layer/include")
+  fi
+done
+if [ "${#layer_dirs[@]}" -gt 0 ]; then
+  layer_headers="$(find "${layer_dirs[@]}" -name '*.hpp' | wc -l)"
+  missing="$(comm -23 <(find "${layer_dirs[@]}" -name '*.hpp' | sort) <(sort "$list"))"
+  echo "cabecalhos sob <camada>/include/: ${layer_headers}"
+  if [ -n "$missing" ]; then
+    echo "FAIL: headers under a layer's include/ are missing from the list:"
+    echo "$missing"
+    exit 1
+  fi
+fi
 case "$found" in
   ''|*[!0-9]*)
     echo "FAIL: the source count is missing or not a number"

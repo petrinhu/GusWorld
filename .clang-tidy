@@ -17,9 +17,12 @@
 #
 # HeaderFilterRegex: clang-tidy reports a finding in a header only when the header path
 # matches this regex. The five layers keep their headers under <layer>/include/, so those
-# headers are analysed when a source includes them. System and third-party headers do not
-# match, and stay out of the gate. A header that no source includes is not seen by
-# clang-tidy: cppcheck, which takes the headers as input, covers that case.
+# headers are analysed when a source includes them. System and third-party headers are
+# meant not to match this regex; no proof in this repository measures that they stay out.
+# A header that no source includes is not seen by clang-tidy: cppcheck, which takes the
+# headers as input, covers that case.
+# The layer list is the same as in tools/ci/cppcheck/scan.sh and enumerate.sh; change all
+# three together.
 #
 # WarningsAsErrors is deliberately NOT set here. Setting it in this file would turn the
 # warnings into errors in the developer's editor too. The CI job passes

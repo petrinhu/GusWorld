@@ -22,6 +22,7 @@ here="$(cd "$(dirname "$0")" && pwd)"
 # Include path of each layer that exists. A source reaches its headers through these
 # directories only, so without them the #include lines do not resolve and cppcheck loses
 # the header bodies. Relative paths: this script runs from the repository root.
+# The layer list is the same as in .clang-tidy and in enumerate.sh; change all three together.
 includes=()
 for layer in core content domain app present; do
   if [ -d "$layer/include" ]; then

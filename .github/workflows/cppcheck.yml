@@ -87,6 +87,12 @@ jobs:
       - name: Red proof, WITH --error-exitcode=1 (must exit 1 and name uninitvar)
         run: bash tools/ci/cppcheck/scan.sh with "$RUNNER_TEMP/with.log" tests/fixtures/cppcheck/cppcheck_fixture.cpp
 
+      # Red proof for a header under <layer>/include/: the header is passed alone with the
+      # option, and must exit 1 with the finding id. The enumeration of headers is checked by
+      # the self-check in enumerate.sh, not here.
+      - name: Red proof, header under <layer>/include/ with WITH --error-exitcode=1
+        run: bash tools/ci/cppcheck/scan.sh with "$RUNNER_TEMP/cc-header-with.log" tests/fixtures/cppcheck/core/include/gusworld/core/header_probe.hpp
+
       # Red proof, case WITHOUT the option: THE TRAP. Same fixture, same defect, no
       # --error-exitcode. judge.sh requires exit 0 WITH the finding in the log.
       - name: Red proof, WITHOUT --error-exitcode (the trap, must exit 0 with the finding)
