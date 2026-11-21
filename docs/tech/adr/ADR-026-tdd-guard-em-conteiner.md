@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Proposed (respostas do líder de 20/11/2026; decisões técnicas a ratificar) |
+| **Status** | Em vigor desde a virada de 20/11/2026 (`e00d05c`), com a prova real do encadeamento na fatia 8 (respostas do líder de 20/11/2026; decisões técnicas a ratificar) |
 | **Data** | 2026-11-20 |
 | **Decisor** | petrinhu (líder supremo), por `AskUserQuestion`; desenho técnico do CTO (Caetano) |
 | **Reversibilidade** | Two-way door: a imagem, a tag e o mecanismo de volume ou de `docker exec` trocam sem mudar o contrato do guard. O que muda o contrato (prazos, veredito de cada código de saída) exige nova ratificação. |
@@ -164,6 +164,36 @@ Decididas pelo orquestrador, sem ratificação registrada ainda:
   é garantia de código, sem teste de contêiner.
 - **Dependências de outros itens:** o `D1` passa a depender de `C8` e `C10`.
   O `C8` depende do `C3`, o harness de teste próprio (`ADR-025`).
+
+## Consequências medidas
+
+Medidas em 20/11/2026.
+
+- **Prova real do encadeamento (fatia 8):** depois da virada, o runner do plugin rodou
+  `bash tools/tdd/run_suite.sh` no contêiner real e gravou `ran: true` e `exit_code: 0`,
+  com 7 de 7 testes verdes, em duas execuções (`ts` `1795219920` e `1795219944`, às
+  21:12:00 e às 21:12:24 no horário de Recife). Em seguida, uma edição em `core/layer.cpp`
+  foi bloqueada com a mensagem "TDD guard: a suite esta toda verde", e o diff final ficou
+  vazio. Isso prova no contêiner real o critério (a) do `tools/tdd/test/test_virada_chain.sh`:
+  o runner chama o `run_suite.sh` e grava `ran: true` com o veredito da suíte.
+- **Preparo:** o `prepare.sh` levou 1,58 s e aproveitou o contêiner já criado.
+- **Recursos:** picos de 6 a 17 pids contra o teto de 233. Na prova real, o pico foi de
+  12 pids de 233 e de 220 MiB de 4 GiB.
+- **Tempo:** no máximo 1 s no relógio interno e no máximo 901 ms de parede. O relógio
+  interno (`tdd-tempo`) conta segundos inteiros, e por isso marcar 1 s não contradiz os
+  901 ms de parede.
+- **Mutantes mortos:** 7 de 7 (M1 a M7) e depois 8 de 8, com o M8, na fatia 6; 5 de 5
+  (V1 a V5) na fatia 7.
+
+Limites que ficam:
+
+- **Veredito da fatia 7:** nos testes da fatia 7, o docker falso respondeu pelo contêiner; o contêiner real só entrou na fatia 8, com a suíte verde.
+- **Contêiner real frio:** o código 126 e o aviso do `notice.py` com o contêiner real frio não foram exercitados ao vivo, só em contêiner, com o fake.
+- **Texto do runner:** a saída do runner no `PostToolUse` não aparece no resultado do Edit para o agente; a prova saiu do `last-run.json` e do `last.log`.
+- **Tolerância de 2 s:** um `last-reason` de outra execução, gravado até 2 s antes do `ts` do estado, passa por atual (`FRESH_TOLERANCE` do `notice.py`).
+- **Aviso com subagente:** o `systemMessage` não chega à tela do líder quando quem edita é subagente, e o subagente cita o aviso no relatório (decisão do líder em `docs/decisoes-do-lider.md`).
+- **Checagem de dono:** existe só no código, sem teste de contêiner (ver "Consequências e limites").
+- **`heavy_slot`:** o lock do `tools/container/heavy_slot.sh` segue symlink em `/var/tmp`, e o conserto espera na INBOX do `TODO.md`.
 
 ## Cross-refs
 

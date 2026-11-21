@@ -99,6 +99,7 @@ A cerca completa do que o jogo **não** é (**14 cortes**, numerados `C-01` a `C
 - `docs/tech/adr/`: ADRs (`ls docs/tech/adr/ADR-*.md | wc -l` responde quantos existem). Os números ausentes estão na linha **Não presentes** (números aposentados) de `docs/tech/adr/_INDEX.md`. ⚠️ **Número de ADR não se reaproveita.**
 - `tools/ci/`: os portões de CI atomizados, um diretório por portão (`cve`, `gitleaks`, `commit_gate`, `cppcheck`, `clang_tidy`, `sanitizers`), mais `tools/ci/cmake_floor.sh`, `tools/ci/fetch_verified.sh` e `tools/ci/env/`, um script de toolchain por ambiente de build.
 - `tools/security/`: o portão 5 da L-19 (`tools/security/commit_gate.py`, `tools/security/test_commit_gate.py`, `tools/security/termos_proibidos.txt` cifrado) e os ganchos `tools/git-hooks/commit-msg` e `tools/git-hooks/install.py`.
+- `tools/tdd/`, `tools/container/` e `.claude/tdd-guard.json`: o guard de TDD em contêiner, a imagem que ele usa e a configuração dele (`ADR-026`); o uso está em "Comandos".
 - `resources/` e `assets/`: existem (`ls` confirma), não inventariados aqui — fora do escopo desta tarefa.
 
 ## Decisões fechadas pelo líder
@@ -156,6 +157,16 @@ O caminho medido que funciona nesta máquina, e por que cada parte dele é assim
 - **Volume de host em container NÃO funciona:** o SELinux desta máquina está `Enforcing` e bloqueia `container_t`. A L-60 do global manda não mexer em política; os arquivos entram por `tar` na entrada padrão e o resultado sai pela saída padrão.
 - **Cópia de trabalho em subpasta FALHA neste repositório:** o filtro de descriptografia do `git-crypt` não resolve no worktree novo e o checkout aborta nos arquivos de `docs/_secret/`. Para verificar uma fatia, extraia do blob com `git archive`, que é o que a L-27 do global manda de todo modo.
 - **Instalar a toolchain em container estoura o limite de primeiro plano:** rode em segundo plano.
+
+**O guard de TDD roda a suíte em contêiner** (`C8`; desenho, números e limites no `ADR-026`):
+
+- O `.claude/tdd-guard.json` chama `bash tools/tdd/run_suite.sh`, com `timeout_sec` de 144 s, e o script roda a suíte no contêiner `gusworld-tdd-<hash16>`, nunca na sessão do líder (L-35).
+- O script sai com 0 (verde), 1 (vermelho) ou 126 (não rodou). O 126 é fail-open: a edição passa, com o aviso do plugin e o do `tools/tdd/notice.py`.
+- Rode `bash tools/tdd/prepare.sh` em segundo plano para aquecer o contêiner. Com o contêiner frio, o guard recebe 126.
+- O resultado de cada execução fica em `~/.claude/state/tdd-guard/<hash16>/last-run.json` e em `/var/tmp/gusworld-tdd/<hash16>/last.log`.
+- Os testes de `tools/tdd/` rodam com `bash tools/tdd/test/run_in_container.sh`. A variável `GUSWORLD_TEST_PIDS` só aperta o teto de pids desse contêiner, nunca o afrouxa.
+- **Protocolo de rajada, combinado com a sessão `manutencao`:** antes de editar C++, a sessão avisa "abrindo rajada do guard" e só edita se houver vaga; no fim, avisa "fechando rajada" com o pico medido. O preparo frio se pede à parte.
+- O aviso de tela (`systemMessage`) não chega ao líder quando quem edita é subagente. Por isso todo subagente cita no relatório, verbatim, o aviso do guard que receber.
 
 Os portões locais de texto, que não dependem de build e rodam desde agosto:
 
