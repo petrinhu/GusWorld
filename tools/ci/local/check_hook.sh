@@ -52,6 +52,13 @@ if [ -z "$hooks_path" ]; then
   echo "HOOK CHECK PASSED"
   exit 0
 fi
+# A relative core.hooksPath is relative to the repository's top level, as git resolves it.
+# Resolving it inside the probe would test a different directory and fail for no reason.
+repo_abs=$(cd "$repo" && pwd -P)
+case "$hooks_path" in
+  /*|[A-Za-z]:*|"~"/*) ;;
+  *) hooks_path="$repo_abs/$hooks_path" ;;
+esac
 echo "core.hooksPath is set: $hooks_path"
 
 base="${TMPDIR:-/var/tmp}"

@@ -196,9 +196,9 @@ run_container() {
 run_host_gates() {
   cd "$src" || return 1
   echo "== sanitizadores (fixo, só no CI remoto)"
-not_run sanitizadores fixo "sanitizadores só no CI remoto, por decisão do líder de 21/11/2026"
+  not_run sanitizadores fixo "sanitizadores só no CI remoto, por decisão do líder de 21/11/2026"
 
-echo "== piso-cmake"
+  echo "== piso-cmake"
   step piso-cmake piso bash tools/ci/cmake_floor.sh
 
   echo "== formatacao"
@@ -312,7 +312,12 @@ FIXED_NOT_RUN="cve versao-tag sanitizadores"
 not_passed=0
 for g in $GATES; do
   v=$(gate_verdict "$g")
-  [ -n "$v" ] || continue
+  # Coverage: a gate with no record at all is REPROVA, never silence (GW-19: a gate with no
+  # step is a broken scan, L-36). The record makes the exit code non-zero below.
+  if [ -z "$v" ]; then
+    record "$g" "cobertura" "REPROVA" "portão sem nenhum registro: o espelho não rodou nenhum passo dele"
+    v="REPROVA"
+  fi
   printf '  %-20s %-14s %s\n' "$g" "$v" "$(title_of "$g")"
   case " $FIXED_NOT_RUN " in
     *" $g "*) [ "$v" = "PASSA" ] || [ "$v" = "NÃO EXECUTADO" ] || not_passed=$((not_passed + 1)) ;;

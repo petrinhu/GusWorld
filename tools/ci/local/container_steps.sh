@@ -7,10 +7,16 @@
 # and streams a snapshot of the repository (a git repository with one commit) on stdin.
 # Each step prints one line: "STEP <gate> <name> <rc>". The verdict is the host's, from rc.
 #
-# Inline commands here mirror the workflow `run:` blocks that have no script under
-# tools/ci/ (the test count of build.yml, the sanitizer configure line, the commit-gate
-# tree checks). Any change in a workflow must be copied here by hand: that is a known
-# drift risk, noted in tools/ci/local/ and the C7 report.
+# Inline blocks copied from the workflows, with no script under tools/ci/ to call. Each one
+# is a copy, not a call, so a change in the workflow does NOT reach this file by itself. The
+# list below is the declared limit (GW-19, emenda de 12/10/2026: no drift test is written for
+# these blocks). Copy by hand when the workflow changes.
+#   step build configure   <- .github/workflows/build.yml:152-153 (cmake -S . -B build -DGUSWORLD_WERROR=ON)
+#   step build compile     <- .github/workflows/build.yml:158 (cmake --build build)
+#   count_tests            <- .github/workflows/build.yml:163-181 (Count registered tests)
+#   step build ctest       <- .github/workflows/build.yml:183 (ctest --test-dir build --output-on-failure)
+#   arquivos-intactos      <- .github/workflows/commit-gate.yml:94-95 (git status / git diff --exit-code)
+# The tools/ci/ scripts the other steps call are the workflows' own calls, not copies.
 set -u
 
 # The image runs as the unprivileged user builder (WORKDIR /home/builder), so the tree goes
