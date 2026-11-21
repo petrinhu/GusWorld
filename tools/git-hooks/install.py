@@ -28,7 +28,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-HOOKS = ["commit-msg"]
+HOOKS = ["commit-msg", "pre-commit"]
 
 
 def git_common_dir(repo_root: Path) -> Path:
