@@ -16,9 +16,9 @@ Nenhum conteúdo se corta por não caber num jogo curto, e a duração só se me
 
 **Git e remoto:**
 
-- `git rev-list --count HEAD` responde quantos commits tem o branch local `main`.
+- `git rev-list --count HEAD` responde quantos commits tem o ramo atual.
 - `git ls-remote git@github.com:petrinhu/GusWorld.git main` responde o SHA do `main` no remoto.
-- `git rev-list --count origin/main..HEAD` responde quantos commits locais ainda não foram pushados.
+- `git rev-list --count @{u}..HEAD` responde quantos commits do ramo atual ainda não foram pushados para o upstream dele.
 - Existem onze workflows de CI em `.github/workflows/` (medido em 20/11/2026), cada um com o `name:` declarado. `ls .github/workflows/*.yml | wc -l` responde quantos são, e `grep -H '^name:' .github/workflows/*.yml` responde o nome de cada um: `Build` (`build.yml`), `Camadas` (`layers.yml`), `LEI ZERO` (`lei-zero.yml`), `version-tag` (`version-tag.yml`), `Segredo no histórico` (`gitleaks.yml`), `Mensagem de commit` (`commit-gate.yml`), `Análise estática` (`cppcheck.yml`), `Análise estática com clang-tidy` (`clang-tidy.yml`), `Sanitizadores` (`sanitizers.yml`), `Portão de CVE` (`cve.yml`) e `Formatação` (`clang-format.yml`). O `lei-zero.yml` nasceu no commit `c2dc58d` de 28/08/2026, disparado em `push`, `pull_request` e `workflow_dispatch`. Ele roda `tools/security/lei_zero_guard.py` duas vezes (sobre o range do push, para regressão, e sobre a árvore inteira, para dívida) e **já dá à GW-32 (push só com o GHA verde) o que checar**. `gh run list --workflow=lei-zero.yml` responde quantas execuções há e a conclusão de cada uma. ⚠️ **Isto não é o CI de build do projeto**: o build é o workflow `Build`. O LEI ZERO verifica só TEXTO, sem compilar nada.
 
 **Código-fonte: EXISTE desde 11/10/2026.** Medido por comando, não por suposição:
@@ -70,8 +70,6 @@ Os demais workflows (`layers.yml`, `lei-zero.yml`, `version-tag.yml`, `gitleaks.
 ## Pendências
 
 A tabela de pendências do projeto está em `TODO.md` na raiz (`grep -cE '^\| [0-9]' TODO.md` responde quantos itens há), em schema de **10 colunas** (`WSJF`, `ID`, `Onda`, `Grupo`, `Descrição Técnica`, `Prioridade`, `Pré-requisito`, `Dificuldade`, `Status`, `Estado Auditado`, com `WSJF` como primeira coluna, GW-30). A coluna `Onda` vai de `0` até o maior valor em uso, mais `—` para item que não entra em fila de execução: bloqueado sem data, ou prática contínua que por desenho nunca fecha, como o `A11b`. `awk -F'|' '/^\| [0-9]/{gsub(/^[ \t]+|[ \t]+$/,"",$4); print $4}' TODO.md | grep -E '^[0-9]+$' | sort -n | tail -1` responde o maior valor de `Onda` hoje; `awk -F'|' '/^\| [0-9]/{gsub(/^[ \t]+|[ \t]+$/,"",$4); print $4}' TODO.md | sort -u | wc -l` responde quantos valores distintos a coluna tem (contando o `—`).
-
-Não há mais nenhum status `🟡 Parcial`: o único era o `A11`, que em 25/08/2026 foi **fatiado em `A11a` e `A11b`** por decisão do líder sob a GW-33 — ele misturava o gabarito SPDX, que fecha uma vez, com a prática de aplicá-lo, que nunca fecha, e nessa forma travava o grafo do primeiro commit.
 
 O rastreio dos 28 itens do `inicial.md` — condição da GW-21 para apagá-lo — vive dentro do próprio `TODO.md`, não duplicado aqui.
 

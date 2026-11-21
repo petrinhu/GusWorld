@@ -61,6 +61,7 @@ GusWorld é escrito em **C++23** ([GW-03](GODS_LAWS.md#gw-03)). A única depend�
 - [`sinopse.md`](sinopse.md), [`CHARS.md`](CHARS.md), [`PLACES.md`](PLACES.md): o panorama canônico do mundo, o inventário de personagens e o inventário de lugares.
 - [`docs/mapa-do-lore.md`](docs/mapa-do-lore.md): mapa por assunto de todo o lore do mundo (gente, lugares, tempo, língua, facções, objetos, sistemas, história, textos in-world, humor e segredos), com caminho para cada documento.
 - [`docs/tech/adr/`](docs/tech/adr/): os registros de decisão de arquitetura.
+- [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md): o detalhe para o qual o `CLAUDE.md` da raiz aponta, com o inventário do repositório medido por comando, os comandos e as provas de CI, o teste dinâmico em container, o schema das pendências e o bus entre projetos.
 - [`docs/decisoes-do-lider.md`](docs/decisoes-do-lider.md): índice único das decisões do líder, com data e onde cada uma vive por completo.
 - [`TODO.md`](TODO.md): a tabela de pendências, onde o projeto está agora e o que vem a seguir.
 

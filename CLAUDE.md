@@ -18,7 +18,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Índice de gatilhos
 
-Transcrito de `GODS_LAWS.md` (38 leis, medido em 12/09/2026 por `grep -c "^## GW-" GODS_LAWS.md`). Este índice é cópia; a fonte de verdade é sempre o arquivo, nunca esta tabela.
+Transcrito de `GODS_LAWS.md` (38 leis, medido em 20/11/2026 por `grep -c "^## GW-" GODS_LAWS.md`). Este índice é cópia; a fonte de verdade é sempre o arquivo, nunca esta tabela.
 
 | Lei | Gatilho: dispara quando você vai... | Resumo |
 |---|---|---|
