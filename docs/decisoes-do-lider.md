@@ -58,6 +58,7 @@ O critério de entrada é **permanência**, não tema: entra decisão que, se co
 | 21/11/2026 | alvo da mutação N1 (GW-19) | A mutação da revisão N1 mira só as linhas de produto que a fatia mudou, até dez; linha de teste fica fora. Esclarecimento escrito na GW-19. | *"Só linhas de produto (Recomendado)"* | `GODS_LAWS.md`, GW-19 |
 | 21/11/2026 | ganchos que o `install.py` instala | O `tools/git-hooks/install.py` passa a instalar o `commit-msg` e o `pre-commit` da LEI ZERO, como o canon diz, e o `C7` checa os dois. | *"Instalar os dois (Recomendado)"* | `tools/git-hooks/install.py`; `TODO.md`, INBOX de 12/10/2026 |
 | 21/11/2026 | sanitizadores no espelho local (`C7`) | A imagem `gusworld-ci-fedora` não ganha `libasan` nem `libubsan`. O portão 2 fica só no CI remoto, e no espelho local entra como NÃO EXECUTADO por desenho, com o limite declarado. | *"Manter só no CI (Recomendado)"* | `tools/ci/local/`; `TODO.md`, linha `C7` |
+| 21/11/2026 | formatação bloqueada pelo guard de TDD (`D1`, fatia 3) | Com a suíte toda verde, o guard barra a reescrita de produção, e a formatação do `error.hpp` sai por `clang-format -i` no terminal; logo depois o main roda `tools/tdd/run_suite.sh` no contêiner do guard sobre o byte final, e o commit só sai com verde. | *"Formatar e reprovar (Recomendado)"* | `core/include/gusworld/core/error.hpp` |
 
 ## 2026-10
 
