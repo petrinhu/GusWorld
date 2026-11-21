@@ -56,6 +56,7 @@ O critério de entrada é **permanência**, não tema: entra decisão que, se co
 | 20/11/2026 | resumos do índice de gatilhos do `GODS_LAWS.md` | Os resumos de oito leis (GW-15, GW-16, GW-19, GW-26, GW-29, GW-32, GW-34 e GW-38) passam a repetir o corpo vigente de cada lei, sem mudar regra. O líder confere o diff antes do commit. | *"Alinhar ao corpo (Recomendado)"* | `GODS_LAWS.md`, índice; `CLAUDE.md`, índice |
 | 21/11/2026 | NVD e OSV no portão de CVE (`TST-3b` a `TST-3d`) | A decisão (5) do `TST-3a` vale para o par grype e trivy juntos, e não para cada ferramenta: na entrada Ubuntu o NVD fica com o grype, e o OSV e o limite T-01 do trivy (que casa pacote de sistema pelo feed da distro) ficam declarados. Fecham o `TST-3b` e o `TST-3c`; o `TST-3d` espera a conferência do erro do pacman. | *"As duas juntas (Recomendado)"* | `TODO.md`, linhas `TST-3b` a `TST-3d` |
 | 21/11/2026 | alvo da mutação N1 (GW-19) | A mutação da revisão N1 mira só as linhas de produto que a fatia mudou, até dez; linha de teste fica fora. Esclarecimento escrito na GW-19. | *"Só linhas de produto (Recomendado)"* | `GODS_LAWS.md`, GW-19 |
+| 21/11/2026 | ganchos que o `install.py` instala | O `tools/git-hooks/install.py` passa a instalar o `commit-msg` e o `pre-commit` da LEI ZERO, como o canon diz, e o `C7` checa os dois. | *"Instalar os dois (Recomendado)"* | `tools/git-hooks/install.py`; `TODO.md`, INBOX de 12/10/2026 |
 
 ## 2026-10
 
