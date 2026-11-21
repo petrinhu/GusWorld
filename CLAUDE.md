@@ -36,30 +36,30 @@ Transcrito de `GODS_LAWS.md` (38 leis, medido em 20/11/2026 por `grep -c "^## GW
 | [GW-12](GODS_LAWS.md#gw-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
 | [GW-13](GODS_LAWS.md#gw-13) | tocar em qualquer trabalho que dependa de canon | Canon desatualizado bloqueia: atualiza primeiro, trabalha depois |
 | [GW-14](GODS_LAWS.md#gw-14) | concluir que algo está morto, obsoleto ou descartável | Nada é declarado morto por agente; a decisão é do líder |
-| [GW-15](GODS_LAWS.md#gw-15) | versionar binário, asset pesado ou configurar o repositório | `livros/` e `glb/` fora do git; LFS no resto |
-| [GW-16](GODS_LAWS.md#gw-16) | homenagear pessoa real, ou citar o filho do líder | Homenagem só com aceite; o filho aparece só como "Gus Dragon" |
+| [GW-15](GODS_LAWS.md#gw-15) | versionar binário, asset pesado ou configurar o repositório | `resources/livros/` e `resources/glb/` fora do git; binário pesado só via LFS; regras do repositório nascem antes do primeiro commit |
+| [GW-16](GODS_LAWS.md#gw-16) | homenagear pessoa real, ou citar o filho do líder | Homenagem só com aceite prévio do líder; o filho aparece só como "Gus Dragon" ou "Dragon-Drv"; caso do roster fechado não se reabre |
 | [GW-17](GODS_LAWS.md#gw-17) | criar módulo, arquivo, ou desenhar a forma de um sistema | Espinha de cinco camadas com gate de CI; regra como comando e evento |
 | [GW-18](GODS_LAWS.md#gw-18) | escolher formato de arquivo de mapa, save, configuração ou item | Nada em formato de texto; máxima proteção contra edição |
-| [GW-19](GODS_LAWS.md#gw-19) | commitar, fechar fatia, pensar em cobertura e formatação, **ou escrever ordem de serviço que vai ser revisada** | Cinco portões de qualidade; TDD estrito; sem meta de cobertura; **rigor da revisão por CAMADA (N1 a N4), declarada no cabeçalho da ordem, e o orçamento de rodadas sai dela, não do revisor** |
+| [GW-19](GODS_LAWS.md#gw-19) | commitar, fechar fatia, pensar em cobertura e formatação, **ou escrever ordem de serviço que vai ser revisada** | Cinco portões de qualidade; TDD estrito; sem meta de cobertura; **rigor da revisão por CAMADA (N1 a N4), declarada no cabeçalho da ordem, e o orçamento de rodadas sai dela, não do revisor**; **nenhum nível novo de verificação sem ordem do líder, e a prova de estreia vermelha fica** |
 | [GW-20](GODS_LAWS.md#gw-20) | escrever CI, ou declarar que uma plataforma funciona | Matriz das cinco plataformas desde o primeiro commit |
 | [GW-21](GODS_LAWS.md#gw-21) | achar que o `inicial.md` cumpriu o papel dele | Só se apaga com as quatro condições satisfeitas e o líder confirmando |
 | [GW-22](GODS_LAWS.md#gw-22) | nomear qualquer coisa, ou escrever comentário e commit | Identificador e comentário em inglês, `snake_case`; commit em pt-br |
 | [GW-23](GODS_LAWS.md#gw-23) | criar tag, publicar release, ou mexer na versão | Versão e tag são `vA.B.C.D`, como no GlintFx |
 | [GW-24](GODS_LAWS.md#gw-24) | ver regra, seção ou documento que o líder revogou, ou escrever relatório/reconferência que narraria por que uma versão anterior dele reprovou | Revogado se APAGA; não se guarda como histórico — vale também para histórico de processo (bilhete sobre reprovação anterior) |
 | [GW-25](GODS_LAWS.md#gw-25) | tocar save, configuração, mapa ou catálogo de conteúdo | Envelope binário selado, teto técnico faseado, cripto vem do GlintFx |
-| [GW-26](GODS_LAWS.md#gw-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, grade quadrada; sprite em quatro cardeais, locomoção em oito |
+| [GW-26](GODS_LAWS.md#gw-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, grade quadrada, câmera sem rotação; sprite em quatro cardeais desenhados à mão, locomoção em oito exibindo o cardeal mais próximo |
 | [GW-27](GODS_LAWS.md#gw-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
 | [GW-28](GODS_LAWS.md#gw-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
-| [GW-29](GODS_LAWS.md#gw-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é |
+| [GW-29](GODS_LAWS.md#gw-29) | propor recurso, sistema ou escopo novo | Os 14 cortes (C-03 e C-13 revogados, sem reuso): a cerca do que o jogo NÃO é; campanha longa por desenho, com orçamento de conteúdo por área (C-15) |
 | [GW-30](GODS_LAWS.md#gw-30) | escrever, reordenar ou acrescentar item na tabela, ou escrever/editar checklist em qualquer outro documento do projeto | Tabela aponta para o documento que a especifica; TODO.md é a única fonte de checklist, o resto aponta de volta pelo ID, sem caixa de estado própria |
 | [GW-31](GODS_LAWS.md#gw-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
-| [GW-32](GODS_LAWS.md#gw-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push livre para ramo de trabalho, aceito só com CI verde; merge e tag só com onda fechada e aval |
+| [GW-32](GODS_LAWS.md#gw-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia citando o ID; push para ramo de trabalho a qualquer hora, aceito só com CI remoto verde; merge e tag só com onda fechada e aval do líder |
 | [GW-33](GODS_LAWS.md#gw-33) | criar ou revisar unidade de código do jogo, ou pensar em atomizar teste, ferramenta, documento, commit, item ou asset | Átomo só no código do jogo; fora dele, organiza-se como for melhor; no jogo, monolito é acoplamento, não tamanho, e há cinco perguntas na revisão |
-| [GW-34](GODS_LAWS.md#gw-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato, interrompe onda |
+| [GW-34](GODS_LAWS.md#gw-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato interrompe a fatia, conteúdo espera a onda fechar; nenhuma ideia dele é aprovada por agente sozinho |
 | [GW-35](GODS_LAWS.md#gw-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, o resultado é "não executado" |
 | [GW-36](GODS_LAWS.md#gw-36) | decidir se lore ainda não escrita atrasa uma fatia de engenharia, ou sentir a tentação de esperar completar canon antes de codar | Lore que falta não bloqueia código, puxa-se sob demanda em micro-sessão pontual; distinta da GW-13, que trava por canon que contradiz, não por canon que ainda falta |
 | [GW-37](GODS_LAWS.md#gw-37) | editar, revisar ou propor mudança em fala, aparte, revide, cena ou traço de caracterização já aprovado que define o Gus original | Mudança em conteúdo já aprovado do Gus original exige nova autorização explícita do líder; parente da GW-16, sem fundir nela |
-| [GW-38](GODS_LAWS.md#gw-38) | desenhar, revisar ou implementar qualquer enigma, puzzle ou câmara de lógica do jogo | Nenhum puzzle cede por ferramenta do jogo em vez do jogador; vale para todo enigma, escrito antes ou depois desta lei |
+| [GW-38](GODS_LAWS.md#gw-38) | desenhar, revisar ou implementar qualquer enigma, puzzle ou câmara de lógica do jogo | Nenhum puzzle cede por ferramenta do jogo, nem por insistência, em vez do jogador; o jogo confere só o acerto, nunca o vocabulário; vale para todo enigma, escrito antes ou depois desta lei |
 
 ## O que é o GusWorld
 
