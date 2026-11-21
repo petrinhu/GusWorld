@@ -32,14 +32,15 @@ Nenhum conteúdo se corta por não caber num jogo curto, e a duração só se me
 
 **O que existe hoje, fora de código de jogo** (contado por `find`/`ls`):
 
-- Arquivos `.md` na raiz (`ls *.md | wc -l` responde quantos há; inclui o `CLAUDE.md`): os manuais listados em "Autoridade documental" do `CLAUDE.md`, mais `GODS_LAWS.md`, `TODO.md`, `inicial.md`, `README.md`, `sinopse.md`, `CHARS.md`, `PLACES.md`.
+- Arquivos `.md` na raiz (`ls *.md | wc -l` responde quantos há; inclui o `CLAUDE.md`): os manuais listados em "Autoridade documental" do `CLAUDE.md`, mais `GODS_LAWS.md`, `TODO.md`, `ESCOPO.md`, `inicial.md`, `README.md`, `sinopse.md`, `CHARS.md`, `PLACES.md`.
 - `LICENSE` (AGPL-3.0), `NOTICE`, `REUSE.toml`, `.gitattributes`, `.gitignore`, `.bigtech-porte` (`porte=bigtech`), `LICENSES/` (textos integrais SPDX).
-- `docs/`: diretórios de primeiro nível (`art`, `audio`, `book`, `design`, `narrative`, `_processo`, `production`, `qa`, `_secret`, `security`, `specs`, `tech`; `find docs -maxdepth 1 -mindepth 1 -type d | wc -l` responde quantos há; sem o `-mindepth 1` o comando conta também o próprio `docs/`, um a mais) mais `docs/licoes-aprendidas.md` na raiz de `docs/`. `docs/_secret/` é área cifrada por `git-crypt` (GW-25) — só o caminho é citável, nunca o conteúdo.
+- `docs/`: diretórios de primeiro nível (`art`, `book`, `claude`, `design`, `narrative`, `_processo`, `qa`, `_secret`, `security`, `specs`, `tech`; `find docs -maxdepth 1 -mindepth 1 -type d | wc -l` responde quantos há; sem o `-mindepth 1` o comando conta também o próprio `docs/`, um a mais) mais os arquivos da raiz de `docs/`: `licoes-aprendidas.md`, `decisoes-do-lider.md` e `mapa-do-lore.md`. `docs/_secret/` é área cifrada por `git-crypt` (GW-25) — só o caminho é citável, nunca o conteúdo.
 - `docs/tech/adr/`: ADRs (`ls docs/tech/adr/ADR-*.md | wc -l` responde quantos existem). Os números ausentes estão na linha **Não presentes** (números aposentados) de `docs/tech/adr/_INDEX.md`. ⚠️ **Número de ADR não se reaproveita.**
-- `tools/ci/`: os portões de CI atomizados, um diretório por portão (`cve`, `gitleaks`, `commit_gate`, `cppcheck`, `clang_tidy`, `sanitizers`), mais `tools/ci/cmake_floor.sh`, `tools/ci/fetch_verified.sh` e `tools/ci/env/`, um script de toolchain por ambiente de build.
+- `tools/ci/`: os portões de CI atomizados, um diretório por portão (`clang_format` (workflow `Formatação`), `clang_tidy`, `commit_gate`, `cppcheck`, `cve`, `gitleaks`, `sanitizers`), mais os arquivos soltos `tools/ci/check_layers.py`, `tools/ci/test_check_layers.py`, `tools/ci/check_version_matches_tag.py`, `tools/ci/cmake_floor.sh` e `tools/ci/fetch_verified.sh`, e `tools/ci/env/`, um script de toolchain por ambiente de build.
+- `tools/art/`: `tools/art/sprites_inventory_gen.py`, o único script do diretório.
 - `tools/security/`: o portão 5 da GW-19 (`tools/security/commit_gate.py`, `tools/security/test_commit_gate.py`, `tools/security/termos_proibidos.txt` cifrado) e os ganchos `tools/git-hooks/commit-msg` e `tools/git-hooks/install.py`.
 - `tools/tdd/`, `tools/container/` e `.claude/tdd-guard.json`: o guard de TDD em contêiner, a imagem que ele usa e a configuração dele (`ADR-026`); o uso está em "Comandos" do `CLAUDE.md`.
-- `resources/` e `assets/`: existem (`ls` confirma), não inventariados aqui — fora do escopo desta tarefa.
+- `resources/` e `assets/`: existem (`ls -d resources assets` confirma), não inventariados nesta seção.
 
 ## Comandos: o detalhe
 
@@ -87,7 +88,7 @@ Canal assíncrono entre as sessões do líder e o filho dele. Clone: `<vault>/gu
 
 Fluxo: ler o que está solto em `inbox/gusworld/`, agir, `git mv` para `inbox/gusworld/archive/`, commit `read: <arquivo>`, push. Enviar: um `.md` em `inbox/<destinatario>/` com frontmatter `de`/`para`/`assunto`/`data`, sempre depois de `git pull`. **Pedido vai sem classificação de prioridade** (quem recebe classifica).
 
-Estado em 24/08/2026 (`ls inbox/gusworld/`): **vazia**, só `archive/` e `.gitkeep`.
+O estado da caixa não se grava aqui, porque ela muda a cada envio e leitura: meça com `ls -la inbox/gusworld/` no clone do bus.
 
 **Aviso proativo ao Gus Dragon é obrigação permanente (GW-31):** sempre que o líder aprovar, rejeitar ou mudar algo que seja ideia dele, ou fechar item de alta prioridade da tabela, avisar **sem que ele pergunte** — na discussion 7 (o catálogo de bugs que ele mantém), com timestamp e uma das três classificações que ele fixou (**Bug Consertado**, **Bug Funcional**, **Bug Possível**).
 
