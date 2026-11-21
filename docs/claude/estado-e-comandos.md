@@ -44,6 +44,8 @@ Nenhum conteúdo se corta por não caber num jogo curto, e a duração só se me
 
 ## Comandos: o detalhe
 
+Espelho local do CI, antes do push: `sh tools/ci/local/mirror.sh` roda os portões estáticos na cópia de `HEAD` e reporta por portão (PASSA, REPROVA, NÃO EXECUTADO ou PARCIAL); `--container` sobe os dinâmicos e só é usado com o pode do líder (GW-35).
+
 ### Resultado do guard de TDD e testes de `tools/tdd/`
 
 - O resultado de cada execução fica em `~/.claude/state/tdd-guard/<hash16>/last-run.json` e em `/var/tmp/gusworld-tdd/<hash16>/last.log`.
