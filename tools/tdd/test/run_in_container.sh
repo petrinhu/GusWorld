@@ -30,12 +30,30 @@ mkdir -p "$out_dir/plugin"
 cp -a "$plugin_src" "$out_dir/plugin/hooks"
 # The log names the exact bytes that enter the container (sha256 of each .py copied).
 sha256sum "$out_dir"/plugin/hooks/*.py | sed 's/^/run_in_container: plugin sha256 /' >&2
-(cd "$root" && tar -c -f "$tar_file" tools/tdd tools/container tools/ci/env tools/ci/cmake_floor.sh .claude/settings.json -C "$out_dir" plugin)
+(cd "$root" && tar -c -f "$tar_file" tools/tdd tools/container tools/ci/env tools/ci/cmake_floor.sh .claude/settings.json .claude/tdd-guard.json -C "$out_dir" plugin)
 tar -t -f "$tar_file" > /dev/null
 
-docker run --rm -i --pull never \
+# The pids limit of the test container (C8 fatia 7). The default is 60. GUSWORLD_TEST_PIDS
+# can only TIGHTEN it: an integer from 1 to 60. Any other value keeps the default.
+pids_limit=60
+case "${GUSWORLD_TEST_PIDS:-}" in
+    ""|*[!0-9]*) ;;
+    *)
+        if [ "$GUSWORLD_TEST_PIDS" -ge 1 ] && [ "$GUSWORLD_TEST_PIDS" -le 60 ]; then
+            pids_limit="$GUSWORLD_TEST_PIDS"
+        fi
+        ;;
+esac
+# The resource gate of the L-11 global limits, before each container (12 GiB free).
+GATE_MIN_MEM_KB=12582912 "$root/tools/container/resource_gate.sh" >/dev/null 2>&1 \
+    || { echo "run_in_container: portao de recurso reprovou (GATE_MIN_MEM_KB=12582912)" >&2; exit 1; }
+echo "run_in_container: pids-limit $pids_limit" >&2
+name="gusworld-tdd-test-$$"
+echo "run_in_container: contêiner $name" >&2
+
+docker run --rm -i --pull never --name "$name" \
     --network none \
-    --memory 2g --pids-limit 233 --cpus 4 \
+    --memory 2g --pids-limit "$pids_limit" --cpus 4 \
     --cap-drop ALL --security-opt no-new-privileges \
     --user builder \
     "$image" \

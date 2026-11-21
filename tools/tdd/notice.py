@@ -198,16 +198,25 @@ def clean_text(text):
     return " ".join(kept.split())
 
 
+# Tolerance of the freshness check, in seconds. run_suite.sh writes last-reason before it
+# exits, and the runner stamps ts = int(time.time()) after the subprocess returns. When a
+# whole second ticks in between, the fresh last-reason has mtime < ts by under one second,
+# and the check wrongly calls it stale. Decided by the CTO (C8 fatia 7, achado 2): a
+# 2 s window absorbs that race. A last-reason written 5 s before ts is still stale.
+FRESH_TOLERANCE = 2
+
+
 def fresh_enough(mtime, state):
-    """A last-reason older than the state's ts belongs to an earlier run: it is ignored.
-    Without a state there is no ts to compare with, so the last-reason is not trusted
-    (R2): no state never lets an old last-reason become the motive."""
+    """A last-reason older than the state's ts (minus FRESH_TOLERANCE) belongs to an
+    earlier run: it is ignored. Without a state there is no ts to compare with, so the
+    last-reason is not trusted (R2): no state never lets an old last-reason become the
+    motive."""
     if not isinstance(state, dict):
         return False
     ts = state.get("ts")
     if not isinstance(ts, (int, float)) or isinstance(ts, bool):
         return True
-    return mtime >= ts
+    return mtime >= ts - FRESH_TOLERANCE
 
 
 def motive(state, msg, root):

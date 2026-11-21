@@ -28,8 +28,21 @@ MUTANTS = {
     "M4": (NOTICE, '"hookEventName": "PreToolUse"', '"hookEventName": "PostToolUse"'),
     "M5": (SETTINGS, ' || true",', '",'),
     "M6": (SETTINGS, '"matcher": "Write|Edit|MultiEdit"', '"matcher": "Write|Edit"'),
-    "M7": (NOTICE, "return mtime >= ts", "return mtime < ts"),
+    "M7": (NOTICE, "return mtime >= ts - FRESH_TOLERANCE", "return mtime < ts - FRESH_TOLERANCE"),
 }
+
+# Virada mutants (C8 fatia 7). Each changes one line of the guard config or of run_suite.sh,
+# and each must be killed by test_virada_config.sh or test_virada_chain.sh.
+CONFIG = ".claude/tdd-guard.json"
+SUITE = "tools/tdd/run_suite.sh"
+VIRADA = {
+    "V1": (CONFIG, '"test_command": "bash tools/tdd/run_suite.sh"', '"test_command": "bash tools/tdd/run_suit.sh"'),
+    "V2": (CONFIG, '"timeout_sec": 144', '"timeout_sec": 200'),
+    "V3": (SUITE, '    record "sem execucao: $1"', '    true'),
+    "V4": (CONFIG, '    "tests/**",\n    "tests/**/CMakeLists.txt",\n', '    "tests/**/CMakeLists.txt",\n'),
+    "V5": (CONFIG, '"timeout_sec": 144', '"timeout_sec": 180'),
+}
+MUTANTS.update(VIRADA)
 
 # id -> (file, [(text that must occur once, its replacement), ...]). Each pair is one whole
 # line, so the diff must show one removed line per pair. M8 puts back the R2 defect: the

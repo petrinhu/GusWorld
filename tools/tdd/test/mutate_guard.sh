@@ -9,17 +9,19 @@
 # container must carry the mutated bytes. The live tree is never edited. The tests run
 # in the container (L-35), without volume and without network, under the pids limit below
 # and 2 GiB.
-# usage: mutate_guard.sh baseline M1 [M2 ... M8]
-# M8 undoes the two halves of the R2 fix (mutants.py, MULTI).
+# usage: mutate_guard.sh baseline M1 [M2 ... M8] [V1 ... V5]
+# M8 undoes the two halves of the R2 fix (mutants.py, MULTI). V1 to V5 are the virada mutants
+# of C8 fatia 7 (mutants.py, MUTANTS): they change the guard config and run_suite.sh.
+# MUT_FILES is every file a mutant may touch: each mutant must differ from HEAD in exactly one.
 set -u
 
-# The pids limit of each container. The default is 80. GUSWORLD_TEST_PIDS can only
-# TIGHTEN it: an integer from 1 to 80. Any other value keeps the default 80.
-pids_limit=80
+# The pids limit of each container. The default is 60. GUSWORLD_TEST_PIDS can only
+# TIGHTEN it: an integer from 1 to 60. Any other value keeps the default 60.
+pids_limit=60
 case "${GUSWORLD_TEST_PIDS:-}" in
     ""|*[!0-9]*) ;;
     *)
-        if [ "$GUSWORLD_TEST_PIDS" -ge 1 ] && [ "$GUSWORLD_TEST_PIDS" -le 80 ]; then
+        if [ "$GUSWORLD_TEST_PIDS" -ge 1 ] && [ "$GUSWORLD_TEST_PIDS" -le 60 ]; then
             pids_limit="$GUSWORLD_TEST_PIDS"
         fi
         ;;
@@ -28,25 +30,36 @@ echo "mutate_guard: pids-limit $pids_limit" >&2
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 root="$(cd "$here/../../.." && pwd -P)"
-suites="tools/tdd/test/test_guard_proof.sh tools/tdd/test/test_notice_settings.sh tools/tdd/test/test_notice_contract.sh"
+suites="tools/tdd/test/test_guard_proof.sh tools/tdd/test/test_notice_settings.sh tools/tdd/test/test_notice_contract.sh tools/tdd/test/test_notice_tolerancia.sh tools/tdd/test/test_virada_config.sh tools/tdd/test/test_virada_chain.sh"
 
-if [ -n "$(git -C "$root" status --porcelain -- tools/tdd .claude/settings.json)" ]; then
-    echo "recusado: tools/tdd ou .claude/settings.json com alteracao nao commitada (L-27)" >&2
+if [ -n "$(git -C "$root" status --porcelain -- tools/tdd .claude/settings.json .claude/tdd-guard.json)" ]; then
+    echo "recusado: tools/tdd ou .claude/ com alteracao nao commitada (L-27)" >&2
     exit 1
 fi
 head="$(git -C "$root" rev-parse HEAD)" || exit 1
 work="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/gusworld-mut-XXXXXX")" || exit 1
 trap 'rm -rf -- "${work:?}"' EXIT
+# The logs and the pids of every case are copied to MUTATE_OUT, an existing directory the
+# caller names (outside the tree), BEFORE the trap removes the work dir. The verdict reads
+# only those copies, through compare, never the exit code of the container: the bash -c
+# inside the container exits 0 even when a suite fails.
+out="${MUTATE_OUT:-}"
+if [ -z "$out" ] || [ ! -d "$out" ]; then
+    echo "recusado: MUTATE_OUT deve apontar para um diretorio existente, fora da arvore" >&2
+    exit 1
+fi
 # The plugin is the one the resolver names (review F2), not a fixed cache version.
 plugin_src="$(python3 -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import notice; print(notice.plugin_hooks_dir())' "$root/tools/tdd")" \
     || { echo "mutate_guard: plugin nao resolvido pelo notice.py" >&2; exit 1; }
 echo "mutate_guard: plugin $plugin_src" >&2
 
 # run_case ID: one tree, one container, one log. Returns non-zero on any refusal.
+MUT_FILES="tools/tdd/notice.py .claude/settings.json .claude/tdd-guard.json tools/tdd/run_suite.sh"
+
 run_case() {
     local id="$1" tree="$work/$1" tar_file="$work/$1.tar" log="$work/$1.log" rel
     mkdir -p "$tree" || return 1
-    git -C "$root" archive "$head" tools/tdd .claude/settings.json | tar -x -C "$tree" || return 1
+    git -C "$root" archive "$head" tools/tdd .claude/settings.json .claude/tdd-guard.json | tar -x -C "$tree" || return 1
     mkdir -p "$tree/plugin" && cp -a "$plugin_src" "$tree/plugin/hooks" || return 1
     if [ "$id" != baseline ]; then
         python3 -I "$here/mutants.py" apply "$tree" "$id" || { echo "caso $id: mutante nao aplicado" >&2; return 1; }
@@ -54,7 +67,7 @@ run_case() {
     # Blob check: the baseline copy equals HEAD, and a mutant copy differs from HEAD in
     # exactly one of the two files (the one the mutant names).
     local differs=0
-    for rel in tools/tdd/notice.py .claude/settings.json; do
+    for rel in $MUT_FILES; do
         local head_blob copy_blob
         head_blob="$(git -C "$root" rev-parse "$head:$rel")" || return 1
         copy_blob="$(git hash-object -- "$tree/$rel")" || return 1
@@ -68,7 +81,7 @@ run_case() {
     fi
     tar -C "$tree" -cf "$tar_file" . || return 1
     # The bytes that enter the container are the bytes of the copy.
-    for rel in tools/tdd/notice.py .claude/settings.json; do
+    for rel in $MUT_FILES; do
         if [ "$(tar -xOf "$tar_file" "./$rel" | sha256sum)" != "$(sha256sum < "$tree/$rel")" ]; then
             echo "caso $id: o tar nao carrega o arquivo mutado ($rel)" >&2; return 1
         fi
@@ -93,6 +106,7 @@ run_case() {
     wait "$run_pid"
     echo "caso $id: contêiner saiu com $?, log em $log"
     echo "caso $id: pids $(cat "$work/$id.pids")"
+    cp -- "$log" "$out/$id.log" && cp -- "$work/$id.pids" "$out/$id.pids" || return 1
     return 0
 }
 
@@ -124,7 +138,7 @@ sample_pids() {
 }
 
 run_case baseline || { echo "linha de base nao executada: nada a comparar" >&2; exit 1; }
-base_log="$work/baseline.log"
+base_log="$out/baseline.log"
 if ! grep -q '^casos=' "$base_log"; then
     echo "linha de base sem linhas casos=: inconclusiva" >&2
     exit 1
@@ -132,6 +146,7 @@ fi
 echo "== linha de base (FALHA esperada no R2 enquanto o defeito existir)"
 grep -E '^(ok|FALHA) ' "$base_log"
 
+nsuites="$(printf '%s\n' $suites | wc -l)"
 status=0
 for id in "$@"; do
     if [ "$id" = baseline ]; then
@@ -143,7 +158,7 @@ for id in "$@"; do
         continue
     fi
     echo "== $id"
-    python3 -I "$here/mutants.py" compare "$base_log" "$work/$id.log" 3
+    python3 -I "$here/mutants.py" compare "$base_log" "$out/$id.log" "$nsuites"
     rc=$?
     [ "$rc" -eq 0 ] || status=1
 done
