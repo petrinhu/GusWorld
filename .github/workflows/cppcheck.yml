@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Static analysis gate (L-19 portao 3, cppcheck half; clang-tidy is slice C5f). A
+# Static analysis gate (GW-19 portao 3, cppcheck half; clang-tidy is slice C5f). A
 # separate job, in its own workflow file, like sanitizers.yml and layers.yml.
 #
 # Why the flags and codes are written this way:

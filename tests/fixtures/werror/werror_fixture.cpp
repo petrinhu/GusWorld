@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // DELIBERATE WARNINGS. This file exists only to prove the warnings-as-errors
-// gate (GUSWORLD_WERROR, L-19 portao 1). Do not fix the two warnings below:
+// gate (GUSWORLD_WERROR, GW-19 portao 1). Do not fix the two warnings below:
 // without them the proof has nothing to catch.
 #include <cstddef>
 

@@ -4,7 +4,7 @@
 // declarativo — o dano-base sozinho (power + ATK do conjurador) é o efeito
 // inteiro, reusando puro o caminho de área que o Newton já usa. A face
 // irmã fora-de-combate ("iluminar áreas escuras") fica STUB posse-only.
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/maxwell.md.
 
 #meta id maxwell

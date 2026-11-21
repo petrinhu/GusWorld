@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Fork (`vonneumann`)
 
-**Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, extração do projeto anterior (L-01).
+**Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, extração do projeto anterior (GW-01).
 
 Dado completo em [`resources/cards/vonneumann.gw.card`](../../../../resources/cards/vonneumann.gw.card).
 
@@ -29,5 +29,5 @@ O mecanismo de clone **não** adiciona um ator novo à fila de combate: reaplica
 ## Pontas soltas
 
 - A percentagem de eco (50%) e a duração (3 turnos) estão marcadas `//PLAYTEST`.
-- O visual do clone (um "sprite-eco translúcido" num slot de batalha) é **obrigatório** por decisão de design, mas é responsabilidade da camada de apresentação — não existe hoje, porque a camada de apresentação deste projeto (L-06) só nasce quando o GlintFx tiver janela e desenho.
+- O visual do clone (um "sprite-eco translúcido" num slot de batalha) é **obrigatório** por decisão de design, mas é responsabilidade da camada de apresentação — não existe hoje, porque a camada de apresentação deste projeto (GW-06) só nasce quando o GlintFx tiver janela e desenho.
 - A chave `CARD_EXEC_VONNEUMANN_NAME` resolve para **"Fork"**.

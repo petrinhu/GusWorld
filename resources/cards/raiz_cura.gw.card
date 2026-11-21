@@ -2,7 +2,7 @@
 //
 // Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
 // Bioquimico - Raiz: sem dano, aplica Regen no proprio caster. Extraida do
-// projeto anterior (L-01) - conhecimento, nao codigo. Ver
+// projeto anterior (GW-01) - conhecimento, nao codigo. Ver
 // docs/design/mecanicas/cartas/raiz_cura.md para o "porque".
 
 #meta id raiz_cura

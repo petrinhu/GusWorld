@@ -10,7 +10,7 @@
 
 ## 1. Decisão
 
-Locomoção top-down em oito direções, com deslocamento diagonal liberado; o sprite exibido é sempre um dos quatro cardeais puros (Sul, Norte, Leste, Oeste), o mais próximo do vetor de movimento, sem sprite nem animação diagonal (L-26). Estilo de cadência minimalista (poucos frames), suavizável depois sem retrabalho de código.
+Locomoção top-down em oito direções, com deslocamento diagonal liberado; o sprite exibido é sempre um dos quatro cardeais puros (Sul, Norte, Leste, Oeste), o mais próximo do vetor de movimento, sem sprite nem animação diagonal (GW-26). Estilo de cadência minimalista (poucos frames), suavizável depois sem retrabalho de código.
 
 As 4 direções são **desenhadas à mão, uma a uma, em TODOS os personagens** (party, antagonistas E NPCs). **Proibido espelhamento / flip horizontal** para gerar Leste a partir de Oeste (ou vice-versa).
 
@@ -18,7 +18,7 @@ As 4 direções são **desenhadas à mão, uma a uma, em TODOS os personagens** 
 
 A diagonal não corta canto: o passo diagonal só acontece quando as duas células cardeais vizinhas ao movimento estão livres. Se uma delas está bloqueada, o passo diagonal não acontece. Efeito observável: diante da quina de um obstáculo, o personagem contorna em vez de atravessá-la.
 
-**Fronteira com o GlintFx (LEI ZERO, L-05):** ler a entrada (duas teclas simultâneas ou eixo analógico), transformar isso num vetor de direção, mover a entidade pela grade e consultar a colisão, incluindo a regra do canto acima, são do GlintFx. Consulta de colisão em grade é mecanismo da lib, decisão do líder registrada no GlintFx (`ESCOPO.md` §5, 21/08/2026 e 22/08/2026), não código que o GusWorld escreve ou testa por conta própria. O GusWorld diz o que cada célula do mapa SIGNIFICA: quais são sólidas, o que é parede e o que é porta, e o que acontece quando o jogador chega ali. A regra do canto se manifesta sobre esse dado, sem o GusWorld reimplementar a consulta.
+**Fronteira com o GlintFx (LEI ZERO, GW-05):** ler a entrada (duas teclas simultâneas ou eixo analógico), transformar isso num vetor de direção, mover a entidade pela grade e consultar a colisão, incluindo a regra do canto acima, são do GlintFx. Consulta de colisão em grade é mecanismo da lib, decisão do líder registrada no GlintFx (`ESCOPO.md` §5, 21/08/2026 e 22/08/2026), não código que o GusWorld escreve ou testa por conta própria. O GusWorld diz o que cada célula do mapa SIGNIFICA: quais são sólidas, o que é parede e o que é porta, e o que acontece quando o jogador chega ali. A regra do canto se manifesta sobre esse dado, sem o GusWorld reimplementar a consulta.
 
 ---
 

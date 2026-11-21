@@ -1,6 +1,6 @@
 # Lições aprendidas
 
-> As lições sobre teste e gate de qualidade já viraram lei e vivem em `GODS_LAWS.md`, seção **L-19**: a da asserção pensada pelo bug, a do conserto sem gate, a do gate que não mede, a da métrica sem régua, a do autoteste que cabe no próprio limite de tempo, a de distinguir defeito do teste e do produto, e a do prefixo comum. Não repetidas aqui. Consulte a L-19 antes de escrever qualquer teste ou gate novo.
+> As lições sobre teste e gate de qualidade já viraram lei e vivem em `GODS_LAWS.md`, seção **GW-19**: a da asserção pensada pelo bug, a do conserto sem gate, a do gate que não mede, a da métrica sem régua, a do autoteste que cabe no próprio limite de tempo, a de distinguir defeito do teste e do produto, e a do prefixo comum. Não repetidas aqui. Consulte a GW-19 antes de escrever qualquer teste ou gate novo.
 
 Este documento reúne as demais lições recuperadas da mineração do projeto anterior (21/08/2026), ordenadas da mais generalizável para a mais específica.
 
@@ -8,7 +8,7 @@ Este documento reúne as demais lições recuperadas da mineração do projeto a
 
 Um comentário dizia "NÃO commitado" num arquivo que estava commitado havia meses, sem consequência prática nenhuma no comportamento do programa. Ainda assim é defeito: comentário que mente engana quem lê depois, inclusive um agente que decide com base nele.
 
-**Fazer diferente:** corrigir o comentário assim que a divergência for encontrada, no mesmo commit, sem abrir item para "depois". Isto é o mesmo princípio da L-24 aplicado a comentário: texto errado que sobrevive é texto que alguém vai obedecer por engano.
+**Fazer diferente:** corrigir o comentário assim que a divergência for encontrada, no mesmo commit, sem abrir item para "depois". Isto é o mesmo princípio da GW-24 aplicado a comentário: texto errado que sobrevive é texto que alguém vai obedecer por engano.
 
 ## 2. Comando que deveria mudar o sistema de arquivos se confere pelo estado resultante, nunca pelo código de saída relatado
 
@@ -20,7 +20,7 @@ Um rótulo de asset trocado (leste/oeste) foi corrigido, o comando de troca repo
 
 Depois de rotacionar a licença do código inteiro, um QA verificou que sobravam 11 arquivos citando a licença antiga e apontou como pendência. Todos os 11 eram preservação deliberada de contexto histórico: o registro da decisão superada, o catálogo do que foi vendorizado antes, a licença de uma dependência de terceiro que é dela mesma, não do projeto.
 
-**Fazer diferente:** ao caçar "zero ocorrências de X" como critério de limpeza, classificar cada ocorrência encontrada entre "resíduo a apagar" e "registro do porquê da decisão", antes de apagar qualquer uma. Apagar a segunda destrói a rastreabilidade da própria decisão. Vale junto com a L-24 (revogado se apaga) e a L-14 (nada é declarado morto por agente): a classificação em si não dá licença para apagar sozinho o que parecer resíduo.
+**Fazer diferente:** ao caçar "zero ocorrências de X" como critério de limpeza, classificar cada ocorrência encontrada entre "resíduo a apagar" e "registro do porquê da decisão", antes de apagar qualquer uma. Apagar a segunda destrói a rastreabilidade da própria decisão. Vale junto com a GW-24 (revogado se apaga) e a GW-14 (nada é declarado morto por agente): a classificação em si não dá licença para apagar sozinho o que parecer resíduo.
 
 ## 4. Preferir a correção arquitetural a uma sequência de remendos pontuais da mesma classe de bug
 
@@ -62,7 +62,7 @@ Um harness de caça a teste instável rodou 55 amostras e reportou 20 falhas (36
 
 Em duas ocasiões distintas o líder relatou, jogando ao vivo, o personagem continuando a se mover sozinho depois de fechar um diálogo. Nas duas vezes a causa raiz foi a mesma: um evento de tecla solta descartado enquanto o modal (diálogo, menu) estava aberto, deixando o estado de "tecla pressionada" pendurado depois que o modal fechava.
 
-**Fazer diferente:** todo sistema de input com modo modal (que pausa o jogo mas não pausa a leitura de eventos do sistema operacional) precisa de uma limpeza explícita do estado de tecla ao entrar e ao sair do modal. Esta é uma classe de bug, não um caso isolado, e merece teste de regressão dedicado quando a camada `present/` nascer (L-06).
+**Fazer diferente:** todo sistema de input com modo modal (que pausa o jogo mas não pausa a leitura de eventos do sistema operacional) precisa de uma limpeza explícita do estado de tecla ao entrar e ao sair do modal. Esta é uma classe de bug, não um caso isolado, e merece teste de regressão dedicado quando a camada `present/` nascer (GW-06).
 
 ---
 

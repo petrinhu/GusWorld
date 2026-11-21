@@ -33,7 +33,7 @@
 
 1. Read this document fully for the first task in a project.
 2. Identify the target language and framework  -  apply sections 11 and 12 accordingly.
-3. Identify the architecture layer being modified  -  layers now follow GODS_LAWS.md, L-17.
+3. Identify the architecture layer being modified  -  layers now follow GODS_LAWS.md, GW-17.
 4. After completing any task: run the checklist in section 10.
 
 **Decision flow:**
@@ -45,7 +45,7 @@ New task received
 Read existing code before modifying ──► Understand context fully
       │
       ▼
-Identify architecture layer (GODS_LAWS.md, L-17)
+Identify architecture layer (GODS_LAWS.md, GW-17)
       │
       ▼
 Apply SOLID + Design Pattern rules
@@ -309,7 +309,7 @@ public:
 
 ---
 
-> Arquitetura de camadas: ver [GODS_LAWS.md](GODS_LAWS.md), L-17.
+> Arquitetura de camadas: ver [GODS_LAWS.md](GODS_LAWS.md), GW-17.
 
 ---
 
@@ -317,7 +317,7 @@ public:
 
 ### 5.1 Naming
 
-> Convenção de nomes de identificador e comentário: ver [GODS_LAWS.md](GODS_LAWS.md), L-22.
+> Convenção de nomes de identificador e comentário: ver [GODS_LAWS.md](GODS_LAWS.md), GW-22.
 
 ### 5.2 Functions
 

@@ -3,7 +3,7 @@
 **Domínio:** os dois livros-companheiros do GusWorld (Universo Literário Cyberpunk/Medieval, Formato: Romance Épico em 2 Tomos)
 **Entidade Central de Homologação:** Ordem Recursiva (facção canônica, ver `sinopse.md` §9)
 
-> Este protocolo governa a revisão textual dos **dois livros-companheiros** citados na `GODS_LAWS.md` L-08: obra à parte do jogo, com direitos reservados próprios, que a licença do jogo não estende. Onde este protocolo e o `GODS_LAWS.md` divergirem, a lei vence, em particular a L-13 (canon desatualizado bloqueia o trabalho que depende dele), a L-14 e a L-24 (nada é declarado morto ou revogado por agente; o líder decide) e a L-16 (homenagem a pessoa real só com aceite prévio dele). O canon de referência para nome próprio, cronologia e facção é `sinopse.md`, `CHARS.md` e `PLACES.md`. Hub: `Standards.md`.
+> Este protocolo governa a revisão textual dos **dois livros-companheiros** citados na `GODS_LAWS.md` GW-08: obra à parte do jogo, com direitos reservados próprios, que a licença do jogo não estende. Onde este protocolo e o `GODS_LAWS.md` divergirem, a lei vence, em particular a GW-13 (canon desatualizado bloqueia o trabalho que depende dele), a GW-14 e a GW-24 (nada é declarado morto ou revogado por agente; o líder decide) e a GW-16 (homenagem a pessoa real só com aceite prévio dele). O canon de referência para nome próprio, cronologia e facção é `sinopse.md`, `CHARS.md` e `PLACES.md`. Hub: `Standards.md`.
 
 ---
 

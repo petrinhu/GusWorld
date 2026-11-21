@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 >
 > **Os 9 críticos "maçom literal" e as decisões de terminologia in-world (one-way doors) NÃO foram reconferidos** por este agente. Ficam como estavam no legacy.
 >
-> **Nada aqui foi declarado morto por este agente** (L-14 do `GODS_LAWS.md`). Se o líder quiser fechar o item por completo, um `grep -rn "—" docs/narrative/` mais uma decisão sobre os 130 remanescentes encerraria o achado principal.
+> **Nada aqui foi declarado morto por este agente** (GW-14 do `GODS_LAWS.md`). Se o líder quiser fechar o item por completo, um `grep -rn "—" docs/narrative/` mais uma decisão sobre os 130 remanescentes encerraria o achado principal.
 >
 > **O que segue é o texto original do legacy, sem edição de conteúdo.**
 

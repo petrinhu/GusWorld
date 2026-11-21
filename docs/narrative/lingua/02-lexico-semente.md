@@ -59,7 +59,7 @@ Tambem nao e sinonimo de `anhrim` (`anh-` + `-rim`, raiz 13 + coletivo ja aprova
 plural simples de "ciclos" (quantidade indefinida e media, tipo "anos"), `anhesse` e o abstrato de
 grande escala (uma era inteira como conceito unico, nao uma soma de ciclos contaveis). O valor concreto de cada uso vive
 junto do contexto que o emprega - a inscricao do `D23`, por exemplo, tem o seu proprio valor
-fixado em area cifrada (`docs/_secret/dungeons/d23-inscricao-porta.md`, L-25 do projeto), por
+fixado em area cifrada (`docs/_secret/dungeons/d23-inscricao-porta.md`, GW-25 do projeto), por
 nomear pista de enigma jogavel da dungeon final. O que muda agora e que a palavra em si ja nao e
 dedicada so a essa inscricao.
 
@@ -103,7 +103,7 @@ funciona como marcador: sinaliza que o que vem a seguir se le como numero, nao c
 
 Nenhum outro digito (0, 1, 3, 4, 6, 8) e nenhuma outra potencia (10.000 em diante) tem forma
 ainda - a lingua so tem o que os numeros da inscricao do `D23` exigem (os numeros em si sao
-conteudo cifrado, `docs/_secret/dungeons/d23-inscricao-porta.md`, L-25 do projeto).
+conteudo cifrado, `docs/_secret/dungeons/d23-inscricao-porta.md`, GW-25 do projeto).
 
 **Regra de composicao:** digito multiplicador + potencia, justapostos SEM espaco e SEM lenicao
 (digito e potencia aqui sao sufixos da mesma classe fechada, nao duas raizes livres compostas -
@@ -178,7 +178,7 @@ Nota: a raiz *eryn-* cobre os dois lados da vida vegetal, *Erynin* (decomposicao
 - O cruzamento elfico->canon nao e acidente: a lore ja usava raizes pseudo-elficas (Vyr, Selve), o Sylvarin so as TORNA SISTEMATICAS (Pillar 2). Onde um nome canon ja existe, a raiz se ajusta a ele, nunca o contrario.
 - Emprestimos modernos (Neo, Drive) marcam a camada Era 3 (a lingua viva absorveu termos tecnicos), exatamente como o portugues real absorve o ingles.
 - 13 raizes e ponto de partida; o lexico cresce sob demanda da narrativa, sempre derivando por estas regras. As raizes 14-17 sao o primeiro caso real desse crescimento sob demanda (`D23`).
-- A inscricao completa que usa as raizes 14-17 e os numerais, com a traducao linha a linha e os numeros exatos (ano de lancamento, janela de queda, e o valor de `anhesse` nesse uso), e conteudo cifrado (`docs/_secret/dungeons/d23-inscricao-porta.md`, L-25 do projeto) por revelar pista de enigma jogavel da dungeon final (`D21`).
+- A inscricao completa que usa as raizes 14-17 e os numerais, com a traducao linha a linha e os numeros exatos (ano de lancamento, janela de queda, e o valor de `anhesse` nesse uso), e conteudo cifrado (`docs/_secret/dungeons/d23-inscricao-porta.md`, GW-25 do projeto) por revelar pista de enigma jogavel da dungeon final (`D21`).
 
 ## Pendente
 - Tabela completa de mutacao consonantal.

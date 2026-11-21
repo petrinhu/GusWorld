@@ -10,7 +10,7 @@ três decisões seguintes, do mesmo dia, fecham local, recompensa e gatilho, tod
 Prosa final (a fala do Gus, se houver, e qualquer redação além das linhas ilustrativas abaixo) cabe a
 `narrative-writer`, por L-76 global: este documento é arquitetura, não prosa.
 
-**Ponteiros (L-30):** cena em `docs/narrative/comic-reliefs/easter-eggs-educacionais.md` (EE-25);
+**Ponteiros (GW-30):** cena em `docs/narrative/comic-reliefs/easter-eggs-educacionais.md` (EE-25);
 NPC em `CHARS.md` §6 (Joaquim Bartolomeu), mora na Zona do Silêncio; taxonomia e naming de carta em
 `docs/design/mecanicas/cartas-technomagik.md` §2.2 e `docs/design/mecanicas/cartas/pulso_eletrico.md`
 (padrão de carta comum de família Elétrico). As 2 áreas secretas já fechadas da Zona do Silêncio

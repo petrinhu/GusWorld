@@ -2,7 +2,7 @@
 //
 // Quantum-Lock (Planck): Passiva, Universal, mana 0. Quantiza o dano de
 // carta do portador em 3 degraus fixos (piso/centro/teto), chances FIXAS.
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/planck.md.
 
 #meta id planck

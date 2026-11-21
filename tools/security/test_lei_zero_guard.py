@@ -18,7 +18,7 @@ tres coisas, na ordem da ordem de servico:
 Usa repositorios git de verdade em diretorio temporario (nao mocka
 subprocess) porque o proprio comportamento do `git diff` diante de SHA
 invalido e o fato sob teste. Roda com stdlib puro (unittest), sem pytest
-(GODS_LAWS.md L-28: nao instala nada em nenhuma das cinco plataformas).
+(GODS_LAWS.md GW-28: nao instala nada em nenhuma das cinco plataformas).
 
 Uso: python3 tools/security/test_lei_zero_guard.py -v
 """

@@ -83,12 +83,12 @@ add_test(NAME harness_selftest_empty_registry_fails
     -DREQUIRED_TEXT=no\ test\ case\ registered
     -P ${expect_exit_script})
 
-# Warnings-as-errors gate (L-19 portao 1), proved on a fixture with deliberate
+# Warnings-as-errors gate (GW-19 portao 1), proved on a fixture with deliberate
 # warnings. Registered only when GUSWORLD_WERROR is ON, because only then is the
 # red case a fact to expect: with the switch OFF it could never pass. Each case
 # builds in its own directory, so the two sub-builds cannot contaminate each other.
 #
-# Diagnostic needles were measured on neither compiler here (L-35: nothing runs
+# Diagnostic needles were measured on neither compiler here (GW-35: nothing runs
 # in this session). GCC prints "error: unused parameter 'x' [-Werror=unused-parameter]"
 # and Clang prints "error: unused parameter 'x' [-Werror,-Wunused-parameter]", so
 # "error: unused parameter" and "[-Werror" are the same text on both.
@@ -152,7 +152,7 @@ if(GUSWORLD_WERROR)
       -P ${expect_exit_script})
 endif()
 
-# Sanitizer gate (L-19 portao 2), proved on three fixtures, one deliberate defect each.
+# Sanitizer gate (GW-19 portao 2), proved on three fixtures, one deliberate defect each.
 # Off by default: a plain configure must never build a defective program. Only the
 # sanitizers job turns it on, together with the sanitizer flags in CMAKE_CXX_FLAGS.
 #

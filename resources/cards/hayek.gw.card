@@ -4,7 +4,7 @@
 // "Ordem espontânea": quando os membros do lado do portador agem de formas
 // DIFERENTES na mesma rodada, o lado inteiro ganha um bônus escalonado de
 // dano e um desconto no limiar de falha. Nunca pune, só premia. Extraida
-// do projeto anterior (L-01). Ver docs/design/mecanicas/cartas/hayek.md.
+// do projeto anterior (GW-01). Ver docs/design/mecanicas/cartas/hayek.md.
 
 #meta id hayek
 #meta display_name CARD_EXEC_HAYEK_NAME

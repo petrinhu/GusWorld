@@ -1,8 +1,8 @@
 # Cartas: hardware, energia e pirataria
 
-> **Atualização 2026-08-25 (líder, revogação de C-03/C-13 na L-29 de `GODS_LAWS.md`):** o craft de cópia pirata deixa de ser exclusivo da COMUM e passa a alcançar **ESPECIAL e SUPER**, sempre em qualidade inferior ao original — ver §15, seção nova. A SUPER também deixa de ser descrita como "forjada" em `cartas-technomagik.md` (ela é carta original; reflexo já aplicado lá, §2.4).
+> **Atualização 2026-08-25 (líder, revogação de C-03/C-13 na GW-29 de `GODS_LAWS.md`):** o craft de cópia pirata deixa de ser exclusivo da COMUM e passa a alcançar **ESPECIAL e SUPER**, sempre em qualidade inferior ao original — ver §15, seção nova. A SUPER também deixa de ser descrita como "forjada" em `cartas-technomagik.md` (ela é carta original; reflexo já aplicado lá, §2.4).
 >
-> **Atualização 2026-08-25 (líder, canon pessoal do Gus Dragon, L-16 de `GODS_LAWS.md`):** o líder dita, no mesmo dia, a expansão de quatro para **doze comidas** favoritas reais dele como itens de cura do jogo, mais **oito ingredientes de craft** (catálogo completo em `comidas-ingredientes-craft.md` §5.5 (catálogo movido de `economia.md` em 25/08/2026, L-33)). Duas das doze, suco de limão e água com gás, continuam alimentando craft de **bateria de baixa qualidade**, via refino em suco puro de limão / água destilada: ver §5, subseção "Bateria de baixa qualidade (craftada)", que nesta rodada também fecha se a bateria craftada herda os riscos da pirata comprada (herda, sim).
+> **Atualização 2026-08-25 (líder, canon pessoal do Gus Dragon, GW-16 de `GODS_LAWS.md`):** o líder dita, no mesmo dia, a expansão de quatro para **doze comidas** favoritas reais dele como itens de cura do jogo, mais **oito ingredientes de craft** (catálogo completo em `comidas-ingredientes-craft.md` §5.5 (catálogo movido de `economia.md` em 25/08/2026, GW-33)). Duas das doze, suco de limão e água com gás, continuam alimentando craft de **bateria de baixa qualidade**, via refino em suco puro de limão / água destilada: ver §5, subseção "Bateria de baixa qualidade (craftada)", que nesta rodada também fecha se a bateria craftada herda os riscos da pirata comprada (herda, sim).
 >
 > **Status:** ✅ **CANON FECHADO (líder, 2026-07-28).** Os **números** vivem em `cartas-numeros-proposta.md`, a **spec de implementação** em `cartas-spec-dados.md` e `cartas-spec-logica.md`, e os **efeitos do vírus** e o **mercado negro** estão fixados aqui e nos docs de números. Reflexo pendente em `cartas-technomagik.md` e na terminologia, que é passo de escrita, não decisão. Decisões fechadas via AskUserQuestion capturadas fielmente.
 >
@@ -149,7 +149,7 @@ equivalência de nomes, é um sistema de recurso.
 4. **O jogador pode selecionar outra bateria**, e a barra passa a mostrar a selecionada — a escolha
    de qual bateria usar é decisão dele, não do sistema.
 5. **A barra fica abaixo do quadro do personagem.** Isto é posição de interface, registrada aqui como
-   decisão de layout já tomada pelo líder — **não é desenho de interface feito nesta fatia** (L-27
+   decisão de layout já tomada pelo líder — **não é desenho de interface feito nesta fatia** (GW-27
    deste projeto: nenhuma interface se escreve antes de o GlintFx traduzir marcação). Nenhuma
    marcação, folha de estilo ou mockup nasce deste parágrafo; ele só fixa o fato, para quando a
    camada `present/` existir.
@@ -178,7 +178,7 @@ mesmo dia (ver "Estoque e vazão", logo abaixo):**
    `CMakeLists.txt`/`src/`/`include/`). O documento cita nomes de um consumidor planejado, não de
    código que roda aqui — não é spec "já implementada". Quanto à pergunta em si: os pips de Mana não
    eram forma errada nem tela desatualizada, era só metade do que agora existe — ver "Estoque e
-   vazão" abaixo. Não editado: é spec de tela, e a L-27 deste projeto proíbe desenhar interface nesta
+   vazão" abaixo. Não editado: é spec de tela, e a GW-27 deste projeto proíbe desenhar interface nesta
    fatia de qualquer forma.
 
 ### Estoque, vazão e saúde: as propriedades físicas da bateria (decisões do líder, 31/08/2026, 02/09/2026 e 03/09/2026)
@@ -275,7 +275,7 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
    "abaixo do quadro do personagem" (verbatim do acréscimo anterior) bate com o cockpit da spec, onde
    o medidor de Mana já fica sob o retrato e o nome; a dúvida anterior era de FORMA (pips × barra),
    nunca de posição; registrado aqui para ninguém reabrir achando que há divergência de layout.
-   **Requisito novo para a tela, registrado como fato e não desenhado aqui (L-27):** como a saúde só
+   **Requisito novo para a tela, registrado como fato e não desenhado aqui (GW-27):** como a saúde só
    se conhece depois de medir (item 8), a interface vai precisar distinguir saúde DESCONHECIDA de
    saúde RUIM; a forma disso, assim como cor, tamanho, posição fina, ordem de empilhamento e
    marcação dos dois elementos, nasce com a camada `present/` e espera o GlintFx.
@@ -300,7 +300,7 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
 8. **A saúde é desconhecida até ser medida (decisão do líder, 02/09/2026).** A carga aparece sempre;
    a saúde só depois do teste sob carga, na mesa ou com o multímetro (item 9). O exemplar guarda se
    já foi medido (`is_health_measured`), e a regra do que pode ser mostrado é do domínio, obedecida
-   pela tela (L-17, armadilha 5). **O protocolo de medição, na ordem do líder:** (1) medir a tensão
+   pela tela (GW-17, armadilha 5). **O protocolo de medição, na ordem do líder:** (1) medir a tensão
    de repouso, que dá o SoC; (2) se estiver abaixo do limiar de recarga (na escala do jogo, o
    patamar correspondente ao "~12,4 V" do exemplo dele), **recarregar primeiro**; (3) só então fazer
    o **teste sob carga**, que dá o SoH e a corrente disponível (CCA efetivo). Testar sob carga uma
@@ -335,7 +335,7 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
     princípio canônico do §3 (a variação vem de dado cruzando originalidade × bateria). A carta do
     Volta já carrega o mesmo perfil, por decisão do líder de 02/09/2026: um pico de consumo para dar
     o início, depois consumo contínuo até acabar (`docs/design/mecanicas/cartas/volta.md`).
-    **Fronteira (LEI ZERO, L-06, L-27):** o que é do GusWorld é o resultado (plena ou falha) e o
+    **Fronteira (LEI ZERO, GW-06, GW-27):** o que é do GusWorld é o resultado (plena ou falha) e o
     evento que a falha emite; fumaça e faísca são desenho, nascem em `present/` ligada direto ao
     GlintFx, e nada disso se especifica aqui.
 11. **Os dois lados da conta moram em átomos diferentes, e cada lado tem a própria classe (decisões
@@ -357,7 +357,7 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
     especial falso, comum original, especial) e a classe da bateria (os tipos do §5: de fábrica,
     selada das ESPECIAIS, pirata/genérica, de baixa qualidade craftada) são dois eixos
     independentes; capacidade é propriedade da BATERIA, nunca da classe da carta.** Nenhum campo de
-    demanda entra na bateria e nenhum campo de oferta entra na carta (L-04, L-33). Cada TIPO de
+    demanda entra na bateria e nenhum campo de oferta entra na carta (GW-04, GW-33). Cada TIPO de
     bateria é átomo com POCO próprio (verbatim: *"lembre que cada bateria é um átomo e cada um tipo
     tem seu poco"*). Campo existir não obriga valor diferente de zero. A especificação campo a campo
     dos POCOs é documento próprio (ver "Pontos ABERTOS").
@@ -369,7 +369,7 @@ engenharia são universais em inglês; o giro diegético entra no conceito, nunc
     slot de usadas, não só para a instalada numa carta. **"Com o tempo" é tempo DE JOGO contado,
     nunca o relógio da máquina** (`docs/tech/convencao-formatos-gw.md`, "A mochila registra, não
     age": esta perda de carga é contada em ciclos de jogo — turnos jogados —, nunca em tempo de
-    parede, senão o replay byte a byte da L-17 não fecha). **Esta perda é de CARGA (SoC), não de
+    parede, senão o replay byte a byte da GW-17 não fecha). **Esta perda é de CARGA (SoC), não de
     saúde (SoH): a saúde só cai por ciclo de recarga, nunca por uso nem por tempo parado (decisão
     do líder, 05/09/2026, por `AskUserQuestion`).** A curva da perda por SoH é número do
     `economy-designer`; a unidade de tempo de jogo em que ela se aplica é proposta de agente, não
@@ -534,7 +534,7 @@ multímetro. O sorteio é por exemplar: duas piratas do mesmo lote podem sair di
 
 ### Bateria de baixa qualidade (craftada, canon do Gus Dragon, decisão do líder 2026-08-25)
 
-> **Canon pessoal (L-16 de `GODS_LAWS.md`), amarrado ao mesmo eixo do §12 (Bastiat: "o que se vê e
+> **Canon pessoal (GW-16 de `GODS_LAWS.md`), amarrado ao mesmo eixo do §12 (Bastiat: "o que se vê e
 > o que não se vê") e à Doutrina do Comedimento (`economia.md` §0).** O líder, verbatim, sobre o
 > suco de limão: *"Com o tempo, o personagem aprende a filtrar o suco de limão (craft) e obtem
 > 'suco puro de limão', item obrigatório para craft de baterias de baixa qualidade mas que são
@@ -546,7 +546,7 @@ multímetro. O sorteio é por exemplar: duas piratas do mesmo lote podem sair di
 > Mesma logica do suco de limao."*
 
 **Três degraus por insumo, dos doze itens de comida do Gus Dragon (`comidas-ingredientes-craft.md`
-§5.5.1, catálogo movido de `economia.md` §5.5 em 2026-08-25, L-33), e o que cada combinação produz
+§5.5.1, catálogo movido de `economia.md` §5.5 em 2026-08-25, GW-33), e o que cada combinação produz
 (decisões do líder, 03/09/2026, a primeira verbatim, a segunda por `AskUserQuestion`).** Cada um dos
 dois insumos desta subseção tem TRÊS níveis de refino, não dois. **Os nomes já canônicos não são
 aposentados**: o líder rejeitou explicitamente a opção de renomeá-los; eles continuam existindo,
@@ -713,11 +713,11 @@ parte na tabela de baterias (§5, "Bateria pirata / genérica" e "Bateria de bai
 (craftada)"). O que nasce aqui é uma **regra de recarga por zona**, própria da bateria desta carta,
 não um tipo novo na classificação de bateria.
 
-**Fronteira da LEI ZERO (L-06, L-27 deste projeto):** cobertura de sinal como dado de mapa é
+**Fronteira da LEI ZERO (GW-06, GW-27 deste projeto):** cobertura de sinal como dado de mapa é
 formato de mapa, e formato de mapa é do GlintFx. O que é do GusWorld aqui é a regra de jogo: onde a
 bateria recarrega e o que muda quando não há sinal. Nenhuma etiqueta de bloco, campo de arquivo de
 mapa ou marcação nasce deste parágrafo; se faltar função no GlintFx para isto, o pedido segue pelo
-bus quando o trabalho esbarrar de verdade nela (L-07 deste projeto).
+bus quando o trabalho esbarrar de verdade nela (GW-07 deste projeto).
 
 **Não decidido, não inventado aqui:** raio ou desenho da cobertura, taxa de recarga dentro da zona,
 e quantas zonas de sinal existem em cada dungeon. Números e desenho de nível ficam para
@@ -843,7 +843,7 @@ Duas camadas que se combinam:
 
 ## 15. Pirataria alcança ESPECIAL e SUPER (decisão do líder, 25/08/2026)
 
-> **Revoga o que bloqueava isto:** os cortes **C-03** e **C-13** da L-29 (`GODS_LAWS.md`) foram revogados nesta data. O GusWorld TEM crafting, e ele alcança as cartas — inclusive ESPECIAL e SUPER, sob a forma de **cópia pirata**. As ORIGINAIS continuam fora de alcance de qualquer bancada: só progresso narrativo (`cartas-technomagik.md` §2.3-2.4).
+> **Revoga o que bloqueava isto:** os cortes **C-03** e **C-13** da GW-29 (`GODS_LAWS.md`) foram revogados nesta data. O GusWorld TEM crafting, e ele alcança as cartas — inclusive ESPECIAL e SUPER, sob a forma de **cópia pirata**. As ORIGINAIS continuam fora de alcance de qualquer bancada: só progresso narrativo (`cartas-technomagik.md` §2.3-2.4).
 
 ### 15.1 O que pode ser craftado, e o que nunca pode
 
@@ -888,13 +888,13 @@ A bancada onde a cópia é gravada é a mesma do §4 (terminal de bancada fixo, 
 
 ### 15.6 Como a party recebe a SUPER (decisão do líder, 03/09/2026, por `AskUserQuestion`)
 
-**O mecanismo já estava escrito, e o líder ratificou o canon existente: manter o canon, as vinte peças são a chave, a carta está inteira.** As vinte peças especiais que dão acesso à missão-capstone são a CHAVE que abre o caminho até a SUPER, nunca matéria-prima que a compõe. A carta é original, inteira, escrita de próprio punho por Helion Tusk num compilador que ele mesmo apagou; ninguém jamais a teve em punho tempo bastante para examiná-la, o que é a mesma razão que trava a engenharia reversa dela (§15.2). Mecanismo completo, com a cena do encaixe das vinte peças na bancada emprestada de Helion Tusk: `docs/narrative/deep/characters/mestre-cap-21-helion-tusk.md`, §6 (não repetido aqui, L-30).
+**O mecanismo já estava escrito, e o líder ratificou o canon existente: manter o canon, as vinte peças são a chave, a carta está inteira.** As vinte peças especiais que dão acesso à missão-capstone são a CHAVE que abre o caminho até a SUPER, nunca matéria-prima que a compõe. A carta é original, inteira, escrita de próprio punho por Helion Tusk num compilador que ele mesmo apagou; ninguém jamais a teve em punho tempo bastante para examiná-la, o que é a mesma razão que trava a engenharia reversa dela (§15.2). Mecanismo completo, com a cena do encaixe das vinte peças na bancada emprestada de Helion Tusk: `docs/narrative/deep/characters/mestre-cap-21-helion-tusk.md`, §6 (não repetido aqui, GW-30).
 
 ---
 
 ## Pontos ABERTOS (retomar aqui)
-- ✅ **Números** (ENTREGUE: `cartas-numeros-proposta.md`) → `economy-designer` (preço de recarga, AP da troca in-battle, drain rate, capacidade kR/MR, vida de ciclos, **X% e a tabela de risco de contaminação da §9**, preço pirata vs original ao longo do arco). Sem item correspondente no `TODO.md` (L-30).
-- ✅ **Spec de implementação** (ENTREGUE e APROVADA 2026-07-28: `cartas-spec-dados.md` + `cartas-spec-logica.md`) → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção). Sem item correspondente no `TODO.md` (L-30).
-- ✅ **Canonizado pelo líder em 2026-07-28.** Falta só refletir em `cartas-technomagik.md` e na terminologia (passo de escrita). Era: canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar. Ponteiro (L-30): `TODO.md` item `G27`.
+- ✅ **Números** (ENTREGUE: `cartas-numeros-proposta.md`) → `economy-designer` (preço de recarga, AP da troca in-battle, drain rate, capacidade kR/MR, vida de ciclos, **X% e a tabela de risco de contaminação da §9**, preço pirata vs original ao longo do arco). Sem item correspondente no `TODO.md` (GW-30).
+- ✅ **Spec de implementação** (ENTREGUE e APROVADA 2026-07-28: `cartas-spec-dados.md` + `cartas-spec-logica.md`) → `gameplay_engineer` (usos/bateria, estados de carta, vírus/adware) + `backend-engineer` (modelo de dados: tipo, memória, bateria, integridade, flag de infecção). Sem item correspondente no `TODO.md` (GW-30).
+- ✅ **Canonizado pelo líder em 2026-07-28.** Falta só refletir em `cartas-technomagik.md` e na terminologia (passo de escrita). Era: canonizar no doc de mecânicas + refletir em `cartas-technomagik.md` / terminologia quando o líder aprovar. Ponteiro (GW-30): `TODO.md` item `G27`.
 - **Camada pirata de ESPECIAL/SUPER (§15, decisão do líder 25/08/2026):** canon fechado, números em aberto → `economy-designer` (probabilidade de cada um dos 3 graus de falha, custo em crédito/material do craft, preço da cópia comprada pronta no mercado negro) — item `D42` do `TODO.md`. O mecanismo de entrega da SUPER original ao fim da missão-capstone foi fechado em 03/09/2026 (§15.6): as vinte peças são a chave, a carta está inteira.
 - **Bateria de baixa qualidade craftada a partir de lanches refinados e materiais sólidos (§5, decisão do líder 25/08/2026, ampliada em 05/09/2026 e 06/09/2026; herança de risco FECHADA em 25/08/2026):** canon fechado no mecanismo (refino gated, bancada compartilhada com reparo/pirataria, trade-off consumir×refinar, rede de segurança, terceira rota de compra, herança dos três riscos da bateria pirata comprada, exigência dos dois insumos líquidos juntos, os três materiais sólidos da receita — zinco, cobre e grafite —, mentor que entrega o conhecimento de filtrar — Brunus "Vetorial" Solveckt) → `economy-designer` (capacidade/usos, preço de compra do suco puro/água destilada, taxa de sucesso do refino, probabilidade numérica de cada risco herdado, quantidade de grafite por fonte e taxa de refino do carvão) — item `D43` do `TODO.md`. **Não sobrou lacuna de desenho sobre o mentor, sobre a fonte de zinco/cobre nem sobre a fonte de grafite:** o momento narrativo em que o personagem "aprende a filtrar" já está fechado acima (§5, mentor Brunus "Vetorial" Solveckt), a fonte de obtenção do zinco e do cobre também já está fechada acima (§5, ferro-velho como fonte principal, loja e negociação como rota alternativa, decisão do líder de 05/09/2026) — item `G32` do `TODO.md` —, e a fonte do grafite tem quatro vias abertas e não fechadas (carvão refinado, bateria velha reciclada, lápis, traje da Kola-SG3-12262), lista propositalmente não fechada pelo líder. O item `G12` cobre só a origem dos insumos alimentares (suco de limão e água com gás), não estes números de craft nem os materiais sólidos.

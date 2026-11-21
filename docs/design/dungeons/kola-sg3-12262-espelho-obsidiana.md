@@ -17,7 +17,7 @@
 > **Fonte:** `docs/_secret/dungeons/CAPTURA-BRUTA-kola-espelho-obsidiana.md` (texto do líder,
 > verbatim, 29/08/2026, e as rodadas de decisão subsequentes na mesma data) e
 > `docs/_secret/dungeons/conferencia-canon-espelho-obsidiana.md` (apuração de canon, mesma data).
-> Esses dois arquivos são área cifrada (`docs/_secret/`, L-25) e continuam sendo o registro
+> Esses dois arquivos são área cifrada (`docs/_secret/`, GW-25) e continuam sendo o registro
 > processual bruto; este documento é a canonização pública derivada deles, no mesmo papel que
 > `docs/design/roster-analogos/21-helion-tusk.md` ocupa em relação ao brainstorm do capstone do
 > Tusk. Pesquisa factual de apoio, também cifrada por estar no mesmo diretório:
@@ -43,7 +43,7 @@
 
 Este é o documento **hub** da dungeon final. Ele fixa a identidade dela, o orçamento, a cadeia de
 missão de ponta a ponta e o conjunto de decisões de lore que a sustentam. Ele **não** duplica o
-que outros quatro itens da tabela de pendências já possuem como escopo próprio (L-33, L-34: cada
+que outros quatro itens da tabela de pendências já possuem como escopo próprio (GW-33, L-34: cada
 um é seu próprio átomo) — apontar, não copiar:
 
 | O que fica de fora daqui | Onde vive |
@@ -208,7 +208,7 @@ documento.
 ## 6. Lacunas nomeadas (não decidido, não preenchido por invenção deste documento)
 
 Estas sete pontas seguem em aberto depois de toda a apuração e todas as rodadas de decisão do
-líder já registradas; nenhuma foi resolvida por este documento, por dever da L-13/L-14:
+líder já registradas; nenhuma foi resolvida por este documento, por dever da GW-13/GW-14:
 
 1. **Orçamento da segunda dungeon (8 níveis, `D27`).** Se ela conta contra o total fechado de 13
    dungeons, se é categoria à parte (o precedente real de algo fora do cômputo é o repositório
@@ -279,7 +279,7 @@ nomeada, decisão do líder pendente.
 
 ---
 
-## 8. Cortes da L-29 atravessados
+## 8. Cortes da GW-29 atravessados
 
 Nenhum corte é contradito por esta dungeon; um tensiona de leve, sem violar:
 

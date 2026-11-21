@@ -43,6 +43,6 @@ jobs:
 
       - name: Divida — a arvore inteira
         # Morde a arvore. Enquanto houver violacao antiga, este passo e
-        # VERMELHO de proposito: e a verdade sobre o corpus, e a L-32 nao
+        # VERMELHO de proposito: e a verdade sobre o corpus, e a GW-32 nao
         # deixa pushar com CI vermelho.
         run: python3 tools/security/lei_zero_guard.py

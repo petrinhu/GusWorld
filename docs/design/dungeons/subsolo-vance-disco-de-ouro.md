@@ -57,7 +57,7 @@ dungeon; não repetido nem resumido aqui.
 
 ## 3. O que é um "nível" aqui
 
-Nesta perspectiva fixa e sem eixo de altura (L-26), "nível" é **um espaço distinto conectado à
+Nesta perspectiva fixa e sem eixo de altura (GW-26), "nível" é **um espaço distinto conectado à
 grade**, mapa próprio como qualquer área do mundo — nunca andar visto de lado nem câmera subindo.
 Avançar de nível troca de mapa; a sensação de profundidade vem só de composição (paleta, som), nunca
 de geometria empilhada.
@@ -119,7 +119,7 @@ ao gimmick dos selos — perda pequena, porque `N3` já ensina por si (reset sem
 o padrão geral de "scan revela passagem" já foi ensinado na missão de abertura dos Dutos. **A posição
 da porta (entre `N1` e `N2`) não muda com este canon.**
 
-## 5. Cortes da L-29 atravessados
+## 5. Cortes da GW-29 atravessados
 
 Nenhum corte é contradito. **C-02** (gating nunca é trava dura): a porta é atalho, nunca único
 acesso — a entrada pelo Edifício Vance sempre funciona sozinha. **Cabe.**

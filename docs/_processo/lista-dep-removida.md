@@ -2,8 +2,8 @@
 
 **Autor:** technical-writer (agente operacional, levantamento somente leitura)
 **Data:** 2026-08-28
-**Base legal:** `GODS_LAWS.md` (leis L-11, L-14, L-24, L-25, L-30, L-32)
-**Regras seguidas:** L-11 (nada decidido aqui, só listado — a decisão de correção é do líder em `G1`), L-14 (nenhuma ocorrência é declarada morta/lixo por mim; ofereço recomendação, não conclusão), L-24 (toda recomendação abaixo separa a CITAÇÃO órfã da AFIRMAÇÃO por trás dela), L-25 (`docs/book/`, `docs/_secret/`, `docs/narrative/deep/stinger/` são cifrados por git-crypt; contados pelo caminho, conteúdo não citado), L-30 (este documento não é item de tabela, é o anexo que `B1a` referencia).
+**Base legal:** `GODS_LAWS.md` (leis GW-11, GW-14, GW-24, GW-25, GW-30, GW-32)
+**Regras seguidas:** GW-11 (nada decidido aqui, só listado — a decisão de correção é do líder em `G1`), GW-14 (nenhuma ocorrência é declarada morta/lixo por mim; ofereço recomendação, não conclusão), GW-24 (toda recomendação abaixo separa a CITAÇÃO órfã da AFIRMAÇÃO por trás dela), GW-25 (`docs/book/`, `docs/_secret/`, `docs/narrative/deep/stinger/` são cifrados por git-crypt; contados pelo caminho, conteúdo não citado), GW-30 (este documento não é item de tabela, é o anexo que `B1a` referencia).
 
 **Aviso de método, como no relatório-irmão `candidatos-revogacao.md`:** este documento **não decide nada** e **não edita nada**. Nenhum arquivo do projeto foi tocado além deste. Somente leitura, do início ao fim. Escrito seção por seção, incrementalmente.
 
@@ -72,8 +72,8 @@ Cinco categorias emergiram do material — pelo que a frase **afirma**, não pel
 
 **Recomendação (proposta, não aplicada):** tratar como DUAS perguntas separadas por lote, não misturadas:
 
-1. **Se a frase descreve a arquitetura ATUAL** (a maioria destas parece descrever, porque fala no presente e sem marcação de "histórico"): trocar `__DEP_REMOVIDA__` por `GlintFx`, já que hoje é isso que é verdade sob a LEI ZERO. Onde ainda diz "C++20", subir para "C++23" no mesmo passe (L-03, achado A.9 do relatório-irmão já cobre isso).
-2. **Se alguma dessas frases pretende registrar uma decisão HISTÓRICA** (o motor que antecedeu o GlintFx, hoje descartado) — nenhuma das 11 linhas acima parece estar marcada como histórica no arquivo em que vive (ao contrário de `docs/art/style-guide.md:227,229`, já dentro de bloco `<details><summary>Histórico</summary>` e por isso fora desta lista) — então a citação órfã (L-24) deve ser **restaurada com o nome real** dentro de um bloco explicitamente histórico, não apagada silenciosamente.
+1. **Se a frase descreve a arquitetura ATUAL** (a maioria destas parece descrever, porque fala no presente e sem marcação de "histórico"): trocar `__DEP_REMOVIDA__` por `GlintFx`, já que hoje é isso que é verdade sob a LEI ZERO. Onde ainda diz "C++20", subir para "C++23" no mesmo passe (GW-03, achado A.9 do relatório-irmão já cobre isso).
+2. **Se alguma dessas frases pretende registrar uma decisão HISTÓRICA** (o motor que antecedeu o GlintFx, hoje descartado) — nenhuma das 11 linhas acima parece estar marcada como histórica no arquivo em que vive (ao contrário de `docs/art/style-guide.md:227,229`, já dentro de bloco `<details><summary>Histórico</summary>` e por isso fora desta lista) — então a citação órfã (GW-24) deve ser **restaurada com o nome real** dentro de um bloco explicitamente histórico, não apagada silenciosamente.
 
 Decisão de qual frase cai em (1) ou (2) é do líder — eu não tenho como saber, lendo cada arquivo isolado, se a intenção editorial era "isto é o presente" ou "isto ficou datado e ninguém atualizou".
 
@@ -116,7 +116,7 @@ Tabela por arquivo (contexto resumido; linha completa disponível em `git grep -
 | `docs/design/ui-kit/PORTING-RCSS.md` | 23,30 | 2 | "elemento real no `__DEP_REMOVIDA__`"; "elemento `<img>` `__DEP_REMOVIDA__`" |
 | `docs/narrative/diary/ui-spec.md` | 452 | 1 | "Xbox/PS4/PS5 nativo via `__DEP_REMOVIDA__`" |
 
-**Recomendação (proposta, não aplicada):** estas são citações técnicas em registros de decisão (ADR), não texto de marketing — esconder o nome real prejudica quem precisa entender o histórico de arquitetura no futuro, inclusive para compliance de licença (ADR-005). Pela leitura da L-24, a **afirmação técnica** por trás de cada uma continua válida (o diagnóstico do ADR-018, por exemplo, descreve um bug real já corrigido; a arquitetura de 4 camadas do ADR-009/ADR-014 continua valendo). É a **citação do nome** que ficou órfã. Recomendo restaurar o nome real da dependência nestes documentos — são registros históricos por natureza (ADR = decisão tomada num momento, não afirmação de presente), e cabe ao líder decidir só se algum ADR específico também precisa de nota de "superado" adicional (fora do escopo do marcador em si).
+**Recomendação (proposta, não aplicada):** estas são citações técnicas em registros de decisão (ADR), não texto de marketing — esconder o nome real prejudica quem precisa entender o histórico de arquitetura no futuro, inclusive para compliance de licença (ADR-005). Pela leitura da GW-24, a **afirmação técnica** por trás de cada uma continua válida (o diagnóstico do ADR-018, por exemplo, descreve um bug real já corrigido; a arquitetura de 4 camadas do ADR-009/ADR-014 continua valendo). É a **citação do nome** que ficou órfã. Recomendo restaurar o nome real da dependência nestes documentos — são registros históricos por natureza (ADR = decisão tomada num momento, não afirmação de presente), e cabe ao líder decidir só se algum ADR específico também precisa de nota de "superado" adicional (fora do escopo do marcador em si).
 
 ---
 
@@ -134,7 +134,7 @@ Tabela por arquivo (contexto resumido; linha completa disponível em `git grep -
 | `assets/AUDIO_KIT_PROVISORIO.md:75` | "Música já veio em MP3 (decodificação nativa do **`__DEP_REMOVIDA__`**), só precisou de redução de bitrate..." | idem |
 
 **Recomendação (proposta, não aplicada):**
-- **`AI-DISCLOSURE.md`** credita uma **pessoa real** (L-16 se aplica por analogia de cuidado, mesmo não sendo o filho do líder) — restaurar o nome técnico aqui tem duas leituras possíveis e a decisão é do líder: (a) restaurar o nome real da dependência, mantendo o crédito preciso; (b) generalizar para algo como "arquitetura, escolha de motor/renderer e spritesheets", já que a dependência específica não faz mais parte do projeto e o crédito à PESSOA (a orientação dada) continua válido independente do nome da ferramenta.
+- **`AI-DISCLOSURE.md`** credita uma **pessoa real** (GW-16 se aplica por analogia de cuidado, mesmo não sendo o filho do líder) — restaurar o nome técnico aqui tem duas leituras possíveis e a decisão é do líder: (a) restaurar o nome real da dependência, mantendo o crédito preciso; (b) generalizar para algo como "arquitetura, escolha de motor/renderer e spritesheets", já que a dependência específica não faz mais parte do projeto e o crédito à PESSOA (a orientação dada) continua válido independente do nome da ferramenta.
 - **`AUDIO_KIT_PROVISORIO.md`** é puramente técnico, sem pessoa envolvida na frase — recomendo restaurar o nome real diretamente, é a leitura mais simples desta categoria inteira.
 
 ---
@@ -146,7 +146,7 @@ Tabela por arquivo (contexto resumido; linha completa disponível em `git grep -
 | Caminho:linha | Contexto | Confiança da restauração |
 |---|---|---|
 | `resources/prompts_images/feitos/CASSIEL_FERRAZ_IMAGEPROMPT.md:13` | "...his stubby hands rest **fi`__DEP_REMOVIDA__`y** on the head of a heavy iron SMITH'S HAMMER planted upright on the ground in front of him, like a king on a sword." | **Alta.** "fi" + "y" com o miolo faltando bate com a palavra inglesa "**firmly**" ("rest firmly on the head of..."), mesmo padrão do achado anterior (miolo de palavra comum apagado, início e fim sobrevivem) |
-| `docs/book/BIBLE-V1-APENDICE-G.md:152` (**cifrado**) | Conteúdo não citado aqui (L-25). O relatório não-cifrado `docs/_processo/mapa-corpus-gusworld.md:152` já registra e cita esta MESMA ocorrência anteriormente (achado prévio, já público naquele arquivo) — aponto para lá em vez de recitar o conteúdo de novo. | A correção real, se autorizada, precisa ser feita dentro do arquivo cifrado e exige a chave do git-crypt |
+| `docs/book/BIBLE-V1-APENDICE-G.md:152` (**cifrado**) | Conteúdo não citado aqui (GW-25). O relatório não-cifrado `docs/_processo/mapa-corpus-gusworld.md:152` já registra e cita esta MESMA ocorrência anteriormente (achado prévio, já público naquele arquivo) — aponto para lá em vez de recitar o conteúdo de novo. | A correção real, se autorizada, precisa ser feita dentro do arquivo cifrado e exige a chave do git-crypt |
 
 **Recomendação (proposta, não aplicada):** restauração direta nos dois casos — não há julgamento de "qual nome de dependência" envolvido, é reconstrução de palavra comum corrompida, mesma classe do lote já corrigido em 25/08. `CASSIEL_FERRAZ_IMAGEPROMPT.md` pode ser corrigido sem tocar em nenhum outro arquivo. `BIBLE-V1-APENDICE-G.md` precisa da chave do git-crypt para a edição (fase `B1b`, fora do escopo desta compilação).
 
@@ -154,7 +154,7 @@ Tabela por arquivo (contexto resumido; linha completa disponível em `git grep -
 
 ## 7. CAT-E — Citação do marcador como tópico (recomendo NÃO editar)
 
-**O que a frase afirma:** estes documentos **discutem o marcador em si** como achado de auditoria ou item de tabela — não são texto corrompido, são relatórios/leis/pendências que citam `__DEP_REMOVIDA__` deliberadamente, entre crases, como evidência do que precisa ser investigado. Editar aqui apagaria o rastro da própria auditoria que descobriu o problema (o oposto do que a L-24 pede).
+**O que a frase afirma:** estes documentos **discutem o marcador em si** como achado de auditoria ou item de tabela — não são texto corrompido, são relatórios/leis/pendências que citam `__DEP_REMOVIDA__` deliberadamente, entre crases, como evidência do que precisa ser investigado. Editar aqui apagaria o rastro da própria auditoria que descobriu o problema (o oposto do que a GW-24 pede).
 
 | Arquivo | Linhas | Marcadores | Natureza |
 |---|---|---|---|
@@ -176,7 +176,7 @@ Tabela por arquivo (contexto resumido; linha completa disponível em `git grep -
 
 | Caminho:linha | Motivo |
 |---|---|
-| `docs/book/BIBLE-V1-PREFACIO.md:26` (**cifrado**) | Conteúdo não inspecionado por instrução da tarefa (L-25) — sem nenhum relatório não-cifrado pré-existente que descreva esta ocorrência especificamente (diferente do caso do §6, que já tinha cross-referência pública), não há base para propor categoria sem abrir o arquivo. |
+| `docs/book/BIBLE-V1-PREFACIO.md:26` (**cifrado**) | Conteúdo não inspecionado por instrução da tarefa (GW-25) — sem nenhum relatório não-cifrado pré-existente que descreva esta ocorrência especificamente (diferente do caso do §6, que já tinha cross-referência pública), não há base para propor categoria sem abrir o arquivo. |
 
 **Não classificado: 1 de 116 linhas (0,9%), 1 de 173 marcadores.**
 

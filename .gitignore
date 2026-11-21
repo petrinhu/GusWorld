@@ -1,10 +1,10 @@
 # GusWorld - .gitignore
-# GODS_LAWS.md L-15: fora do git por serem regeneraveis ou pessoais.
+# GODS_LAWS.md GW-15: fora do git por serem regeneraveis ou pessoais.
 
 # Bancos vetoriais de RAG (943 MB), regeneraveis
 resources/livros/
 
-# Pipeline 3D pessoal do lider (402 MB), fora do jogo (L-02)
+# Pipeline 3D pessoal do lider (402 MB), fora do jogo (GW-02)
 resources/glb/
 
 # Build e cache

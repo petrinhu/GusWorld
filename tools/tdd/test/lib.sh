@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Shared helpers for the invoker tests. Sourced by test_*.sh, which run inside
-# the container (L-35). Every assertion counts one case. suite_done exits 1 when
+# the container (GW-35). Every assertion counts one case. suite_done exits 1 when
 # a case failed and also when no case ran at all, so an empty suite is red.
 
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"

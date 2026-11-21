@@ -19,9 +19,9 @@ Conteúdo, por grupo:
 - **Screens:** `90-bancada.html`, `91-mercado.html`
 - **Infraestrutura (não é conteúdo de design):** `_ds_manifest.json`, `_ds_bundle.js`, `_adherence.oxlintrc.json`
 
-## 2. Fronteira da L-27
+## 2. Fronteira da GW-27
 
-A L-27 (`GODS_LAWS.md`) diz: "Nenhuma interface, arquivo de marcação, folha de estilo, tela piloto ou prova de conceito é escrita antes de o GlintFx traduzir marcação de tela." Ela vincula os agentes. O kit é do líder e vive no espaço dele, no Claude Design, fora do repositório; este documento é só markdown descritivo e não contém marcação, folha de estilo nem trecho de código de interface.
+A GW-27 (`GODS_LAWS.md`) diz: "Nenhuma interface, arquivo de marcação, folha de estilo, tela piloto ou prova de conceito é escrita antes de o GlintFx traduzir marcação de tela." Ela vincula os agentes. O kit é do líder e vive no espaço dele, no Claude Design, fora do repositório; este documento é só markdown descritivo e não contém marcação, folha de estilo nem trecho de código de interface.
 
 Existe, à parte, uma cópia recuperada do projeto anterior em `docs/design/ui-kit/` (sete arquivos HTML com os mesmos nomes de `00-tokens` a `91-mercado`, mais `REQUISITOS-UI.md`), versionada desde 22/08/2026. Este documento não a tocou e não afirma que seja idêntica à versão do Claude Design: as frases-chave conferem (mão como seleção, loadout determinístico, regra do NPC do caminho, pilha de fonte com `Consolas`), mas igualdade completa não foi medida. O destino dessa cópia pertence ao item `G7` do `TODO.md`.
 
@@ -116,4 +116,4 @@ Nome, efeito e custo de mana das cartas de amostra são ilustração de componen
 
 ## 10. Governança
 
-Este documento governa a INTERFACE da bancada e do mercado como o líder a desenhou no Claude Design; `docs/art/style-guide.md` governa a arte de MUNDO. Nenhum valor deste documento é decisão de produto até o líder resolver §8. Arte e pipeline visual são do líder (L-02): este documento registra, não propõe.
+Este documento governa a INTERFACE da bancada e do mercado como o líder a desenhou no Claude Design; `docs/art/style-guide.md` governa a arte de MUNDO. Nenhum valor deste documento é decisão de produto até o líder resolver §8. Arte e pipeline visual são do líder (GW-02): este documento registra, não propõe.

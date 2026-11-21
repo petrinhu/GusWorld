@@ -132,14 +132,14 @@ Alívios cômicos, homenagens, easter eggs.
 
 - `docs/narrative/comic-reliefs.md` - o documento de princípios (timing, tom, referências) e ponto de entrada.
 - `docs/narrative/comic-reliefs/` (22 arquivos) - as cenas em si: `cena-01` a `cena-19`, mais `convencoes-diegeticas-guerra-de-plataforma.md`, `easter-eggs-educacionais.md`, `homenagens-diegeticas.md`.
-- `docs/narrative/gus-apartes-c-arcane.md` - os apartes de fanboy do Gus em C-Arcane, aprovados um a um pelo líder; qualquer mudança futura exige nova autorização ([[project_lei_do_revogado]], ver `GODS_LAWS.md` L-37 do projeto).
+- `docs/narrative/gus-apartes-c-arcane.md` - os apartes de fanboy do Gus em C-Arcane, aprovados um a um pelo líder; qualquer mudança futura exige nova autorização ([[project_lei_do_revogado]], ver `GODS_LAWS.md` GW-37 do projeto).
 - `docs/design/mecanicas/easter-egg-faro-de-inacia.md` e `easter-egg-sidequest-procure-por-pauli.md` - dois easter eggs educacionais com mecânica própria.
 - O manual completo de easter eggs e a proposta de balanceamento deles ficam cifrados: `docs/_secret/easter-eggs-manual.md`, `docs/_secret/proposta-balanceamento-easter-eggs.md` (ver eixo 12).
 - O aviso de ficção sobre reimaginar figuras históricas reais (`docs/design/roster-analogos/OBRA-DE-FICCAO-E-METODOLOGIA.md`, eixo 1) é o parente direto de `homenagens-diegeticas.md` aqui.
 
 ## 12. A fronteira do cifrado
 
-Três áreas do repositório são cifradas por `git-crypt` e **nunca aparecem em texto puro fora dele** (`.gitattributes`, cross-ref `GODS_LAWS.md` L-08/L-18/L-25 do projeto). Este mapa cita só o CAMINHO de cada arquivo, nunca o conteúdo:
+Três áreas do repositório são cifradas por `git-crypt` e **nunca aparecem em texto puro fora dele** (`.gitattributes`, cross-ref `GODS_LAWS.md` GW-08/GW-18/GW-25 do projeto). Este mapa cita só o CAMINHO de cada arquivo, nunca o conteúdo:
 
 - **`docs/_secret/`** (17 arquivos, índice em `_INDEX.md`) - a maior parte é solução de enigma de dungeon, em `docs/_secret/dungeons/` (11 arquivos: capturas brutas, soluções, conferências de canon, pesquisas de mecânica). Os demais 6 são: `auditoria-privacidade.md`, `AUDIT-T5-EASTEREGGS-V2.md`, `cosmologia-origem-notas-secret.md` (eixo 3), `easter-eggs-manual.md` e `proposta-balanceamento-easter-eggs.md` (eixo 11), e o próprio `_INDEX.md`.
 - **`docs/narrative/deep/stinger/`** (2 arquivos) - os ganchos pós-créditos e de sequência (eixo 9).

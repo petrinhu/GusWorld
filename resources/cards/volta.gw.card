@@ -1,7 +1,7 @@
 // volta.gw.card
 //
 // Volt-Leech (Volta): Ativa, Eletrico. Dreno termodinamico do alvo,
-// devolvido a party como mana+HP. Extraida do projeto anterior (L-01) -
+// devolvido a party como mana+HP. Extraida do projeto anterior (GW-01) -
 // conhecimento, nao codigo. Ver docs/design/mecanicas/cartas/volta.md.
 
 #meta id volta

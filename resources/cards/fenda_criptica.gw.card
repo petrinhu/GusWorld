@@ -2,7 +2,7 @@
 //
 // Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
 // Criptografico - Fenda: dano + Expose (abre o alvo a mais dano). Extraida
-// do projeto anterior (L-01) - conhecimento, nao codigo. Ver
+// do projeto anterior (GW-01) - conhecimento, nao codigo. Ver
 // docs/design/mecanicas/cartas/fenda_criptica.md para o "porque".
 
 #meta id fenda_criptica

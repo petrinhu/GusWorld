@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > **Endossado por:** `docs/tech/contrato-i18n.md` (item `D20`, convenção de chave §4, `B9` depende
 > dele) e `docs/tech/convencao-formatos-gw.md` (item `G2`, convenção `.gw.<tipo>`).
 >
-> **O achado que resolve a aparente contradição com a L-18, dito aqui antes de qualquer outra
+> **O achado que resolve a aparente contradição com a GW-18, dito aqui antes de qualquer outra
 > coisa, para não se perder:** um arquivo `.gw.text` **nunca contém prosa**. Todo campo visível ao
 > jogador — a fala de um nó, o rótulo de uma escolha — é sempre uma **chave i18n**, nunca um valor
 > literal. A prosa vive só nos catálogos de tradução (`pt_br.md`, `en_intl.md`), fora deste
@@ -46,16 +46,16 @@ dentro do repositório para revisão, controle de versão e tradução.
 - o pacote binário selado que chega à máquina do jogador (`spec-catalogo-dialogo-binario.md`);
 - o contrato de i18n em si — convenção de chave, fallback, plural/gênero (`contrato-i18n.md`, `D20`);
   este documento só **usa** essas regras, não as redefine;
-- decisão de interface — nenhuma tela de diálogo existe ainda (`present/` bloqueada, L-06).
+- decisão de interface — nenhuma tela de diálogo existe ainda (`present/` bloqueada, GW-06).
 
 ---
 
-## 2. Onde este formato vive, e por que o nome do item não contradiz a L-18
+## 2. Onde este formato vive, e por que o nome do item não contradiz a GW-18
 
 `.gw.text` fica em `resources/dialogues/*.gw.text`: **fonte de build**, nunca artefato de
-distribuição (L-25: *"Fonte do conteúdo: texto estruturado dentro do repositório, lido apenas pelo
+distribuição (GW-25: *"Fonte do conteúdo: texto estruturado dentro do repositório, lido apenas pelo
 gerador em tempo de build. Nada em texto na distribuição"*). O item `B5` já fechou, em 24/08/2026,
-que não há tensão real entre "formato de texto" no nome do item e a L-18: a proibição é sobre o
+que não há tensão real entre "formato de texto" no nome do item e a GW-18: a proibição é sobre o
 que **chega ao jogador**, não sobre a fonte mantida em texto no repositório.
 
 **O ponto central que resolve a aparente contradição, e que se mede nos quatro arquivos reais, não
@@ -193,7 +193,7 @@ risco que motivou a decisão — ver §12). Exemplo real, em `n1_hook` de `npc_i
 ### 7.3 Regra de exclusividade
 
 Todo nó tem **exatamente uma** forma de saída: ou uma `->` linear, ou uma ou mais linhas de
-escolha — nunca as duas juntas. Não observado combinando nos quatro arquivos, e a L-04 do projeto
+escolha — nunca as duas juntas. Não observado combinando nos quatro arquivos, e a GW-04 do projeto
 (um átomo, uma responsabilidade) trata a mistura como erro de forma, não como recurso.
 
 ### 7.4 Convergência é permitida
@@ -248,7 +248,7 @@ text: DIALOGUE_NPC_INTRO_N1_HOOK
 - **Sem espera, retomada nem entrada condicional.** Um arquivo corre inteiro do `entry` ao `@exit`
   numa sessão só. Isto é conhecimento herdado da capacidade do parser do projeto anterior (citado
   na proposta piloto como `dialogue_text.hpp`) — citado aqui só como restrição de capacidade
-  conhecida, **não como arquivo existente hoje** (o projeto é do zero, L-01; nenhum código existe
+  conhecida, **não como arquivo existente hoje** (o projeto é do zero, GW-01; nenhum código existe
   ainda no repositório).
 - **Sem leitura condicional de flag para desviar o grafo por estado prévio** (distinto de
   ramificar por escolha do jogador dentro da própria sessão, que §7.2 já cobre). Os quatro arquivos
@@ -265,15 +265,15 @@ text: DIALOGUE_NPC_INTRO_N1_HOOK
 
 ---
 
-## 11. Camadas (L-17)
+## 11. Camadas (GW-17)
 
 | Onde | O que mora |
 |---|---|
-| **fora da espinha**, `tools/` | o `.gw.text` em si (fonte, lido só pelo gerador em build) e o próprio gerador — ferramenta que só constrói e nunca embarca (LEI ZERO, reforma de 28/08/2026, L-05) |
+| **fora da espinha**, `tools/` | o `.gw.text` em si (fonte, lido só pelo gerador em build) e o próprio gerador — ferramenta que só constrói e nunca embarca (LEI ZERO, reforma de 28/08/2026, GW-05) |
 | **`content/`** | o grafo estático pós-compilação (tabela de nós/transições/flags) — dado, não código de instância |
 | **`domain/`** | o motor que percorre o grafo em tempo de execução: estado de qual nó está ativo, aplica `on_enter`, expõe escolhas |
 | **`app/`** | decide quando disparar um `dialogue_id` e alimenta a escolha do jogador de volta ao motor |
-| **`present/`** | desenha a caixa de diálogo — bloqueada até o GlintFx existir (L-06) |
+| **`present/`** | desenha a caixa de diálogo — bloqueada até o GlintFx existir (GW-06) |
 
 Detalhe de payload e a fronteira jurídica AGPL × ativo reservado: `spec-catalogo-dialogo-binario.md` §5.
 

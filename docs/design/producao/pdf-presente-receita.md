@@ -1,7 +1,7 @@
 # Receita: PDF-presente de personagem inspirado em pessoa real
 
 **Status:** Registro histórico de uma pendência reutilizável do `gusworld_legacy`, trazido a pedido do líder em 25/08/2026. Não é item de tabela — é documento de referência para quando o líder mandar produzir um PDF-presente novo neste projeto. Nenhum código, template ou caminho descrito aqui foi executado ou verificado neste repositório: é o que o garimpo nos commits do projeto anterior encontrou, mais a forma de conversão vigente nesta máquina (ver "Ferramenta de conversão vigente" abaixo).
-**Cross-ref:** `GODS_LAWS.md` L-16 (homenagem a pessoa real); `AI-DISCLOSURE.md` (créditos de inspiração); `CHARS.md` (inventário de personagem); `ASSETS-LICENSE.md` (regime de asset/lore).
+**Cross-ref:** `GODS_LAWS.md` GW-16 (homenagem a pessoa real); `AI-DISCLOSURE.md` (créditos de inspiração); `CHARS.md` (inventário de personagem); `ASSETS-LICENSE.md` (regime de asset/lore).
 
 ---
 
@@ -99,19 +99,19 @@ chromium-browser --headless --disable-gpu --no-sandbox \
   file://<página.html>
 ```
 
-Como registrado em §2, **isto já era a forma em uso** no `gusworld_legacy` desde `cced60c7` (25/07/2026) — a receita neste projeto não precisa "migrar" de weasyprint para Chromium, porque essa migração já tinha acontecido no projeto anterior antes mesmo dele ser encerrado. O que muda, se e quando o líder pedir um PDF-presente neste projeto, é reescrever o script do zero (LEI ZERO, L-01: nenhum arquivo do `gusworld_legacy` é reaproveitável como base de código aqui), usando esta receita só como referência de forma — cores a reamostrar do PDF original do Brunus (se ele for trazido), estrutura de template, e a lista de três defeitos de §2.3 como checklist de comparação visual antes de aprovar qualquer PDF novo.
+Como registrado em §2, **isto já era a forma em uso** no `gusworld_legacy` desde `cced60c7` (25/07/2026) — a receita neste projeto não precisa "migrar" de weasyprint para Chromium, porque essa migração já tinha acontecido no projeto anterior antes mesmo dele ser encerrado. O que muda, se e quando o líder pedir um PDF-presente neste projeto, é reescrever o script do zero (LEI ZERO, GW-01: nenhum arquivo do `gusworld_legacy` é reaproveitável como base de código aqui), usando esta receita só como referência de forma — cores a reamostrar do PDF original do Brunus (se ele for trazido), estrutura de template, e a lista de três defeitos de §2.3 como checklist de comparação visual antes de aprovar qualquer PDF novo.
 
 Embutir imagem como `data:` URI base64 (em vez de referência de caminho de arquivo) evita problema de resolução de caminho relativo entre o HTML temporário e o sprite — prática já usada no script antigo e coerente com a orientação geral desta máquina para conversão HTML → PDF.
 
-## §5. L-16 — homenagem a pessoa real só existe com aceite
+## §5. GW-16 — homenagem a pessoa real só existe com aceite
 
-Este é o ponto que torna este documento sensível, e não um mero registro técnico de CSS: **a receita descreve exatamente o artefato físico/digital que se entrega à pessoa homenageada.** A L-16 do `GODS_LAWS.md` (21/08/2026) é explícita: homenagem a pessoa real só existe **com aceite prévio dela**, e o aceite é fato que o **líder confirma**, não que um agente presume.
+Este é o ponto que torna este documento sensível, e não um mero registro técnico de CSS: **a receita descreve exatamente o artefato físico/digital que se entrega à pessoa homenageada.** A GW-16 do `GODS_LAWS.md` (21/08/2026) é explícita: homenagem a pessoa real só existe **com aceite prévio dela**, e o aceite é fato que o **líder confirma**, não que um agente presume.
 
 Consequências diretas para qualquer uso futuro desta receita:
 
-- **Nenhum PDF-presente se gera para um personagem inspirado em pessoa real sem o líder confirmar que essa pessoa já aceitou a homenagem.** O `gusworld_legacy` só gerou PDFs para quatro casos, e em todos os quatro a dedicatória e o aceite eram fatos que o líder tinha estabelecido antes: Brunus → Bruno Vettore (crédito registrado, à época, no `README.md` do projeto anterior; neste projeto o crédito equivalente vive em `AI-DISCLOSURE.md` e `CHARS.md`), Gus → "Gus Dragon" (nunca o nome de batismo — regra do menor, também consolidada na L-16), Pyotor → Petrus (o próprio líder), Yakov → Iago.
-- **O nome de batismo de menor nunca é versionado.** No caso do Gus, a dedicatória do PDF era para "Gus Dragon", nunca para o nome real do filho do líder — o mesmo apelido que a L-16 fixa como o único citável em público.
-- **Este documento não autoriza a geração de nenhum PDF-presente novo por conta própria.** Ele registra a forma, para quando o líder pedir; o pedido e a confirmação de aceite continuam sendo decisão exclusiva dele (L-11 também se aplica: agente não decide, pergunta).
+- **Nenhum PDF-presente se gera para um personagem inspirado em pessoa real sem o líder confirmar que essa pessoa já aceitou a homenagem.** O `gusworld_legacy` só gerou PDFs para quatro casos, e em todos os quatro a dedicatória e o aceite eram fatos que o líder tinha estabelecido antes: Brunus → Bruno Vettore (crédito registrado, à época, no `README.md` do projeto anterior; neste projeto o crédito equivalente vive em `AI-DISCLOSURE.md` e `CHARS.md`), Gus → "Gus Dragon" (nunca o nome de batismo — regra do menor, também consolidada na GW-16), Pyotor → Petrus (o próprio líder), Yakov → Iago.
+- **O nome de batismo de menor nunca é versionado.** No caso do Gus, a dedicatória do PDF era para "Gus Dragon", nunca para o nome real do filho do líder — o mesmo apelido que a GW-16 fixa como o único citável em público.
+- **Este documento não autoriza a geração de nenhum PDF-presente novo por conta própria.** Ele registra a forma, para quando o líder pedir; o pedido e a confirmação de aceite continuam sendo decisão exclusiva dele (GW-11 também se aplica: agente não decide, pergunta).
 
 ## §6. O que este documento não é
 

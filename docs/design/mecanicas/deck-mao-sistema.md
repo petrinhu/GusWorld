@@ -2,7 +2,7 @@
 
 **Status:** ARQUITETURA FECHADA no brainstorm colaborativo com o criador (2026-07-16). Números exatos (tamanhos, taxas, preços) = `//PLAYTEST`. Catálogo das comuns + tela de montagem = frentes próprias (ver §9). Substitui a versão de definições-base de 2026-07-15.
 
-Cross-ref: `docs/design/mecanicas/mini-mapa.md` §0.1 (loot), `docs/design/mecanicas/economia.md` (crédito), `docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md` (motor de efeitos), `GODS_LAWS.md` L-25 (save assinado = base anti-tamper), `docs/design/mecanicas/cartas-technomagik.md`, `docs/design/mecanicas/capacitor-item.md`.
+Cross-ref: `docs/design/mecanicas/mini-mapa.md` §0.1 (loot), `docs/design/mecanicas/economia.md` (crédito), `docs/tech/adr/ADR-016-techmagic-effect-engine-data-driven.md` (motor de efeitos), `GODS_LAWS.md` GW-25 (save assinado = base anti-tamper), `docs/design/mecanicas/cartas-technomagik.md`, `docs/design/mecanicas/capacitor-item.md`.
 
 O efeito de cada carta é ortogonal a este sistema: o motor techMagic (ADR-016) já executa os efeitos; este doc é o **meta-layer** de QUAIS cartas você traz e usa.
 

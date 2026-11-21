@@ -1276,6 +1276,6 @@ decisão de processo (commit e push só com ordem do líder).*
 > ⚠️ **Não verificado contra código.** A afirmação de que esta spec foi escrita "sobre
 > o código de produção lido em `combat_constants.hpp` / `combat_state_machine.cpp`"
 > vem da análise de projeto, não de leitura de código executado. O código deste
-> projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava
+> projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava
 > não existe. O conteúdo de design desta spec continua válido como especificação;
 > revalidar contra código quando houver implementação.

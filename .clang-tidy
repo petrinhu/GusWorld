@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# clang-tidy configuration, the clang half of L-19 portao 3 (cppcheck is the other half,
+# clang-tidy configuration, the clang half of GW-19 portao 3 (cppcheck is the other half,
 # see .github/workflows/cppcheck.yml). The set is CONSERVATIVE and is declared here so it
 # is versioned. It grows only by an explicit decision of the project lead, never as a
 # side effect of a cleanup.

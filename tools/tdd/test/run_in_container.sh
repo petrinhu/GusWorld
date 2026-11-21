@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Host side of the invoker tests. It only launches: the tests run in a fresh
-# container of the image (L-35). The tree goes in as a tar file, written first and
+# container of the image (GW-35). The tree goes in as a tar file, written first and
 # fed by "<", so a failed tar stops here. No volume is mounted (ADR-026, decision 7).
 set -euo pipefail
 
@@ -21,7 +21,7 @@ out_dir="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/gusworld-tdd-test-XXXXXX")"
 trap 'rm -rf -- "${out_dir:?}"' EXIT
 tar_file="$out_dir/test-tree.tar"
 # The bigtech plugin's hooks travel as a copy under plugin/hooks (the contract test loads
-# the real tdd_guard from there, L-35). The copy comes from the SAME resolver the notice
+# the real tdd_guard from there, GW-35). The copy comes from the SAME resolver the notice
 # uses (review F2: marketplace directory first, installPath as fallback), so the tests run
 # the plugin Claude Code runs, not a stale cache. Nothing under ~/.claude is written.
 plugin_src="$(python3 -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import notice; print(notice.plugin_hooks_dir())' "$root/tools/tdd")" \

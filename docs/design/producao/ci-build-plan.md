@@ -19,12 +19,12 @@ nos testes e ainda assim não abrir numa máquina limpa.
 
 A fundação de build e a matriz de CI existem **desde o primeiro commit**, como
 **primeira fatia do projeto**, antes de qualquer módulo de comportamento
-(GODS_LAWS.md, L-20). Fundação de build não tem comportamento a especificar, então
+(GODS_LAWS.md, GW-20). Fundação de build não tem comportamento a especificar, então
 nasce legitimamente sem TDD; a partir do primeiro módulo de verdade, essa saída acaba
-(GODS_LAWS.md, L-19).
+(GODS_LAWS.md, GW-19).
 
-A matriz tem **cinco entradas distintas, nenhuma não bloqueante** (GODS_LAWS.md, L-09
-e L-20):
+A matriz tem **cinco entradas distintas, nenhuma não bloqueante** (GODS_LAWS.md, GW-09
+e GW-20):
 
 | Plataforma | Papel | Observação |
 |---|---|---|
@@ -44,7 +44,7 @@ executada.
 ## Fase 1 — Build local que espelha o CI
 
 Script local reproduzível, de um comando, rodado **antes do push**, espelhando
-exatamente os passos que o CI roda (GODS_LAWS.md, L-19). O objetivo é achar
+exatamente os passos que o CI roda (GODS_LAWS.md, GW-19). O objetivo é achar
 divergência de plataforma antes do push, não depois.
 
 ---
@@ -61,14 +61,14 @@ plataforma da matriz:
 | Reprodutível pelo wrapper da Fase 1, não por passo manual | Rerrodar o script do zero produz artefatos equivalentes |
 
 **Nenhuma das cinco plataformas é dispensada ou tratada como confirmação não
-bloqueante** (GODS_LAWS.md, L-20): verde numa plataforma não substitui o smoke de
+bloqueante** (GODS_LAWS.md, GW-20): verde numa plataforma não substitui o smoke de
 outra — o mesmo princípio que já impede o CachyOS de herdar o resultado do Arch.
 
 ---
 
 ## Fase 3 — Reforço incremental de qualidade em CI
 
-Os quatro portões de qualidade já são lei (GODS_LAWS.md, L-19) e se somam à matriz da
+Os quatro portões de qualidade já são lei (GODS_LAWS.md, GW-19) e se somam à matriz da
 Fase 0 de forma incremental, plugados um de cada vez, não como decisão em aberto:
 
 1. Zero aviso de compilação em todo commit.
@@ -89,5 +89,5 @@ Fase 0 de forma incremental, plugados um de cada vez, não como decisão em aber
 - Assinatura de binário (Linux/Windows).
 
 ---
-*Este plano deriva o portão e a matriz de GODS_LAWS.md (L-09, L-19, L-20); não decide
+*Este plano deriva o portão e a matriz de GODS_LAWS.md (GW-09, GW-19, GW-20); não decide
 ferramenta além do que a lei já fixa.*

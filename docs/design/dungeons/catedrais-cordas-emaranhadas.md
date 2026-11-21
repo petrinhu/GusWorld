@@ -2,7 +2,7 @@
 
 > **Status:** CONCEITO (mesmo grão que as demais dungeons registradas em
 > `docs/design/mundo-topologia.md` §4: tema, gimmick e forma; layout sala a sala fica para
-> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, L-06/L-27). Nada aqui é
+> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, GW-06/GW-27). Nada aqui é
 > planta nem disposição fina de encontro.
 >
 > **Decisão do líder, 12/09/2026.** Escolha de local por `AskUserQuestion` (Catedrais #1, sobre
@@ -18,9 +18,9 @@
 > dungeon, sincronização de carrilhões). `docs/narrative/environments/03-catedrais-neo-sylvania.md`
 > §2.1 e §2.3 (Nave Principal e Capela do Sino Mecânico Asmódico, vocabulário nativo de cordas e
 > sino) e §7 (ganchos mecânicos já registrados, que este documento acrescenta). `PLACES.md` e
-> `CHARS.md` (Catedral do Cronômetro-Hilário, Bento "Requiem", Ordem Recursiva). L-26 (perspectiva
+> `CHARS.md` (Catedral do Cronômetro-Hilário, Bento "Requiem", Ordem Recursiva). GW-26 (perspectiva
 > 3/4 top-down fixa, sem eixo de altura: a verticalidade "nave + campanário" é leitura de cenário,
-> nunca eixo jogável). L-27 (nenhuma marcação de interface antes de o GlintFx traduzir marcação).
+> nunca eixo jogável). GW-27 (nenhuma marcação de interface antes de o GlintFx traduzir marcação).
 >
 > **A resposta do enigma e a matemática por trás da pedra são área cifrada:**
 > `docs/_secret/dungeons/catedrais-cordas-emaranhadas-solucao.md`.
@@ -43,7 +43,7 @@ quem sincroniza os carrilhões lá dentro é quem, depois, abre a cripta. Dois o
 em sequência, na mesma dungeon.
 
 **Grade e câmera:** o nó de cordas vive todo numa única parede/vão da câmara, em grade quadrada 2D,
-sem eixo de altura e sem câmera que gire ou suba (L-26). A "subida ao campanário" é troca de mapa,
+sem eixo de altura e sem câmera que gire ou suba (GW-26). A "subida ao campanário" é troca de mapa,
 não geometria empilhada, no mesmo sentido já fixado para "nível" em
 `docs/design/dungeons/subsolo-vance-disco-de-ouro.md` §3.
 

@@ -10,9 +10,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > líder de 24/08/2026.
 >
 > **O que este documento NÃO redesenha:** o envelope binário comum do projeto (`E1`: magia, versão
-> de formato, tipo, nonce, dado, selo — servindo save, configuração, mapa e catálogo, L-25), que
+> de formato, tipo, nonce, dado, selo — servindo save, configuração, mapa e catálogo, GW-25), que
 > ainda **não existe** (`⏳ Pendente` na tabela, bloqueado pela criptografia do GlintFx via `E7`,
-> sem dublê, L-05). Este documento fixa **o que a compilação de `.gw.text` produz** — o `payload`
+> sem dublê, GW-05). Este documento fixa **o que a compilação de `.gw.text` produz** — o `payload`
 > que um dia entra dentro de `E1` —, não como `E1` embrulha esse payload. Também não redesenha o
 > contrato de i18n (`D20`, `contrato-i18n.md`), só usa suas regras de fallback e convenção de chave.
 
@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 ## 1. A fronteira jurídica, e por que ela corta o diálogo ao meio
 
-A L-25 do projeto fixa, para carta: *"Nenhum número ou regra de carta fica fora do executável: são
+A GW-25 do projeto fixa, para carta: *"Nenhum número ou regra de carta fica fora do executável: são
 código sob a licença do código e vivem dentro dele. Nenhum texto de sabor ou prosa de carta entra
 no executável: ficam no pacote binário selado como asset."*
 
@@ -33,7 +33,7 @@ Aplicado a diálogo, a mesma régua corta o dado em dois, e a fronteira não é 
   **`E8a`**: tabela embutida **dentro do próprio executável**, sob a licença do código
   (AGPL-3.0-or-later).
 - **A prosa** — o valor de cada chave i18n, em cada locale — é **texto de sabor**: ficção, voz de
-  personagem, com direito autoral reservado (L-08, `ASSETS-LICENSE.md`). Vai para **`E8b`**: pacote
+  personagem, com direito autoral reservado (GW-08, `ASSETS-LICENSE.md`). Vai para **`E8b`**: pacote
   binário selado à parte, no mesmo regime de todos-os-direitos-reservados que já vale hoje para
   `pt_br.md`/`en_intl.md`.
 
@@ -125,15 +125,15 @@ Não é código — é o contrato de validação que qualquer implementação de
 
 ---
 
-## 5. Camadas (L-17)
+## 5. Camadas (GW-17)
 
 | Camada | O que mora aqui, para diálogo |
 |---|---|
-| **fora da espinha**, `tools/` | o gerador: lê `.gw.text` + catálogos de tradução, valida (§4), emite `E8a` + `E8b`. Nunca embarca no binário do jogador (LEI ZERO, reforma de 28/08/2026, L-05) |
+| **fora da espinha**, `tools/` | o gerador: lê `.gw.text` + catálogos de tradução, valida (§4), emite `E8a` + `E8b`. Nunca embarca no binário do jogador (LEI ZERO, reforma de 28/08/2026, GW-05) |
 | **`content/`** | o catálogo estático pós-compilação — a tabela de grafos/nós/transições (`E8a`) e a tabela de strings por locale (`E8b`), carregadas em memória no boot, imutáveis durante a partida |
-| **`domain/`** | o motor de travessia: estado "qual nó está ativo neste `dialogue_id` agora" (parte do save), aplica `on_enter` (grava flag), calcula as escolhas disponíveis, avança por comando — transição determinística que recebe estado e comando e devolve estado novo e eventos (L-17) |
+| **`domain/`** | o motor de travessia: estado "qual nó está ativo neste `dialogue_id` agora" (parte do save), aplica `on_enter` (grava flag), calcula as escolhas disponíveis, avança por comando — transição determinística que recebe estado e comando e devolve estado novo e eventos (GW-17) |
 | **`app/`** | decide quando invocar um `dialogue_id` (reage a evento de quest/NPC/zona de mapa) e alimenta a escolha do jogador de volta ao motor de `domain/` |
-| **`present/`** | desenha a caixa de diálogo, retrato, texto (chave → string do locale ativo, com a cadeia de fallback do `contrato-i18n.md` §3). Bloqueada até o GlintFx existir (L-06) |
+| **`present/`** | desenha a caixa de diálogo, retrato, texto (chave → string do locale ativo, com a cadeia de fallback do `contrato-i18n.md` §3). Bloqueada até o GlintFx existir (GW-06) |
 
 ---
 

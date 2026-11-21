@@ -3,7 +3,7 @@
 // Calc-Edge (Mises): Passiva, Universal, mana 0, equip-only, alvo Self.
 // Passiva DUPLA num único efeito: face 1 concede AP extra ao dono; face 2
 // atrasa e desconta o dano de inimigos marcados "comando central" do lado
-// oposto. Extraida do projeto anterior (L-01). Ver
+// oposto. Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/mises.md.
 
 #meta id mises

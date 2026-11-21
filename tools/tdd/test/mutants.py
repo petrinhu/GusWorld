@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Mutants of the TDD guard's notice and settings (ADR-026, C8 fatia 6, L-19 N2). Standard
+# Mutants of the TDD guard's notice and settings (ADR-026, C8 fatia 6, GW-19 N2). Standard
 # library only, and pure text work: it edits a COPY of the tree (made by mutate_guard.sh
 # from the committed HEAD), never the live tree. Each mutant must match exactly once, and
 # the diff must show the intended change, so a mutant that did not arrive is refused.

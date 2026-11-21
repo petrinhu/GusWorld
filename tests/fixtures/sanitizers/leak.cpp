@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // DELIBERATE DEFECT. This file exists only to prove the LeakSanitizer gate
-// (sanitizers job, L-19 portao 2). Do not add a delete below: without the leak
+// (sanitizers job, GW-19 portao 2). Do not add a delete below: without the leak
 // the proof has nothing to catch.
 #include <cstddef>
 #include <cstdio>

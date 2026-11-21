@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Fifth gate of L-19 (project GODS_LAWS), half (a): the self-test of the commit-message gate runs
+# Fifth gate of GW-19 (project GODS_LAWS), half (a): the self-test of the commit-message gate runs
 # in CI, and this job proves that the gate really rejects. Item C5a, first of
 # the six slices of C5. Half (b), failing when the commit-msg hook is not
 # installed in a clone, is NOT checked here: a CI clone never carries hooks or
@@ -17,7 +17,7 @@
 # - The git-crypt key does NOT go to CI (decision of the leader, 12/10/2026).
 # - The gate is NOT run against the messages of the pushed commits. Without the
 #   key it raises TermosIndisponiveis, which would reject every commit, and
-#   L-19 (project GODS_LAWS) forbids approving in silence when the gate cannot
+#   GW-19 (project GODS_LAWS) forbids approving in silence when the gate cannot
 #   read its list.
 # - The runner is the bare ubuntu-latest image, with no container. lei-zero.yml
 #   and layers.yml already run python3 there with no install step, so this job

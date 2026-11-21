@@ -6,14 +6,14 @@
 //
 // FONTE DE BUILD, NAO FORMATO DE RUNTIME: este arquivo existe em texto DENTRO do
 // repositorio para ser revisado e traduzido; o jogo NUNCA le texto. O gerador o
-// compila em pacote binario selado na hora de construir (L-25), e e isso que chega
-// a maquina do jogador (L-18).
+// compila em pacote binario selado na hora de construir (GW-25), e e isso que chega
+// a maquina do jogador (GW-18).
 //
 // A ESPECIFICACAO DESTE FORMATO AINDA NAO EXISTE ESCRITA. Ela vive implicitamente
 // nestes quatro arquivos, mais o exemplo comentado em
 // docs/narrative/propostas/cena15-dlgtxt-PILOTO-PROPOSTA.md. Escreve-la e item
 // proprio da tabela. O cabecalho anterior apontava para um ADR e um caminho de
-// codigo do projeto ANTERIOR, ambos inexistentes (L-01); os dois foram removidos
+// codigo do projeto ANTERIOR, ambos inexistentes (GW-01); os dois foram removidos
 // em 24/08/2026 em vez de mantidos como ponteiro morto.
 //
 // Blueprint canonico (roteiro/flags/reconvergencia): docs/design/narrativa/

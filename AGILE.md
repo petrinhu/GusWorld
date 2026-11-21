@@ -1,6 +1,6 @@
 # AGILE.md  -  Diretiva de Sistema: Metodologia Ágil no GusWorld
 
-> Este documento é uma instrução normativa para a cadência de sprint e o backlog do GusWorld. Onde qualquer item aqui contradiser uma lei do `GODS_LAWS.md`, a lei vence (já aplicado abaixo à meta de cobertura de teste, revogada pela L-19). Hub: `Standards.md`.
+> Este documento é uma instrução normativa para a cadência de sprint e o backlog do GusWorld. Onde qualquer item aqui contradiser uma lei do `GODS_LAWS.md`, a lei vence (já aplicado abaixo à meta de cobertura de teste, revogada pela GW-19). Hub: `Standards.md`.
 
 > Ao ser incluído no contexto deste projeto, define que **toda gestão, planejamento, desenvolvimento e entrega deve seguir rigorosamente os princípios e práticas do paradigma Ágil**, conforme especificado abaixo.
 
@@ -253,7 +253,7 @@ A LLM deve, quando solicitado ou quando pertinente, calcular e apresentar as seg
 | **Lead Time** | Tempo do item entrar no backlog até ser entregue | Menor possível |
 | **Cycle Time** | Tempo do item começar até ser entregue | Menor possível |
 | **Taxa de defeitos** | Bugs encontrados em produção por sprint | Decrescente |
-| **Cobertura de testes** | consequência do TDD estrito, não meta | sem meta numérica (revogado por `GODS_LAWS.md` L-19: cobertura premia linha executada, não comportamento verificado) |
+| **Cobertura de testes** | consequência do TDD estrito, não meta | sem meta numérica (revogado por `GODS_LAWS.md` GW-19: cobertura premia linha executada, não comportamento verificado) |
 | **Satisfação do time** | NPS ou survey simples na retrospectiva | ≥ 7/10 |
 
 ---

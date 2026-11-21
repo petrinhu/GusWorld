@@ -3,7 +3,7 @@
 // Fork (von Neumann): Hibrida, Universal. Duas faces: clona um aliado
 // qualquer (Eco, reaplica uma fração do último dano dele por N turnos) +
 // devolve o uso da primeira especial ativa/híbrida jogada na batalha.
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/vonneumann.md.
 
 #meta id vonneumann

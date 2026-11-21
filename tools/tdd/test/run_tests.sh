@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Driver of the invoker tests. Runs inside the container (L-35), never on the host.
+# Driver of the invoker tests. Runs inside the container (GW-35), never on the host.
 # Each test_*.sh runs in its own bash process. The driver exits 1 when a file
 # fails and when there is no test file at all.
 set -u

@@ -18,6 +18,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 ## O que NÃO se pode concluir daqui
 
-⚠️ Estas imagens saíram de um renderizador que **não é o nosso**. O desenho da fonte é o mesmo (a `PixelOperatorMono` está em `resources/fonts/`, CC0), mas **posicionamento, hinting e escala dependem de quem desenha** — e quem vai desenhar é o **GlintFx**. Trate como **hipótese a reconfirmar**, nunca como resultado válido para a camada de tela que ainda não existe (L-06, L-27).
+⚠️ Estas imagens saíram de um renderizador que **não é o nosso**. O desenho da fonte é o mesmo (a `PixelOperatorMono` está em `resources/fonts/`, CC0), mas **posicionamento, hinting e escala dependem de quem desenha** — e quem vai desenhar é o **GlintFx**. Trate como **hipótese a reconfirmar**, nunca como resultado válido para a camada de tela que ainda não existe (GW-06, GW-27).
 
 **Decisão de design que consumiu esta investigação:** `docs/design/mecanicas/terminal-estetica.md`.

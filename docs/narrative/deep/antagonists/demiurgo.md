@@ -5,7 +5,7 @@
 > **Origem:** decisão do líder de 11/10/2026: Yaldabaoth vaga por perto das Catedrais Neo-Sylvania, com encontro opcional. Ordens de 11/10/2026: *"circulando = vagando por perto"*; *"o demiurgo se chama yaldabaoth. No jogo ele é cego, por isso é mini-boss."*; *"quero que coloque os pneumatics, psychics e hylics também. Veja onde cabem."*
 > **Companheiro:** `docs/narrative/deep/antagonists/pleroma-setiano.md`, com os seres que ficam acima dele na escada. Este arquivo aponta para lá e não os absorve.
 > **Camada de rigor:** N4 (documento).
-> **Leis que governam este texto:** L-13 (canon desatualizado bloqueia), L-14 (nada declarado morto por agente), L-16 (o filho do líder só como "Gus Dragon"), L-29 (cortes; nenhum atravessado), L-38 (nenhum enigma cede pelo Yaldabaoth), L-02 (sem arte nem pipeline visual), L-30 (sem checklist de estado próprio), L-33 (unidade com fronteira própria), L-76 (falas em intent, não prosa final).
+> **Leis que governam este texto:** GW-13 (canon desatualizado bloqueia), GW-14 (nada declarado morto por agente), GW-16 (o filho do líder só como "Gus Dragon"), GW-29 (cortes; nenhum atravessado), GW-38 (nenhum enigma cede pelo Yaldabaoth), GW-02 (sem arte nem pipeline visual), GW-30 (sem checklist de estado próprio), GW-33 (unidade com fronteira própria), L-76 (falas em intent, não prosa final).
 > **Tema:** Certeza.
 
 ---
@@ -133,7 +133,7 @@ $flag.yaldabaoth_canto_apontado = true
 
 - Nenhum nó dá veredito sobre a origem do mundo.
 - Nenhum nó dá veredito sobre a classificação: ela é fala dele, não fato (seção 9).
-- Nenhum nó entrega a solução de enigma (L-38). Ele não aponta padrão, não anuncia sequência e não "lê" a engrenagem da nave. A sequência 1-1-2-3-5-8 da nave (`docs/narrative/environments/03-catedrais-neo-sylvania.md` §2.1) permanece com o jogador.
+- Nenhum nó entrega a solução de enigma (GW-38). Ele não aponta padrão, não anuncia sequência e não "lê" a engrenagem da nave. A sequência 1-1-2-3-5-8 da nave (`docs/narrative/environments/03-catedrais-neo-sylvania.md` §2.1) permanece com o jogador.
 - As flags são de Diário e de tom, não de progressão.
 
 ---
@@ -174,10 +174,10 @@ Decisão do líder de 11/10/2026: a recompensa são **dois itens raros de craft 
 
 Decisão do líder de 11/10/2026: Yaldabaoth **cria arcontes como magia dele**, com probabilidade de invocação por dificuldade, e **age também por conta própria** (seção 6).
 
-- O corpus do GusWorld não usa a palavra "arconte" (busca por palavra inteira em `docs/`, `CHARS.md` e `PLACES.md`, feita em 11/10/2026). Nome e forma dos arcontes são campo livre do líder, e a arte deles é do líder (L-02).
+- O corpus do GusWorld não usa a palavra "arconte" (busca por palavra inteira em `docs/`, `CHARS.md` e `PLACES.md`, feita em 11/10/2026). Nome e forma dos arcontes são campo livre do líder, e a arte deles é do líder (GW-02).
 - **Servos anônimos, não arcontes nomeados.** Os seres que o Yaldabaoth invoca como magia são os servos anônimos e descartáveis de `docs/narrative/deep/antagonists/arcontes.md` §6.2: sem nome, sem fala, sem ficha e sem lugar fixo. Os arcontes nomeados daquele documento (as três tradições) são outra coisa: vivem no mundo por conta própria e não são invocados por ele.
 - Como magia, o arconte não tem fala de lore. Recomendação deste documento: nenhuma linha de diálogo para arcontes.
-- Cada invocação consome o orçamento de conteúdo da área (L-29, C-15). A probabilidade por dificuldade é valor de `lead-game-designer`.
+- Cada invocação consome o orçamento de conteúdo da área (GW-29, C-15). A probabilidade por dificuldade é valor de `lead-game-designer`.
 
 ---
 
@@ -297,12 +297,12 @@ Garantias de texto, para o `narrative-writer` e para a revisão:
 - Não concilia a Primeira Compilação com o fato em área cifrada (cosmologia §3, nota do líder).
 - Não resolve a disputa acadêmica sobre Valentino: registra as duas leituras (seção 9.2).
 - Não transforma a tríade em mecânica de inimigo nem em taxonomia do mundo (seção 9.4).
-- Não dá ao Yaldabaoth poder de resolver enigma (L-38).
-- Não especifica arte, modelo, câmera ou pipeline (L-02).
+- Não dá ao Yaldabaoth poder de resolver enigma (GW-38).
+- Não especifica arte, modelo, câmera ou pipeline (GW-02).
 - Não fixa números: AP, dano, HP e valor de Token são de `lead-game-designer`.
 - Não escreve prosa final: falas em intent são stub, a redação é do `narrative-writer` (L-76).
 - Não altera `CHARS.md`, `PLACES.md`, `TODO.md`, `GODS_LAWS.md`, `CLAUDE.md`, a cosmologia, o `patch-zero.md` nem nenhum arquivo existente.
-- Não cita o filho do líder (L-16).
+- Não cita o filho do líder (GW-16).
 - Não descreve os seres do Pleroma. Eles estão em `pleroma-setiano.md`.
 
 ---
@@ -313,7 +313,7 @@ Cada ponta é decisão do líder, levada por `AskUserQuestion`, com a opção re
 
 - **P1. Presença e conflito de canon.**
   - **P1a. Presença: ao entrar no nó ou por sorteio?** Recomendado: ao entrar no nó, como estado sem horário e sem sorteio (seção 4).
-  - **P1b. Intent caótico em mini-boss.** Conflito entre `docs/design/gdd.md` §98 (Gambito falha contra "intent caótico (mini-bosses específicos)") e `docs/design/mecanicas/combat.md`. A evidência favorece o `combat.md`: a linha 689 diz que a falha é "exclusivamente de Patch-Zero" e que "Mini-bosses têm UtilityBrain sem ruído", com a marca "N.2 R3, one-way door 2026-06-03"; a linha 712 diz que o "Gambito-Prever funciona normalmente" contra mini-boss; a linha 713 diz que o caos é "reservado EXCLUSIVAMENTE para Patch-Zero". O `gdd.md` §98 é uma frase de passagem, sem data e sem marca de decisão. **Recomendação: seguir o `combat.md`.** A correção do `gdd.md` não cabe a agente (L-14): o líder decide.
+  - **P1b. Intent caótico em mini-boss.** Conflito entre `docs/design/gdd.md` §98 (Gambito falha contra "intent caótico (mini-bosses específicos)") e `docs/design/mecanicas/combat.md`. A evidência favorece o `combat.md`: a linha 689 diz que a falha é "exclusivamente de Patch-Zero" e que "Mini-bosses têm UtilityBrain sem ruído", com a marca "N.2 R3, one-way door 2026-06-03"; a linha 712 diz que o "Gambito-Prever funciona normalmente" contra mini-boss; a linha 713 diz que o caos é "reservado EXCLUSIVAMENTE para Patch-Zero". O `gdd.md` §98 é uma frase de passagem, sem data e sem marca de decisão. **Recomendação: seguir o `combat.md`.** A correção do `gdd.md` não cabe a agente (GW-14): o líder decide.
 - **P2b. Atribuição de classe aos membros da party.** A tabela da seção 9.4 é proposta de partida. Pergunta: aprovar a tabela, ajustar membro a membro, ou deixar a classificação só para o jogador (Gus).
 - **P3. Itens da recompensa.** Confirmar a leitura de que os itens valem só na primeira vitória e que, da segunda em diante, sai no máximo uma moeda (seção 7). Definir nomes e quantidade por dificuldade.
 - **P5. Relação com o Patch-Zero, lado dele.** Recomendado: o Patch-Zero não reage à negação (seção 10). Alternativa: ele reage, o que exige texto novo no `patch-zero.md`, que não posso alterar sem decisão.
@@ -330,7 +330,7 @@ Os fatos gnósticos usados (Yaldabaoth, Saklas, Samael; cegueira do criador; arc
 
 **Atenção de escola:** a tríade é de Valentino, e o nome Yaldabaoth e a cegueira vêm da tradição setiana (Apócrifo de João). São escolas diferentes. O documento usa as duas porque o líder pediu, e a fronteira entre elas está em `pleroma-setiano.md`, seção 8.
 
-Iconografia de cabeça de leão e corpo de serpente, se houver, é referência de arte, e arte é do líder (L-02).
+Iconografia de cabeça de leão e corpo de serpente, se houver, é referência de arte, e arte é do líder (GW-02).
 
 ---
 

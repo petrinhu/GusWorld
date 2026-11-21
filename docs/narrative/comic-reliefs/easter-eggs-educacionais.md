@@ -6,7 +6,7 @@
 > (matemática/estatística) ensinado diegeticamente por um personagem do mundo. Mecanismo completo,
 > dependência entre os dois momentos e pendências de balanceamento em
 > [`docs/design/mecanicas/easter-egg-faro-de-inacia.md`](../../design/mecanicas/easter-egg-faro-de-inacia.md)
-> (L-30): este arquivo é a cena/flavor, não a especificação.
+> (GW-30): este arquivo é a cena/flavor, não a especificação.
 >
 > **Critério que separa este catálogo do de homenagens (decisão do líder, 12/09/2026):**
 > homenagem aponta para obra externa reconhecível; educacional ensina conceito real (matemática,
@@ -58,7 +58,7 @@ Na Zona do Silêncio, Joaquim Bartolomeu recebe o jogador com um nome, não com 
 nome esconde fica bem longe de onde ele mora. Mecanismo completo, local, recompensa e gatilho
 fechados em
 [`docs/design/mecanicas/easter-egg-sidequest-procure-por-pauli.md`](../../design/mecanicas/easter-egg-sidequest-procure-por-pauli.md)
-(L-30): este arquivo é a cena/flavor, não a especificação.
+(GW-30): este arquivo é a cena/flavor, não a especificação.
 
 > JOAQUIM: "Você quer achar isso, tá bem. Não vou te dar o caminho de bandeja, mas vou te dar um
 > nome: procura o Pauli. Não me pergunta quem é, nem onde, porque eu não sei nada disso. Só sei que

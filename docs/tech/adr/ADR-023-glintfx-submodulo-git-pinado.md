@@ -18,7 +18,7 @@ do GusWorld busca e fixa** esse código — se por submódulo git, por
 vendorizada manual. Essa lacuna é distinta da decisão de versão mínima de
 CMake (ADR-022): uma é "qual ferramenta de build", a outra é "como uma
 dependência de outro repositório do mesmo líder entra nessa ferramenta" —
-razões de mudar diferentes, por isso ADRs diferentes (L-33).
+razões de mudar diferentes, por isso ADRs diferentes (GW-33).
 
 Os dois repositórios (GusWorld e GlintFx) são do mesmo autor e evoluem juntos,
 em sessões e dias diferentes. Sem um mecanismo de fixação explícito, o
@@ -105,7 +105,7 @@ entradas da matriz (ADR-024), uma combinação onde o GlintFx nasce de um
 compilador e o jogo de outro. **O nosso CI nunca exercita o cenário de
 quebra**, porque ele nunca constrói a combinação que quebraria.
 
-**Mas o jogo é FOSS sob AGPL-3.0-or-later (L-08), e quem compila da fonte
+**Mas o jogo é FOSS sob AGPL-3.0-or-later (GW-08), e quem compila da fonte
 fora do nosso CI não está sujeito a essa garantia.** O cenário real de
 quebra: alguém instala um `libglintfx.so` empacotado por uma distro
 (construído com GCC, por exemplo) e compila o GusWorld com Clang contra esse
@@ -185,8 +185,8 @@ para terceiros) que não existe aqui.
 **Contras:** viola a reprodutibilidade que motivou a pergunta — não há
 registro automático de qual commit do GlintFx foi copiado, atualizar vira
 um `diff` manual sujeito a erro, e o histórico de "quem mudou o quê" se
-perde. É exatamente o "dublê" que a L-05 do `GODS_LAWS.md` proíbe em
-espírito, ainda que a L-05 fale de runtime, não de build: um vendor manual
+perde. É exatamente o "dublê" que a GW-05 do `GODS_LAWS.md` proíbe em
+espírito, ainda que a GW-05 fale de runtime, não de build: um vendor manual
 sem rastreio é uma cópia que finge ser a coisa original.
 **Rejeitada.**
 
@@ -260,7 +260,7 @@ framework/GlintFx`, e `add_subdirectory(framework/GlintFx)` no
 
 - Enquanto o GlintFx muda rápido (11 dias, 359 commits medidos em outro
   projeto irmão — ver memória de sessão), o GusWorld pode ficar "atrasado"
-  de propósito, esperando uma função específica (L-07: pedido só quando o
+  de propósito, esperando uma função específica (GW-07: pedido só quando o
   jogo esbarrar de fato na falta). Isso é o comportamento desejado, não um
   bug do mecanismo de pino.
 - CI precisa rodar `git submodule update --init --recursive` (ou
@@ -287,9 +287,9 @@ retrabalhar lógica de jogo.
 
 ## Cross-refs
 
-- [ADR-022](ADR-022-cmake-versao-minima-fixada.md) (o sistema de build que hospeda este `add_subdirectory`, e o gerador Ninja que compila os dois lados; ADR irmão, razão de mudar distinta por L-33)
+- [ADR-022](ADR-022-cmake-versao-minima-fixada.md) (o sistema de build que hospeda este `add_subdirectory`, e o gerador Ninja que compila os dois lados; ADR irmão, razão de mudar distinta por GW-33)
 - [ADR-024](ADR-024-ci-cinco-plataformas-cachyos-container.md) (a matriz de nove entradas cujo compilador único por célula é o que torna a ABI coerente dentro do nosso CI)
-- `../../../GODS_LAWS.md` LEI ZERO, L-05, L-06, L-07 (de onde vem a função, não como ela chega ao build), L-08 (AGPL-3.0-or-later — por que o jogo é FOSS e por que alguém fora do nosso CI pode compilar da fonte), L-33
+- `../../../GODS_LAWS.md` LEI ZERO, GW-05, GW-06, GW-07 (de onde vem a função, não como ela chega ao build), GW-08 (AGPL-3.0-or-later — por que o jogo é FOSS e por que alguém fora do nosso CI pode compilar da fonte), GW-33
 - `../../../GlintFx/CMakeLists.txt` (comentários `FIX-CONSUMO`, `PROJECT_SOURCE_DIR`/`PROJECT_BINARY_DIR` — o desenho do GlintFx já assume ser consumido por `add_subdirectory`)
 - `../../../GlintFx/tests/embed/`, `tests/embed_name_collision/`, `tests/embed_dll_colocation/`, `tests/package/` (os quatro modos de consumo que o próprio GlintFx já testa)
 - `../../../GlintFx/GODS_LAWS.md` L-19 (biblioteca compartilhada por padrão, superfície pública opaca) e L-22 (a nota verbatim de ABI/RTTI sobre exceção atravessando `.so`)

@@ -110,7 +110,7 @@ O **efeito PEM das dungeons** (que já bloqueia save, `save-por-local.md`) **TAM
 - **Config:** mini-mapa on/off, o que os marcadores mostram, nível de zoom preferido.
 - **Estado:** modo de dificuldade; assinatura Hard dos marcadores (ligada/desligada + saldo gasto).
 
-**Fundação robusta que já existe (herdada, não reinventar):** envelope **AEAD** (cifra+autentica, primitiva vinda do GlintFx — `GODS_LAWS.md` L-25); `save_version` versionado com **migrators** desde o D1 (campo novo = bump + migrator); **recuperação por backup** + aviso de save danificado/versão-incompatível (commit `db9a185`); **fail-secure** (save duvidoso nunca carrega silenciosamente). Feat do `backend-engineer`: estender o schema do save-domain com estes campos (bump de `save_version` + migrator + teste de roundtrip/tamper).
+**Fundação robusta que já existe (herdada, não reinventar):** envelope **AEAD** (cifra+autentica, primitiva vinda do GlintFx — `GODS_LAWS.md` GW-25); `save_version` versionado com **migrators** desde o D1 (campo novo = bump + migrator); **recuperação por backup** + aviso de save danificado/versão-incompatível (commit `db9a185`); **fail-secure** (save duvidoso nunca carrega silenciosamente). Feat do `backend-engineer`: estender o schema do save-domain com estes campos (bump de `save_version` + migrator + teste de roundtrip/tamper).
 
 ## 8. Fios abertos — VÁRIOS brainstorms pedidos pelo criador
 

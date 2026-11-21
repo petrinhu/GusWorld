@@ -5,13 +5,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Vocabulário compartilhado das cartas
 
-**Tipo Diátaxis:** Reference. **Audiência:** quem lê ou escreve qualquer `.gw.card`, ou o `.md` de qualquer carta individual. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, extraído do código do projeto anterior (`GusEngine/domain/include/gus/domain/cards/card_enums.hpp`, 344 linhas) sob L-01 — **conhecimento, não código**: nenhuma linha de C++ aparece abaixo, só o significado de cada termo.
+**Tipo Diátaxis:** Reference. **Audiência:** quem lê ou escreve qualquer `.gw.card`, ou o `.md` de qualquer carta individual. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, extraído do código do projeto anterior (`GusEngine/domain/include/gus/domain/cards/card_enums.hpp`, 344 linhas) sob GW-01 — **conhecimento, não código**: nenhuma linha de C++ aparece abaixo, só o significado de cada termo.
 
-> Este documento **não pertence a nenhuma carta**: é o átomo de vocabulário que todas as 25 compartilham (L-33, "documento é átomo de assunto"). Cada carta aponta para cá em vez de repetir a definição de cada termo (L-30).
+> Este documento **não pertence a nenhuma carta**: é o átomo de vocabulário que todas as 25 compartilham (GW-33, "documento é átomo de assunto"). Cada carta aponta para cá em vez de repetir a definição de cada termo (GW-30).
 
 ## 1. Por que este vocabulário existe
 
-O projeto anterior modelava cada carta como um **programa**: uma lista ordenada de instruções (`EffectSpec`) que o motor de combate executa em momentos específicos do turno. Este documento descreve o vocabulário desse programa — os nomes que aparecem nos blocos `@effect` de cada `.gw.card` (`FORMATO.md` §5) — sem descrever o motor que os interpreta, porque o motor não existe neste projeto (L-01).
+O projeto anterior modelava cada carta como um **programa**: uma lista ordenada de instruções (`EffectSpec`) que o motor de combate executa em momentos específicos do turno. Este documento descreve o vocabulário desse programa — os nomes que aparecem nos blocos `@effect` de cada `.gw.card` (`FORMATO.md` §5) — sem descrever o motor que os interpreta, porque o motor não existe neste projeto (GW-01).
 
 ## 2. Família (`family`)
 
@@ -94,7 +94,7 @@ Quando, dentro do ciclo de combate, um `@effect` dispara: `OnCast` (no momento e
 
 ## 9. Tier e categoria (`tier`, `category`)
 
-`tier` distingue as três trilhas de raridade: `comum` (obtida por loja/craft/loot, sem exclusividade), `especial` (uma cópia no jogo inteiro, entregue por progresso narrativo — nunca comprada, craftada ou dropada), `super` (a carta-capstone, carta original, nunca forjada; as 20 especiais são pré-requisito de ACESSO à missão-capstone que leva até ela, não matéria-prima de criação; correção 25/08/2026, decisão do líder, ver `cartas-technomagik.md` §2.1/§2.4). `category` só faz sentido quando `tier` não é `comum`, e distingue **quatro** formas de uso, todas descritas em `cartas-technomagik.md` §2.3 deste projeto (não repetido aqui, L-30):
+`tier` distingue as três trilhas de raridade: `comum` (obtida por loja/craft/loot, sem exclusividade), `especial` (uma cópia no jogo inteiro, entregue por progresso narrativo — nunca comprada, craftada ou dropada), `super` (a carta-capstone, carta original, nunca forjada; as 20 especiais são pré-requisito de ACESSO à missão-capstone que leva até ela, não matéria-prima de criação; correção 25/08/2026, decisão do líder, ver `cartas-technomagik.md` §2.1/§2.4). `category` só faz sentido quando `tier` não é `comum`, e distingue **quatro** formas de uso, todas descritas em `cartas-technomagik.md` §2.3 deste projeto (não repetido aqui, GW-30):
 
 - **`ativa`** — jogada uma vez por batalha, com custo de mana.
 - **`passiva`** — sempre ligada enquanto equipada, sem consumir o uso único da batalha. Nunca tem custo zero: carrega **dois gastos** de mana/carga de bateria (mana e bateria são o mesmo recurso, `cartas-hardware-pirataria-energia.md` §5, "Mana e bateria são o mesmo recurso"), um gasto **menor**, contínuo, para ficar ativa em standby, e um gasto **maior** no momento em que o efeito é exercido (decisão do líder, 02/09/2026, `cartas-hardware-pirataria-energia.md` §5, "Passiva tem dois gastos: standby e disparo"). Os dois números, por carta, são pendentes de proposta do `economy-designer` e ratificação do líder (INBOX, `TODO.md`).
@@ -103,4 +103,4 @@ Quando, dentro do ciclo de combate, um `@effect` dispara: `OnCast` (no momento e
 
 ## 10. Fontes
 
-Extraído de `card_enums.hpp` (344 linhas) e `card_records.hpp` (142 linhas) do projeto anterior, lidos via `git show` do clone read-only, sob a autorização de leitura da L-01 (o código não é base, mas o conhecimento que ele carrega é insumo válido). Nenhuma linha de C++ foi copiada; todo nome de campo e de valor foi traduzido para prosa.
+Extraído de `card_enums.hpp` (344 linhas) e `card_records.hpp` (142 linhas) do projeto anterior, lidos via `git show` do clone read-only, sob a autorização de leitura da GW-01 (o código não é base, mas o conhecimento que ele carrega é insumo válido). Nenhuma linha de C++ foi copiada; todo nome de campo e de valor foi traduzido para prosa.

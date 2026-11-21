@@ -3,7 +3,7 @@
 > **Status:** rascunho para revisão do líder.
 > **Quando dispara:** dentro das Catedrais Neo-Sylvania, quando a party atravessa uma área onde a presença ainda não se mostra. Uma fala de cada conjunto é sorteada por evento.
 
-## Trava de conteúdo (L-38)
+## Trava de conteúdo (GW-38)
 
 Nenhuma das dez falas confirma nem nega a presença de algo no lugar. A fala de quem sente só descreve um incômodo dentro de quem fala. A fala de quem menospreza só atribui esse incômodo a cansaço, nervosismo ou ao próprio lugar. Nenhuma nomeia inimigo, nenhuma avisa de perigo, e nenhuma explica o que está acontecendo. O jogador tira a conclusão sozinho, ou não tira.
 

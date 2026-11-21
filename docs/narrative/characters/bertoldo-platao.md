@@ -2,7 +2,7 @@
 
 > **Status:** PROPOSTA N4 (documento de design). Não é canon até o líder decidir as pontas da seção 9. As três escolhas do líder de 11/10/2026 já estão aplicadas no texto.
 > **Camada de rigor:** N4 (documento). Redação final das falas é do `narrative-writer` (L-76, lei global).
-> **Leis que governam este texto:** L-13 (canon desatualizado bloqueia), L-14 (nada declarado morto por agente), L-16 (o filho do líder só como "Gus Dragon"), L-29 (cortes C-04, C-11, C-15), L-33 (unidade com fronteira própria), L-34, L-38 (o jogador resolve, a ferramenta não), L-22 (identificadores em inglês, texto em pt-br), L-32 (sem travessão).
+> **Leis que governam este texto:** GW-13 (canon desatualizado bloqueia), GW-14 (nada declarado morto por agente), GW-16 (o filho do líder só como "Gus Dragon"), GW-29 (cortes C-04, C-11, C-15), GW-33 (unidade com fronteira própria), L-34, GW-38 (o jogador resolve, a ferramenta não), GW-22 (identificadores em inglês, texto em pt-br), L-32 (sem travessão).
 > **Companheiros:** `docs/design/mecanicas/cronovisor.md`, `docs/design/mecanicas/radio-padre-landell.md`, `docs/narrative/deep/antagonists/demiurgo.md`, `docs/narrative/deep/antagonists/pleroma-setiano.md`.
 > **Tema:** Lembrança. O que a família guardou e o que o bairro esqueceu.
 
@@ -94,7 +94,7 @@ O documento do Yaldabaoth (`demiurgo.md`) usa a caracterização valentiniana co
 
 **O que o aparelho confirma.** Quando alguém da party olha no aparelho (rádio do Padre Landell com a placa Lemon-Gama e o Cronovisor montado), as referências históricas que o Platão citou se confirmam. **Decisão do líder, verbatim:** "todas as referências históricas se confirmam sempre que alguém da party olhar no aparelho radio-interface-lemon-gama-cronvisao".
 
-**Por que isso não viola a L-38.** A L-38 permite a ferramenta que mostra estado observável do mundo, e proíbe a ferramenta que faz o raciocínio no lugar do jogador. Confirmar que um fato histórico é verdadeiro é mostrar o passado, o que o Cronovisor já faz com o eco (`cronovisor.md`, seção 1). A confirmação não diz nada sobre enigma nenhum.
+**Por que isso não viola a GW-38.** A GW-38 permite a ferramenta que mostra estado observável do mundo, e proíbe a ferramenta que faz o raciocínio no lugar do jogador. Confirmar que um fato histórico é verdadeiro é mostrar o passado, o que o Cronovisor já faz com o eco (`cronovisor.md`, seção 1). A confirmação não diz nada sobre enigma nenhum.
 
 **A trava, em uma frase:** o aparelho confirma referência histórica e nunca confirma solução de enigma, nunca diz se uma hipótese do jogador está certa e nunca aponta caminho.
 
@@ -147,11 +147,11 @@ Cada ponta é decisão do líder, levada por `AskUserQuestion`, com a opção re
 - Não escreve diálogo final, só intent e rascunho de duas linhas (L-76).
 - Não cita literalmente Platão sem conferência.
 - Não explica a origem do mundo, nem concilia a Primeira Compilação com o fato em área cifrada.
-- Não dá ao aparelho poder de confirmar solução de enigma (L-38).
+- Não dá ao aparelho poder de confirmar solução de enigma (GW-38).
 - Não altera `CHARS.md`, `PLACES.md`, `TODO.md`, `GODS_LAWS.md`, `cronovisor.md`, `radio-padre-landell.md`, `demiurgo.md`, nem nenhum arquivo existente.
 - Não usa `docs/_secret/`.
-- Não cita o filho do líder (L-16).
-- Não define arte, câmera ou pipeline visual (L-02).
+- Não cita o filho do líder (GW-16).
+- Não define arte, câmera ou pipeline visual (GW-02).
 
 ---
 

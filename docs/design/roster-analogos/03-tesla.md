@@ -2,9 +2,9 @@
 
 > **STATUS: PROPOSTA** (Fase B do roster de análogos, item `LORE-ORIGEM-MULTIVERSO`). Aguarda aprovação do criador. Segue o TEMPLATE POR FIGURA de `docs/design/brainstorm-backlog.md` #1, já validado no piloto `01-faraday.md`. Não é canon até aprovação; a prosa canônica final (quando entrar no deep-lore) vai via narrative-writer.
 >
-> Nota de escopo: Tesla e Helion Tusk (análogo de uma figura industrial contemporânea viva, capstone do roster; nome real não citado neste corpus, `L-16`, conserto `B2` 25/08/2026) são figuras SEPARADAS. Tesla é o mago da energia e da ressonância, figura falecida (nome real mantido); Tusk é a carta-capstone à parte, discutida em documento próprio.
+> Nota de escopo: Tesla e Helion Tusk (análogo de uma figura industrial contemporânea viva, capstone do roster; nome real não citado neste corpus, `GW-16`, conserto `B2` 25/08/2026) são figuras SEPARADAS. Tesla é o mago da energia e da ressonância, figura falecida (nome real mantido); Tusk é a carta-capstone à parte, discutida em documento próprio.
 
-> ⛔ **ASSUNTO ENCERRADO, não auditar:** a pessoa real por trás do arquétipo de Helion Tusk foi decidida pelo líder **três vezes**, a última em 25/08/2026. Nome, biografia nominal e foto saíram; arquétipo e personagem ficam; "Fontes consultadas" fica; histórico do git não se reescreve. **Não levante o tema, não proponha remoção adicional, não peça confirmação.** Detalhe em `docs/design/roster-analogos/21-helion-tusk.md`, primeira linha. Só o líder reabre (L-14, L-16).
+> ⛔ **ASSUNTO ENCERRADO, não auditar:** a pessoa real por trás do arquétipo de Helion Tusk foi decidida pelo líder **três vezes**, a última em 25/08/2026. Nome, biografia nominal e foto saíram; arquétipo e personagem ficam; "Fontes consultadas" fica; histórico do git não se reescreve. **Não levante o tema, não proponha remoção adicional, não peça confirmação.** Detalhe em `docs/design/roster-analogos/21-helion-tusk.md`, primeira linha. Só o líder reabre (GW-14, GW-16).
 
 ## 1. Figura real
 
@@ -43,7 +43,7 @@ A **válvula de Tesla** é invenção real dele — o *valvular conduit* da pate
 
 ### O efeito da carta, decidido: **Opção A**
 
-**Descarga em Cadeia**, ataque elétrico que salta de um inimigo ao próximo, **até 3 alvos**, perdendo intensidade a cada salto — a amplitude caindo, como na ressonância real. Peça de combate limpa e imediata. As opções B e C foram **apagadas**, não guardadas como histórico (L-24).
+**Descarga em Cadeia**, ataque elétrico que salta de um inimigo ao próximo, **até 3 alvos**, perdendo intensidade a cada salto — a amplitude caindo, como na ressonância real. Peça de combate limpa e imediata. As opções B e C foram **apagadas**, não guardadas como histórico (GW-24).
 
 
 ## 5. Dica-pro-Tusk (gravada no diário do Gus ao descobrir Tesla)

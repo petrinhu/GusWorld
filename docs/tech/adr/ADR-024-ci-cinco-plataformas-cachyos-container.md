@@ -5,11 +5,11 @@
 | **Status** | Accepted (decisão do líder, 25/08/2026) |
 | **Data** | 2026-08-25 |
 | **Decisor** | petrinhu (líder supremo) |
-| **Reversibilidade** | Two-way door quanto ao mecanismo de CI (trocar imagem, runner ou compilador não afeta código de jogo); one-way door reputacional se a matriz declarar uma plataforma verde sem cobertura real (L-09: "verde no Arch não autoriza declarar CachyOS suportado"), ou se declarar uma entrada de compilador não-bloqueante (L-20). |
+| **Reversibilidade** | Two-way door quanto ao mecanismo de CI (trocar imagem, runner ou compilador não afeta código de jogo); one-way door reputacional se a matriz declarar uma plataforma verde sem cobertura real (GW-09: "verde no Arch não autoriza declarar CachyOS suportado"), ou se declarar uma entrada de compilador não-bloqueante (GW-20). |
 
 ## Contexto
 
-A L-09 e a L-20 do `GODS_LAWS.md` exigem cinco entradas distintas de CI —
+A GW-09 e a GW-20 do `GODS_LAWS.md` exigem cinco entradas distintas de CI —
 Fedora 44 (primário, pinado), Ubuntu, Arch, CachyOS e Windows — e são
 explícitas: **"CachyOS não é Arch renomeado" e não é coberto pelo job de
 Arch**. O que faltava decidir era **como rodar CachyOS de verdade** num
@@ -19,19 +19,19 @@ CachyOS entre suas imagens padrão (`ubuntu-latest`, `windows-latest`,
 
 Sem uma imagem oficial, a tentação seria uma de duas saídas ruins: (a) rodar
 o job de CachyOS sobre uma imagem Arch genérica reconfigurada para "parecer"
-CachyOS, o que contradiz a L-09 no espírito (a lei existe justamente para
+CachyOS, o que contradiz a GW-09 no espírito (a lei existe justamente para
 distinguir toolchain e repositórios próprios do CachyOS do Arch puro); ou
 (b) usar uma imagem de terceiro não afiliada ao projeto CachyOS, cuja
 manutenção e fidelidade ninguém garante.
 
 **Acréscimo de 25/08/2026, mesma ordem de serviço:** o líder tomou mais duas
 decisões que pertencem a esta mesma ADR, por serem parte da mesma
-preocupação (estratégia de CI/plataforma, L-09/L-20), e fecham o item `G6`
+preocupação (estratégia de CI/plataforma, GW-09/GW-20), e fecham o item `G6`
 — a única decisão pendente dentro da cadeia crítica do projeto:
 
 - **Compilador no Linux: GCC e Clang, os dois.** Razão do líder, verbatim
   em espírito: os dois compiladores pegam classes de bug diferentes, e com
-  `-Werror` (portão 1 da L-19) a divergência entre eles aparece cedo — no
+  `-Werror` (portão 1 da GW-19) a divergência entre eles aparece cedo — no
   commit que a introduziu, não meses depois.
 - **Compilador no Windows: MSVC.** ABI nativa do sistema, binário sem
   runtime de terceiro (nem MinGW, nem libc++ extra), e é o toolchain que
@@ -49,12 +49,12 @@ de compilação real.
 
 **Fedora 44 e Ubuntu entram do mesmo jeito**, por consistência de matriz:
 `container: fedora:44` (pinado, nunca `:latest`, por exigência textual da
-L-09) e `container: ubuntu:24.04` (a série já em uso pelo GlintFx, ver
+GW-09) e `container: ubuntu:24.04` (a série já em uso pelo GlintFx, ver
 ADR-022). **Arch entra como `container: archlinux:latest`.**
 
 **Cada uma das quatro plataformas Linux compila com GCC E com Clang, os
 dois** — cada combinação (plataforma × compilador) é uma entrada própria e
-**bloqueante** da matriz, nunca informativa (L-20: "a matriz de cinco
+**bloqueante** da matriz, nunca informativa (GW-20: "a matriz de cinco
 plataformas... nenhuma não bloqueante" — a mesma régua se estende, por
 decisão do líder, ao par de compiladores dentro de cada plataforma Linux).
 
@@ -89,8 +89,8 @@ dois compiladores em **todas** as quatro plataformas Linux é o que garante
 que a divergência apareça em qualquer distro onde ela exista, não só
 naquela que o CI escolheu arbitrariamente testar com os dois.
 
-**As nove entradas são bloqueantes, sem exceção (L-20).** Nenhuma delas é
-informativa nem pode ficar de fora do gate de push (L-32).
+**As nove entradas são bloqueantes, sem exceção (GW-20).** Nenhuma delas é
+informativa nem pode ficar de fora do gate de push (GW-32).
 
 ## Evidência de que a imagem oficial existe
 
@@ -123,7 +123,7 @@ nunca um em GCC e o outro em Clang dentro da mesma célula da matriz. O
 detalhe completo — o que isso garante e, mais importante, o que **não**
 garante para quem compila fora deste CI — está registrado no ADR-023, seção
 "Vínculo: compartilhado (`.so`), espelhando o GlintFx", para não duplicar o
-mesmo texto em dois ADRs sobre razões de mudar diferentes (L-33).
+mesmo texto em dois ADRs sobre razões de mudar diferentes (GW-33).
 
 ## Alternativas consideradas
 
@@ -139,7 +139,7 @@ classe de bug que o líder quer pegar cedo, no commit que a introduziu, via
 ### A1. Rodar o job de CachyOS sobre `archlinux:latest`, com `pacman.conf` do CachyOS injetado manualmente
 
 **Prós:** nenhuma dependência de uma imagem de terceiro.
-**Contras:** é exatamente o "CachyOS renomeado" que a L-09 proíbe — não é
+**Contras:** é exatamente o "CachyOS renomeado" que a GW-09 proíbe — não é
 CachyOS de verdade, é Arch com repositórios trocados na hora, sem os
 compiladores, flags e otimizações que o CachyOS de fato distribui (o CachyOS
 compila pacotes com otimizações de CPU próprias, ex. `x86-64-v3`, e um
@@ -159,7 +159,7 @@ manutenção contínua; nenhuma auditabilidade de proveniência.
 **Prós:** é CachyOS de verdade — mesmos repositórios, mesmos compiladores,
 mesmas flags; mantida pelo próprio projeto CachyOS; já provada em produção
 no repositório irmão GlintFx.
-**Contras:** `:latest` é uma tag móvel (a mesma tensão que a L-09 já resolve
+**Contras:** `:latest` é uma tag móvel (a mesma tensão que a GW-09 já resolve
 para Fedora, mandando pino explícito só lá — Fedora é o alvo primário e por
 isso precisa detectar regressão da própria máquina do líder; CachyOS e Arch
 são alvos de portabilidade, e usar `:latest` neles é a mesma escolha já
@@ -175,7 +175,7 @@ feita pelo GlintFx, não uma nova).
   o CI de um projeto entende o do outro.
 - Item de parada previsto na ordem de serviço ("se não existir imagem
   oficial, pare e reporte") não se aplicou — a imagem existe e está provada.
-- Divergência GCC/Clang some cedo: com `-Werror` (L-19 portão 1), um
+- Divergência GCC/Clang some cedo: com `-Werror` (GW-19 portão 1), um
   aviso que só aparece num dos dois compiladores derruba o build no
   commit que o introduziu, não meses depois numa auditoria.
 - MSVC no Windows detecta código que assume POSIX silenciosamente (paths,
@@ -191,19 +191,19 @@ feita pelo GlintFx, não uma nova).
   hoje; mitigado por `fail-fast: false` na matriz, para que uma falha nessa
   entrada não esconda o resultado das outras quatro.
 - Container Linux não cobre teste de superfície gráfica real (janela,
-  input) — irrelevante hoje porque `present/` ainda não existe (L-06,
-  L-27), mas registrado para quando nascer: a prática já em uso no GlintFx
+  input) — irrelevante hoje porque `present/` ainda não existe (GW-06,
+  GW-27), mas registrado para quando nascer: a prática já em uso no GlintFx
   é compositor Wayland aninhado dentro do container, nunca a sessão viva.
 - **A matriz cresce de cinco para nove entradas**, confirmado pelo líder
   (ver seção de contagem acima). Custo de tempo e minutos de CI por push
   aumenta proporcionalmente, e nenhuma das nove entradas pode ser não
-  bloqueante (L-20) — custo aceito conscientemente em troca de cobertura
+  bloqueante (GW-20) — custo aceito conscientemente em troca de cobertura
   uniforme (cobertura desigual esconde bug, razão do líder).
 
 ## Riscos / pontos de atenção
 
 - **Nunca declarar CachyOS suportado a partir de um job verde de Arch.** A
-  L-09 é textual sobre isso; a matriz tem de manter as duas entradas
+  GW-09 é textual sobre isso; a matriz tem de manter as duas entradas
   fisicamente separadas, cada uma com seu próprio resultado de CI visível.
 - Acompanhar se o CachyOS um dia publicar uma tag versionada estável (em vez
   de só `:latest`); se sim, é decisão do líder migrar, não automática.
@@ -219,14 +219,14 @@ feita pelo GlintFx, não uma nova).
 Two-way door quanto ao mecanismo: trocar a imagem, o runner, o compilador ou
 a forma de hospedar CachyOS no CI não toca em nenhum código de jogo. One-way
 door reputacional se a matriz um dia disser "CachyOS suportado" sem esta
-entrada verde e isolada (L-09), ou se uma entrada de compilador virar
-não-bloqueante (L-20) — ambos os erros que as leis nomeiam explicitamente
+entrada verde e isolada (GW-09), ou se uma entrada de compilador virar
+não-bloqueante (GW-20) — ambos os erros que as leis nomeiam explicitamente
 para nunca acontecer.
 
 ## Cross-refs
 
 - [ADR-022](ADR-022-cmake-versao-minima-fixada.md) (a versão de CMake que cada uma destas imagens precisa entregar, e o gerador Ninja usado em cada compilação; o piso medido ali usa exatamente estas mesmas imagens)
 - [ADR-023](ADR-023-glintfx-submodulo-git-pinado.md) (o submódulo que cada job desta matriz precisa inicializar via `git submodule update --init --recursive` ou checkout recursivo, e o vínculo compartilhado cuja coerência de ABI depende de esta matriz nunca misturar compilador dentro de uma célula)
-- `../../../GODS_LAWS.md` L-09, L-19 (portão 1, `-Werror`, a razão de testar dois compiladores), L-20, L-33
+- `../../../GODS_LAWS.md` GW-09, GW-19 (portão 1, `-Werror`, a razão de testar dois compiladores), GW-20, GW-33
 - `../../../GlintFx/.github/workflows/ci.yml` (o precedente medido, linhas 60-150 e 218 em diante)
 - <https://github.com/CachyOS/docker>, <https://hub.docker.com/r/cachyos/cachyos> (a imagem oficial)

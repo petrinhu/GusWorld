@@ -1,11 +1,11 @@
 # Comidas, ingredientes de craft e a cozinha do apartamento Vance (GusWorld G1/F3-Alpha)
 
 **Status:** canônico. Extraído de `economia.md` §5.5 em 2026-08-25 (decisão do líder, verbatim:
-"opcao um e deixe o ponteiro no economia.md para o novo arquivo"). Razão da extração: L-33 de
+"opcao um e deixe o ponteiro no economia.md para o novo arquivo"). Razão da extração: GW-33 de
 `GODS_LAWS.md`: economia de crédito muda quando preço, fonte e sumidouro mudam; comida muda
 quando o catálogo e o craft mudam. As duas viviam juntas em `economia.md` só porque foi ali que a
 conversa começou, não porque compartilham razão de mudar.
-**Escopo:** canon pessoal do Gus Dragon (L-16): doze comidas, oito ingredientes de craft, a
+**Escopo:** canon pessoal do Gus Dragon (GW-16): doze comidas, oito ingredientes de craft, a
 cozinha do apartamento Vance como local de craft (caderneta de Gargi Vance, `in-world-docs.md`
 Documento 19), e as duas decisões novas de 25/08/2026 sobre como cozinhar se amarra a essa
 caderneta.
@@ -18,7 +18,7 @@ partir de duas destas comidas continua em
 
 ## §5.5. Lanches e ingredientes de craft (canon do Gus Dragon)
 
-> **Canon pessoal (L-16 de `GODS_LAWS.md`).** Os itens abaixo são as comidas e os ingredientes de
+> **Canon pessoal (GW-16 de `GODS_LAWS.md`).** Os itens abaixo são as comidas e os ingredientes de
 > craft favoritos reais do Gus Dragon, filho do líder e colaborador humano do projeto,
 > transformados em item de cura e em insumo de craft do jogo com aceite dele. Decisão original em
 > 2026-07-17 (chocolate, suco de uva; suco de limão e água com gás ficaram com efeito aberto);
@@ -36,7 +36,7 @@ pizza de atum e macarrão ao molho pesto, as duas últimas, fecharam agora, ver 
 A única nuance que resta é o item 6 (tirinhas de frango): a CATEGORIA do buff ("buff ofensivo
 temporário") está fechada, só a estatística exata (Ataque ou Força) não foi escolhida; por isso
 não carrega marcador de pendência, é uma escolha binária dentro de efeito já fechado, não um
-efeito em aberto (L-11: quem decide é o líder, não o agente).
+efeito em aberto (GW-11: quem decide é o líder, não o agente).
 
 | # | Item | Efeito | Craft / refino | Decisão |
 |---|---|---|---|---|
@@ -245,7 +245,7 @@ em §5.5.4, logo abaixo.
 **A metodologia da busca** (padrões de grep testados, arquivos varridos, e a constatação de que
 `DITADO-COMIDAS.md` não existe neste checkout do repositório) **foi movida para**
 [`docs/_processo/investigacao-bancada-cozinha.md`](../../_processo/investigacao-bancada-cozinha.md),
-**por ser processo de investigação, não spec de design (L-33).**
+**por ser processo de investigação, não spec de design (GW-33).**
 
 ### 5.5.3 Fôlego do corpo × energia de ação (LACUNA FECHADA, 2026-08-25)
 
@@ -362,7 +362,7 @@ lado da Gargi: cada página de receita nova é, para ela, o que cada bilhete já
 Repetir a ação de cozinhar, a cada prato novo do catálogo de doze, é repetir o contato com a
 letra da mãe, de novo e de novo, ao longo do jogo inteiro, não uma única vez num flashback.
 
-**O que este documento NÃO inventa (L-11: decisão é do líder, não do agente):**
+**O que este documento NÃO inventa (GW-11: decisão é do líder, não do agente):**
 
 - **Nenhum conteúdo de receita.** O Documento 19 mostra três receitas de exemplo (Pão-de-bit com
   canela, Café-de-neurônio, Caldo-de-folha-fractal) e nenhuma delas é uma das doze comidas deste
@@ -399,7 +399,7 @@ não inventa efeito mecânico de prato, mecânica não inventa conteúdo de pág
 
 ---
 
-**Última revisão:** 2026-08-25, extração de `economia.md` §5.5 (L-33: comida e economia de
+**Última revisão:** 2026-08-25, extração de `economia.md` §5.5 (GW-33: comida e economia de
 crédito mudam por razão diferente), mais as duas decisões novas da mesma rodada: cozinhar herda a
 trava de três retornos da caderneta (§5.5.5) e a caderneta entra na mecânica, cada receita nova
 sendo uma página escrita à mão pela mãe (§5.5.6). Nenhum número novo introduzido nesta revisão.

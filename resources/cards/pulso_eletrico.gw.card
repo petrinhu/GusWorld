@@ -2,7 +2,7 @@
 //
 // Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
 // Eletrico - Pulso: dano direto + Stun (controle curto). Extraida do projeto
-// anterior (L-01, GODS_LAWS.md) - conhecimento, nao codigo. Ver
+// anterior (GW-01, GODS_LAWS.md) - conhecimento, nao codigo. Ver
 // docs/design/mecanicas/cartas/pulso_eletrico.md para o "porque".
 
 #meta id pulso_eletrico

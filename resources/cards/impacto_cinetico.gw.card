@@ -2,7 +2,7 @@
 //
 // Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
 // Cinetico - Pulso: maior dano direto + Knockback (reposiciona). Extraida
-// do projeto anterior (L-01) - conhecimento, nao codigo. Ver
+// do projeto anterior (GW-01) - conhecimento, nao codigo. Ver
 // docs/design/mecanicas/cartas/impacto_cinetico.md para o "porque".
 
 #meta id impacto_cinetico

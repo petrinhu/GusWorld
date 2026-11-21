@@ -8,13 +8,13 @@ estes documentos dizem por que, com quem, e contra que alternativas.
 
 | Arquivo | O que é | Autor |
 |---|---|---|
-| `opcoes-arquitetura-gusworld.md` | As três arquiteturas comparadas; base da L-17 | Caetano (CTO) |
-| `opcoes-protecao-save.md` | Modelo de ameaça e opções de proteção; base da L-25 | Narciso (CISO) |
-| `parecer-licenca-catalogo.md` | Statline é código ou asset; base da L-08 e da L-25 | Cláudio (CLO) |
+| `opcoes-arquitetura-gusworld.md` | As três arquiteturas comparadas; base da GW-17 | Caetano (CTO) |
+| `opcoes-protecao-save.md` | Modelo de ameaça e opções de proteção; base da GW-25 | Narciso (CISO) |
+| `parecer-licenca-catalogo.md` | Statline é código ou asset; base da GW-08 e da GW-25 | Cláudio (CLO) |
 | `auditoria-privacidade.md` | Varredura de dado pessoal antes do primeiro commit. **Movido para `docs/_secret/` em 22/08/2026**: concentra 17 ocorrências de 12 termos protegidos e é, por natureza, o relatório do próprio vazamento. Só se lê com a chave do `git-crypt`. | security-engineer |
 | `mapa-corpus-gusworld.md` | Inventário do corpus documental (57 mil linhas) | technical-writer |
 | `candidatos-revogacao.md` | O que estava revogado, por grupo; base da limpeza | technical-writer |
-| `mineracao-roadmap-todo-antigos.md` | Rodada 1: cortes de escopo e lições; base da L-29 | technical-writer |
+| `mineracao-roadmap-todo-antigos.md` | Rodada 1: cortes de escopo e lições; base da GW-29 | technical-writer |
 | `mineracao-rodada-2.md` | Rodada 2: design, roster, topologia, save por local | technical-writer |
 | `dossie-pixellab.md` | A API do PixelLab, levantada exaustivamente | applied-ai-engineer |
 | `levantamento-registro-marca.md` | Registro de marca (categorias de Nice, custo, prazo, lacunas); material de apoio à decisão do titular sobre `G31`, não é parecer jurídico | technical-writer |
@@ -25,7 +25,7 @@ Foram trazidos para cá em 21/08/2026 para não se perderem.
 
 ## Auditorias de lore resgatadas do `gusworld_legacy` (25/08/2026)
 
-Trazidas inteiras pelo `technical-writer`, na varredura profunda de narrativa, com cabeçalho de aviso no topo de cada uma (o que já foi confirmado resolvido contra a árvore atual, o que não foi reconferido). Nenhuma foi declarada morta (L-14 do `GODS_LAWS.md`).
+Trazidas inteiras pelo `technical-writer`, na varredura profunda de narrativa, com cabeçalho de aviso no topo de cada uma (o que já foi confirmado resolvido contra a árvore atual, o que não foi reconferido). Nenhuma foi declarada morta (GW-14 do `GODS_LAWS.md`).
 
 - `AUDIT-T1-NOMES.md` — auditoria v1 (22/05/2026) de nomes de personagem cross-doc, 98 achados; sucedida pela v2 abaixo.
 - `AUDIT-T1-NOMES-V2.md` — auditoria v2 de nomes; os 4 críticos residuais já estão resolvidos na árvore atual (conferido 25/08/2026).
@@ -35,8 +35,8 @@ Trazidas inteiras pelo `technical-writer`, na varredura profunda de narrativa, c
 - `AUDIT-T3-CRONOLOGIA-V2.md` — auditoria v2 de cronologia; os 4 críticos residuais (idade do Bento no incidente Patch-Zero) estão resolvidos na árvore atual, exceto uma menção em `diary/entries-manuscrito-glossario.md:425` que pode ser informação legítima e distinta — achado a confirmar com o líder.
 - `AUDIT-T4-VOZ-V2.md` — auditoria de fadiga de prosa ("voz Stephenson") concentrada em `era-2-boom-tecnico.md`; 71 achados. Reconferido item a item em 05/09/2026, ver `RECONFERENCIA-D38-T4-T6.md` abaixo.
 - `AUDIT-T6-PALAVRAS-V2.md` — auditoria de palavras/pontuação proibida; o achado principal (992 travessões/em-dash em prosa canônica) está hoje reduzido a 130 ocorrências em todo `docs/narrative/` (~87% de queda, conferido 25/08/2026), mas não foi feita varredura arquivo a arquivo do que resta. Reconferido em 05/09/2026, ver `RECONFERENCIA-D38-T4-T6.md` abaixo.
-- `RECONFERENCIA-D38-T4-T6.md` — item `D38` do `TODO.md`: reconferência dos dois dossiês acima contra a árvore de 05/09/2026, com a contagem encontrados/reconferidos/vivos que a L-36 global exige. Recupera 17 dos 71 achados do T4 (antes todos "sem âncora") por medição de fórmula e por nome de personagem; confirma e agrava o achado maçônico do T6 (21 trechos em 15 arquivos com "esquadro e compasso" explícito, contra os 9 do relatório original); nenhum achado foi corrigido, só reconferido (L-33).
-- `RECONCILIACAO-D40-GENEALOGIAS.md` — item `D40` do `TODO.md`: quatro achados de genealogia com arquivo e linha (cadeia institucional Chevalier, sucessão matrilinear cronistas Atelaiá, linhagem de sangue da narradora, árvore Vanderbist de Jaci); nenhum foi corrigido nesta rodada, cada um fica para decisão do líder (L-33).
+- `RECONFERENCIA-D38-T4-T6.md` — item `D38` do `TODO.md`: reconferência dos dois dossiês acima contra a árvore de 05/09/2026, com a contagem encontrados/reconferidos/vivos que a L-36 global exige. Recupera 17 dos 71 achados do T4 (antes todos "sem âncora") por medição de fórmula e por nome de personagem; confirma e agrava o achado maçônico do T6 (21 trechos em 15 arquivos com "esquadro e compasso" explícito, contra os 9 do relatório original); nenhum achado foi corrigido, só reconferido (GW-33).
+- `RECONCILIACAO-D40-GENEALOGIAS.md` — item `D40` do `TODO.md`: quatro achados de genealogia com arquivo e linha (cadeia institucional Chevalier, sucessão matrilinear cronistas Atelaiá, linhagem de sangue da narradora, árvore Vanderbist de Jaci); nenhum foi corrigido nesta rodada, cada um fica para decisão do líder (GW-33).
 
 A auditoria de easter eggs (T5) tem lugar em `docs/_secret/`, cifrada — ver o `_INDEX.md` de lá.
 

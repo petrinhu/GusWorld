@@ -30,7 +30,7 @@ Antes de propor qualquer coisa nova, a varredura do que já existe encontrou o s
 > ⚠️ **Não verificado contra código.** Os itens 2 e 3 acima, com as citações de
 > `combat_records.hpp:80` e `battle_scene.cpp:658`, vêm da análise de projeto, não de
 > medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md,
-> L-01), e a fonte que a redação original citava não existe. A forma descrita
+> GW-01), e a fonte que a redação original citava não existe. A forma descrita
 > continua válida como descrição de intenção; revalidar quando houver implementação.
 
 Conclusão (segundo a premissa acima, não verificada): a peça cara (motor prever a
@@ -49,7 +49,7 @@ inteira.
 
 > ⚠️ **Não verificado contra código.** A citação de `scripted_brain.cpp:26` e o trecho
 > de código acima vêm da análise de projeto, não de medição em código executado. O
-> código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação
+> código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação
 > original citava não existe. A observação do playtest (o inimigo concentrou os
 > ataques em um só personagem) continua válida como fato observado pelo líder;
 > revalidar a causa no código quando houver implementação.

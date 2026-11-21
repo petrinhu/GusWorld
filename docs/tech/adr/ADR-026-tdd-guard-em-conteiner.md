@@ -124,7 +124,7 @@ Decididas pelo orquestrador, sem ratificação registrada ainda:
   de 144 s. Medidos na fatia 4 antes de virar fixo.
 - **Opção A:** `docker exec -i` em contêiner de vida longa, sem volume.
 - **Só GCC** no contêiner do guard. O Clang fica para o CI.
-- **Sem `-Werror` no laço** do guard. O `-Werror` continua no CI, portão 1 da L-19.
+- **Sem `-Werror` no laço** do guard. O `-Werror` continua no CI, portão 1 da GW-19.
 - **`test_globs` novos** no `tdd-guard.json`, para a fatia 7.
 - **Edição por Bash escapa do guard.** Fica como limite declarado. A regra é que
   produção e teste se editam só por Write e Edit, e as ordens de serviço dizem isso.
@@ -144,7 +144,7 @@ Decididas pelo orquestrador, sem ratificação registrada ainda:
 ## Consequências e limites
 
 - **Positivas:** o guard deixa de liberar produção por falha de comando. A suíte
-  roda fora da sessão viva do líder (L-35), e o aviso chega ao agente.
+  roda fora da sessão viva do líder (GW-35), e o aviso chega ao agente.
 - **Custos:** cada teste copia a árvore pelo tar. O contêiner frio devolve `126`
   até o aquecimento. A imagem é puxada de `fedora:latest` e fixada por digest; cada rebuild pede
   autorização nova, registrada no índice de decisões (L-51).
@@ -199,5 +199,5 @@ Limites que ficam:
 
 - [ADR-025](ADR-025-harness-teste-proprio-minimo.md) (harness de teste próprio)
 - [ADR-024](ADR-024-ci-cinco-plataformas-cachyos-container.md) (contêiner Fedora na matriz de CI)
-- `../../../GODS_LAWS.md` L-19 (cinco portões), L-35 (teste dinâmico só em contêiner), L-43 (critério pré-registrado), L-51 (instalação pede permissão)
+- `../../../GODS_LAWS.md` GW-19 (cinco portões), GW-35 (teste dinâmico só em contêiner), L-43 (critério pré-registrado), L-51 (instalação pede permissão)
 - `TODO.md`, itens `C3`, `C8` e `D1`

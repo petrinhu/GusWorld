@@ -284,7 +284,7 @@ com respeito: era uma hipótese legítima, e foi exatamente para isso que o estu
 > ⚠️ **Não verificado contra código.** Esta afirmação sobre `scripted_brain.cpp` e
 > `pick_weighted_enemy_target`/`mira_target_weight` vem da análise de projeto, não de
 > medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md,
-> L-01), e a fonte que a redação original citava não existe. Revalidar quando houver
+> GW-01), e a fonte que a redação original citava não existe. Revalidar quando houver
 > implementação.
 
 **Como o jogo se sente:** quase igual à C, com um detalhe elegante: mesmo sem peso

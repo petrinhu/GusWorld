@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # `urandom`
 
-**Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, extração do projeto anterior (L-01).
+**Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, extração do projeto anterior (GW-01).
 
 Dado completo em [`resources/cards/urandom.gw.card`](../../../../resources/cards/urandom.gw.card).
 
@@ -17,7 +17,7 @@ Família **Universal** · categoria **Ativa** · especial · mana **0** · alvo 
 
 Ao contrário das outras 19, o "programa" real desta carta não vive dentro do registro de efeitos — vive em **duas tabelas de peso**, fora do escopo deste registro: uma para a carta em versão **original**, outra para a versão **pirata**. Ao ser jogada, sorteia por peso uma faixa (fraco/médio/forte/especial, e para a pirata também um resultado de "backfire") e redireciona a execução para uma carta **já existente** no catálogo — nunca inventa um efeito novo. O `EffectSpec` desta carta existe só para que esse redirecionamento seja disparado por um gatilho de vocabulário compartilhado, em vez de um `if` amarrado ao id literal desta única carta (um achado de auditoria do próprio projeto anterior).
 
-Os pesos, extraídos de `cartas-numeros-proposta.md` §4 deste projeto (já existente, não duplicado aqui em detalhe): a versão **original** sorteia 21/34/21/8 (fraco/médio/forte/especial, de um total de 84); a versão **pirata** sorteia 7/2/1/0/5 de um total de 15 (fraco/médio/forte/jackpot/backfire) — um **backfire exato de 1/3** (33,3%), fechado pelo líder especificamente para bater essa fração, com crédito de autoria explícito ao Gus Dragon (colaborador humano, filho do líder, cross-ref L-07/L-16 de `GODS_LAWS.md`).
+Os pesos, extraídos de `cartas-numeros-proposta.md` §4 deste projeto (já existente, não duplicado aqui em detalhe): a versão **original** sorteia 21/34/21/8 (fraco/médio/forte/especial, de um total de 84); a versão **pirata** sorteia 7/2/1/0/5 de um total de 15 (fraco/médio/forte/jackpot/backfire) — um **backfire exato de 1/3** (33,3%), fechado pelo líder especificamente para bater essa fração, com crédito de autoria explícito ao Gus Dragon (colaborador humano, filho do líder, cross-ref GW-07/GW-16 de `GODS_LAWS.md`).
 
 ## Por que é assim
 

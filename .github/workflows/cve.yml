@@ -86,7 +86,7 @@
 # - fedora:latest is Fedora 45 (VERSION_ID=45 measured on 20/11/2026). ubuntu:latest is Ubuntu
 #   26.04 by the same tag rule. Both tags move: when the release changes, the gate measures it
 #   again. An unrecognized distro rejects (fail closed). Leader decision: keep :latest and
-#   measure (L-09 project).
+#   measure (GW-09 project).
 # - archlinux:latest is a rolling release. Measured on run 44793892079 (20/11/2026): os-release
 #   gives ID=arch and VERSION_ID=20261108.0.623074, and the grype distro name is "archlinux", not
 #   "arch". The matrix carries it as scan_distro. Trivy does not cover this entry.

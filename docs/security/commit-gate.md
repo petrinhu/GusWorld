@@ -16,7 +16,7 @@ de commit**. Uma mensagem de commit pode citar em texto puro, para sempre,
 num histórico de repositório público, algo que o próprio conteúdo cifrado
 existe para proteger.
 
-O `gitleaks` (GODS_LAWS.md L-19, quarto portão de qualidade) cobre padrão de
+O `gitleaks` (GODS_LAWS.md GW-19, quarto portão de qualidade) cobre padrão de
 credencial. Ele não cobre nome de personagem secreto, rótulo que expõe o
 mecanismo de um segredo de design do jogo, spoiler de enredo ou dado
 pessoal do líder — essa é a lacuna que este gate cobre.
@@ -32,7 +32,7 @@ pessoal do líder — essa é a lacuna que este gate cobre.
    `tools/security/commit_gate.py`, em Python puro. A lógica inteira
    (normalização, comparação, decisão de bloquear) mora no `.py`, para
    rodar idêntica nas cinco plataformas da matriz de CI (GODS_LAWS.md
-   L-09, L-20) sem depender de utilitário de shell específico de sistema.
+   GW-09, GW-20) sem depender de utilitário de shell específico de sistema.
 3. O script lê `tools/security/termos_proibidos.txt` — a lista de termos
    proibidos, dividida em **quatro classes**:
    - segredo de mecanismo de jogo (rótulo, não o elemento velado em si);
@@ -42,7 +42,7 @@ pessoal do líder — essa é a lacuna que este gate cobre.
      jogo, e outros projetos pessoais dele sem relação com o GusWorld;
    - caminho de máquina e identificador técnico.
 4. Esse arquivo de termos está **cifrado com git-crypt**, com a mesma
-   chave do resto do repositório (GODS_LAWS.md L-25). Em texto puro, a
+   chave do resto do repositório (GODS_LAWS.md GW-25). Em texto puro, a
    lista **seria** o vazamento — bastaria lê-la para saber, de uma vez,
    tudo que o projeto trata como segredo. Cifrar a lista, e não só os
    documentos que ela protege, é a decisão do líder que fecha essa
@@ -105,7 +105,7 @@ blob cifrado ilegível. O gate **não** interpreta isso como "lista vazia,
 nada a bloquear" — ele **recusa o commit** com uma mensagem que diz
 exatamente isso: não é prova de que a mensagem está limpa, é prova de que
 ninguém checou. Mesma lógica se o arquivo estiver ausente, vazio, ou
-corrompido de outra forma. Isto é a aplicação direta de GODS_LAWS.md L-19:
+corrompido de outra forma. Isto é a aplicação direta de GODS_LAWS.md GW-19:
 "gate que não consegue medir tem de FALHAR, nunca aprovar em silêncio".
 
 ## Como isto convive com o `core.hooksPath` compartilhado
@@ -154,18 +154,18 @@ reinstalar depois de editar o hook fonte — o instalador é idempotente).
   instalação normal, que traz Git Bash/MSYS2 junto). Se essa instalação
   não tiver `python3` nem `python` acessível de dentro desse shell, o
   script imprime um erro explícito pedindo para instalar Python
-  (GODS_LAWS.md L-28: nada se instala sem perguntar ao líder) — mas só
+  (GODS_LAWS.md GW-28: nada se instala sem perguntar ao líder) — mas só
   imprime esse erro se o próprio `sh` conseguir rodar; um Git instalado
   sem esse shell embutido (incomum, mas possível em instalação mínima)
   simplesmente não dispara o hook nenhum, sem aviso, porque nesse caso é
   o próprio git que não consegue executar o arquivo. **Isto ainda não foi
   testado em CI Windows real** — pendência a confirmar na matriz de CI
-  (GODS_LAWS.md L-20).
+  (GODS_LAWS.md GW-20).
 - **CI (todas as cinco plataformas):** o CI nunca tem a chave do
   `git-crypt`, e não roda hook de commit (não há commit sendo criado em
   pipeline de build/teste). O gate é, por desenho, uma proteção de
   **tempo de desenvolvimento local**, não um portão de CI. A proteção de
-  CI contra segredo em texto puro continua sendo o `gitleaks` (L-19,
+  CI contra segredo em texto puro continua sendo o `gitleaks` (GW-19,
   quarto portão) mais a própria cifra do `git-crypt` sobre o conteúdo.
 
 ## Como acrescentar um termo
@@ -183,7 +183,7 @@ reinstalar depois de editar o hook fonte — o instalador é idempotente).
 
 ### Nota para o líder: nome de batismo do filho
 
-`GODS_LAWS.md` L-16 proíbe versionar o nome civil real do filho do líder
+`GODS_LAWS.md` GW-16 proíbe versionar o nome civil real do filho do líder
 em qualquer lugar do repositório, inclusive como exemplo de teste. Quem
 implementou este gate não conhece esse nome e não o inseriu na lista.
 Se o líder quiser blindar esse nome contra mensagem de commit, o único
@@ -193,12 +193,12 @@ ele deve adicioná-lo lá.
 ## Pendência registrada para o líder/orquestrador
 
 O caminho `tools/security/termos_proibidos.txt` é um **quarto caminho de
-cifra**, além dos três que `GODS_LAWS.md` L-25 já registra
+cifra**, além dos três que `GODS_LAWS.md` GW-25 já registra
 (`docs/_secret/**`, `docs/narrative/deep/stinger/**`, `docs/book/**`).
 A ordem de serviço que originou este gate proibiu explicitamente tocar em
 `GODS_LAWS.md`, então essa lei **ainda não reflete** o quarto caminho —
 falta ao líder (ou a quem ele delegar) acrescentar a linha correspondente
-na tabela do L-25.
+na tabela do GW-25.
 
 ## Limitação conhecida, para não prometer o que o gate não entrega
 

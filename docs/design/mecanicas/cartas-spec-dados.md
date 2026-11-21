@@ -8,7 +8,7 @@
 - [`cartas-numeros-proposta.md`](cartas-numeros-proposta.md) — os NÚMEROS (capacidade de bateria por dificuldade, memória kR/MR, % de contaminação etc.). Este doc referencia constantes por nome, não recopia valores.
 - [`cartas-technomagik.md`](cartas-technomagik.md) — os 3 tiers canônicos (COMUM/ESPECIAL/SUPER), `ChargeCost`, `CardTier`/`CardCategory`, taxonomia da carta-catálogo.
 - [`deck-mao-sistema.md`](deck-mao-sistema.md) — deck ativo/morto, `CardInstance`, invariantes anti-exploit (§7), classe PROTEGIDA (inv.9).
-- Forma-alvo referenciada por este doc (descrição de intenção, código ainda não escrito — ver L-01 em `GODS_LAWS.md`):
+- Forma-alvo referenciada por este doc (descrição de intenção, código ainda não escrito — ver GW-01 em `GODS_LAWS.md`):
   `combat_records.hpp` (`struct Card`, catálogo),
   `deck_records.hpp` (`struct CardInstance`),
   `card_collection.hpp` (agregado deck ativo/morto),

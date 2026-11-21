@@ -142,7 +142,7 @@ consequência mensurável, em rodadas: 7 cravadas.
 
 > ⚠️ **Não verificado contra código.** A leitura de `combat.md` sobre "turno" vs "rodada"
 > vem de análise textual do documento, não de busca executada neste repositório (que
-> nasce do zero, GODS_LAWS.md L-01, sem o histórico de commits de `combat.md` para
+> nasce do zero, GODS_LAWS.md GW-01, sem o histórico de commits de `combat.md` para
 > conferir). Revalidar `begin_turn()` contra código quando houver implementação.
 
 **Segunda decisão do líder daí derivada:** já que junho falava de "turnos de ator", e

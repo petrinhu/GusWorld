@@ -1,6 +1,6 @@
 # Licença dos assets (arte, música, lore in-game)
 
-> Fronteira explícita entre **código** e **assets**. Regime decidido pelo líder supremo em 2026-08-21 (GODS_LAWS.md, L-08 e L-25).
+> Fronteira explícita entre **código** e **assets**. Regime decidido pelo líder supremo em 2026-08-21 (GODS_LAWS.md, GW-08 e GW-25).
 
 GusWorld tem partes sob regimes diferentes. Este arquivo define qual regime cobre qual asset.
 
@@ -49,7 +49,7 @@ Parte destes assets nasce de ferramentas de IA generativa de terceiro (PixelLab,
 
 ## Fronteira do catálogo (número e regra vs. texto de sabor)
 
-O catálogo de conteúdo (cartas, inimigos, receitas, statlines) é fatiado por natureza jurídica (GODS_LAWS.md, L-25):
+O catálogo de conteúdo (cartas, inimigos, receitas, statlines) é fatiado por natureza jurídica (GODS_LAWS.md, GW-25):
 
 - **Número e regra** (identificador, custo, poder, velocidade, efeito) são **código sob AGPL-3.0-or-later**, compilados dentro do executável. A Lei 9.610/98, artigo 8º, inciso II, exclui da proteção autoral as regras de jogo, então não há direito autoral ali para reservar.
 - **Texto de sabor, descrição e qualquer prosa de carta** são **asset**, sob o regime de direitos reservados acima, e ficam fora do executável, no pacote binário selado.

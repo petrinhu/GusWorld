@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Sanitizers job (L-19 portao 2). A separate build in build-sanitizers/, never in
+# Sanitizers job (GW-19 portao 2). A separate build in build-sanitizers/, never in
 # build/, so the platform build of build.yml stays free of instrumentation. The whole
 # suite runs under AddressSanitizer and UndefinedBehaviorSanitizer, and the gate is
 # proved by three deliberate-defect fixtures (tests/fixtures/sanitizers).

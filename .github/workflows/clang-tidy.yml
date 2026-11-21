@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Static analysis gate, clang-tidy half (L-19 portao 3; cppcheck is the other half, see
+# Static analysis gate, clang-tidy half (GW-19 portao 3; cppcheck is the other half, see
 # cppcheck.yml). A separate job in its own file, like cppcheck.yml and sanitizers.yml.
 # This file is orchestration only. The logic and the reason of each rule live in
 # tools/ci/clang_tidy/ (enumerate.sh, check_db.sh, scan.sh, judge.sh).
@@ -57,7 +57,7 @@ jobs:
       # for the database alone: nothing is compiled. The compile database comes from a
       # configure that turns GUSWORLD_PRESENT on. That option is only switched on so the
       # database describes the whole tree (11 files). present/ stays blocked for BUILD
-      # (L-06 and L-27 of the project laws). This exception was authorized by the project
+      # (GW-06 and GW-27 of the project laws). This exception was authorized by the project
       # lead on 12/10/2026 (explicit state, L-02 of the global laws). It applies ONLY to
       # this job and ONLY to this configure step. No other file, job or step inherits this
       # permission: whoever needs it again asks again.

@@ -146,7 +146,7 @@ jobs:
       - name: Version floor (CMake 4.1)
         run: bash tools/ci/cmake_floor.sh
 
-      # -DGUSWORLD_WERROR=ON is the gate for L-19 (portao 1): zero warnings.
+      # -DGUSWORLD_WERROR=ON is the gate for GW-19 (portao 1): zero warnings.
       - name: Configure
         run: |
           cmake -S . -B build \

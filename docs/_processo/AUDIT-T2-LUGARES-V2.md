@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > - **CR-T2v2-01** (`diary/entries-mapas-timeline.md`, "Câmara do Equinócio Acústico descoberta por Joaquim em -1" vs canon "-3"): **resolvido**. `diary/entries-mapas-timeline.md:329` e `:339` já dizem "descoberta Joaquim -3" / "descoberta -3", batendo com `PLACES.md:91`.
 > - **CR-T2v2-02** (quadrante do vilarejo Pelicano Branco: "oeste-sul" em `deep/settings/02-selve-sombria.md` vs "centro-sul" em `deep/settings/08-selve-profunda.md`, colidindo com "Pelicano Roxo a oeste"): **resolvido**. Os dois arquivos hoje dizem "Pelicano Branco centro-sul" e "Pelicano Roxo a oeste" de forma consistente (`02-selve-sombria.md:25`, `08-selve-profunda.md:11`).
 >
-> **Os itens MÉDIOS e LEVES abaixo não foram reconferidos individualmente.** Nada aqui foi declarado morto por este agente (L-14 do `GODS_LAWS.md`); a confirmação acima é factual (arquivo:linha).
+> **Os itens MÉDIOS e LEVES abaixo não foram reconferidos individualmente.** Nada aqui foi declarado morto por este agente (GW-14 do `GODS_LAWS.md`); a confirmação acima é factual (arquivo:linha).
 >
 > **O que segue é o texto original do legacy, sem edição de conteúdo.**
 

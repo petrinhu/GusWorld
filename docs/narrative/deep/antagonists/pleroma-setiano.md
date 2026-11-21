@@ -5,13 +5,13 @@
 > **Origem:** decisão do líder de 11/10/2026, verbatim: *"Acrescente ainda os inimigos: 'o pai invisível', barbelo, autógenes, harmozel, oriael, daveithai, eleleth, 'adao pura', set, semente, almas (todos do setianismo)."* E: *"o demiurgo se chama yaldabaoth. No jogo ele é cego, por isso é mini-boss."*
 > **Companheiro:** `docs/narrative/deep/antagonists/demiurgo.md` (Yaldabaoth). Este arquivo fica acima dele na escada e não o redefine.
 > **Camada de rigor:** N4 (documento).
-> **Leis que governam este texto:** L-13 (canon desatualizado bloqueia), L-14 (tradução em tier e qualquer ponta são do líder), L-16 (sem homenagem a pessoa real), L-29 (cortes), L-33 (justificativa de atomização abaixo), L-34, L-38 (frase-guarda na seção 5), L-02 (sem arte), L-76 (falas em intent, não prosa final), L-22.
+> **Leis que governam este texto:** GW-13 (canon desatualizado bloqueia), GW-14 (tradução em tier e qualquer ponta são do líder), GW-16 (sem homenagem a pessoa real), GW-29 (cortes), GW-33 (justificativa de atomização abaixo), L-34, GW-38 (frase-guarda na seção 5), GW-02 (sem arte), L-76 (falas em intent, não prosa final), L-22.
 
 ---
 
 ## Por que onze num arquivo só
 
-L-33 proíbe monolito, que é acoplamento sem fronteira, e não tamanho. Aqui a escada é o próprio conteúdo: cada ser se define pelo que está acima e abaixo dele, e separá-los em onze arquivos perderia a ordem de leitura, que é a hierarquia. Cada ser tem bloco com fronteira própria (doutrina, hostilidade, ordem, contato, observação), e nenhum bloco mistura razões de mudar vindas de leis diferentes. Quem quiser tirar um ser daqui pode fazê-lo sem tocar os outros. Set, Semente e Almas ficam fora da escada do Pleroma e têm seção própria, porque a ordem não se aplica a eles.
+GW-33 proíbe monolito, que é acoplamento sem fronteira, e não tamanho. Aqui a escada é o próprio conteúdo: cada ser se define pelo que está acima e abaixo dele, e separá-los em onze arquivos perderia a ordem de leitura, que é a hierarquia. Cada ser tem bloco com fronteira própria (doutrina, hostilidade, ordem, contato, observação), e nenhum bloco mistura razões de mudar vindas de leis diferentes. Quem quiser tirar um ser daqui pode fazê-lo sem tocar os outros. Set, Semente e Almas ficam fora da escada do Pleroma e têm seção própria, porque a ordem não se aplica a eles.
 
 ---
 
@@ -81,8 +81,8 @@ Ordem doutrinal, do mais alto ao mais baixo. A tradução dessa ordem em tier é
 - **Doutrina.** Filho da Mônada e de Barbelo, na tríade suprema com o Pai e a Mãe. Nas fontes consultadas aparece identificado com Cristo ("Christ the Autogenes", a conferir na edição). A relação com o Adão Pura está em disputa (§7.1).
 - **Hostil sem maldade.** Salva os seus. Não reconhece um estranho como um dos seus, e por isso não há acordo possível com quem não é dele. Não é cruel: é seletivo na salvação.
 - **Ordem.** N3, na tríade.
-- **Contato (proposta).** Presença sem combate. A presença é uma porta fechada para quem não é dos seus. Nenhuma passagem depende dele (L-38).
-- **O que o jogador observa.** O ambiente registra que a presença existe e não dá sinal nenhum de como ser reconhecido. Qualquer sinal desses seria pista de enigma (L-38).
+- **Contato (proposta).** Presença sem combate. A presença é uma porta fechada para quem não é dos seus. Nenhuma passagem depende dele (GW-38).
+- **O que o jogador observa.** O ambiente registra que a presença existe e não dá sinal nenhum de como ser reconhecido. Qualquer sinal desses seria pista de enigma (GW-38).
 - **Fala.** Nenhuma.
 
 ### N4. Adão Pura (Pigeradamas, Adão celeste)
@@ -91,7 +91,7 @@ Ordem doutrinal, do mais alto ao mais baixo. A tradução dessa ordem em tier é
 - **Hostil sem maldade.** É o modelo, e reage à semelhança com a cópia. Não vê a pessoa diante de si, só a forma. A party é uma cópia que atravessou, e a reação é a de um original diante de uma imitação, não a de um inimigo diante de outro.
 - **Ordem.** N4. Posição disputada: uma fonte o situa no éon de Harmozel, o que o poria abaixo de N5 (§7.2).
 - **Contato (proposta).** Presença sem combate.
-- **O que o jogador observa.** Uma figura de forma humana, imóvel, que fica no ponto onde a party passou. Descrição de comportamento, não de arte (L-02).
+- **O que o jogador observa.** Uma figura de forma humana, imóvel, que fica no ponto onde a party passou. Descrição de comportamento, não de arte (GW-02).
 - **Fala.** Nenhuma.
 
 ### N5. Harmozel (Armozel)
@@ -168,7 +168,7 @@ Ordem doutrinal, do mais alto ao mais baixo. A tradução dessa ordem em tier é
 
 ---
 
-## 5. Frase-guarda (L-38)
+## 5. Frase-guarda (GW-38)
 
 Nenhum ser desta escada aponta resposta de enigma, anuncia padrão ou mede a engrenagem de uma passagem. Oriael mede a party, nunca a engrenagem. Qualquer solução em que o jogo aponte a resposta contradiz a decisão do líder de 12/09/2026: *"o jogador resolve, nao é pra ser automatico"*.
 

@@ -2,7 +2,7 @@
 //
 // Barter (Menger): ForaDeCombate, Universal, mana 0. Posse-only (valor
 // marginal + escambo loot->Crédito); economia, sem programa de combate.
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/menger.md.
 
 #meta id menger

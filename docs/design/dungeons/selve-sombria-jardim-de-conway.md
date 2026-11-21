@@ -2,7 +2,7 @@
 
 > **Status:** CONCEITO (mesmo grão que as demais dungeons registradas em
 > `docs/design/mundo-topologia.md` §4: tema, gimmick e forma; layout sala a sala fica para
-> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, L-06/L-27). Nada aqui é
+> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, GW-06/GW-27). Nada aqui é
 > planta nem disposição fina de encontro.
 >
 > **Decisão do líder, 12/09/2026.** O mecanismo de resolução é o Jogo da Vida de Conway (autômato
@@ -21,8 +21,8 @@
 > "anel de cogumelos pulsando em padrão recorrente perfeito", reaproveitado aqui) e §7 (ganchos
 > mecânicos já registrados, que este documento acrescenta por referência mínima).
 > `docs/design/roster-analogos/13-von-neumann.md` (precursor histórico real do autômato celular,
-> medido e intocado, seção 10). L-26 (perspectiva 3/4 top-down fixa, grade quadrada, sem eixo de
-> altura). L-27 (nenhuma marcação de interface antes de o GlintFx traduzir marcação).
+> medido e intocado, seção 10). GW-26 (perspectiva 3/4 top-down fixa, grade quadrada, sem eixo de
+> altura). GW-27 (nenhuma marcação de interface antes de o GlintFx traduzir marcação).
 >
 > **A resposta do enigma (qual arranjo caminha e como plantá-lo) e a matemática real do autômato
 > são área cifrada:** `docs/_secret/dungeons/selve-sombria-jardim-de-conway-solucao.md`.
@@ -64,7 +64,7 @@ cheia. O conteúdo exato de cada lição é área cifrada (topo deste documento)
 ## 4. Grade e câmera
 
 O jardim inteiro vive no piso, em grade quadrada 2D, sem eixo de altura e sem câmera que gire ou
-mude de ângulo (L-26): cabe direto na perspectiva 3/4 top-down fixa do jogo, do mesmo jeito que a
+mude de ângulo (GW-26): cabe direto na perspectiva 3/4 top-down fixa do jogo, do mesmo jeito que a
 espiral de Ulam. A antecâmara usa grade 5x5; a câmara cheia usa grade 13x13, grande o bastante para
 a solução se desenrolar por uma distância real, pequena o bastante para caber inteira num único
 olhar de quem está diante dela.

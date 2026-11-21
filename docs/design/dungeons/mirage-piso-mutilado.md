@@ -2,7 +2,7 @@
 
 > **Status:** CONCEITO (mesmo grão que as demais dungeons registradas em
 > `docs/design/mundo-topologia.md` §4: tema, gimmick e forma; layout sala a sala fica para
-> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, L-06/L-27). Nada aqui é
+> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, GW-06/GW-27). Nada aqui é
 > planta nem disposição fina de encontro.
 >
 > **Decisão do líder, 12/09/2026.** Local escolhido por `AskUserQuestion` (Setor Mirage, Festival,
@@ -17,8 +17,8 @@
 > câmara). `docs/narrative/environments/05-setor-mirage.md` §2.4 (Catacumbas do Cult, nível -1) e §7
 > (ganchos mecânicos já registrados, que este documento acrescenta). `docs/narrative/characters/iara-lumen.md`
 > (Wound, Belief, memórias formativas). `CHARS.md`, `PLACES.md` (Iara "Lumen", Caleidoscópio,
-> Catacumbas Cult). L-26 (perspectiva 3/4 top-down fixa, sem eixo de altura: o salão vive todo num
-> único piso, nunca em geometria empilhada). L-27 (nenhuma marcação de interface antes de o GlintFx
+> Catacumbas Cult). GW-26 (perspectiva 3/4 top-down fixa, sem eixo de altura: o salão vive todo num
+> único piso, nunca em geometria empilhada). GW-27 (nenhuma marcação de interface antes de o GlintFx
 > traduzir marcação).
 >
 > **O resultado de tentar cobrir o piso, onde fica a saída real, e a matemática por trás dos dois

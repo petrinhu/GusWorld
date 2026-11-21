@@ -7,9 +7,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 > **Origem:** item `D18` do `TODO.md`. Formaliza, em blueprint estrutural (não em prosa final — este documento é arquitetura, a redação de banner/copy cabe a `narrative-writer` quando `present/` nascer), as **sete conquistas cross-ato** listadas na tabela "Distribuição expandida pelos atos" de `docs/narrative/comic-reliefs.md` e detalhadas em `docs/narrative/comic-reliefs/homenagens-diegeticas.md`: EE-4, EE-9, EE-10, EE-12, EE-16, EE-18, EE-20.
 >
-> **Ponteiros (L-30):** `docs/narrative/comic-reliefs/homenagens-diegeticas.md` (catálogo EE-N) e `docs/narrative/comic-reliefs.md` (tabela "Distribuição expandida pelos atos") · `docs/tech/convencao-formatos-gw.md` (definição de `.gw.achv` e das duas naturezas da conquista, linhas 89-114).
+> **Ponteiros (GW-30):** `docs/narrative/comic-reliefs/homenagens-diegeticas.md` (catálogo EE-N) e `docs/narrative/comic-reliefs.md` (tabela "Distribuição expandida pelos atos") · `docs/tech/convencao-formatos-gw.md` (definição de `.gw.achv` e das duas naturezas da conquista, linhas 89-114).
 >
-> **Fora de escopo aqui, por lei:** a apresentação do banner de conquista (texto na tela, animação, som) é `present/`, bloqueada pelo GlintFx e ainda inexistente (L-06, L-27). Este documento especifica só o **gatilho de domínio** — a condição verificável na camada de regra — e o **estado mínimo** que o save precisa registrar. Nomear, redigir dica final e desenhar a UI do banner são etapas posteriores, de outros agentes.
+> **Fora de escopo aqui, por lei:** a apresentação do banner de conquista (texto na tela, animação, som) é `present/`, bloqueada pelo GlintFx e ainda inexistente (GW-06, GW-27). Este documento especifica só o **gatilho de domínio** — a condição verificável na camada de regra — e o **estado mínimo** que o save precisa registrar. Nomear, redigir dica final e desenhar a UI do banner são etapas posteriores, de outros agentes.
 
 ---
 
@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 Antes de especificar cada conquista, três invariantes já fixados em `convencao-formatos-gw.md` valem para as sete sem exceção, e evitam repetir o mesmo raciocínio sete vezes:
 
-1. **Duas naturezas que não moram juntas.** O que a conquista É (nome, dica, condição de destravar, oculta ou não) vive no catálogo `.gw.achv`, igual para todo save. O que aconteceu com ela (destravou ou não) vive no envelope binário selado do jogador (L-25). Este documento especifica só o primeiro; o segundo já está decidido — ver item 2.
+1. **Duas naturezas que não moram juntas.** O que a conquista É (nome, dica, condição de destravar, oculta ou não) vive no catálogo `.gw.achv`, igual para todo save. O que aconteceu com ela (destravou ou não) vive no envelope binário selado do jogador (GW-25). Este documento especifica só o primeiro; o segundo já está decidido — ver item 2.
 
 2. **O save guarda um CONJUNTO de `id`, não um contador de destravamentos.** Por construção, um conjunto não distingue "destravei uma vez" de "destravei três vezes": um `id` está dentro ou fora dele. **Logo, nenhuma das sete conquistas é destravável mais de uma vez** — não por escolha de design de cada uma, mas porque a estrutura de dado que as guarda não tem onde registrar uma segunda vez. Isto NÃO impede que o **contador que alimenta a condição** (bestiário documentado, mortes na mesma cena, sequência sem acerto) continue vivo e mudando depois do destravamento — só a **conquista em si** não retravamento nem re-destrava.
 
@@ -25,7 +25,7 @@ Antes de especificar cada conquista, três invariantes já fixados em `convencao
 
 Essas três regras respondem, de uma vez, à pergunta "e se o gatilho ocorrer com o jogo em estado inválido (destravamento duplicado)?" para as sete conquistas. Onde uma conquista tiver um estado inválido **próprio**, além deste, ele está descrito na seção dela.
 
-**Nomenclatura (L-22):** identificador em inglês, `snake_case`, prefixo `achv_`. Nome de exibição e dica são prosa/asset (direitos reservados, L-08); o `id` e a condição de destravar são regra (código, AGPL). Os nomes de exibição abaixo são os que já existem em `comic-reliefs/homenagens-diegeticas.md` — citados, não inventados; onde não existem, isso está marcado.
+**Nomenclatura (GW-22):** identificador em inglês, `snake_case`, prefixo `achv_`. Nome de exibição e dica são prosa/asset (direitos reservados, GW-08); o `id` e a condição de destravar são regra (código, AGPL). Os nomes de exibição abaixo são os que já existem em `comic-reliefs/homenagens-diegeticas.md` — citados, não inventados; onde não existem, isso está marcado.
 
 ---
 
@@ -76,7 +76,7 @@ Três das sete (EE-4, EE-10, EE-16) não têm condição de destravar em lugar n
 - **(A) Contagem cumulativa de eventos**, contando toda vez que um inimigo é documentado (incluindo reencontros com o mesmo inimigo já catalogado antes — cada abate ou cada "1º combate" novo soma, mesmo repetindo espécie). Compatível com "144" mesmo havendo só ~22 espécies.
 - **(B) Contagem de entradas ÚNICAS completas do catálogo.** Neste caso 144 é **matematicamente impossível** com ~22 espécies catalogáveis, e o número do corpus está errado ou o catálogo precisa crescer.
 
-Não decido entre as duas (L-14). Pergunta formal em §3. O líder escolheu nenhuma das duas leituras: criou o conceito de **documentação multi-estágio por espécie** (avistamento, primeiro combate, análise completa, fraqueza descoberta, item de drop identificado), mantendo o limiar em **144**.
+Não decido entre as duas (GW-14). Pergunta formal em §3. O líder escolheu nenhuma das duas leituras: criou o conceito de **documentação multi-estágio por espécie** (avistamento, primeiro combate, análise completa, fraqueza descoberta, item de drop identificado), mantendo o limiar em **144**.
 
 **Aplicado em `docs/narrative/diary/entries-fichas-bestiary.md` §5 (item `D32` do `TODO.md`, 05/09/2026):** o corpo real de §5 cataloga **20 espécies** (5 cidade, 6 Selve, 6 cross-settings, 3 bosses), das quais **14** completam os 5 estágios, **1** (Voz Cromada Sterling, sem loot material) trava no estágio 4, e **5** (Patch-Zero, Anomalia Glitch, exceção de glitch já descrita, mais Sterling Locke Fase 1, Sterling Locke Fase 2 e o Mestre pró-Sterling Asmódico da cena do arco Bento, os três últimos por serem encontros não repetíveis, sem os "3-6 combates adicionais" que o estágio 3 exige) travam no estágio 2. Isso dá **84 eventos de documentação possíveis** com o catálogo medido até aqui (14×5 + 1×4 + 5×2), mesmo documentando tudo, abaixo do limiar de 144.
 
@@ -117,7 +117,7 @@ Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilib
 
 **Destravável mais de uma vez:** não (regra 2 do §0). Uma vez que QUALQUER cena atinja o limiar da dificuldade do save, a conquista destrava e não retrava; uma segunda cena atingir o limiar depois é no-op (regra 3 do §0).
 
-**Estado inválido:** coberto pela regra 3 do §0. Um caso próprio: se o mesmo evento de derrota for processado duas vezes por um bug de replay/rollback do save (L-25, fase 2, verificação por re-execução), o incremento tem que ser amarrado à identidade do evento de domínio, não à leitura do save, senão o contador infla sem uma derrota real correspondente. Isto não é peculiar desta conquista; é a mesma exigência de determinismo que `D13` já coloca para todo o resto do estado ("mesma semente mais mesma lista de comandos reproduz o estado final byte a byte").
+**Estado inválido:** coberto pela regra 3 do §0. Um caso próprio: se o mesmo evento de derrota for processado duas vezes por um bug de replay/rollback do save (GW-25, fase 2, verificação por re-execução), o incremento tem que ser amarrado à identidade do evento de domínio, não à leitura do save, senão o contador infla sem uma derrota real correspondente. Isto não é peculiar desta conquista; é a mesma exigência de determinismo que `D13` já coloca para todo o resto do estado ("mesma semente mais mesma lista de comandos reproduz o estado final byte a byte").
 
 ⚠️ **Dependência de infraestrutura, não decidida aqui:** "mesma cena" pressupõe uma identidade estável de cena/encontro que **sobreviva a tentativas repetidas**. O `combat.md` já emite `CombatStarted(encounter)`, o que prova que existe um conceito de `encounter` no domínio, mas não está documentado em lugar nenhum se esse identificador é **da instância de combate** (um novo `encounter` a cada tentativa, o que tornaria o limiar de derrotas na mesma cena incontável, porque cada tentativa teria um id diferente) ou **do local/configuração fixa** que gera a luta (o mesmo `encounter` toda vez que o jogador entra ali, o que é o que esta conquista precisa para funcionar). Busca em `docs/` não encontrou nenhum documento que resolva essa distinção (`scene_id`/`encounter_id`/`room_id`, zero ocorrências fora deste rascunho). Pergunta formal em §3.
 
@@ -139,9 +139,9 @@ Segue **sem efeito mecânico**, só o banner de piada, sem economia a desequilib
 
 **Isto TEM gatilho explícito** (diferente de EE-4/EE-10/EE-16), mas **nunca é enquadrado como "conquista oculta"** com nome e dica de banner, ao contrário de EE-9/EE-12/EE-20 — é descrito como sistema/evento narrativo. Por isso a especificação abaixo cobre o que É derivável, e a seção de perguntas cobre o que não é.
 
-**Gatilho de domínio:** a **dificuldade escolhida no save** (L-25, lida do envelope selado). O corte `C-06` (L-29) proíbe qualquer gatilho por desempenho do jogador (mesmo quando o ajuste é uma ajuda ao jogador travado, não uma facilitação disfarçada do lado do inimigo, é o mesmo tipo de gatilho que o corte veta), então a concessão nunca depende de quantas vezes Gus foi derrotado na cena. A escala por dificuldade da cura (tabela abaixo) e a concessão de uma vez por identidade de cena valem como descrito. **Não decidido aqui, e não inventado por presunção de simetria com §2.12:** o instante exato, dentro da cena, em que a dificuldade do save dispara a concessão (ex.: ao entrar na cena, ao primeiro combate dela, outro evento de domínio já nomeado); fica como pergunta nova ao líder.
+**Gatilho de domínio:** a **dificuldade escolhida no save** (GW-25, lida do envelope selado). O corte `C-06` (GW-29) proíbe qualquer gatilho por desempenho do jogador (mesmo quando o ajuste é uma ajuda ao jogador travado, não uma facilitação disfarçada do lado do inimigo, é o mesmo tipo de gatilho que o corte veta), então a concessão nunca depende de quantas vezes Gus foi derrotado na cena. A escala por dificuldade da cura (tabela abaixo) e a concessão de uma vez por identidade de cena valem como descrito. **Não decidido aqui, e não inventado por presunção de simetria com §2.12:** o instante exato, dentro da cena, em que a dificuldade do save dispara a concessão (ex.: ao entrar na cena, ao primeiro combate dela, outro evento de domínio já nomeado); fica como pergunta nova ao líder.
 
-**Estado mínimo a contar:** a dificuldade do save (já lida do envelope selado, L-25) e o conjunto de identidades de cena que já receberam o Token (para a idempotência por cena, ver "Estado inválido" abaixo). O mapa `id_cena → contagem de derrotas` de §2.12 é próprio daquela conquista e não alimenta esta linha.
+**Estado mínimo a contar:** a dificuldade do save (já lida do envelope selado, GW-25) e o conjunto de identidades de cena que já receberam o Token (para a idempotência por cena, ver "Estado inválido" abaixo). O mapa `id_cena → contagem de derrotas` de §2.12 é próprio daquela conquista e não alimenta esta linha.
 
 **Destravável mais de uma vez:** conforme a regra 2 do §0, a **conquista** (se vier a existir uma) não retrava. O **efeito narrativo** (a fala do NPC, o Token-de-Coragem) — que É explicitamente descrito no corpus — repete a cada cena distinta em que a dificuldade do save dispara a concessão: o Token é concedido **uma vez por identidade de cena**, não uma vez por campanha; magnitude e escopo no bloco de §3, pergunta 7.
 
@@ -183,7 +183,7 @@ O limiar de "3 erros seguidos" do corpus **não muda**. Mais grades tornam a con
 
 ## 3. Perguntas ao líder (lacunas e ambiguidades que este documento NÃO resolve)
 
-Nenhuma das seis abaixo foi decidida por mim (L-14). Cada uma referencia a seção correspondente.
+Nenhuma das seis abaixo foi decidida por mim (GW-14). Cada uma referencia a seção correspondente.
 
 1. **EE-4 (§2.4) — existe conquista aqui, ou é só o item?** O corpus só descreve o Cogumelo-Recuperador como item de revive. Se o líder quiser uma conquista ligada a ele, preciso saber qual condição: obter o item pela primeira vez, ou usá-lo (reviver) pela primeira vez — as duas são leituras plausíveis e nenhuma está escrita.
 2. **EE-10 (§2.10) — existe conquista aqui, ou é só a placa?** Nenhuma condição de destravar está descrita. Se o líder quiser uma, preciso de qual evento a dispara (ler a placa? entrar no hospital pela primeira vez? algo ligado à piada da doação?).
@@ -201,4 +201,4 @@ Nenhuma das seis abaixo foi decidida por mim (L-14). Cada uma referencia a seç�
 - `docs/narrative/diary/entries-fichas-bestiary.md` — sistema de Bestiário citado no gatilho de EE-9 e na tensão numérica da pergunta 3.
 - `docs/design/mecanicas/combat.md` §16 — vocabulário de evento (`CombatBus`, `CombatStarted(encounter)`, `ActorDefeated`, `CombatEnded`) usado para derivar os gatilhos de EE-12 e EE-18.
 - `docs/design/mecanicas/modos-morte.md` — dispatcher de derrota de Gus, ponto de origem provável do evento que alimenta EE-12/EE-18.
-- `GODS_LAWS.md` L-04, L-14, L-17, L-18, L-22, L-25, L-33 — atomicidade, não-decisão de agente, regra como comando/evento, envelope selado, nomenclatura, proteção de dado, revisão em cinco perguntas.
+- `GODS_LAWS.md` GW-04, GW-14, GW-17, GW-18, GW-22, GW-25, GW-33 — atomicidade, não-decisão de agente, regra como comando/evento, envelope selado, nomenclatura, proteção de dado, revisão em cinco perguntas.

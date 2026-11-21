@@ -73,7 +73,7 @@
 
    > ⚠️ **Não verificado contra código.** Esta afirmação sobre `scripted_brain.cpp` e
    > sobre o call site de produção vem da análise de projeto, não de medição em código
-   > executado. O código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte
+   > executado. O código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte
    > que a redação original citava não existe. Revalidar quando houver implementação.
 
 ---
@@ -89,7 +89,7 @@ Re-rodada da bateria de confirmação da Fase C com o sistema em volta consertad
 
 > ⚠️ **Não verificado contra código.** As expressões "motor real" e "FSM real" acima
 > descrevem a premissa da análise de projeto, não medição em código executado. O
-> código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação
+> código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação
 > original citava não existe. Os parâmetros de grade seguem válidos como
 > especificação de protocolo; revalidar a execução quando houver implementação.
 
@@ -370,7 +370,7 @@ sobreviveu a essa decisão, na ordem que o protocolo §9.1 já fixa.
 > `mira_target_weight`/`pick_weighted_enemy_target`, `scripted_brain.cpp` e sobre
 > Provocar/soft enrage estarem "implementados no motor real" vêm da análise de
 > projeto, não de medição em código executado. O código deste projeto nasce do zero
-> (GODS_LAWS.md, L-01), e a fonte que a redação original citava não existe. Revalidar
+> (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não existe. Revalidar
 > quando houver implementação.
 
 ## 11. Comparação com a Fase C

@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# The inner verdict, EXECUTED inside the container (L-35) on a tiny CMake project.
+# The inner verdict, EXECUTED inside the container (GW-35) on a tiny CMake project.
 # Each case warms a work dir (cold run, then configure with -G Ninja) and then runs
 # the case. Every verdict is read from the output and checked by value.
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"

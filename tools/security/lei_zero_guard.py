@@ -22,7 +22,7 @@ licenciado (a fonte Pixel Operator Mono) tambem nao entra -- e asset, nao
 link.
 
 ⚠️ O GERADOR e ferramenta (nao linka), MAS o que ele produz EMBARCA, e o
-output obedece as leis do produto (L-18: nada em texto; L-25: envelope
+output obedece as leis do produto (GW-18: nada em texto; GW-25: envelope
 selado). "Nao linka" nunca foi o mesmo que "nao afeta o que o jogador
 recebe".
 
@@ -87,7 +87,7 @@ ISENTOS = (
 MSG_COMO_APAGAR = """
 NAO reescreva a mencao. NAO troque por sinonimo. NAO deixe nota, aviso,
 comentario, marcador nem bloco explicando que algo foi removido. O texto que
-ficar tem de ler-se como se aquilo nunca tivesse existido (L-24).
+ficar tem de ler-se como se aquilo nunca tivesse existido (GW-24).
 
 Como apagar, conforme o caso:
 

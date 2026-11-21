@@ -64,4 +64,4 @@ Para cada item: a exigência que o mockup faz, e a alternativa equivalente que o
 
 ### 2.9 SVG vetorial embutido inline
 **Exigência:** ícones vetoriais pequenos (triângulo de play, engrenagem, seta de voltar, moldura hexagonal, colchete de canto), nítidos em mais de um tamanho de exibição.
-**Alternativa equivalente:** um sprite raster pré-renderizado no tamanho final necessário para cada uso; coerente, inclusive, com o registro pixel-art 2D do jogo (`GODS_LAWS.md`, L-02), que já não pede nitidez vetorial em tempo real.
+**Alternativa equivalente:** um sprite raster pré-renderizado no tamanho final necessário para cada uso; coerente, inclusive, com o registro pixel-art 2D do jogo (`GODS_LAWS.md`, GW-02), que já não pede nitidez vetorial em tempo real.

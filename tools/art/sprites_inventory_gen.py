@@ -8,7 +8,7 @@ reforma mediu oito divergencias entre o que o documento dizia e o que
 resources/sprites/ de fato tinha. O documento derivou porque nada o mantinha
 honesto -- este script tira essa carga de quem escreve a mao.
 
-O que este script cobre, e SO isto (GODS_LAWS.md L-04/L-33 -- atomo com fronteira
+O que este script cobre, e SO isto (GODS_LAWS.md GW-04/GW-33 -- atomo com fronteira
 propria, nao dono de tudo): por pasta de nivel 1 de resources/sprites/,
 contagem de arquivos no topo, presenca e tamanho de walk/ e de anims/, e as
 dimensoes distintas de imagem encontradas recursivamente. Julgamento sobre o
@@ -16,7 +16,7 @@ que cada pasta significa (quem e personagem, quem e pasta especial, o que
 esta pendente de geracao) NAO e mecanico -- continua escrito a mao na PARTE DE
 JULGAMENTO do documento, e este script nunca toca nela.
 
-Fronteira entre a parte gerada e a parte escrita a mao (GODS_LAWS.md L-05
+Fronteira entre a parte gerada e a parte escrita a mao (GODS_LAWS.md GW-05
 global -- marcador explicito, nunca heuristica): o par de comentarios HTML
 MARCADOR_INICIO/MARCADOR_FIM abaixo. So o texto ENTRE eles e substituido. Na
 primeira execucao, sem o par ainda no arquivo, o bloco novo entra logo antes
@@ -318,7 +318,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     if Image is None:
-        print("ERRO: Pillow (PIL) nao esta disponivel neste Python -- nao executado, falta a biblioteca (L-28/L-51: nao instalar sem autorizacao).", file=sys.stderr)
+        print("ERRO: Pillow (PIL) nao esta disponivel neste Python -- nao executado, falta a biblioteca (GW-28/L-51: nao instalar sem autorizacao).", file=sys.stderr)
         return 2
 
     try:

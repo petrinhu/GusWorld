@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Sourced by in_container.sh. Defines xdg_runtime_ok DIR: the directory must exist,
-# be mode 700 and belong to the current user (L-35: the test process gets its own
+# be mode 700 and belong to the current user (GW-35: the test process gets its own
 # runtime dir, not the session's). Runs nothing on its own.
 
 xdg_runtime_ok() {

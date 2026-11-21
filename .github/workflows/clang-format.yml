@@ -5,11 +5,11 @@
 # separate job in its own file, like cppcheck.yml and clang-tidy.yml.
 #
 # The reformatting patch is produced HERE, in CI, because nothing runs on the lead's
-# machine (L-35 of the project). The patch is uploaded as the artifact clang-format-patch
+# machine (GW-35 of the project). The patch is uploaded as the artifact clang-format-patch
 # and applied in a slice of its own. The gate below still fails on a non-conforming tree:
 # the patch step does not change the verdict.
 #
-# Declared limit, accepted under the project's L-09 (latest image, measure it): clang-tools-extra
+# Declared limit, accepted under the project's GW-09 (latest image, measure it): clang-tools-extra
 # comes unpinned from the dnf of fedora:latest, and judge.sh has a floor (18) and no ceiling.
 # A newer clang-format can change the LLVM style output and turn the tree red with no file
 # changed. Measured so far: clang-format 23.1.5 (Fedora 23.1.5-2.fc45), run 44799179231.

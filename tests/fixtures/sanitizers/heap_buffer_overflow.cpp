@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // DELIBERATE DEFECT. This file exists only to prove the AddressSanitizer gate
-// (sanitizers job, L-19 portao 2). Do not fix the out-of-bounds write below:
+// (sanitizers job, GW-19 portao 2). Do not fix the out-of-bounds write below:
 // without it the proof has nothing to catch.
 #include <cstddef>
 #include <cstdio>

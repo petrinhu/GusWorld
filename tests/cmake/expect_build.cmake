@@ -2,7 +2,7 @@
 # given, then checks that the build passes or fails as expected and prints the
 # text it must print.
 #
-# Used by tests/CMakeLists.txt to prove the warnings-as-errors gate (L-19 portao 1):
+# Used by tests/CMakeLists.txt to prove the warnings-as-errors gate (GW-19 portao 1):
 # the red case must fail because a warning became an error, and the control must
 # pass with the same source, so a failure cannot be blamed on the fixture alone.
 #

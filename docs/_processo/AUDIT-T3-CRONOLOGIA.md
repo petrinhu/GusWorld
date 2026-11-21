@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 > **RESGATADO em 25/08/2026 do `gusworld_legacy` pelo `technical-writer`, na varredura profunda de narrativa.** Dossiê **v1** (`F5-BK.AUDIT.FULL T3`, 22/05/2026) de auditoria cross-doc de cronologia, 31 issues (16 críticos). Sucedido pelo `AUDIT-T3-CRONOLOGIA-V2.md` (também resgatado), que registra ~80% de eficácia da cascata v1 e lista 4 críticos residuais. Ver o cabeçalho de `AUDIT-T3-CRONOLOGIA-V2.md` para a conferência factual desses 4 contra a árvore atual.
 >
-> **Por que este documento v1 não foi descartado:** L-14 do `GODS_LAWS.md` — nenhum agente declara documento morto. Fica como registro do processo, não como pendência ativa.
+> **Por que este documento v1 não foi descartado:** GW-14 do `GODS_LAWS.md` — nenhum agente declara documento morto. Fica como registro do processo, não como pendência ativa.
 >
 > **O que segue é o texto original do legacy, sem edição de conteúdo.**
 

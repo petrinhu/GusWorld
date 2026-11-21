@@ -4,7 +4,7 @@
 // chave de tradução em uso resolve literalmente para "Tesla" — ver o .md
 // irmão, secão Pontas soltas. Ativa, Eletrico. Descarga em cadeia: o
 // dano-base atinge o alvo primário e SALTA para os próximos inimigos vivos,
-// retendo uma fração a cada salto. Extraida do projeto anterior (L-01).
+// retendo uma fração a cada salto. Extraida do projeto anterior (GW-01).
 // Ver docs/design/mecanicas/cartas/tesla.md.
 
 #meta id tesla

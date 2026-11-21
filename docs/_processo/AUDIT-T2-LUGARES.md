@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 > **RESGATADO em 25/08/2026 do `gusworld_legacy` pelo `technical-writer`, na varredura profunda de narrativa.** Dossiê **v1** (`F5-BK.AUDIT.FULL T2`, 22/05/2026) de auditoria cross-doc de lugares. Sucedido pelo `AUDIT-T2-LUGARES-V2.md` (também resgatado), que registra "eficácia cascata T2 v1: 93% confirmada". Os 2 críticos residuais que sobreviveram até a v2 foram conferidos por este agente em 25/08/2026 contra a árvore atual e **estão resolvidos** — ver o cabeçalho de `AUDIT-T2-LUGARES-V2.md` para o detalhe factual.
 >
-> **Por que este documento v1 não foi descartado:** L-14 do `GODS_LAWS.md` — nenhum agente declara documento morto. Fica como registro do processo, não como pendência ativa.
+> **Por que este documento v1 não foi descartado:** GW-14 do `GODS_LAWS.md` — nenhum agente declara documento morto. Fica como registro do processo, não como pendência ativa.
 >
 > **O que segue é o texto original do legacy, sem edição de conteúdo.**
 

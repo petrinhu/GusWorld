@@ -2,12 +2,12 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Mutation proof of the TDD guard (ADR-026, C8 fatia 6, L-19 N2, L-27). Host side: it
+# Mutation proof of the TDD guard (ADR-026, C8 fatia 6, GW-19 N2, L-27). Host side: it
 # only prepares trees and launches one fresh container per case. Each tree comes from the
 # COMMITTED HEAD (git archive), gets at most one mutant (mutants.py), and is checked by
 # hash: the blob of HEAD must differ from the mutated file, and the tar that enters the
 # container must carry the mutated bytes. The live tree is never edited. The tests run
-# in the container (L-35), without volume and without network, under the pids limit below
+# in the container (GW-35), without volume and without network, under the pids limit below
 # and 2 GiB.
 # usage: mutate_guard.sh baseline M1 [M2 ... M8] [V1 ... V5]
 # M8 undoes the two halves of the R2 fix (mutants.py, MULTI). V1 to V5 are the virada mutants

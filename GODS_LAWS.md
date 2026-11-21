@@ -1,8 +1,11 @@
 > **LEI DAS LEIS, ANTERIOR ATÉ À LEI ZERO: só o líder pode quebrar uma lei deste arquivo** — agente nenhum quebra, flexibiliza, reinterpreta ou "adapta ao caso" por conta própria — **e nem a ordem direta dele dispensa a confirmação**: antes de executar, nomeie a lei que está sendo quebrada, cite o texto dela, diga o que ela protege e o que se perde ao quebrá-la, e pergunte por `AskUserQuestion` se é isso mesmo que ele quer; **quando o pedido for ALTERAR ou REVOGAR uma lei, argumente CONTRA primeiro, sempre e sem exceção**, com razões concretas, o problema que a lei existe para impedir, os trade-offs da mudança e o que fica desprotegido depois dela, e só então leve a escolha por `AskUserQuestion` entre **confirmar** a alteração e **cancelá-la**; pressa, obviedade aparente, "ele já mandou uma vez" e aprovação dada em outro contexto **nunca** substituem essa confirmação, e silêncio jamais vale como aval. (Ordem do líder, 22/08/2026.)
 
-> **LEI ZERO, ACIMA DE TODAS: O JOGO ASSENTA EM GLINTFX, E QUEM É DONO DA JANELA E DO LAÇO É ELE.** O GusWorld liga em exatamente duas coisas: o **GlintFx** e o **sistema operacional**. Ordem do líder em 21/08/2026, verbatim: *"aceita apenas link com framework GlintFx em ../Glintfx e [github]/petrinhu/GlintFx e com o SO. [...] Você NUNCA cria workarounds nem passa por cima da camada de GlintFx. Se ainda não existir a funcao em GlintFx, registre a necessidade no bus e espere parado a resposta dele."* Qualquer análise, atalho ou desenho que contorne o GlintFx está **errado por construção**. Exceção a esta lei só existe se o líder a conceder nominalmente, caso a caso. — **REFORMA DE 28/08/2026, decisão do líder após argumentação contra (lei das leis). Verbatim:** *"o que entra no produto entregue é dependência e está proibido; o que só ajuda a construir e nunca é ligado ao binário, não é. Logo, se você precisar de python como apoio, além de bash script, pode."* **A palavra que sempre esteve na lei é `liga`**, e a reforma diz o que ela significa: **dependência é o que embarca no que o jogador recebe.** Ferramenta que constrói, verifica ou gera, e **nunca** é ligada ao binário, **não é dependência** — CMake, Ninja, `ctest`, `clang-tidy`, `cppcheck`, `gitleaks`, `git`, `reuse`, **Python** e script de shell entram por aqui. ⚠️ **A régua operacional, que o líder mandou entrar junto para a linha não ficar fofa: _se o arquivo sumisse da máquina do JOGADOR, o jogo deixaria de rodar?_** **Sim** → é dependência, e está proibida. **Não** → é ferramenta, e é permitida. A pergunta é sobre a máquina **dele**, não sobre a nossa. ⚠️ **O caso do GERADOR, que a reforma resolve nominalmente porque era o furo:** um gerador (de catálogo `.gw.*`, de código, de tabela) **não linka**, logo é **ferramenta** — mas **o que ele produz EMBARCA**, e por isso o **output obedece integralmente às leis do produto** (L-18: nada em formato de texto; L-25: envelope selado). *"Não linka"* nunca foi o mesmo que *"não afeta o que o jogador recebe"*. ⚠️ **O que a reforma NÃO faz, e foi dito ao líder antes de ele decidir:** ela não elimina a superfície de **supply chain**. Pacote comprometido no caminho de build injeta no artefato sem jamais aparecer como dependência do binário. Ferramenta de build é zona **permitida**, não zona **neutra** — e quanto menos ferramenta, menor a superfície. **Motivo de fundo, medido em 28/08/2026:** sob a leitura estrita anterior, o próprio projeto era ilegal — quatro arquivos Python rastreados, incluindo o guard **da própria LEI ZERO**, mais o CMake e o `ctest` que o `C1` vai usar. Lei que o próprio build viola é lei que todos aprendem a ignorar, e isso corrói as outras. — **A divisão de responsabilidade é a que o próprio GlintFx declara**, ordem do líder em 21/08/2026, verbatim: *"do modo que glintfx disse"*, apontando para a **L-02** do `GODS_LAWS.md` dele, que diz: *"framework 2D completo (janela, loop, render2d, input, gamepad, áudio, fonte, asset, math2d); **o consumidor escreve só a lógica dele**"*. Portanto: **janela, laço principal, entrada, áudio e desenho são do GlintFx. O GusWorld escreve a lógica do jogo, e mais nada.** O jogo **não** cria janela, **não** possui contexto gráfico e **não** roda laço próprio de quadro. — **Registro de decisão revogada, para ninguém ressuscitar:** o `ADR-010` do projeto anterior adotava o modelo inverso (o jogo dono da janela, o framework embutido como camada de interface). Aquele modelo só fazia sentido porque existia uma biblioteca externa criando a janela, e ela foi removida do ecossistema em 20/08/2026. O ADR-010 foi **apagado** do repositório em 21/08/2026 por ordem do líder, sob a L-24.
+> **LEI ZERO, ACIMA DE TODAS: O JOGO ASSENTA EM GLINTFX, E QUEM É DONO DA JANELA E DO LAÇO É ELE.** O GusWorld liga em exatamente duas coisas: o **GlintFx** e o **sistema operacional**. Ordem do líder em 21/08/2026, verbatim: *"aceita apenas link com framework GlintFx em ../Glintfx e [github]/petrinhu/GlintFx e com o SO. [...] Você NUNCA cria workarounds nem passa por cima da camada de GlintFx. Se ainda não existir a funcao em GlintFx, registre a necessidade no bus e espere parado a resposta dele."* Qualquer análise, atalho ou desenho que contorne o GlintFx está **errado por construção**. Exceção a esta lei só existe se o líder a conceder nominalmente, caso a caso. — **REFORMA DE 28/08/2026, decisão do líder após argumentação contra (lei das leis). Verbatim:** *"o que entra no produto entregue é dependência e está proibido; o que só ajuda a construir e nunca é ligado ao binário, não é. Logo, se você precisar de python como apoio, além de bash script, pode."* **A palavra que sempre esteve na lei é `liga`**, e a reforma diz o que ela significa: **dependência é o que embarca no que o jogador recebe.** Ferramenta que constrói, verifica ou gera, e **nunca** é ligada ao binário, **não é dependência** — CMake, Ninja, `ctest`, `clang-tidy`, `cppcheck`, `gitleaks`, `git`, `reuse`, **Python** e script de shell entram por aqui. ⚠️ **A régua operacional, que o líder mandou entrar junto para a linha não ficar fofa: _se o arquivo sumisse da máquina do JOGADOR, o jogo deixaria de rodar?_** **Sim** → é dependência, e está proibida. **Não** → é ferramenta, e é permitida. A pergunta é sobre a máquina **dele**, não sobre a nossa. ⚠️ **O caso do GERADOR, que a reforma resolve nominalmente porque era o furo:** um gerador (de catálogo `.gw.*`, de código, de tabela) **não linka**, logo é **ferramenta** — mas **o que ele produz EMBARCA**, e por isso o **output obedece integralmente às leis do produto** (GW-18: nada em formato de texto; GW-25: envelope selado). *"Não linka"* nunca foi o mesmo que *"não afeta o que o jogador recebe"*. ⚠️ **O que a reforma NÃO faz, e foi dito ao líder antes de ele decidir:** ela não elimina a superfície de **supply chain**. Pacote comprometido no caminho de build injeta no artefato sem jamais aparecer como dependência do binário. Ferramenta de build é zona **permitida**, não zona **neutra** — e quanto menos ferramenta, menor a superfície. **Motivo de fundo, medido em 28/08/2026:** sob a leitura estrita anterior, o próprio projeto era ilegal — quatro arquivos Python rastreados, incluindo o guard **da própria LEI ZERO**, mais o CMake e o `ctest` que o `C1` vai usar. Lei que o próprio build viola é lei que todos aprendem a ignorar, e isso corrói as outras. — **A divisão de responsabilidade é a que o próprio GlintFx declara**, ordem do líder em 21/08/2026, verbatim: *"do modo que glintfx disse"*, apontando para a **L-02** do `GODS_LAWS.md` dele, que diz: *"framework 2D completo (janela, loop, render2d, input, gamepad, áudio, fonte, asset, math2d); **o consumidor escreve só a lógica dele**"*. Portanto: **janela, laço principal, entrada, áudio e desenho são do GlintFx. O GusWorld escreve a lógica do jogo, e mais nada.** O jogo **não** cria janela, **não** possui contexto gráfico e **não** roda laço próprio de quadro. — **Registro de decisão revogada, para ninguém ressuscitar:** o `ADR-010` do projeto anterior adotava o modelo inverso (o jogo dono da janela, o framework embutido como camada de interface). Aquele modelo só fazia sentido porque existia uma biblioteca externa criando a janela, e ela foi removida do ecossistema em 20/08/2026. O ADR-010 foi **apagado** do repositório em 21/08/2026 por ordem do líder, sob a GW-24.
 
 # GODS_LAWS.md
+
+Até 20/11/2026 estas leis se chamavam L-NN; os commits anteriores usam o nome antigo.
+Citações a leis do GODS_LAWS global continuam L-NN.
 
 > Ordens expressas do líder (petrus). Este arquivo **não é declaração, é execução**: cada lei tem um **gatilho**, e o gatilho é conferido **no momento da ação**, não no fim.
 
@@ -19,122 +22,122 @@
 
 | Lei | Gatilho: dispara quando você vai... | Resumo |
 |---|---|---|
-| [L-01](#l-01) | procurar código anterior, "como era antes", ou base para reaproveitar | O código é do zero; o GusWorld anterior não é base |
-| [L-02](#l-02) | tocar arte, câmera, sprite, modelo ou pipeline visual | Jogo é 2D pixel-art; o pipeline 3D é do líder e agente não toca |
-| [L-03](#l-03) | criar build, escolher padrão de linguagem | C++23 |
-| [L-04](#l-04) | escrever função, arquivo, classe, módulo, item ou carta | Proibido monolito; cada elemento do jogo é átomo com POCO próprio |
-| [L-05](#l-05) | precisar de algo que o GlintFx ainda não tem, ou de ferramenta de apoio | Proibido dublê: ou liga no GlintFx, ou não existe. ⚠️ **Ferramenta que só constrói e nunca embarca NÃO é dependência** (LEI ZERO, reforma de 28/08/2026) |
-| [L-06](#l-06) | decidir o que construir primeiro | Núcleo puro agora; a camada que desenha só nasce com o GlintFx |
-| [L-07](#l-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
-| [L-08](#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
-| [L-09](#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos, todos em `:latest`; Fedora primário; CachyOS é próprio, não Arch |
-| [L-10](#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level audita e planeja; operacional cria e implementa; modelo pelo /modelos_sessao |
-| [L-11](#l-11) | fazer **qualquer** pergunta ao líder, inclusive de esclarecimento | `AskUserQuestion` SEMPRE, com opções clicáveis; nunca pergunta em prosa |
-| [L-12](#l-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
-| [L-13](#l-13) | tocar em qualquer trabalho que dependa de canon | Canon desatualizado bloqueia: atualiza primeiro, trabalha depois |
-| [L-14](#l-14) | concluir que algo está morto, obsoleto ou descartável | Nada é declarado morto por agente; a decisão é do líder |
-| [L-15](#l-15) | versionar binário, asset pesado ou configurar o repositório | `livros/` e `glb/` fora do git; LFS no resto; regras nascem antes do primeiro commit |
-| [L-16](#l-16) | homenagear pessoa real, ou citar o filho do líder | Homenagem só com aceite; o filho aparece só como "Gus Dragon" ou Dragon-Drv; caso do roster fechado, não se reabre |
-| [L-17](#l-17) | criar módulo, arquivo, ou desenhar a forma de um sistema | Espinha de cinco camadas com gate de CI; regra como comando e evento |
-| [L-18](#l-18) | escolher formato de arquivo de mapa, save, configuração ou item | Nada em formato de texto; máxima proteção contra edição |
-| [L-19](#l-19) | commitar, fechar fatia, pensar em cobertura e formatação, **ou escrever ordem de serviço que vai ser revisada** | Cinco portões de qualidade; TDD estrito; sem meta de cobertura; **rigor da revisão por CAMADA (N1 a N4), declarada no cabeçalho da ordem, e o orçamento de rodadas sai dela, não do revisor**; **nenhum nível novo de verificação sem ordem do líder, e a prova de estreia vermelha fica** |
-| [L-20](#l-20) | escrever CI, ou declarar que uma plataforma funciona | Matriz das cinco plataformas desde o primeiro commit |
-| [L-21](#l-21) | achar que o `inicial.md` cumpriu o papel dele | Só se apaga com as quatro condições satisfeitas e o líder confirmando |
-| [L-22](#l-22) | nomear qualquer coisa, ou escrever comentário e commit | Identificador e comentário em inglês, `snake_case`; commit em pt-br |
-| [L-23](#l-23) | criar tag, publicar release, ou mexer na versão | Versão e tag são `vA.B.C.D`, como no GlintFx |
-| [L-24](#l-24) | ver regra, seção ou documento que o líder revogou, ou escrever relatório/reconferência que narraria por que uma versão anterior dele reprovou | Revogado se APAGA; não se guarda como histórico — vale também para histórico de processo (bilhete sobre reprovação anterior) |
-| [L-25](#l-25) | tocar save, configuração, mapa ou catálogo de conteúdo | Envelope binário selado, teto técnico faseado, cripto vem do GlintFx |
-| [L-26](#l-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, quatro direções cardeais, grade quadrada |
-| [L-27](#l-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
-| [L-28](#l-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
-| [L-29](#l-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é, com a campanha longa por desenho e a cerca de escopo no orçamento de cada área (C-15) |
-| [L-30](#l-30) | escrever, reordenar ou acrescentar item na tabela, ou escrever/editar checklist em qualquer outro documento do projeto | Tabela aponta para o documento que a especifica; TODO.md é a única fonte de checklist, o resto aponta de volta pelo ID, sem caixa de estado própria |
-| [L-31](#l-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
-| [L-32](#l-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só ao fim da onda, aceito só quando a verificação automática daquele push sai verde e os testes estão verdes |
-| [L-33](#l-33) | criar ou revisar unidade de código do jogo, ou pensar em atomizar teste, ferramenta, documento, commit, item ou asset | Átomo só no código do jogo; fora dele, organiza-se como for melhor; no jogo, monolito é acoplamento, não tamanho, e há cinco perguntas na revisão |
-| [L-34](#l-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato interrompe a fatia, conteúdo espera a onda fechar |
-| [L-35](#l-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, o resultado é "não executado" |
-| [L-36](#l-36) | decidir se lore ainda não escrita atrasa uma fatia de engenharia, ou sentir a tentação de esperar completar canon antes de codar | Lore que falta não bloqueia código, puxa-se sob demanda em micro-sessão pontual; distinta da L-13, que trava por canon que contradiz, não por canon que ainda falta |
-| [L-37](#l-37) | editar, revisar ou propor mudança em fala, aparte, revide, cena ou traço de caracterização já aprovado que define o Gus original | Mudança em conteúdo já aprovado do Gus original exige nova autorização explícita do líder; parente da L-16, sem fundir nela |
-| [L-38](#l-38) | desenhar, revisar ou implementar qualquer enigma, puzzle ou câmara de lógica do jogo | Nenhum puzzle cede por ferramenta do jogo em vez do jogador; só o acerto é conferido, nunca o vocabulário; vale para todo enigma, escrito antes ou depois desta lei |
+| [GW-01](#gw-01) | procurar código anterior, "como era antes", ou base para reaproveitar | O código é do zero; o GusWorld anterior não é base |
+| [GW-02](#gw-02) | tocar arte, câmera, sprite, modelo ou pipeline visual | Jogo é 2D pixel-art; o pipeline 3D é do líder e agente não toca |
+| [GW-03](#gw-03) | criar build, escolher padrão de linguagem | C++23 |
+| [GW-04](#gw-04) | escrever função, arquivo, classe, módulo, item ou carta | Proibido monolito; cada elemento do jogo é átomo com POCO próprio |
+| [GW-05](#gw-05) | precisar de algo que o GlintFx ainda não tem, ou de ferramenta de apoio | Proibido dublê: ou liga no GlintFx, ou não existe. ⚠️ **Ferramenta que só constrói e nunca embarca NÃO é dependência** (LEI ZERO, reforma de 28/08/2026) |
+| [GW-06](#gw-06) | decidir o que construir primeiro | Núcleo puro agora; a camada que desenha só nasce com o GlintFx |
+| [GW-07](#gw-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
+| [GW-08](#gw-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
+| [GW-09](#gw-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos, todos em `:latest`; Fedora primário; CachyOS é próprio, não Arch |
+| [GW-10](#gw-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level audita e planeja; operacional cria e implementa; modelo pelo /modelos_sessao |
+| [GW-11](#gw-11) | fazer **qualquer** pergunta ao líder, inclusive de esclarecimento | `AskUserQuestion` SEMPRE, com opções clicáveis; nunca pergunta em prosa |
+| [GW-12](#gw-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
+| [GW-13](#gw-13) | tocar em qualquer trabalho que dependa de canon | Canon desatualizado bloqueia: atualiza primeiro, trabalha depois |
+| [GW-14](#gw-14) | concluir que algo está morto, obsoleto ou descartável | Nada é declarado morto por agente; a decisão é do líder |
+| [GW-15](#gw-15) | versionar binário, asset pesado ou configurar o repositório | `livros/` e `glb/` fora do git; LFS no resto; regras nascem antes do primeiro commit |
+| [GW-16](#gw-16) | homenagear pessoa real, ou citar o filho do líder | Homenagem só com aceite; o filho aparece só como "Gus Dragon" ou Dragon-Drv; caso do roster fechado, não se reabre |
+| [GW-17](#gw-17) | criar módulo, arquivo, ou desenhar a forma de um sistema | Espinha de cinco camadas com gate de CI; regra como comando e evento |
+| [GW-18](#gw-18) | escolher formato de arquivo de mapa, save, configuração ou item | Nada em formato de texto; máxima proteção contra edição |
+| [GW-19](#gw-19) | commitar, fechar fatia, pensar em cobertura e formatação, **ou escrever ordem de serviço que vai ser revisada** | Cinco portões de qualidade; TDD estrito; sem meta de cobertura; **rigor da revisão por CAMADA (N1 a N4), declarada no cabeçalho da ordem, e o orçamento de rodadas sai dela, não do revisor**; **nenhum nível novo de verificação sem ordem do líder, e a prova de estreia vermelha fica** |
+| [GW-20](#gw-20) | escrever CI, ou declarar que uma plataforma funciona | Matriz das cinco plataformas desde o primeiro commit |
+| [GW-21](#gw-21) | achar que o `inicial.md` cumpriu o papel dele | Só se apaga com as quatro condições satisfeitas e o líder confirmando |
+| [GW-22](#gw-22) | nomear qualquer coisa, ou escrever comentário e commit | Identificador e comentário em inglês, `snake_case`; commit em pt-br |
+| [GW-23](#gw-23) | criar tag, publicar release, ou mexer na versão | Versão e tag são `vA.B.C.D`, como no GlintFx |
+| [GW-24](#gw-24) | ver regra, seção ou documento que o líder revogou, ou escrever relatório/reconferência que narraria por que uma versão anterior dele reprovou | Revogado se APAGA; não se guarda como histórico — vale também para histórico de processo (bilhete sobre reprovação anterior) |
+| [GW-25](#gw-25) | tocar save, configuração, mapa ou catálogo de conteúdo | Envelope binário selado, teto técnico faseado, cripto vem do GlintFx |
+| [GW-26](#gw-26) | tocar câmera, mapa, locomoção ou direção de sprite | 3/4 top-down fixa, quatro direções cardeais, grade quadrada |
+| [GW-27](#gw-27) | pensar em escrever tela, HUD ou marcação de interface | Nenhuma interface se escreve antes de o GlintFx traduzir marcação |
+| [GW-28](#gw-28) | precisar baixar, instalar ou atualizar qualquer coisa | Pergunte ao líder; nunca falhe calado; `sudo` sempre com `-A` |
+| [GW-29](#gw-29) | propor recurso, sistema ou escopo novo | Os 14 cortes: a cerca do que o jogo NÃO é, com a campanha longa por desenho e a cerca de escopo no orçamento de cada área (C-15) |
+| [GW-30](#gw-30) | escrever, reordenar ou acrescentar item na tabela, ou escrever/editar checklist em qualquer outro documento do projeto | Tabela aponta para o documento que a especifica; TODO.md é a única fonte de checklist, o resto aponta de volta pelo ID, sem caixa de estado própria |
+| [GW-31](#gw-31) | o líder aprovar, rejeitar ou mudar algo, ou fechar item de alta prioridade | Avisar o Gus Dragon sem ele perguntar |
+| [GW-32](#gw-32) | fechar uma fatia, fechar uma onda, ou pensar em `git push` | Commit por fatia; push só ao fim da onda, aceito só quando a verificação automática daquele push sai verde e os testes estão verdes |
+| [GW-33](#gw-33) | criar ou revisar unidade de código do jogo, ou pensar em atomizar teste, ferramenta, documento, commit, item ou asset | Átomo só no código do jogo; fora dele, organiza-se como for melhor; no jogo, monolito é acoplamento, não tamanho, e há cinco perguntas na revisão |
+| [GW-34](#gw-34) | ver qualquer coisa vinda do Gus Dragon, em qualquer dos cinco canais | Pedido dele é prioridade e é SEMPRE respondido; ack imediato interrompe a fatia, conteúdo espera a onda fechar |
+| [GW-35](#gw-35) | rodar qualquer teste que EXECUTE código: suíte, fuzzing, sanitizer, mutação, sonda de janela ou entrada | Nenhum teste dinâmico toca a sessão do líder; sempre em container. Sem container, o resultado é "não executado" |
+| [GW-36](#gw-36) | decidir se lore ainda não escrita atrasa uma fatia de engenharia, ou sentir a tentação de esperar completar canon antes de codar | Lore que falta não bloqueia código, puxa-se sob demanda em micro-sessão pontual; distinta da GW-13, que trava por canon que contradiz, não por canon que ainda falta |
+| [GW-37](#gw-37) | editar, revisar ou propor mudança em fala, aparte, revide, cena ou traço de caracterização já aprovado que define o Gus original | Mudança em conteúdo já aprovado do Gus original exige nova autorização explícita do líder; parente da GW-16, sem fundir nela |
+| [GW-38](#gw-38) | desenhar, revisar ou implementar qualquer enigma, puzzle ou câmara de lógica do jogo | Nenhum puzzle cede por ferramenta do jogo em vez do jogador; só o acerto é conferido, nunca o vocabulário; vale para todo enigma, escrito antes ou depois desta lei |
 
 ---
 
-## L-01
+## GW-01
 
 Nenhuma linha de código, arquivo ou protótipo do projeto anterior serve de base, referência ou canon para o código do GusWorld, que nasce do zero. Nenhuma referência a arquivo de código do corpus é tratada como existente, e nenhum campo derivado da prosa se fecha sem o líder. A documentação e a lore em `docs/` e `resources/` não são atingidas por esta lei.
 
-## L-02
+## GW-02
 
 Nenhum modelo, mesh, câmera 3D ou bake entra no jogo em runtime: o jogo é 2D pixel-art, e o pipeline 3D é exclusivo do líder, para livro e impressão 3D. Nenhum agente gera, converte, organiza ou opina sobre esse pipeline sem pedido explícito dele.
 
-## L-03
+## GW-03
 
 Nenhuma linguagem além de C++23 entra no código do jogo ou no seu padrão sem ordem explícita do líder; ferramenta de apoio ao build que não embarca no binário do jogador foge desta proibição (LEI ZERO).
 
-## L-04
+## GW-04
 
 Nenhuma função, arquivo, classe ou módulo do jogo reúne mais de um assunto ou responsabilidade: monolito é proibido em todo nível. Nenhum elemento do jogo (carta, item, inimigo, efeito, diálogo, missão) vive como campo dentro de um agregado maior; cada um é átomo com POCO próprio.
 
-## L-05
+## GW-05
 
 Nenhum stub, mock, simulacro, camada própria embrulhando o GlintFx, seleção condicional entre implementações ou modo headless simulando o framework é permitido: o que não liga no GlintFx não existe. Regra de jogo pura, que não precisaria do GlintFx para funcionar, escapa desta proibição e pode ser escrita antes de o framework existir.
 
-## L-06
+## GW-06
 
 Nenhuma camada que desenha nasce antes de o GlintFx ter janela, contexto gráfico, entrada e texto; só o núcleo de regra de jogo, em TDD estrito, é escrito agora. Nenhum relatório apresenta tela, demo ou progresso visual que não existe.
 
-## L-07
+## GW-07
 
 Nenhum pedido de função ao GlintFx sai por antecipação: só quando o jogo esbarrar de verdade na falta, com o uso real descrito. Nenhum pedido sai fora do bus, clone `<vault>/gusworld_ia_autocomm/`, sob o slug `gusworld`. Nenhum pedido enviado pelo bus carrega classificação de prioridade de quem recebe, e nenhuma ideia do Gus Dragon fica sem confirmação imediata de recebimento, sem discussão com o líder, sem resposta honesta e sem entrada imediata na tabela de pendências logo após a decisão, citando a autoria dele.
 
-## L-08
+## GW-08
 
 Nenhum código do jogo sai sob licença diferente de AGPL-3.0-or-later, e a ressalva sobre o caráter offline nunca entra dentro do texto da licença. Nenhum cabeçalho de copyright usa titular diferente de Petrus Alves da Silva Costa, o titular designado pelo líder e registrado em `REUSE.toml`. Nenhum asset, texto de sabor ou prosa in-game sai de um regime único de todos os direitos reservados a esse titular, ressalvados apenas marca (nome, logotipo, trade dress, nomes de personagem) e conteúdo de fã não comercial. Nenhum dos dois livros-companheiros herda a licença do jogo. Dentro de `docs/`, nada em `narrative/` ou `specs/` sai do regime reservado; na raiz, `CHARS.md`, `PLACES.md` e `sinopse.md` também não saem dele. A distribuição de cada caminho do repositório entre a licença do código e o regime reservado segue `REUSE.toml`, o documento autorizado por esta lei. Nenhum arquivo nasce sem identificação padronizada de copyright e licença: fonte de código leva cabeçalho próprio, binário e asset levam arquivo companheiro, e diretório inteiro pode ser coberto por um arquivo de regras.
 
-## L-09
+## GW-09
 
-Nenhum CI cobre menos que cinco alvos distintos (Fedora, Ubuntu, Arch, CachyOS e Windows), e nenhuma declaração de suporte a uma plataforma se apoia no job verde de outra, especialmente CachyOS sobre Arch. Nenhum alvo da matriz fixa versão de imagem: todos acompanham `:latest`, inclusive o Fedora, que é o alvo primário por ser o sistema do líder. **Decisão do líder de 11/10/2026, por `AskUserQuestion` e depois de contra-argumentação:** o chão de validação do jogo é o mesmo do GlintFx, que soltou o pino em 27/08/2026, e o custo fica aceito de forma explícita: o CI pode ficar vermelho por atualização de distro, não só por mudança de código, e a L-32 bloqueia push com CI vermelho.
+Nenhum CI cobre menos que cinco alvos distintos (Fedora, Ubuntu, Arch, CachyOS e Windows), e nenhuma declaração de suporte a uma plataforma se apoia no job verde de outra, especialmente CachyOS sobre Arch. Nenhum alvo da matriz fixa versão de imagem: todos acompanham `:latest`, inclusive o Fedora, que é o alvo primário por ser o sistema do líder. **Decisão do líder de 11/10/2026, por `AskUserQuestion` e depois de contra-argumentação:** o chão de validação do jogo é o mesmo do GlintFx, que soltou o pino em 27/08/2026, e o custo fica aceito de forma explícita: o CI pode ficar vermelho por atualização de distro, não só por mudança de código, e a GW-32 bloqueia push com CI vermelho.
 
-## L-10
+## GW-10
 
 Nenhum trabalho de produto é executado pela thread principal: ela só orquestra, delega e reverifica. Nenhuma auditoria e nenhum planejamento de arquitetura saem de agente que não seja C-level da constelação bigtech. Nenhuma criação e nenhuma implementação saem de agente que não seja agente operacional da constelação bigtech. Nenhum agente genérico, anônimo ou improvisado executa trabalho. Nenhum modelo é fixado por esta lei: o modelo e o effort de cada agente seguem a skill `/modelos_sessao`, e, pela regra por tarefa dessa skill, prosa ou texto longo para leitor humano vai com `opus` e effort `max`. Nenhum C-level fica dormente por presunção de agente, e quem implementa nunca é quem revisa nem quem reverifica.
 
 Decisões do líder de 20/11/2026, na sessão do claude_configs, verbatim: *"Alinhar à LEI ZERO"*, a LEI ZERO do `GODS_LAWS.md` global, que separa quem planeja de quem implementa, e *"Seguir o /modelos_sessao"*. Confirmação nesta sessão, pela LEI DAS LEIS, por `AskUserQuestion` em 20/11/2026, verbatim: *"Confirmo as duas (Recomendado)"*. A redação desta lei é do agente; o texto do líder é só o das citações.
 
-## L-11
+## GW-11
 
 Nenhuma pergunta ao líder, inclusive de esclarecimento sobre o que ele quis dizer, sai em prosa solta: toda pergunta usa `AskUserQuestion`, sem o campo `preview`, com 2 a 3 alternativas, prós, contras, impacto e esforço, a recomendada primeiro. Nenhum agente decide sozinho o que muda o próximo passo, exceto decisão trivial e reversível com default óbvio, que segue o default e é apenas informada; esta exceção governa só a forma da pergunta que já ia acontecer, nunca cria pergunta nova. Relatar resultado e oferecer o próximo passo continuam sendo prosa, não pergunta. Nenhuma decisão do líder que seja destrutiva, viole princípio do projeto ou inviabilize marco é executada sem o agente antes nomear o problema, o risco concreto e uma alternativa; reafirmada a ordem, o agente executa por inteiro.
 
-## L-12
+## GW-12
 
 Nenhuma mensagem ao líder começa sem o timestamp real no formato `[DD/MM/YY - HH:MM:SS]`, obtido do relógio do sistema no momento da mensagem; nunca estimado ou reaproveitado do timestamp anterior.
 
-## L-13
+## GW-13
 
 Nenhum trabalho que dependa de canon contraditório avança antes de o canon ser atualizado com o líder. Nenhuma implementação se apoia em canon que se sabe errado, e nenhuma contradição encontrada fica fora do registro. Bloqueios vivos, abertos e do líder: a re-derivação técnica do esquema de save em `docs/narrative/diary/knowledge-gates.md` segue bloqueada; os documentos de `docs/design/producao/` que descrevem pipeline aposentado seguem bloqueados; as sinalizações do parágrafo 5 de `docs/design/mecanicas/modos-morte.md` seguem abertas.
 
-## L-14
+## GW-14
 
 Nenhum agente declara algo morto, obsoleto, descartável ou irrelevante por conta própria: documento, decisão, referência órfã, asset ou ideia perdida vai ao líder com a evidência, e a decisão é dele.
 
-## L-15
+## GW-15
 
 Nenhum arquivo de `resources/livros/` ou `resources/glb/` entra no controle de versão. Nenhum binário pesado do restante do projeto entra fora do Git LFS. Nenhuma regra de exclusão ou de atributo do repositório nasce depois do primeiro commit sem autorização do líder: elas nascem antes dele, e só mudam depois com decisão dele registrada.
 
-## L-16
+## GW-16
 
 Nenhuma homenagem a pessoa real existe sem aceite prévio confirmado pelo líder, nunca presumido pelo agente. Nenhum nome de batismo de menor é versionado: o filho do líder aparece só como Gus Dragon ou como Dragon-Drv. Nenhum agente reabre o caso já fechado do análogo do capstone do roster; a decisão do líder ali é definitiva, o histórico do git não se reescreve, e a seção de fontes consultadas daquele arquivo fica como está.
 
-## L-17
+## GW-17
 
 Nenhuma camada da espinha (`present/`, `app/`, `domain/`, `content/`, `core/`) depende da de cima, e nenhuma inclusão do GlintFx sobrevive ao gate de CI fora de `present/`, que só nasce quando o GlintFx existir. Nenhuma regra de jogo deixa de ser transição determinística que recebe estado e comando e devolve estado novo e eventos, com o sorteio dentro do próprio estado. Nenhuma unidade vira dona de tudo, nenhum barramento genérico substitui os tipados, nenhum condicional de dificuldade substitui tabela de parâmetros, nenhum detalhe de C++ quebra o replay determinístico, e nenhuma regra de domínio vaza para a interface. Nenhum replay determinístico fica sem o teste automatizado permanente que o verifica (semente mais lista de comandos reproduz o mesmo estado final). Nenhum número entra literal no corpo da regra: ele nasce nomeado em tabela de parâmetros de configuração. Nenhum POCO de domínio é escondido atrás de superfície opaca: ao contrário do GlintFx, aqui eles são visíveis por desenho, porque são o contrato interno e o formato de save.
 
-## L-18
+## GW-18
 
 Nenhum dado do jogo (mapa, save, configuração ou catálogo de conteúdo) chega à máquina do jogador em formato de texto (a proibição é sobre o que se distribui, não sobre a fonte de conteúdo mantida em texto estruturado no repositório), e a régua é a máxima proteção contra edição, não o mínimo suficiente. Nenhum custo real desta lei é contornado ou silenciado: é nomeado ao líder, com mitigação proposta.
 
-## L-19
+## GW-19
 
 Nenhuma linha de comportamento entra sem um teste que falhava antes dela existir, e nenhuma ordem de serviço se fecha sem a saída real do teste vermelho e depois verde; ao escrever a asserção, pergunta-se o que o defeito produziria, nunca só o que o acerto produz. Nenhum commit de módulo de código com comportamento passa sem os cinco portões, valendo a partir do primeiro módulo desse tipo (commit de canon e de documentação fica fora deles): zero aviso de compilação tratado como erro, sanitizadores de memória e de comportamento indefinido a cada fatia fechada, análise estática automatizada, varredura de segredo cobrindo também o histórico completo do controle de versão, e o portão de mensagem de commit, que barra termo da lista cifrada, caminho de área cifrada, dado pessoal e credencial, e reprova o commit quando não consegue ler a chave, nunca aprova em silêncio. Nenhum push sai sem rodar antes, local, o mesmo script que a verificação remota roda. Nenhuma meta numérica de cobertura é perseguida: cobertura é consequência do TDD, nunca alvo. Nenhuma release 1.0 sai sem o dossiê formal de auditoria.
 
@@ -142,13 +145,13 @@ Nenhuma linha de comportamento entra sem um teste que falhava antes dela existir
 **Emenda de 11/10/2026: o rigor da revisão é por CAMADA.** Adotada do projeto irmão GlintFx por ordem do líder, verbatim: *"Pode fazer igual ao aviso de glintfx"*. Lá ela nasceu quando ele viu dois dias sem código da biblioteca e cerca de 15 voltas de revisão sobre ferramentas que testam ferramentas de teste, e disse, verbatim: *"Já sao mais de DOIS DIAS de teste! Isso definitivamente não é normal. Otimize isso! Descubra como!"* e *"Está incompatível o rigor dos testes com o código. Ou os códigos estão PÉSSIMOS ou o rigor dos testes está com OE"*. Perguntado por `AskUserQuestion`, escolheu **"Por camada"**. Isso refina o rigor desta lei, que continua valendo **inteira para o código de produto**:
 
 - **N1, código de produto (as cinco camadas `core/`, `content/`, `domain/`, `app/`, `present/`):** revisão adversarial que executa e muta, até sair limpa. A mutação mira **só as linhas que a fatia mudou**, no máximo 10 por revisão (padrão do Google: "State of Mutation Testing at Google", arxiv 2102.11378).
-- **N2, portão que protege a sessão do líder** (o que a L-35 exige: nenhum teste dinâmico roda fora de container): mutação mirada na exclusão que ele protege e **uma** rodada de conserto.
-- **N3, ferramenta de teste comum** (o harness de `tests/harness/`, os autotestes, as travas de registro, os scripts de CI): revisão de leitura pelas cinco perguntas da L-33 e **um** caso vermelho conferido. O revisor **não** procura mutantes próprios. Na segunda reprovação da mesma família, o que sobra vai à INBOX ou vira limite declarado, e a fatia fecha.
+- **N2, portão que protege a sessão do líder** (o que a GW-35 exige: nenhum teste dinâmico roda fora de container): mutação mirada na exclusão que ele protege e **uma** rodada de conserto.
+- **N3, ferramenta de teste comum** (o harness de `tests/harness/`, os autotestes, as travas de registro, os scripts de CI): revisão de leitura pelas cinco perguntas da GW-33 e **um** caso vermelho conferido. O revisor **não** procura mutantes próprios. Na segunda reprovação da mesma família, o que sobra vai à INBOX ou vira limite declarado, e a fatia fecha.
 - **N4, texto** (documento, comentário, diário): sem espelho local do CI e sem revisor.
 
 Toda ordem de serviço declara a camada no cabeçalho, e o rigor e o orçamento de rodadas saem dela, e não do julgamento do revisor. Quem planeja roda os comandos de cada ordem antes do despacho e anexa a saída à ordem.
 
-**Tradução de referência declarada, porque a emenda nasceu em outro projeto:** onde o GlintFx diz `src/` e `include/`, aqui são as cinco camadas; as cinco perguntas de revisão são da L-33 deste projeto, não da L-17; o portão de isolamento é o que a L-35 exige; e o espelho local do CI é o item `C7`, ainda por fazer. A substância, os números de rodadas e a fonte do limite de dez mutantes são os mesmos do projeto irmão, de propósito.
+**Tradução de referência declarada, porque a emenda nasceu em outro projeto:** onde o GlintFx diz `src/` e `include/`, aqui são as cinco camadas; as cinco perguntas de revisão são da GW-33 deste projeto, não da L-17; o portão de isolamento é o que a GW-35 exige; e o espelho local do CI é o item `C7`, ainda por fazer. A substância, os números de rodadas e a fonte do limite de dez mutantes são os mesmos do projeto irmão, de propósito.
 **Emenda de 12/10/2026: limite de níveis de verificação, por ordem do líder.** Ordem dada pelo líder nesta conversa, em 12/10/2026, nesta sequência, verbatim: *"cuidado com OE nos testes!"*, *"Use KISS"*, *"e DRY"* e, quando o orquestrador perguntou se ele queria remover níveis existentes, *"nao quero teste de teste de teste de teste..."*. A fonte é a conversa com o líder, não arquivo; a ordem foi levada ao líder por `AskUserQuestion` e confirmada por ele, com as ressalvas abaixo. OE quer dizer over-engineering, excesso de engenharia. Esta emenda refunde a regra irmã da L-68 do `GODS_LAWS.md` global, em vez de criar lei nova.
 
 - **Nenhum nível novo de verificação entra sem ordem explícita do líder.** Nível de verificação é prova de que um portão reprova, autoteste de script, diagnóstico que mede, ou controle que confirma outro controle.
@@ -157,25 +160,25 @@ Toda ordem de serviço declara a camada no cabeçalho, e o rigor e o orçamento 
 - **Enxugar o que já inchou, sem remover nada que reprova.** Caso medido em 12/10/2026: o portão de segredo foi de 658 para 404 linhas tirando só os diagnósticos; os dezoito casos de veredito, as duas provas vermelhas e o piso ficaram intactos. No mesmo dia, os nove workflows somavam 1814 linhas.
 - **Diagnóstico que já respondeu o que existia para medir sai do arquivo do portão**, e a resposta fica registrada na tabela de pendências do projeto.
 
-## L-20
+## GW-20
 
 Nenhuma plataforma da matriz de cinco entra depois do primeiro commit: a fundação de build e o CI são a primeira fatia do projeto. Nenhum módulo de comportamento depois dessa fundação escapa do TDD sob a alegação de ainda estar montando a base.
 
-## L-21
+## GW-21
 
 Nenhum apagamento do documento fundador do projeto acontece antes de cada um dos 28 itens estar resolvido, decidido em lei, executado de fato no repositório e memorizado no lugar certo. Nenhum apagamento acontece sem o checklist item a item apresentado ao líder e confirmado por ele.
 
-## L-22
+## GW-22
 
 Nenhum identificador ou comentário de código sai do inglês em `snake_case`, sem prefixo de membro; esta lei substitui o `CONTRACT.md` §5.1 nesse ponto. Nenhuma mensagem de commit sai do português, e nenhum termo de lore sem tradução honesta (nome próprio, unidade inventada, língua construída) é traduzido para inglês.
 
-## L-23
+## GW-23
 
 Nenhuma versão ou tag do GusWorld sai fora do formato de quatro componentes: o primeiro para quebra de compatibilidade sentida pelo jogador, o segundo para recurso novo compatível, o terceiro para correção e o quarto para build sem mudança de código. Nenhuma tag ou release sai sem aval explícito do líder no contexto, mesmo com o formato fixado.
 
-## L-24
+## GW-24
 
-Nenhum texto revogado pelo líder permanece legível em bloco de histórico, nota de status superado ou seção recolhida: revogado se apaga por inteiro, inclusive do índice de gatilhos. Nenhuma exceção existe além de texto com efeito jurídico ou direito adquirido de terceiro, que não se apaga e vai ao líder. Nenhuma citação órfã para documento inexistente é apagada por agente sozinho: primeiro o líder decide, pela L-14, que o documento citado está morto; só depois se apaga o ponteiro, preservando a afirmação. — **REFORMA DE 06/09/2026, decisão do líder por `AskUserQuestion`.** Apresentadas opções sobre se um relatório de auditoria/reconferência pode narrar dentro de si que um item já reprovou antes, quantas vezes, e por quê, **o líder escolheu, verbatim, a opção "Vale: apaga também"**: a mesma proibição desta lei vale também para **histórico de PROCESSO**, não só para canon do jogo; apaga, não se reescreve em outra forma. O argumento que fundamentava essa opção — uma régua só para tudo, sem julgar caso a caso qual histórico é inocente, porque critério que exige interpretar degrada na primeira exceção, e a nota que explica o passado sempre acha justificativa para existir — **foi escrito pelo orquestrador da sessão (main) na descrição da alternativa; o líder concordou com ele ao escolhê-la, não o formulou.**
+Nenhum texto revogado pelo líder permanece legível em bloco de histórico, nota de status superado ou seção recolhida: revogado se apaga por inteiro, inclusive do índice de gatilhos. Nenhuma exceção existe além de texto com efeito jurídico ou direito adquirido de terceiro, que não se apaga e vai ao líder. Nenhuma citação órfã para documento inexistente é apagada por agente sozinho: primeiro o líder decide, pela GW-14, que o documento citado está morto; só depois se apaga o ponteiro, preservando a afirmação. — **REFORMA DE 06/09/2026, decisão do líder por `AskUserQuestion`.** Apresentadas opções sobre se um relatório de auditoria/reconferência pode narrar dentro de si que um item já reprovou antes, quantas vezes, e por quê, **o líder escolheu, verbatim, a opção "Vale: apaga também"**: a mesma proibição desta lei vale também para **histórico de PROCESSO**, não só para canon do jogo; apaga, não se reescreve em outra forma. O argumento que fundamentava essa opção — uma régua só para tudo, sem julgar caso a caso qual histórico é inocente, porque critério que exige interpretar degrada na primeira exceção, e a nota que explica o passado sempre acha justificativa para existir — **foi escrito pelo orquestrador da sessão (main) na descrição da alternativa; o líder concordou com ele ao escolhê-la, não o formulou.**
 
 **FRONTEIRA DO RODAPÉ, mesma data, decisão do líder por `AskUserQuestion`.** Apresentadas opções sobre se o rodapé de "Última revisão" que fecha muitos documentos do projeto cai dentro da proibição acima, **o líder escolheu, verbatim, a opção "Fica: é proveniência, não bilhete"**: o corpo do documento diz só o que vale; o rodapé de revisão registra a proveniência das decisões do líder com data, e não é alcançado pela proibição desta lei. O argumento que fundamentava essa opção — que o rodapé vive isolado no fim do arquivo, não se mistura ao texto que alguém lê para saber a regra, e guarda a rastreabilidade das decisões do líder com data — **foi escrito pelo orquestrador da sessão (main) na descrição da alternativa; o líder concordou com ele ao escolhê-la, não o formulou.**
 
@@ -183,7 +186,7 @@ Nenhum texto revogado pelo líder permanece legível em bloco de histórico, not
 
 **A exceção protege o CONTEÚDO — registro datado de decisão —, nunca a POSIÇÃO no arquivo.** Um parágrafo que narra tentativa reprovada, número de reprovações ou por que um estado anterior estava errado continua proibido onde quer que esteja: mover esse texto do corpo para debaixo de uma linha "Última revisão" não o transforma em proveniência. Só qualifica como rodapé protegido a entrada que registra DATA e A DECISÃO/MUDANÇA aplicada — o que passou a valer, e quando —, nunca a entrada que renarra por que a versão anterior estava errada ou quantas vezes o item já reprovou antes de chegar aqui; esse conteúdo, ainda que dentro do bloco final, se apaga igual ao do corpo.
 
-## L-25
+## GW-25
 
 - Nenhuma comunicação pública promete impossibilidade de editar, recuperar ou trapacear em save, configuração, mapa ou catálogo: só detecção confiável de adulteração.
 - Nenhum desses quatro dados sai de fora do envelope binário único com selo criptográfico, serialização binária versionada, gravação atômica com cadeia de backups e validação em dois níveis (selo e validador semântico) no carregamento.
@@ -196,19 +199,19 @@ Nenhum texto revogado pelo líder permanece legível em bloco de histórico, not
 - Nenhum formato de save, mapa ou pacote nasce sem a ferramenta de inspeção e reselo junto.
 - Nenhum número ou regra de carta fica fora do executável: são código sob a licença do código e vivem dentro dele. Nenhum texto de sabor ou prosa de carta entra no executável: ficam no pacote binário selado como asset.
 
-## L-26
+## GW-26
 
 Nenhuma perspectiva do jogo sai de 3/4 top-down fixa com mapa em grade quadrada, e nenhuma câmera gira ou orbita. O sprite de qualquer criatura existe em quatro direções cardeais, e nenhuma delas é espelhamento horizontal de outra: todas são desenhadas à mão. A locomoção, essa, aceita deslocamento diagonal, e o sprite exibido é sempre o cardeal mais próximo do vetor de movimento: move-se em oito, desenha-se em quatro. Nenhuma proposta de sprite diagonal, rotação de câmera ou projeção isométrica avança sem decisão do líder. Decisão do líder, 12/09/2026, verbatim: "Opção um", escolhida entre confirmar oito direções desenhadas e cancelar a mudança.
 
-## L-27
+## GW-27
 
 Nenhuma interface, arquivo de marcação, folha de estilo, tela piloto ou prova de conceito é escrita antes de o GlintFx traduzir marcação de tela.
 
-## L-28
+## GW-28
 
 Nenhum pacote, biblioteca, ferramenta, extensão, modelo ou arquivo de rede é baixado, instalado, removido ou atualizado sem perguntar ao líder antes. Nenhuma tarefa que falte algo falha calada: o agente para e diz o que falta, para quê e o custo. Nenhuma elevação de privilégio roda sem `sudo -A`, pedindo a senha por diálogo gráfico, e nenhuma autorização de instalação vale para a instalação seguinte.
 
-## L-29
+## GW-29
 
 Nenhuma proposta de recurso, sistema ou escopo atravessa a cerca abaixo sem virar pedido de exceção explícito ao líder, citado pelo número do corte. Nenhum número de corte revogado (`C-03`, `C-13`) é reaproveitado ou renumerado: a lacuna fica na tabela.
 
@@ -231,40 +234,40 @@ Nenhuma proposta de recurso, sistema ou escopo atravessa a cerca abaixo sem vira
 
 **Decisão do líder sobre o `C-15`, 11/10/2026, verbatim:** *"Ele achou muito pouco 8h e concordo com ele. Esse jogo é pra ser longo, para meses de jogo, não horas"*. O "ele" é o Gus Dragon, que levantou a questão na issue 11 do barramento. O piso de duração entra **sem número**: fixar "meses" em horas repetiria, na direção oposta, o erro de um número que ninguém mediu. E a cerca contra escopo infinito desce para o orçamento de conteúdo de cada área, porque uma cláusula de duração total calibrada para jogo curto deixa de filtrar qualquer coisa quando o alvo é longo.
 
-## L-30
+## GW-30
 
 Nenhum item da tabela de pendências fica sem apontar, na coluna de descrição técnica, para a lei, documento de design, ADR ou manual que o especifica; na ausência de um, o item diz que não há documento. Nenhum documento do projeto além da tabela de pendências mantém checklist com estado próprio, duplica a contagem, a soma ou o percentual dela, ou cria arquivo ou seção paralela de fila de trabalho: caixa de marcar fora da tabela vira marcador simples, e citar o status de um item só é legítimo nomeando o identificador dele. Checklist-gabarito de processo, reutilizável e sem estado por item, não é fila de trabalho e fica fora desta proibição.
 
-## L-31
+## GW-31
 
 Nenhuma aprovação, rejeição ou mudança de ideia do Gus Dragon, e nenhum fechamento de item de alta prioridade, fica sem aviso a ele sem que precise perguntar. Nenhum aviso promete instantaneidade além do que a sessão aberta permite, e nenhuma resposta na discussion 7, o catálogo de bugs dele, sai sem timestamp e uma das três classificações que ele fixou: Bug Consertado, Bug Funcional, Bug Possível.
 
-## L-32
+## GW-32
 
 Nenhuma fatia fecha sem commit local citando o ID do item e tocando o status dele no mesmo commit. Push para ramo de trabalho sai a qualquer hora, porque é ele que dispara o CI. Nenhum push se considera aceito antes de a verificação remota daquele push sair verde, e reprovação nela bloqueia o que vem depois. Merge no main e tag só com a onda fechada e com aval explícito do líder no contexto. Nenhum push se dá por confirmado sem checar o remoto.
 
 **Emenda de 20/11/2026.** Verbatim do líder na primeira resposta: "Push para ramo de trabalho a qualquer hora, porque é ele que dispara o CI. Merge no main e tag só com a onda fechada e com o seu aval. A L-32 do projeto passa a dizer isso. O argumento contra é que o push cedo publica no repositório público trabalho ainda não revisado. O ramo de teste existe justamente para isso, e o portal de segredo roda em todo push." Confirmação, depois do argumento contra, por AskUserQuestion, verbatim do líder: "Confirmar o texto (Recomendado)".
 
-## L-33
+## GW-33
 
-Nenhuma regra de átomo vale fora do código do aplicativo do jogo: só as cinco camadas (`core/`, `content/`, `domain/`, `app/` e `present/`) seguem a L-04 e esta lei, e testes, ferramentas, scripts de CI, documentos, commits, itens de tabela e assets se organizam como for melhor em cada caso, sem obrigação de atomizar. Dentro do código do jogo, monolito não é definido por tamanho, é acoplamento sem fronteira, medido por nome próprio possível, mudança que exige tocar outras partes, e consumidor forçado a levar tudo. Nenhuma fatiação acontece nos quatro casos em que agregar é certo: partes que só têm sentido juntas, ordem de leitura que é o próprio conteúdo, artefato de compilação, e coesão exigida por contrato de terceiro verificável. Nenhuma unidade acumula razões de mudar vindas de leis diferentes e não relacionadas; isso é monolito em formação. Nenhuma unidade de código do jogo criada ou crescida numa fatia fecha revisão sem as cinco perguntas do revisor respondidas e registradas (quais leis a obrigam mudar, se a descrição dela precisa de duas ações ligadas, se o teste monta o mundo inteiro para exercitá-la, se a lista de inclusões mistura grupos que não conversam, e quem paga a próxima funcionalidade no histórico de mudanças); silêncio conta como não revisada, e divergência entre implementador e revisor vai ao líder. Nenhum átomo é menor que a menor unidade com significado: fatiar sem sentido e abstração especulativa são proibidos tanto quanto o monolito. Nenhum portão automático por número (linhas, métodos) substitui as cinco perguntas: o teto de linhas do `CONTRACT.md` é recomendação, nunca portão. Nenhum auditor aceita relatório de revisão sem conferir ele mesmo: responde as cinco perguntas sobre o maior arquivo de cada camada do jogo. Nenhum formato ou esquema de terceiro entra nesta lei: ela vale só para o que este projeto autora e possui. Ordem do líder de 20/11/2026, verbatim: *"atomos devem ser apenas para o aplicativo do jogo, para os testes faça como for melhor"*, com o alcance confirmado por `AskUserQuestion`: *"Átomo só no código do jogo"*.
+Nenhuma regra de átomo vale fora do código do aplicativo do jogo: só as cinco camadas (`core/`, `content/`, `domain/`, `app/` e `present/`) seguem a GW-04 e esta lei, e testes, ferramentas, scripts de CI, documentos, commits, itens de tabela e assets se organizam como for melhor em cada caso, sem obrigação de atomizar. Dentro do código do jogo, monolito não é definido por tamanho, é acoplamento sem fronteira, medido por nome próprio possível, mudança que exige tocar outras partes, e consumidor forçado a levar tudo. Nenhuma fatiação acontece nos quatro casos em que agregar é certo: partes que só têm sentido juntas, ordem de leitura que é o próprio conteúdo, artefato de compilação, e coesão exigida por contrato de terceiro verificável. Nenhuma unidade acumula razões de mudar vindas de leis diferentes e não relacionadas; isso é monolito em formação. Nenhuma unidade de código do jogo criada ou crescida numa fatia fecha revisão sem as cinco perguntas do revisor respondidas e registradas (quais leis a obrigam mudar, se a descrição dela precisa de duas ações ligadas, se o teste monta o mundo inteiro para exercitá-la, se a lista de inclusões mistura grupos que não conversam, e quem paga a próxima funcionalidade no histórico de mudanças); silêncio conta como não revisada, e divergência entre implementador e revisor vai ao líder. Nenhum átomo é menor que a menor unidade com significado: fatiar sem sentido e abstração especulativa são proibidos tanto quanto o monolito. Nenhum portão automático por número (linhas, métodos) substitui as cinco perguntas: o teto de linhas do `CONTRACT.md` é recomendação, nunca portão. Nenhum auditor aceita relatório de revisão sem conferir ele mesmo: responde as cinco perguntas sobre o maior arquivo de cada camada do jogo. Nenhum formato ou esquema de terceiro entra nesta lei: ela vale só para o que este projeto autora e possui. Ordem do líder de 20/11/2026, verbatim: *"atomos devem ser apenas para o aplicativo do jogo, para os testes faça como for melhor"*, com o alcance confirmado por `AskUserQuestion`: *"Átomo só no código do jogo"*.
 
-## L-34
+## GW-34
 
 Nenhuma mensagem do Gus Dragon, em qualquer dos cinco canais dele (issue, comentário em issue, discussion, comentário em discussion e arquivo de texto na caixa de entrada do bus), fica sem leitura em primeiro lugar na sessão nem sem confirmação imediata de recebimento, que interrompe a fatia em andamento na hora; o conteúdo da resposta espera a onda fechar. Nenhuma resposta automática falta após a decisão do líder. Nenhuma ideia dele é aprovada por um agente sozinho, e nenhuma resposta promete instantaneidade que a sessão não garante ou deixa de se adequar a uma criança.
 
-## L-35
+## GW-35
 
 Nenhum teste dinâmico (suíte, integração, fuzzing, sanitizador, teste de mutação, benchmark, sonda de janela, teclado, mouse ou tela) roda na sessão viva do líder: roda sempre em container, e sem container disponível o resultado é que não foi executado. Nenhuma proteção se apoia em desligar variável de ambiente de exibição: `XDG_RUNTIME_DIR` do processo sob teste é trocado por diretório próprio, com permissão restrita a `chmod 700`, e a troca é provada em vigor antes de interagir, nunca só assumida por ter subido o container. O compositor gráfico aninhado dentro do container é piso, nunca alternativa a ele.
 
-## L-36
+## GW-36
 
 Nenhuma fatia de engenharia espera lore ainda não escrita: lore que falta se puxa sob demanda em micro-sessão pontual, nunca em ciclo completo de aprofundamento de lore. Esta lei nunca compete com a lei do canon contraditório: canon que contradiz bloqueia, canon que ainda não existe não bloqueia.
 
-## L-37
+## GW-37
 
 Nenhuma fala, aparte, revide, cena ou traço de caracterização do Gus original já aprovado pelo líder linha a linha é editado, reescrito, cortado, comprimido ou acrescentado sem nova autorização explícita dele, nem quando a mudança parece compressão honesta. Esta lei não se confunde com a lei de homenagem a pessoa real: aquela autoriza a homenagem existir; esta autoriza mudar o que já foi aprovado.
 
-## L-38
+## GW-38
 
 Nenhum enigma do jogo, em nenhuma dungeon, câmara ou área secreta, cede por ferramenta do jogo em vez do jogador que segura o controle: nenhum personagem anuncia o padrão em fala ou aparte, nenhuma marcação de interface (HUD, scan, contorno de destaque, prompt) aponta a resposta, e nenhuma passagem cede por insistência ou tentativa exaustiva confortável. A regra vale para todo enigma do jogo, escrito antes ou depois desta lei, sem exceção por antiguidade, e cada documento de puzzle repete a frase-guarda no próprio texto: qualquer solução em que o jogo aponte a resposta contradiz esta decisão. Decisão do líder, 12/09/2026, verbatim: "o jogador resolve, nao é pra ser automatico". O jogo confere só o acerto, nunca o vocabulário técnico por trás dele. Ferramenta que mostra estado observável do mundo é legítima; o que esta lei proíbe é a ferramenta que faz o raciocínio no lugar do jogador.

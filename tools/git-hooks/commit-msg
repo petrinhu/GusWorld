@@ -2,10 +2,10 @@
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Gate de commit-msg do GusWorld (GODS_LAWS.md L-19, L-25). Este arquivo e
+# Gate de commit-msg do GusWorld (GODS_LAWS.md GW-19, GW-25). Este arquivo e
 # so um delegador fino: a logica de verdade mora em
 # tools/security/commit_gate.py, em Python puro, pra rodar identica nas
-# cinco plataformas da matriz (GODS_LAWS.md L-09, L-20).
+# cinco plataformas da matriz (GODS_LAWS.md GW-09, GW-20).
 #
 # Instalacao: este arquivo NAO roda sozinho -- git so executa hook a
 # partir de .git/hooks/<nome> (ou do que core.hooksPath apontar). Rode
@@ -42,7 +42,7 @@ elif command -v python >/dev/null 2>&1; then
     exec python "$__script" "$1"
 else
     echo "commit_gate: python3 (ou python) nao encontrado no PATH." >&2
-    echo "GODS_LAWS.md L-28: nada e instalado sem perguntar ao lider." >&2
+    echo "GODS_LAWS.md GW-28: nada e instalado sem perguntar ao lider." >&2
     echo "Instale python3 e rode 'git commit' de novo, ou avise o lider." >&2
     exit 1
 fi

@@ -6,27 +6,27 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 # docs/tech/adr
 
 Os ADRs do `gusworld_legacy`, trazidos verbatim. O código que eles descrevem não existe mais
-(L-01: código nasce do zero). O que cada bullet registra é **o que sobrevive** — decisão, padrão ou
+(GW-01: código nasce do zero). O que cada bullet registra é **o que sobrevive** — decisão, padrão ou
 lição — e não a stack morta em que cada um foi escrito.
 
 - `ADR-001` — pausa do deep-lore como gating de engenharia. Morto: a instalação da engine antiga
   que o ADR desbloqueava. O princípio "lore não bloqueia código, puxe sob demanda" foi trazido
-  para outro lugar em 01/09/2026, por decisão do líder: é a `L-36` de `../../../GODS_LAWS.md`.
+  para outro lugar em 01/09/2026, por decisão do líder: é a `GW-36` de `../../../GODS_LAWS.md`.
 - `ADR-004` — contrato do `EnvironmentModifier` (ambientes de combate: terreno×clima×período,
   `multAmbiente`). A implementação antiga morreu; o conteúdo de fórmula já vive, atualizado, em
   `docs/design/mecanicas/combat.md` — redundante, não contraditório. Ver achado em `../_INDEX.md`.
 - `ADR-005` — GPLv3 + CC-BY-SA + livros reservados. Morto por inteiro; o próprio documento já se
-  marca **SUPERADO** (pela rotação de licença de código que, por sua vez, foi superada pela L-08).
+  marca **SUPERADO** (pela rotação de licença de código que, por sua vez, foi superada pela GW-08).
 - `ADR-006` — editado em `G21` (28/08/2026): saiu a primitiva HMAC-SHA256 escrita em casa (a
-  cripto vem do GlintFx, LEI ZERO/L-25); ficaram o formato de serialização binário do `domain/`, o
+  cripto vem do GlintFx, LEI ZERO/GW-25); ficaram o formato de serialização binário do `domain/`, o
   carimbo de data/hora por save e a semente de RNG por data/hora/milissegundo, mais a nota de que
   migrators forward-only operam sobre structs versionadas.
 - `ADR-007` — editado em `G21` (28/08/2026): saiu o desenho inteiro em torno do arquivo de
-  controles em JSON legível (formato texto proibido pela L-18); ficaram as três camadas
+  controles em JSON legível (formato texto proibido pela GW-18); ficaram as três camadas
   anti-tamper do save que não dependiam do JSON (detectar sem crashar, slot-id selado dentro do
   payload, chave do selo derivada por KDF em vez de embutida crua).
 - `ADR-016` — motor `techMagic` de efeito data-driven (lista de instruções, não VM/bytecode). Morto
-  como código; o princípio (dado antes de máquina virtual) é o mesmo que a L-04/L-17 de hoje
+  como código; o princípio (dado antes de máquina virtual) é o mesmo que a GW-04/GW-17 de hoje
   consagram. Já tem edição de terminologia aplicada por outra passada (troca pontual de
   "easter-egg" por "subtexto") — não é achado, já está tratado.
 - `ADR-017` — combate unificado por Action-Clock (pedido do Gus Dragon + velocidade por carta).
@@ -34,10 +34,10 @@ lição — e não a stack morta em que cada um foi escrito.
   registro de design histórico; se o combate atual precisar dessa decisão, é o `product-manager` ou
   o `lead-game-designer` quem confirma se já está em `docs/design/mecanicas/`.
 - `ADR-019` — arquitetura de conteúdo atômica/data-driven (canonização de um padrão já emergente).
-  Precursor direto da L-04 ("proibido monolito; cada elemento do jogo é átomo com POCO próprio").
+  Precursor direto da GW-04 ("proibido monolito; cada elemento do jogo é átomo com POCO próprio").
   Sem contradição; decisão viva, já refletida em lei.
 - `ADR-020` — peças de dado componíveis em módulos estreitos + regra do mundo data-driven.
-  Precursor direto da L-04/L-17. Sem contradição; decisão viva, já refletida em lei.
+  Precursor direto da GW-04/GW-17. Sem contradição; decisão viva, já refletida em lei.
 
 **Não presentes** — números aposentados, não reutilizar: `ADR-002`, `ADR-003`, `ADR-008`, `ADR-009`,
 `ADR-010`, `ADR-011`, `ADR-012`, `ADR-013`, `ADR-014`, `ADR-015`, `ADR-018` e `ADR-021`.
@@ -45,13 +45,13 @@ lição — e não a stack morta em que cada um foi escrito.
 ## ADRs de fundação do GusWorld (código do zero, 25/08/2026)
 
 Os quatro abaixo são decisões novas do líder, tomadas antes da primeira fatia de código, cada
-uma com razão de mudar própria (L-33): sistema de build, consumo de dependência, estratégia de
+uma com razão de mudar própria (GW-33): sistema de build, consumo de dependência, estratégia de
 CI e harness de teste são preocupações distintas, ainda que as quatro nasçam da mesma ordem de
 serviço.
 
 - [`ADR-022`](ADR-022-cmake-versao-minima-fixada.md) — CMake como sistema de build, com
   `cmake_minimum_required(VERSION 4.1)` medido (não suposto) contra as cinco plataformas
-  obrigatórias (L-09, L-20); o piso vem do que o GlintFx exige de quem o consome, e as quatro
+  obrigatórias (GW-09, GW-20); o piso vem do que o GlintFx exige de quem o consome, e as quatro
   entradas Linux o atendem pelo próprio gerenciador de pacote, com o Windows pagando um passo
   de instalação. Ninja como gerador **nas cinco plataformas, Windows incluído** — divergência
   consciente do próprio job Windows do GlintFx (que usa o gerador padrão do Visual Studio),
@@ -67,13 +67,13 @@ serviço.
 - [`ADR-024`](ADR-024-ci-cinco-plataformas-cachyos-container.md) — CachyOS entra na matriz de CI
   como container da imagem oficial `cachyos/cachyos:latest` (confirmada por precedente já em
   produção no próprio GlintFx), nunca como Arch reconfigurado. Linux compila com GCC **e** Clang,
-  os dois, em cada uma das quatro plataformas, ambos bloqueantes (L-20); Windows compila com MSVC.
+  os dois, em cada uma das quatro plataformas, ambos bloqueantes (GW-20); Windows compila com MSVC.
   Matriz de **NOVE** entradas, confirmado pelo líder (a leitura literal e uniforme, corrigindo um
   "sete" que era erro aritmético do relay, não do trabalho já feito) — razão dele: cobertura
   desigual esconde bug.
 - [`ADR-025`](ADR-025-harness-teste-proprio-minimo.md) — harness de teste próprio e mínimo
   (asserção, registro, `main`), e a correção registrada de que a LEI ZERO não fala sobre
-  ferramenta de build nem de teste; a cultura de dependência zero vem da L-07 do `GODS_LAWS.md`
+  ferramenta de build nem de teste; a cultura de dependência zero vem da GW-07 do `GODS_LAWS.md`
   do GlintFx, não de uma lei do GusWorld.
 
 ## ADR de processo (20/11/2026)

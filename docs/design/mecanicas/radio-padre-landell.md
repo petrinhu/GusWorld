@@ -2,7 +2,7 @@
 
 > **Status:** CANÔNICO. Decisão do líder em 12/09/2026, por `AskUserQuestion`, em cinco pontos: hardware (acopla no Tavus-Drive), gate (obrigatório, cedo no jogo), lugar do Landell no roster (fora, é quem construiu a ponte), forma de obtenção (blueprint achado, peças caçadas) e o lugar de cada uma das cinco peças (§6). Documento novo, público (a partição público/cifrado desta mecânica está descrita em §8).
 >
-> **Cross-ref:** `docs/design/pillars.md` (Pillar 3, o triângulo de hardware), `docs/design/technomagik.md` (Tavus-Eco, a cena de encontro de 5 beats), `docs/design/mecanicas/deck-mao-sistema.md` §6.1 (aquisição das 20 cartas ESPECIAIS, hoje condicionada a este rádio), `CHARS.md` §8d (os vinte mestres do Codex) e a entrada de Cassandra "Bento" Chevalier em §7, `PLACES.md` (São Camilo, Núcleo Metropolitano), `docs/design/mundo-topologia.md` §2 (gradiente de dificuldade das 13 áreas), `GODS_LAWS.md` L-38 (o jogador resolve o enigma, a ferramenta não).
+> **Cross-ref:** `docs/design/pillars.md` (Pillar 3, o triângulo de hardware), `docs/design/technomagik.md` (Tavus-Eco, a cena de encontro de 5 beats), `docs/design/mecanicas/deck-mao-sistema.md` §6.1 (aquisição das 20 cartas ESPECIAIS, hoje condicionada a este rádio), `CHARS.md` §8d (os vinte mestres do Codex) e a entrada de Cassandra "Bento" Chevalier em §7, `PLACES.md` (São Camilo, Núcleo Metropolitano), `docs/design/mundo-topologia.md` §2 (gradiente de dificuldade das 13 áreas), `GODS_LAWS.md` GW-38 (o jogador resolve o enigma, a ferramenta não).
 
 ---
 
@@ -52,9 +52,9 @@ Quando o rádio liga pela primeira vez, ele precisa estar presente junto de um a
 
 Este documento é público: descreve só o que o jogador observa (o rádio existe, acopla no Tavus-Drive, precisa de blueprint e cinco peças, libera os Tavus-Eco), onde cada peça se acha (§6) e a lore de Landell, que é anterior ao jogo e não é segredo. Nada aqui revela conteúdo que o jogador deva descobrir por si (a fala de um mestre específico) nem funciona como resposta de enigma: a localização de cada peça é o próprio blueprint, nomeado e desenhado abertamente (§9), não um segredo a proteger. Por isso não recebeu gêmeo cifrado em `docs/_secret/mecanicas/`: não há, neste documento, nenhuma revelação escondida do jogador, e um gêmeo sem conteúdo seria um arquivo vazio sem função. Se algum dia uma peça passar a depender de resolver um enigma cuja resposta não deva ficar pública, o gêmeo nasce naquele momento, nomeado `radio-padre-landell-solucao.md`, e não antes.
 
-## 9. A trava (L-38)
+## 9. A trava (GW-38)
 
-O rádio dá **acesso**, nunca resposta. Ele não resolve nenhum puzzle de mestre, não aponta que artefato ligar nem onde, e não substitui o raciocínio do jogador sobre o puzzle da missão de cada mestre, que continua inteiro e continua sendo resolvido pelo jogador, não pelo jogo (`GODS_LAWS.md` L-38: "Nenhum enigma do jogo [...] cede por ferramenta do jogo em vez do jogador que segura o controle"). A busca das cinco peças e do blueprint é exploração e coleta, não um enigma com resposta escondida: o blueprint nomeia e desenha as cinco peças abertamente, exatamente como um diagrama de patente real nomeia os próprios componentes. Qualquer solução em que o jogo aponte a resposta contradiz esta decisão.
+O rádio dá **acesso**, nunca resposta. Ele não resolve nenhum puzzle de mestre, não aponta que artefato ligar nem onde, e não substitui o raciocínio do jogador sobre o puzzle da missão de cada mestre, que continua inteiro e continua sendo resolvido pelo jogador, não pelo jogo (`GODS_LAWS.md` GW-38: "Nenhum enigma do jogo [...] cede por ferramenta do jogo em vez do jogador que segura o controle"). A busca das cinco peças e do blueprint é exploração e coleta, não um enigma com resposta escondida: o blueprint nomeia e desenha as cinco peças abertamente, exatamente como um diagrama de patente real nomeia os próprios componentes. Qualquer solução em que o jogo aponte a resposta contradiz esta decisão.
 
 ## 10. Roberto Landell de Moura, o padre que fez voz sair do nada
 

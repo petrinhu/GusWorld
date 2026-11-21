@@ -8,8 +8,8 @@
 
 ## FASE 0 - Classificação da mudança
 
-- Quebra de compatibilidade de save sentida pelo jogador (sobe o componente **A** da versão, L-23)
-- Mudança no formato do envelope binário de save, configuração, mapa ou catálogo (L-25) sem caminho de migração
+- Quebra de compatibilidade de save sentida pelo jogador (sobe o componente **A** da versão, GW-23)
+- Mudança no formato do envelope binário de save, configuração, mapa ou catálogo (GW-25) sem caminho de migração
 - Criação de tag e publicação de release pública
 - Merge em `main`, push ao remoto público, ou qualquer ação visível em remoto: exige **autorização explícita do líder naquele contexto**, sempre - aprovação anterior não vale para sempre
 
@@ -17,27 +17,27 @@
 
 ## FASE 1 - Pré-condições de qualidade (antes de tocar em tag)
 
-- CI verde nas **nove entradas** da matriz do workflow `Build`, que cobrem **cinco plataformas** (L-09, L-20): Fedora, Ubuntu, Arch, CachyOS e Windows, todas em `:latest`. O Fedora segue `fedora:latest` por decisão do líder ("Manter :latest e medir"). A versão medida é a que sai no log do run do SHA que recebe a tag (`VERSION_ID`)
-- Os **cinco portões** da L-19 fechados: zero aviso de compilação (`-Werror`), ASan e UBSan em build separado, `clang-tidy`/`cppcheck` no CI, `gitleaks` no histórico completo (modo `git`). Limite declarado: o histórico inclui tudo o que está rastreado; o que fica fora do git não chega ao repositório público e este gate não o varre. O limite também está escrito no workflow `gitleaks.yml`. Busca manual de termo: `git log --all -p | grep -ci <termo>`, com `-i`, e o **gate de mensagem de commit** (`tools/security/commit_gate.py`) instalado e com o teste próprio verde (`python3 tools/security/test_commit_gate.py`)
-- **Sexto portão, fora dos cinco da L-19:** CVE do ambiente de build (TST-3a), só Fedora, workflow `Portão de CVE` (`cve.yml`). Barra só CVE crítica com correção publicada, com grype `0.122.1` e SHA-256 fixo. Ubuntu, Arch e CachyOS não têm cobertura ainda (TST-3b, TST-3c e TST-3d), e Windows não tem
+- CI verde nas **nove entradas** da matriz do workflow `Build`, que cobrem **cinco plataformas** (GW-09, GW-20): Fedora, Ubuntu, Arch, CachyOS e Windows, todas em `:latest`. O Fedora segue `fedora:latest` por decisão do líder ("Manter :latest e medir"). A versão medida é a que sai no log do run do SHA que recebe a tag (`VERSION_ID`)
+- Os **cinco portões** da GW-19 fechados: zero aviso de compilação (`-Werror`), ASan e UBSan em build separado, `clang-tidy`/`cppcheck` no CI, `gitleaks` no histórico completo (modo `git`). Limite declarado: o histórico inclui tudo o que está rastreado; o que fica fora do git não chega ao repositório público e este gate não o varre. O limite também está escrito no workflow `gitleaks.yml`. Busca manual de termo: `git log --all -p | grep -ci <termo>`, com `-i`, e o **gate de mensagem de commit** (`tools/security/commit_gate.py`) instalado e com o teste próprio verde (`python3 tools/security/test_commit_gate.py`)
+- **Sexto portão, fora dos cinco da GW-19:** CVE do ambiente de build (TST-3a), só Fedora, workflow `Portão de CVE` (`cve.yml`). Barra só CVE crítica com correção publicada, com grype `0.122.1` e SHA-256 fixo. Ubuntu, Arch e CachyOS não têm cobertura ainda (TST-3b, TST-3c e TST-3d), e Windows não tem
 - ⚠️ O quinto portão é **gancho local**, não etapa de CI: ele roda na máquina de quem commita. Um clone sem `tools/git-hooks/install.py` executado **não tem o portão**, e o CI verde não prova o contrário. Antes de taggear, confirme que o gancho está instalado no clone de onde a tag vai sair
-- Suíte de **replay determinístico** (L-17: mesma semente + mesma lista de comandos reproduz o mesmo estado final): **não aplicável enquanto não houver domínio com comando e evento** (a suíte nasce com a onda do núcleo `D1`, em `TODO.md`)
-- Marcação REUSE/SPDX íntegra em todo arquivo tocado (L-08)
-- `resources/livros/` e `resources/glb/` seguem fora do git; Git LFS íntegro no restante do binário pesado (L-15)
+- Suíte de **replay determinístico** (GW-17: mesma semente + mesma lista de comandos reproduz o mesmo estado final): **não aplicável enquanto não houver domínio com comando e evento** (a suíte nasce com a onda do núcleo `D1`, em `TODO.md`)
+- Marcação REUSE/SPDX íntegra em todo arquivo tocado (GW-08)
+- `resources/livros/` e `resources/glb/` seguem fora do git; Git LFS íntegro no restante do binário pesado (GW-15)
 
 ---
 
 ## FASE 2 - Validação de compatibilidade
 
-- Se a mudança quebra o formato de save: aviso explícito nas release notes, e o componente **A** da versão sobe (L-23)
-- Se não quebra: componente **B** (recurso novo, compatível para trás) ou **C** (correção, sem recurso novo e sem quebra), conforme a tabela da L-23
+- Se a mudança quebra o formato de save: aviso explícito nas release notes, e o componente **A** da versão sobe (GW-23)
+- Se não quebra: componente **B** (recurso novo, compatível para trás) ou **C** (correção, sem recurso novo e sem quebra), conforme a tabela da GW-23
 - Quando a fatia toca save, configuração, mapa ou catálogo: o `internal-auditor` confirma que `AUDITORIAS.md` cobre a mudança antes de seguir
 
 ---
 
 ## FASE 3 - Aprovação e publicação (passo irreversível)
 
-- **Aval explícito do líder no contexto**, tanto para a tag quanto para a release: a L-23 fixa o formato da versão, mas não autoriza taggear por si só
+- **Aval explícito do líder no contexto**, tanto para a tag quanto para a release: a GW-23 fixa o formato da versão, mas não autoriza taggear por si só
 - Tag no formato **`vA.B.C.D`**, componente certo conforme a Fase 2
 - Release notes agrupadas por tema, escritas para o jogador (destaques, corrigido, quebra de compatibilidade), nunca changelog cru de commit
 
@@ -47,4 +47,4 @@
 
 - Confirmar a tag no remoto por `git ls-remote <url> <tag>` - **nunca só pela mensagem do `git push`**, que já mentiu antes em cenário de remoto duplo
 - **Nenhuma reescrita de tag já publicada.** Erro grave descoberto depois vira tag corretiva nova, nunca `--force` sobre a já publicada
-- Registro no `TODO.md` do que mudou, quando, e quem aprovou (o líder, com timestamp real, L-12)
+- Registro no `TODO.md` do que mudou, quando, e quem aprovou (o líder, com timestamp real, GW-12)

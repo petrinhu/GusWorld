@@ -11,7 +11,7 @@
 #       records ran=false with a reason.
 #   (c) in that case the notice shows the motive of run_suite.sh (last-reason), not a
 #       generic text.
-# Runs inside the container (L-35). The container has no docker, so the docker of each case
+# Runs inside the container (GW-35). The container has no docker, so the docker of each case
 # is the fake one. HOME is fake, and every case has its own fixture and its own state.
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 

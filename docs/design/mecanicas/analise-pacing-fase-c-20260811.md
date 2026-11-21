@@ -70,7 +70,7 @@
 
    > ⚠️ **Não verificado contra código.** Esta afirmação sobre `scripted_brain.cpp` e
    > `pick_weighted_enemy_target` vem da análise de projeto, não de medição em código
-   > executado. O código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte
+   > executado. O código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte
    > que a redação original citava não existe. Revalidar quando houver implementação.
 7. **Recomendação final: não escolher statline agora.** O incumbente 33/12 continua
    sendo o melhor statline conhecido PARA O JOGO COMO ELE É HOJE (mira titular:
@@ -403,7 +403,7 @@ continuaria mirando `players.front()`, o primeiro da lista. O item
 > verificação contra blob commitado, `mira_target_weight`/`pick_weighted_enemy_target`
 > e `scripted_brain.cpp` vem da análise de projeto, não de medição em código
 > executado ou em blob commitado real. O código deste projeto nasce do zero
-> (GODS_LAWS.md, L-01), e a fonte que a redação original citava não existe. Revalidar
+> (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não existe. Revalidar
 > quando houver implementação.
 
 - **Os 48 pontos desta Fase C descrevem o jogo COM a mira ponderada ativa**

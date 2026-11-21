@@ -63,7 +63,7 @@ mundo antes de o jogador chegar à dungeon final que a descobre.
 ### O intervalo não documentado (entre o fim da Era Lendária e a Era 1)
 
 Um intervalo não documentado, de duração não fixada aqui (o valor exato está na mesma seção
-cifrada acima), separa o fim da Era Lendária do início do trecho que este documento já cobre (Era 1, Neo-Sylvania, -1.100 D.E.L.). Não é o mesmo período que o Hiato descrito adiante (entre a Era 1 e a Era 2, -700 a -150 D.E.L.): são duas idades sombrias distintas, em escalas de tempo diferentes, sem sobreposição entre elas. Neste intervalo mais antigo e mais longo, a humanidade reconstrói por séculos, trocando o nome das coisas e absorvendo, de forma secreta, conhecimento anterior preservado por achados arqueológicos. **Sem evento documentado**, pelo mesmo desenho do Hiato: intervalo aberto de propósito, não lacuna a preencher agora (L-36 do projeto).
+cifrada acima), separa o fim da Era Lendária do início do trecho que este documento já cobre (Era 1, Neo-Sylvania, -1.100 D.E.L.). Não é o mesmo período que o Hiato descrito adiante (entre a Era 1 e a Era 2, -700 a -150 D.E.L.): são duas idades sombrias distintas, em escalas de tempo diferentes, sem sobreposição entre elas. Neste intervalo mais antigo e mais longo, a humanidade reconstrói por séculos, trocando o nome das coisas e absorvendo, de forma secreta, conhecimento anterior preservado por achados arqueológicos. **Sem evento documentado**, pelo mesmo desenho do Hiato: intervalo aberto de propósito, não lacuna a preencher agora (GW-36 do projeto).
 
 ---
 

@@ -1,5 +1,5 @@
 {
-  "_por_que": "Arma o TDD estrito da L-19 por maquina, e nao por disciplina. Criado em 28/08/2026 por ordem do lider, depois de a reordenacao de 25/08 apontar que o T1 nao tinha hook que o forcasse. O guard roda em PreToolUse (decide bloquear) e o runner em PostToolUse (executa e grava estado).",
+  "_por_que": "Arma o TDD estrito da GW-19 por maquina, e nao por disciplina. Criado em 28/08/2026 por ordem do lider, depois de a reordenacao de 25/08 apontar que o T1 nao tinha hook que o forcasse. O guard roda em PreToolUse (decide bloquear) e o runner em PostToolUse (executa e grava estado).",
   "_estado": "Armado. Os arquivos C++ de produção das cinco camadas (core/, content/, domain/, app/, present/) casam production_globs: editá-los exige teste vermelho antes. A suíte roda no contêiner gusworld-tdd-<hash16> pelo run_suite.sh (ADR-026).",
   "_semantica_do_guard": "estado ausente BLOQUEIA; teste vermelho PERMITE (fase red); tudo verde BLOQUEIA (escreva o teste que falha antes); comando quebrado faz fail-open com aviso. Escape legitimo: TDD_PHASE=refactor para refatorar, TDD_GUARD=off para desligar pontualmente.",
   "preset": "cpp-ctest",

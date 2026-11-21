@@ -2,7 +2,7 @@
 
 > **Status:** CONCEITO (mesmo grão que as demais dungeons registradas em
 > `docs/design/mundo-topologia.md` §4: tema, gimmick e forma; layout sala a sala fica para
-> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, L-06/L-27). Nada aqui é
+> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, GW-06/GW-27). Nada aqui é
 > planta nem disposição fina de encontro.
 >
 > **Decisão do líder, 12/09/2026.** Escolha do problema (as Sete Pontes de Königsberg, Euler,
@@ -17,8 +17,8 @@
 > labirinto). `docs/design/roster-analogos/09-euler.md` e
 > `docs/narrative/deep/characters/mestre-mat-02-euler.md` (a versão pessoal de Euler deste mesmo
 > problema, num distrito alagado diferente, ver §10 abaixo). `docs/design/mecanicas/cartas/euler.md`
-> (a carta Ponte de Euler / Bridge-Walk). L-26 (perspectiva 3/4 top-down fixa, sem eixo de altura).
-> L-27 (nenhuma marcação de interface antes de o GlintFx traduzir marcação). Mesma trava de
+> (a carta Ponte de Euler / Bridge-Walk). GW-26 (perspectiva 3/4 top-down fixa, sem eixo de altura).
+> GW-27 (nenhuma marcação de interface antes de o GlintFx traduzir marcação). Mesma trava de
 > "o jogador resolve" da espiral de Ulam (`mundo-topologia.md` §4 item 13) e das cordas emaranhadas
 > (`docs/design/dungeons/catedrais-cordas-emaranhadas.md`).
 >
@@ -77,7 +77,7 @@ antecâmara).
 ## 4. Grade e câmera
 
 Toda a malha, os cinco cruzamentos e as dez vielas possíveis (8 fixas + 2 portões), vive num único
-plano, em grade quadrada 2D, sem eixo de altura e sem câmera que gire ou suba (L-26). As escadas já
+plano, em grade quadrada 2D, sem eixo de altura e sem câmera que gire ou suba (GW-26). As escadas já
 citadas no gimmick original mudam **rota**, nunca **altura**: são leitura de cenário (uma escada
 visível na Área secreta E de `areas-secretas/04-periferia-vielas.md`, por exemplo, é ponto de
 orientação, não trecho escalável) e cabem direto na perspectiva 3/4 top-down fixa do jogo.

@@ -5,7 +5,7 @@
 > **Origem:** decisão do líder de 11/10/2026, verbatim: *"acrescente os outros arcontes além de yaldabaoth (demiurgo)"*. A lista que ele mandou: *"behemoth, horaeus, ailoaeus, astaphaeus, adonai, sabaoth, iao, ialdabaoth, leviathan"*. Três escolhas por `AskUserQuestion`: **"quero tudo"** (entram os sete do Apócrifo de João e as doze autoridades); os nomeados **vivem no mundo por conta própria**, e a magia do Yaldabaoth invoca servos anônimos que não são estes; os rostos entram como **descrição escrita**, e a arte fica inteiramente com o líder.
 > **Companheiros:** `docs/narrative/deep/antagonists/demiurgo.md` (Yaldabaoth) e `docs/narrative/deep/antagonists/pleroma-setiano.md` (os seres acima dele). Este arquivo não redefine nenhum dos dois. Usa como base de geografia `docs/design/mundo-topologia.md` §2.
 > **Camada de rigor:** N4 (documento).
-> **Leis que governam este texto:** L-02 (sem arte nem pipeline visual: os rostos são descrição de forma), L-13 (canon desatualizado bloqueia), L-14 (nada declarado morto por agente), L-16 (sem homenagem a pessoa real), L-29 (cortes; C-15 manda orçar conteúdo por área), L-33 (atomização: o documento agrega porque a ordem de leitura é o próprio conteúdo), L-34, L-38 (nenhum arconte resolve enigma pelo jogador). Do GODS_LAWS global, L-76 (falas em intent, nunca prosa final) e L-22 (pesquisa antes do planejamento).
+> **Leis que governam este texto:** GW-02 (sem arte nem pipeline visual: os rostos são descrição de forma), GW-13 (canon desatualizado bloqueia), GW-14 (nada declarado morto por agente), GW-16 (sem homenagem a pessoa real), GW-29 (cortes; C-15 manda orçar conteúdo por área), GW-33 (atomização: o documento agrega porque a ordem de leitura é o próprio conteúdo), L-34, GW-38 (nenhum arconte resolve enigma pelo jogador). Do GODS_LAWS global, L-76 (falas em intent, nunca prosa final) e L-22 (pesquisa antes do planejamento).
 > **Tema proposto:** Fronteira. Confirmado ou não pelo líder na ponta P19.
 
 ---
@@ -14,7 +14,7 @@
 
 Os nomes desta lista não vêm de uma tradição só. Vêm de três corpos de texto distintos (seção 2), com sobreposição de nomes entre eles. Essa sobreposição é **fato histórico**, e este documento a registra como tal, sem escolher uma tradição como a certa.
 
-Três tradições num documento só, porque a sobreposição entre elas é o próprio conteúdo: quem lê precisa ver os nomes repetidos lado a lado para entender por que eles não são um ser só. Cada tradição é um bloco com fronteira própria (seções 3, 4 e 5), e pode sair sozinha sem tocar as outras. A ordem da escada planetária (seção 3) é o próprio conteúdo, por isso fica em um bloco só (L-33).
+Três tradições num documento só, porque a sobreposição entre elas é o próprio conteúdo: quem lê precisa ver os nomes repetidos lado a lado para entender por que eles não são um ser só. Cada tradição é um bloco com fronteira própria (seções 3, 4 e 5), e pode sair sozinha sem tocar as outras. A ordem da escada planetária (seção 3) é o próprio conteúdo, por isso fica em um bloco só (GW-33).
 
 ---
 
@@ -66,7 +66,7 @@ A lista que o líder mandou é a da ofita, descrita por Orígenes e reconstruíd
 
 ## 4. Tradição A: os sete do Apócrifo de João, com forma animal
 
-Sete seres, cada um com forma de animal ou de fogo, descritos no Apócrifo de João (a conferir na edição). A forma é descrita **por escrito**, como texto de bestiário: nenhuma especificação visual (L-02).
+Sete seres, cada um com forma de animal ou de fogo, descritos no Apócrifo de João (a conferir na edição). A forma é descrita **por escrito**, como texto de bestiário: nenhuma especificação visual (GW-02).
 
 | ID | Nome (grafias) | Forma, descrição escrita (a conferir) | Mesmo nome em outra tradição | Lugar no jogo (seção 8) |
 |---|---|---|---|---|
@@ -134,7 +134,7 @@ O que o Yaldabaoth invoca em combate, como magia, são **servos anônimos e desc
 
 ### 6.3 Limite de nomeados por área
 
-Cada nomeado consome conteúdo da área onde vive (L-29, corte C-15: orçamento de conteúdo por área). Por isso, a proposta é **no máximo dois nomeados por área**, somando combate e presença. A seção 8 respeita esse limite. A Catedrais Neo-Sylvania, por exemplo, tem o Yaldabaoth (que já vaga lá por `demiurgo.md` §4) e um segundo nomeado (SE-6). A área faraday fica sem nomeado, por desenho (seção 8).
+Cada nomeado consome conteúdo da área onde vive (GW-29, corte C-15: orçamento de conteúdo por área). Por isso, a proposta é **no máximo dois nomeados por área**, somando combate e presença. A seção 8 respeita esse limite. A Catedrais Neo-Sylvania, por exemplo, tem o Yaldabaoth (que já vaga lá por `demiurgo.md` §4) e um segundo nomeado (SE-6). A área faraday fica sem nomeado, por desenho (seção 8).
 
 **Exceção de contagem para o par de irmãos.** Caim e Abel são dois seres, mas um único conjunto de ambiente (seção 8.1). O limite conta **encaixes de ambiente**, e o par ocupa um. Em Distritos Inferiores ficam então dois encaixes: o par de irmãos e SE-3. Esta exceção é de desenho e vai à ratificação do líder junto com a seção 8.1.
 
@@ -182,7 +182,7 @@ Os tiers são os de `docs/design/mundo-topologia.md` §2 (tabela, linhas 19 a 26
 | Catedrais Neo-Sylvania | 4 | OF-1 Yaldabaoth (já vaga, `demiurgo.md` §4), SE-6 Adonin (presença) | liturgia repetida: o macaco que imita |
 | Montadora Confluência | 4 | OF-3 Sabaoth (combate) | ferro, fábrica e guerra: Marte |
 | Selve Profunda | 5 | SE-4 Yao (presença) | a serpente de sete cabeças. Convive com o ritual do Núcleo Mandelbrot sem vínculo escrito (ponta P25) |
-| Área faraday | especial | nenhum | por desenho: presença aqui seria sinal de pista num enigma (L-38) |
+| Área faraday | especial | nenhum | por desenho: presença aqui seria sinal de pista num enigma (GW-38) |
 
 **Conta por área:** nenhuma área passa de dois encaixes. Dutos Infernais, Catedrais Neo-Sylvania e Distritos Inferiores chegam a dois, sendo o de Distritos a exceção de contagem da seção 6.3.
 
@@ -209,12 +209,12 @@ Cada um dos seis tem **um intent próprio**, que não se repete. São stubs de d
 
 **Restrições:**
 - Nenhum intent reordena a fila de iniciativa. Essa é a mecânica característica do Yaldabaoth (`demiurgo.md` §6), e não é repetida.
-- Nenhum intent toca portão, passagem ou engrenagem de enigma (L-38). O intent de Iao não toca os portões das Sete Pontes, e o de Astaphaeus não puxa o jogador para fora da rota de nenhum puzzle.
+- Nenhum intent toca portão, passagem ou engrenagem de enigma (GW-38). O intent de Iao não toca os portões das Sete Pontes, e o de Astaphaeus não puxa o jogador para fora da rota de nenhum puzzle.
 - Sem fala. Ponta P27 trata das falas, se o líder quiser alguma.
 
 ---
 
-## 10. Frase-guarda (L-38)
+## 10. Frase-guarda (GW-38)
 
 Nenhum arconte deste documento mede engrenagem, aponta padrão, anuncia sequência ou abre passagem. Nenhum dos seis, nenhum dos sete, e nenhum dos doze tem poder de resolver enigma pelo jogador.
 
@@ -235,14 +235,14 @@ Qualquer solução em que o jogo aponte a resposta contradiz esta decisão. Deci
 ## 12. O que este documento NÃO faz
 
 - Não cria arconte fora das três listas.
-- Não especifica arte, modelo, animação ou pipeline (L-02). Os rostos são descrição de forma, e a arte é do líder.
+- Não especifica arte, modelo, animação ou pipeline (GW-02). Os rostos são descrição de forma, e a arte é do líder.
 - Não dá tier numérico, nem AP, nem HP, nem dano.
 - Não funde tradições e não trata nome igual como o mesmo ser.
 - Não atribui função doutrinal às doze.
 - Não altera arquivo existente: `demiurgo.md`, `pleroma-setiano.md`, `mundo-topologia.md`, `CHARS.md`, `PLACES.md`, `TODO.md` e o `combat.md` ficam como estão.
 - Não cita nem sugere conteúdo de `docs/_secret/`.
 - Não aponta, por elipse ou por insinuação, para violência entre Caim e Abel (decisão do líder de 11/10/2026, seção 5).
-- Não cita o filho do líder (L-16).
+- Não cita o filho do líder (GW-16).
 - Não descreve os seres do Pleroma: eles estão em `pleroma-setiano.md`.
 - Não escreve fala final: nenhum nomeado tem fala nesta proposta (L-76 global).
 

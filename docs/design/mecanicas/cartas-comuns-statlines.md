@@ -281,7 +281,7 @@ O `Ondha-Colapso` rápido não é o Bento ficando forte demais: é o jogo **ensi
 > ⚠️ **Não verificado contra código.** Toda esta seção descreve uma implementação
 > (wiring, arquivos de teste, contagem de casos e assertions) contra código-fonte que
 > não existe neste projeto. O código deste projeto nasce do zero (GODS_LAWS.md,
-> L-01), e os arquivos que a redação original citava (`combat_state_machine.cpp`,
+> GW-01), e os arquivos que a redação original citava (`combat_state_machine.cpp`,
 > `combat_records.hpp`, `combat_actor.cpp`, `cartas_comuns_engine_test.cpp`) não
 > existem. A especificação de comportamento abaixo (regras, fórmulas, nomes de campo)
 > continua válida como descrição de intenção; revalidar contra código quando houver

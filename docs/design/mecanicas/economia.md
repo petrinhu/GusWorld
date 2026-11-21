@@ -255,24 +255,24 @@ A derrota (§3.3) NUNCA anula os ganhos de vitórias anteriores — o wipe é um
 
 ## §5.5. Lanches e ingredientes de craft (canon do Gus Dragon), conteúdo movido
 
-**O que morava aqui:** o canon pessoal do Gus Dragon (L-16): as doze comidas, os oito
+**O que morava aqui:** o canon pessoal do Gus Dragon (GW-16): as doze comidas, os oito
 ingredientes de craft, a cozinha do apartamento Vance como local de craft (caderneta de Gargi
 Vance, `in-world-docs.md` Documento 19), e as duas decisões de 2026-08-25 sobre como cozinhar se
 amarra a essa caderneta (a trava de três retornos herdada, e cada receita nova sendo uma página
 escrita à mão pela mãe).
 
-**Por que saiu daqui:** L-33 de `GODS_LAWS.md`: economia de crédito muda quando preço, fonte e
+**Por que saiu daqui:** GW-33 de `GODS_LAWS.md`: economia de crédito muda quando preço, fonte e
 sumidouro mudam; comida muda quando o catálogo e o craft mudam. As duas viviam juntas só porque
 foi ali que a conversa começou em 2026-07-17, não porque compartilham razão de mudar. Decisão do
 líder, verbatim, sobre como fazer a extração: "opcao um e deixe o ponteiro no economia.md para o
 novo arquivo".
 
 **Onde está agora:** [`comidas-ingredientes-craft.md`](comidas-ingredientes-craft.md), inteiro,
-nada perdido (L-14). O craft de bateria a partir de duas dessas comidas (suco de limão, água com
+nada perdido (GW-14). O craft de bateria a partir de duas dessas comidas (suco de limão, água com
 gás) segue como já era, em [`cartas-hardware-pirataria-energia.md`](cartas-hardware-pirataria-energia.md)
 §5.
 
-**Por que o número §5.5 continua aqui, vazio:** este documento não foi renumerado (L-30, L-33). O
+**Por que o número §5.5 continua aqui, vazio:** este documento não foi renumerado (GW-30, GW-33). O
 §5.5 fica de pé, sem conteúdo próprio, só para nenhuma citação externa que aponte pro NÚMERO
 quebrar. As duas citações que precisavam do CONTEÚDO em si (não do número) foram atualizadas para
 o arquivo novo: `cartas-hardware-pirataria-energia.md`, linhas 131 e 164.
@@ -423,7 +423,7 @@ Anti-grind: ingredientes raros/épicos vêm de Knowledge-gated drops (inimigos-m
 ---
 
 **Última revisão:** 2026-08-25, mesma data, mais uma rodada (§5.5 extraída inteira para
-`comidas-ingredientes-craft.md`, L-33: economia de crédito e sistema de comida mudam por razão
+`comidas-ingredientes-craft.md`, GW-33: economia de crédito e sistema de comida mudam por razão
 diferente; decisão do líder sobre a forma da extração, verbatim: "opcao um e deixe o ponteiro no
 economia.md para o novo arquivo". Nenhuma outra seção deste documento foi renumerada ou tocada;
 §5.5 continua existindo como número, vazio, só como ponteiro). Revisão anterior, mesma data
@@ -462,7 +462,7 @@ onde o nome já diz — pão de alho/Alho+Manteiga, pizza de atum/Atum em lata+O
 alho e óleo/Alho; seis comidas citadas sem efeito ficam marcadas ⚠️, nenhum efeito sugerido no
 canon; `cartas-hardware-pirataria-energia.md` §5 fecha em paralelo se a bateria craftada herda os
 riscos da pirata comprada). Revisão anterior, mesmo dia: 2026-08-25 (adição §5.5, catálogo dos
-quatro lanches favoritos reais do Gus Dragon como itens de cura, canon pessoal sob L-16 de
+quatro lanches favoritos reais do Gus Dragon como itens de cura, canon pessoal sob GW-16 de
 `GODS_LAWS.md`; suco de limão e água com gás ganham efeito e viram matéria-prima de craft de
 bateria de baixa qualidade, canonizado em `cartas-hardware-pirataria-energia.md` §5). Revisão
 anterior: 2026-08-01 (adição §0, doutrina do

@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-> **RESGATADO em 25/08/2026 do `gusworld_legacy`.** Ferramenta de produção/design (não é feature do jogo): classifica o espectro político de figuras históricas do roster em `docs/design/roster-analogos/`, via fork/port do quiz 8values. O script `8values_engine.py` citado aqui **não existe neste repositório** (era código do projeto anterior, fora do escopo do L-01 por ser ferramenta de produção, não motor de jogo — mas ainda assim não sobreviveu ao reset). Se a ferramenta for necessária de novo, reescreva-a; este documento preserva a atribuição, o outreach já enviado e o texto-fonte do quiz.
+> **RESGATADO em 25/08/2026 do `gusworld_legacy`.** Ferramenta de produção/design (não é feature do jogo): classifica o espectro político de figuras históricas do roster em `docs/design/roster-analogos/`, via fork/port do quiz 8values. O script `8values_engine.py` citado aqui **não existe neste repositório** (era código do projeto anterior, fora do escopo do GW-01 por ser ferramenta de produção, não motor de jogo — mas ainda assim não sobreviveu ao reset). Se a ferramenta for necessária de novo, reescreva-a; este documento preserva a atribuição, o outreach já enviado e o texto-fonte do quiz.
 
 ---
 

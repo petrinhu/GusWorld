@@ -2,7 +2,7 @@
 //
 // Bridge-Walk (Euler): ForaDeCombate, Eletrico, mana 0. Posse-only (atalho
 // de exploração + revela o grafo da dungeon); sem programa de combate.
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/euler.md.
 
 #meta id euler

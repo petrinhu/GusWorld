@@ -2,7 +2,7 @@
 
 > **Status:** CONCEITO (mesmo grão que as demais dungeons e áreas secretas registradas em
 > `docs/design/mundo-topologia.md` §4/§4.1: tema, gimmick e forma; layout sala a sala fica para
-> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, L-06/L-27). Nada aqui é
+> produção, quando a engine de mapa existir e o GlintFx tiver `present/`, GW-06/GW-27). Nada aqui é
 > planta nem disposição fina de encontro.
 >
 > **Decisão do líder, 12/09/2026.** Local escolhido por `AskUserQuestion` entre três opções:
@@ -23,8 +23,8 @@
 > dungeon, A e C, seguem com pista e enigma próprios, sem tocar o vitral). `docs/narrative/environments/03-catedrais-neo-sylvania.md`
 > §2.1 e §3 (vitral em arco-quente, vocabulário nativo de vitral-tech) e §7 (ganchos mecânicos já
 > registrados). `docs/design/mundo-topologia.md` §7 ("pedra + vitral-tech" já é a paleta/ecossistema
-> fixado das Catedrais). L-26 (perspectiva 3/4 top-down fixa, sem eixo de altura: o vitral é
-> parede, o jogador não sobe nem escala para trabalhar nele). L-27 (nenhuma marcação de interface
+> fixado das Catedrais). GW-26 (perspectiva 3/4 top-down fixa, sem eixo de altura: o vitral é
+> parede, o jogador não sobe nem escala para trabalhar nele). GW-27 (nenhuma marcação de interface
 > antes de o GlintFx traduzir marcação).
 >
 > **A lógica de coloração das regiões e o teorema real por trás do vitral são área cifrada:**
@@ -62,7 +62,7 @@ documento).
 
 ## 3. Como o jogador manipula as peças, sem escalar a parede
 
-A rosácea fica alta na parede, fora de alcance (L-26: perspectiva 3/4 top-down fixa, sem eixo de
+A rosácea fica alta na parede, fora de alcance (GW-26: perspectiva 3/4 top-down fixa, sem eixo de
 altura, o jogador não sobe nem escala para trabalhar nela). Cada uma das oito regiões da armação
 de chumbo tem sua própria corda de guincho, presa a um torniquete baixo ao pé da parede, no
 mesmo vocabulário mecânico já nativo da Catedral (cordas, roldanas, relojoaria de latão): o

@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Bridge-Walk (`euler`)
 
-**Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, extração do projeto anterior (L-01).
+**Tipo Diátaxis:** Explanation. **Audiência:** design/engenharia deste projeto. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, extração do projeto anterior (GW-01).
 
 Dado completo em [`resources/cards/euler.gw.card`](../../../../resources/cards/euler.gw.card).
 
@@ -29,7 +29,7 @@ enigma, nunca destaca a saída certa, e nunca computa paridade ou qualquer outra
 Nenhum puzzle do jogo, incluindo a própria missão de descoberta desta carta na Periferia
 (`docs/design/dungeons/periferia-pontes-de-konigsberg.md`), se resolve por equipá-la ou usá-la:
 mostrar que uma ligação existe não é o mesmo que apontar qual delas sobra ou falta. Decisão do
-líder, 12/09/2026, generalizada em L-38 de `GODS_LAWS.md`: nenhum enigma do jogo cede por
+líder, 12/09/2026, generalizada em GW-38 de `GODS_LAWS.md`: nenhum enigma do jogo cede por
 ferramenta do jogo em vez do jogador que segura o controle.
 
 ## Pontas soltas

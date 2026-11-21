@@ -4,7 +4,7 @@
 >
 > **Todo valor e todo prazo abaixo foram verificados em 05/09/2026** e mudam por portaria do órgão nacional a qualquer momento. Antes de agir sobre qualquer número aqui, confirme se ele ainda vale.
 >
-> Ponteiro de rastreio (L-30 do `GODS_LAWS.md` do projeto): item `G31` da `TODO.md`. Este arquivo é material de apoio à decisão registrada ali, não um checklist novo, e não substitui a linha de `ASSETS-LICENSE.md` que já atribui a decisão ao titular.
+> Ponteiro de rastreio (GW-30 do `GODS_LAWS.md` do projeto): item `G31` da `TODO.md`. Este arquivo é material de apoio à decisão registrada ali, não um checklist novo, e não substitui a linha de `ASSETS-LICENSE.md` que já atribui a decisão ao titular.
 
 ---
 
@@ -68,7 +68,7 @@ Quem usa um nome de boa-fé por pelo menos **seis meses**, sem tê-lo registrado
 
 ## 6. O pedido é público
 
-Assim que protocolado, o pedido é **publicado no boletim semanal do órgão**, com **sessenta dias** de prazo para qualquer pessoa apresentar oposição. Nessa publicação ficam visíveis: o sinal pedido (nome ou desenho), a categoria, a descrição do que ele cobre, e o **nome do requerente**, que precisa ser o titular adulto (Petrus Alves da Silva Costa, pela L-08 do projeto), nunca o filho do líder, mesmo que a ideia da marca seja dele.
+Assim que protocolado, o pedido é **publicado no boletim semanal do órgão**, com **sessenta dias** de prazo para qualquer pessoa apresentar oposição. Nessa publicação ficam visíveis: o sinal pedido (nome ou desenho), a categoria, a descrição do que ele cobre, e o **nome do requerente**, que precisa ser o titular adulto (Petrus Alves da Silva Costa, pela GW-08 do projeto), nunca o filho do líder, mesmo que a ideia da marca seja dele.
 
 ---
 

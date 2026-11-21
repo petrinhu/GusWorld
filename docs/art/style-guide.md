@@ -91,7 +91,7 @@ Biolúmen vegetal, fractais visíveis, gótico-matemático. **Verde-azulado domi
 
 ## 5. Lighting bible
 
-**Seção apagada sob a L-24.** A seção original descrevia luz direcional/ambiente/fog em termos de engine 3D (`OmniLight3D`, `SDFGI`, `WorldEnvironment` fog volumétrico) — não se aplica a sprites pixel-art, onde luz/sombra normalmente é pintada/baked no próprio sprite ou aplicada via overlay de color-grading 2D.
+**Seção apagada sob a GW-24.** A seção original descrevia luz direcional/ambiente/fog em termos de engine 3D (`OmniLight3D`, `SDFGI`, `WorldEnvironment` fog volumétrico) — não se aplica a sprites pixel-art, onde luz/sombra normalmente é pintada/baked no próprio sprite ou aplicada via overlay de color-grading 2D.
 
 **Pendência de spec 2D:** como o jogo comunica "mood" por cena em pixel art — paleta-por-hora-do-dia? overlay de cor no glintfx (screen-space tint)? sprite variants pré-pintados por bioma? Decisão do líder, não assumida aqui. O **mapa emocional por ato** (§6, abaixo) continua vigente independente da resposta técnica.
 
@@ -110,7 +110,7 @@ Vigente, agnóstico de dimensão.
 ## 7. Silhouette rules
 
 - **Silhouette test obrigatório:** screenshot da cena em preto puro contra BG branco. Protagonista, inimigo e objetivo identificáveis em 3s. Vigente.
-- **Character read multi-direcional:** a regra antiga exigia silhueta em 8 ângulos e teste em turntable 3D; foi **apagada sob a L-24**, por ser regra de pipeline 3D num jogo 2D pixel-art (L-02). **Pendência de spec 2D:** quantas direções o pixel-art precisa cobrir (PixelLab tipicamente gera um jogo fixo de direções, não rotação livre) — cruzar com a decisão já registrada em memória de locomoção (4 direções únicas, sem flip, ver `project_locomotion_animacao`) quando o líder consolidar a spec formal.
+- **Character read multi-direcional:** a regra antiga exigia silhueta em 8 ângulos e teste em turntable 3D; foi **apagada sob a GW-24**, por ser regra de pipeline 3D num jogo 2D pixel-art (GW-02). **Pendência de spec 2D:** quantas direções o pixel-art precisa cobrir (PixelLab tipicamente gera um jogo fixo de direções, não rotação livre) — cruzar com a decisão já registrada em memória de locomoção (4 direções únicas, sem flip, ver `project_locomotion_animacao`) quando o líder consolidar a spec formal.
 - **Gus:** triângulo invertido (cabelo asimétrico dominando **quadrante superior DIREITO** + ombros do sobretudo + base estreita das pernas finas). Aparelho ortodôntico visível mesmo em silhueta lateral (mandíbula com "linha" extra). Tavus-Drive saliente no pulso ESQUERDO. Traços de identidade — vigentes, agnósticos de dimensão. Sheet completo: `docs/art/characters/gus.md`.
 - **Inimigos cidade:** ângulos agudos, simetria quebrada (corporativo = uncanny). Triangular shape language. Vigente.
 - **Inimigos Selve:** fractal/orgânico, ramificação em razão recorrente visível. Curvas com pontas (cipó + espinho). Vigente.
@@ -119,15 +119,15 @@ Vigente, agnóstico de dimensão.
 
 ## 8. Target poly budget
 
-**Seção apagada sob a L-24.** Poly budget (tris/texture/material slots) é conceito 3D puro — não existe em pixel-art.
+**Seção apagada sob a GW-24.** Poly budget (tris/texture/material slots) é conceito 3D puro — não existe em pixel-art.
 
-**Resolução do sprite: DECIDIDO em 30/08/2026, pelo líder, por `AskUserQuestion`.** Tamanho canônico **180×180 para todo o elenco**, sem diferenciação por tier (hero/NPC/inimigo/boss/prop compartilham a mesma resolução lógica). Verbatim dele: *"todos 180, mas deixa para mudar o tamanho no glintfx, com o motor grafico, nao precisa regenerar"*. Os assets que hoje estão em 256×256 no disco (o Gus e parte do elenco, ver `docs/art/sprites-inventory.md`) **não são regerados**: o ajuste de tamanho é responsabilidade da camada de apresentação, em tempo de execução, pelo motor gráfico do GlintFx — não do pipeline de geração PixelLab. Isto abre uma exigência nova ao GlintFx, registrada no `TODO.md` (item `P4`); o pedido só vai ao bus quando `present/` esbarrar de fato na falta (L-07).
+**Resolução do sprite: DECIDIDO em 30/08/2026, pelo líder, por `AskUserQuestion`.** Tamanho canônico **180×180 para todo o elenco**, sem diferenciação por tier (hero/NPC/inimigo/boss/prop compartilham a mesma resolução lógica). Verbatim dele: *"todos 180, mas deixa para mudar o tamanho no glintfx, com o motor grafico, nao precisa regenerar"*. Os assets que hoje estão em 256×256 no disco (o Gus e parte do elenco, ver `docs/art/sprites-inventory.md`) **não são regerados**: o ajuste de tamanho é responsabilidade da camada de apresentação, em tempo de execução, pelo motor gráfico do GlintFx — não do pipeline de geração PixelLab. Isto abre uma exigência nova ao GlintFx, registrada no `TODO.md` (item `P4`); o pedido só vai ao bus quando `present/` esbarrar de fato na falta (GW-07).
 
 **Pendência de spec 2D, ainda em aberto:** nº de frames por animação e tamanho de atlas/spritesheet; orçamento de créditos PixelLab por asset. Decisão do líder, não assumida aqui.
 
 ## 9. Texture strategy
 
-**Seção apagada sob a L-24.** Gradient atlas + vertex color + UV unwrap é pipeline 3D — não se aplica a pixel-art gerado via PixelLab.
+**Seção apagada sob a GW-24.** Gradient atlas + vertex color + UV unwrap é pipeline 3D — não se aplica a pixel-art gerado via PixelLab.
 
 **Profundidade de paleta por personagem: DECIDIDO em 30/08/2026, pelo líder, por `AskUserQuestion`.** Dois regimes, por decisão e não por acidente: o **protagonista (Gus) usa cor plena / paleta rica**; o **restante do elenco usa paleta enxuta**. É hierarquia visual intencional — o protagonista está sempre em tela, e carrega o peso de leitura que os companheiros não precisam carregar. Estado atual medido (via `identify`, 30/08/2026): Gus **12.987 cores únicas**, classificado `TrueColorAlpha`; Bento **58**, Iara **23**, Jaci **29**, Linda **41**, Dante **25**, todos classificados `PaletteAlpha`. A distância de ordem de grandeza entre o Gus e o resto do elenco é o dado que passa a sustentar a decisão, não um acidente de geração a ser corrigido depois.
 
@@ -135,7 +135,7 @@ Vigente, agnóstico de dimensão.
 
 ## 10. Shader strategy
 
-**Seção apagada sob a L-24.** A tabela original era shader 3D (`render_mode` custom, inverted hull outline, RIM built-in).
+**Seção apagada sob a GW-24.** A tabela original era shader 3D (`render_mode` custom, inverted hull outline, RIM built-in).
 
 **Pendência de spec 2D:** quais efeitos da lista antiga ainda são necessários e como viram efeitos 2D (ex.: glitch/anomalia e holograma provavelmente seguem como shader screen-space no glintfx sobre o sprite; outline pode já vir do próprio PixelLab). Escopo a decidir pelo líder — nada assumido aqui.
 

@@ -5,7 +5,7 @@
 > **Origem:** aprovado pelo líder em 11/10/2026, depois de proposta do agente de narrativa. A luta não é para vencer, é para ser reconhecido. Os nomes das três fases são do líder, verbatim: *"tres vezes masculina, tres vezes mulher poderosa e tres vezes irreconhecivel"*.
 > **Companheiros:** `docs/narrative/deep/antagonists/pleroma-setiano.md` (Barbelo é o N2 da escada, e este arquivo muda o contato dela, ver seção 8), `docs/narrative/deep/antagonists/demiurgo.md` (o Yaldabaoth, que ela não percebe) e `docs/narrative/deep/antagonists/arcontes.md` (fronteira: Barbelo não é arconte nomeado, e não entra nas três listas).
 > **Camada de rigor:** N4 (documento).
-> **Leis que governam este texto:** L-13 (canon desatualizado bloqueia: `pleroma-setiano.md` já foi atualizado para N2, ver seção 8), L-14 (nada declarado morto por agente), L-16 (sem homenagem a pessoa real), L-02 (sem arte nem pipeline visual), L-29 (C-02, C-15), L-33 (unidade com fronteira própria), L-34, L-38 (reconhecer não é resolver enigma: seção 10). Do GODS_LAWS global, L-76 (falas em intent, nunca prosa final).
+> **Leis que governam este texto:** GW-13 (canon desatualizado bloqueia: `pleroma-setiano.md` já foi atualizado para N2, ver seção 8), GW-14 (nada declarado morto por agente), GW-16 (sem homenagem a pessoa real), GW-02 (sem arte nem pipeline visual), GW-29 (C-02, C-15), GW-33 (unidade com fronteira própria), L-34, GW-38 (reconhecer não é resolver enigma: seção 10). Do GODS_LAWS global, L-76 (falas em intent, nunca prosa final).
 > **Tema:** Reconhecimento.
 
 ---
@@ -32,9 +32,9 @@ Decisão do líder de 11/10/2026, verbatim: *"opcao 2, mas só aparece em sonho.
 - **Função:** o sonho existe para o jogador **conhecer** essa parte do cânon. Não existe para vencer nada.
 - **Sem fim claro:** o sonho some de repente, no meio, sem tela de conclusão, sem recompensa anunciada e sem "você despertou". Isto é o desenho, e não descuido.
 
-**Como as três fases e o sumiço convivem: leitura (b).** O sonho **é** o encontro, e ele acaba exatamente quando ela reconhece. As três fases cabem dentro dele. O sumiço sem fim claro é a fase três se completando: ela reconhece a party, e nesse instante o sonho termina, porque reconhecer era o fim da cena. Razão de desenho: assim o "sem fim claro" deixa de ser convenção de sonho e vira consequência da mecânica. O jogador não entende por que acabou na hora, e entende depois. Isso é exatamente o que a L-38 protege, porque nenhuma passagem é explicada no momento em que acontece. A leitura (a), em que o sonho seria só apresentação e as fases ficariam para outro encontro, foi descartada porque deixaria as duas coisas coexistindo sem arbitragem. O líder pode trocar para (a) como ponta P35.
+**Como as três fases e o sumiço convivem: leitura (b).** O sonho **é** o encontro, e ele acaba exatamente quando ela reconhece. As três fases cabem dentro dele. O sumiço sem fim claro é a fase três se completando: ela reconhece a party, e nesse instante o sonho termina, porque reconhecer era o fim da cena. Razão de desenho: assim o "sem fim claro" deixa de ser convenção de sonho e vira consequência da mecânica. O jogador não entende por que acabou na hora, e entende depois. Isso é exatamente o que a GW-38 protege, porque nenhuma passagem é explicada no momento em que acontece. A leitura (a), em que o sonho seria só apresentação e as fases ficariam para outro encontro, foi descartada porque deixaria as duas coisas coexistindo sem arbitragem. O líder pode trocar para (a) como ponta P35.
 
-**Trava de L-38 dentro do sonho.** Sonho é o terreno mais fácil para um jogo explicar o que devia ser deduzido, porque tudo parece permitido ali. Esta trava vale dentro do sonho igual a fora dele: **Barbelo pode mostrar o que ela é, mas não pode dizer ao jogador o que fazer, não pode adiantar resposta de enigma e não pode apontar caminho.** O sonho não mostra padrão, não anuncia sequência e não abre passagem.
+**Trava de GW-38 dentro do sonho.** Sonho é o terreno mais fácil para um jogo explicar o que devia ser deduzido, porque tudo parece permitido ali. Esta trava vale dentro do sonho igual a fora dele: **Barbelo pode mostrar o que ela é, mas não pode dizer ao jogador o que fazer, não pode adiantar resposta de enigma e não pode apontar caminho.** O sonho não mostra padrão, não anuncia sequência e não abre passagem.
 
 ---
 
@@ -68,7 +68,7 @@ Os nomes das fases são do líder. São **rótulo de desenho**, nunca fala: nenh
 
 ## 4. As fases, uma a uma
 
-Em cada fase: o que a party é para ela, o que ela faz (intent, sem número), o que muda na atenção dela, e a condição de passagem. **A condição de passagem é evento, não tempo nem insistência** (L-38): nenhuma fase avança porque o jogador espera, nem porque ataca mais.
+Em cada fase: o que a party é para ela, o que ela faz (intent, sem número), o que muda na atenção dela, e a condição de passagem. **A condição de passagem é evento, não tempo nem insistência** (GW-38): nenhuma fase avança porque o jogador espera, nem porque ataca mais.
 
 ### 4.1 Fase 1: erro a corrigir
 
@@ -109,7 +109,7 @@ Barbelo precisa de uma mecânica que meça algo **diferente de dano**. Esta é u
 O que a mecânica precisa fazer:
 
 - **Medir a atenção dela sobre a party**, por membro, e não só o estado geral. Ela enxerga um membro antes de outro.
-- **Subir e descer por evento**, não por tempo e não por número de ataques (L-38).
+- **Subir e descer por evento**, não por tempo e não por número de ataques (GW-38).
 - **Dizer em qual fase ela está** e quando a passagem acontece, para que o encontro mude de intent sem depender de texto.
 - **Não ter estado de derrota**: a mecânica não tem um limite que encerre o encontro por falha da party.
 - **Ser legível ao jogador só como estado observável do mundo**, sem entregar a resposta do que ela quer. O que ela enxerga aparece em ambiente (seção 7), nunca como número que diga ao jogador o que fazer.
@@ -128,7 +128,7 @@ Barbelo é boa, e isso não muda. Não é hostil, não é má e não ataca por r
 
 ## 8. O que muda no Pleroma (ponta de atualização)
 
-**Este documento muda o contato de Barbelo, e o canon atual do Pleroma diz outra coisa.** L-13: canon desatualizado bloqueia. Por isso a atualização vai ao líder, e este arquivo não edita `pleroma-setiano.md`.
+**Este documento muda o contato de Barbelo, e o canon atual do Pleroma diz outra coisa.** GW-13: canon desatualizado bloqueia. Por isso a atualização vai ao líder, e este arquivo não edita `pleroma-setiano.md`.
 
 Onde `pleroma-setiano.md` fala de Barbelo como presença sem combate:
 
@@ -149,7 +149,7 @@ Nenhuma fala final neste documento (L-76 global). Os intents são stubs, e as tr
 
 ---
 
-## 10. Frase-guarda (L-38)
+## 10. Frase-guarda (GW-38)
 
 Barbelo não aponta resposta de enigma, não anuncia padrão, não abre passagem e não mede engrenagem. Reconhecer a party é um evento da luta, não a solução de nenhum puzzle.
 

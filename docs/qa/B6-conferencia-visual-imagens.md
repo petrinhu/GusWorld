@@ -14,7 +14,7 @@ nenhum olho humano tinha passado pelas imagens, e o repositório é público. En
 2. Lista ordenada alfabeticamente (`sort`) e partida em 13 blocos de até 100 caminhos
    (`split -l 100 -d -a 2`), preservando a ordem para rastreabilidade caminho↔posição-na-folha.
 3. Para cada bloco, uma folha de contato com `montage` do ImageMagick 7.1.2 (confirmado instalado antes
-   de usar, per L-28): `montage @chunk_NN -label '%f' -background '#202020' -fill white -tile 10x10
+   de usar, per GW-28): `montage @chunk_NN -label '%f' -background '#202020' -fill white -tile 10x10
    -geometry 160x160+2+2 sheet_NN.png` → 13 folhas de 1640×1640px, cada célula rotulada com o nome do
    arquivo. Um manifesto (`nl -ba` do mesmo chunk) mapeia posição-na-grade → caminho completo.
 4. Cada uma das 13 folhas foi **olhada** (ferramenta de leitura visual), célula por célula, procurando:
@@ -61,7 +61,7 @@ precisou ser refeita — não há, portanto, lote estrangulado a reportar. Assim
 - **Apaguei as 13 folhas de `/var/tmp/gw_b6/sheets/`** imediatamente (item 6 da ordem), já que cada uma
   tinha sido lida e seu conteúdo registrado neste relatório.
 - Uma checagem complementar pequena (decodificar 2 QR codes vistos como prop de jogo na sheet_00) **não
-  foi executada**: a ferramenta `zbarimg` não está instalada nesta máquina e, por L-28, não instalo nada
+  foi executada**: a ferramenta `zbarimg` não está instalada nesta máquina e, por GW-28, não instalo nada
   sem autorização — reportado como não executado, não improvisado. Não bloqueia o veredicto abaixo: o
   achado é um prop declaradamente de jogo (ícone estilizado, não foto de tela), fora do padrão de
   vazamento que este item audita (janela de SO / navegador / terminal / desktop / rosto real / documento).
@@ -93,11 +93,11 @@ o próprio jogo, sem hostname real, sem caminho de usuário, sem valor financeir
    reconhecível à Cyberdyne Systems e ao "modelo 101" da franquia *Terminator*. Não é vazamento de dado
    pessoal (é conteúdo fictício gerado), mas é risco de IP/marca registrada num repositório público FOSS.
    O próprio nome do arquivo (`REJECTED_..._hallucination_...`) indica que já foi descartado
-   criativamente, mas o arquivo permanece versionado. **Não decidi remover** — por L-14, nada é declarado
+   criativamente, mas o arquivo permanece versionado. **Não decidi remover** — por GW-14, nada é declarado
    morto/descartável por agente; a decisão é do líder. Recomendação: líder avaliar remoção ou substituição
    antes de release/divulgação pública ampla do repositório.
 2. **2 QR codes** vistos como prop/ícone de jogo em `sheet_00` (grade estilizada, não foto de tela) — não
-   decodificados (ferramenta `zbarimg` ausente; por L-28 não instalo sem autorização). Como são ícones de
+   decodificados (ferramenta `zbarimg` ausente; por GW-28 não instalo sem autorização). Como são ícones de
    UI declaradamente de jogo, e não capturas de tela, ficam fora do escopo estrito deste item; se o líder
    quiser confirmar o conteúdo codificado, é uma checagem trivial e independente de instalar `zbarimg` (ou
    equivalente) — não bloqueia o veredicto de B6.

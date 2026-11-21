@@ -366,7 +366,7 @@ Categoria Mecânico-meta tem cap baixo (~30) intencionalmente. Não pode "destra
 
 - **Hint mode (opcional):** player pode ativar dicas extras no Diário (entries mostram "explore [setting] para destravar". Knowledge não é afetado, apenas legibilidade da exploração). Compensação para players cognitivos que querem o conteúdo sem decifrar pista.
 - **Auto-cross-reference (opcional):** modo onde o jogo sugere ativamente cruzamentos canônicos quando player abre uma das 2 entries. Knowledge Mecânico-meta + 1 (não +2; preserva agência mecânica).
-- **Text-to-speech:** ideia registrada, **fora da 1.0** (`C-04`, `GODS_LAWS.md` L-29: o corte é amplo, o jogo não tem voz nenhuma, e a distinção "UI assistiva, não personagem" não abre exceção). Se voltar, é como **add-on pós-lançamento**: leitura em voz neutra, não dramatizada, das entries, nunca voz de personagem.
+- **Text-to-speech:** ideia registrada, **fora da 1.0** (`C-04`, `GODS_LAWS.md` GW-29: o corte é amplo, o jogo não tem voz nenhuma, e a distinção "UI assistiva, não personagem" não abre exceção). Se voltar, é como **add-on pós-lançamento**: leitura em voz neutra, não dramatizada, das entries, nunca voz de personagem.
 - **Detalhe pleno em [[ui-spec]] §8.**
 
 ---
@@ -387,7 +387,7 @@ Independente de formato de arquivo, o save carrega, no mínimo, estes campos:
 - **Pares de referência cruzada já completados** (ex.: `doc05`+`comic11`, `doc13`+`doc09`).
 - **Elegibilidade de cada final** (bronze, prata, ouro) e a **distância até o próximo gate**, por final.
 
-O formato de gravação destes campos é o envelope binário selado do projeto (`GODS_LAWS.md` L-25), nunca texto (L-18): a serialização concreta é decisão de engenharia da fase do envelope, não deste documento de design.
+O formato de gravação destes campos é o envelope binário selado do projeto (`GODS_LAWS.md` GW-25), nunca texto (GW-18): a serialização concreta é decisão de engenharia da fase do envelope, não deste documento de design.
 
 ### 10.2 Tracking de trigger
 
@@ -395,7 +395,7 @@ Cada trigger tem ID único (string canônico). Save registra apenas IDs consumid
 
 ### 10.3 Cross-reference pairs
 
-Pares canônicos registrados em catálogo de dados separado (data-driven), binário, compilado no pipeline de build (`GODS_LAWS.md` L-18/L-25, nunca formato de texto). Não-hardcoded. Permite expansão sem patch de código. Catálogo: pares de cross-reference, a criar Fase 2.
+Pares canônicos registrados em catálogo de dados separado (data-driven), binário, compilado no pipeline de build (`GODS_LAWS.md` GW-18/GW-25, nunca formato de texto). Não-hardcoded. Permite expansão sem patch de código. Catálogo: pares de cross-reference, a criar Fase 2.
 
 ### 10.4 Performance
 

@@ -5,9 +5,9 @@ Gate de commit-msg do GusWorld.
 
 Barra commit cuja MENSAGEM contenha termo da lista de termos proibidos, que
 vive cifrada com git-crypt em tools/security/termos_proibidos.txt (mesma
-chave do resto do repositorio, GODS_LAWS.md L-25).
+chave do resto do repositorio, GODS_LAWS.md GW-25).
 
-Principio-mae, GODS_LAWS.md L-19: "gate que nao consegue medir tem de
+Principio-mae, GODS_LAWS.md GW-19: "gate que nao consegue medir tem de
 FALHAR, nunca aprovar em silencio". Sem a chave do git-crypt destravada
 nesta copia de trabalho, o arquivo de termos e ilegivel -- e o gate
 BLOQUEIA o commit em vez de deixar passar sem checar nada.
@@ -235,7 +235,7 @@ def main(
             "commit_gate: BLOQUEADO -- nao consigo medir (lista de termos "
             f"proibidos indisponivel: {exc}).\n"
             "Isto NAO significa que a mensagem esta limpa: o gate falha em "
-            "vez de aprovar em silencio (GODS_LAWS.md L-19).\n"
+            "vez de aprovar em silencio (GODS_LAWS.md GW-19).\n"
             "Destrave a chave do git-crypt nesta copia de trabalho "
             "(git-crypt unlock <arquivo-de-chave>) e tente de novo.\n"
             f"Para forcar o commit por sua conta e risco, defina "

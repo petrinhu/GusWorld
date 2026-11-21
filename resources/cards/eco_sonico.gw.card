@@ -2,7 +2,7 @@
 //
 // Carta COMUM (placeholder do slice, 1 das 5 do executor pre-techMagic).
 // Sonico - Eco: dano leve + Disrupt (debuff de magnitude). Extraida do
-// projeto anterior (L-01) - conhecimento, nao codigo. Ver
+// projeto anterior (GW-01) - conhecimento, nao codigo. Ver
 // docs/design/mecanicas/cartas/eco_sonico.md para o "porque".
 
 #meta id eco_sonico

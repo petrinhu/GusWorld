@@ -2,11 +2,11 @@
 
 > **Status:** Canônico. F2-S.11 setup.
 >
-> **Locales:** `pt_br` (dev primário, sempre completo), `en_intl` (alvo da própria 1.0, corte `C-09` alterado pelo líder em 25/08/2026, `GODS_LAWS.md` L-29; paridade estrutural completa com `pt_br` (361/361 chaves com o mesmo nome), mas tradução parcial: 117 chaves com valor preenchido e 244 ainda vazias, medido em 25/08/2026 por parsing do arquivo, faltante que o `D19a`/`D19b` do `TODO.md` fecha antes do lançamento), `es_la` (alvo v1.x+, ainda não existe).
+> **Locales:** `pt_br` (dev primário, sempre completo), `en_intl` (alvo da própria 1.0, corte `C-09` alterado pelo líder em 25/08/2026, `GODS_LAWS.md` GW-29; paridade estrutural completa com `pt_br` (361/361 chaves com o mesmo nome), mas tradução parcial: 117 chaves com valor preenchido e 244 ainda vazias, medido em 25/08/2026 por parsing do arquivo, faltante que o `D19a`/`D19b` do `TODO.md` fecha antes do lançamento), `es_la` (alvo v1.x+, ainda não existe).
 >
 > **Loader:** ainda não implementado (nenhuma linha de código no projeto hoje).
 >
-> ⚠️ **Ponteiro morto (LEI ZERO, L-01):** o caminho de loader que este documento citava era da engine do projeto anterior e **não existe** neste projeto (C++23 sobre GlintFx). Ele fica registrado como estava escrito: descreve a intenção de quem redigiu este documento, não um arquivo consultável hoje. O mesmo vale para as três entradas equivalentes na seção "Cross-refs" abaixo. O carregador vigente, ainda não implementado, fica a definir pelo `software-architect` quando a camada `domain/` de i18n nascer (L-06). As chamadas a `Localization.*` no corpo deste README (seções "Workflow editorial" e "Validação") são do mesmo API morta e não foram tocadas nesta revisão; ver relatório.
+> ⚠️ **Ponteiro morto (LEI ZERO, GW-01):** o caminho de loader que este documento citava era da engine do projeto anterior e **não existe** neste projeto (C++23 sobre GlintFx). Ele fica registrado como estava escrito: descreve a intenção de quem redigiu este documento, não um arquivo consultável hoje. O mesmo vale para as três entradas equivalentes na seção "Cross-refs" abaixo. O carregador vigente, ainda não implementado, fica a definir pelo `software-architect` quando a camada `domain/` de i18n nascer (GW-06). As chamadas a `Localization.*` no corpo deste README (seções "Workflow editorial" e "Validação") são do mesmo API morta e não foram tocadas nesta revisão; ver relatório.
 
 ---
 

@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > Prosa final (falas, texto do documento do vilão) fica com `narrative-writer`, por L-76 global:
 > este documento é arquitetura, não prosa (beat, gatilho, dependência, estado mínimo).
 >
-> **Ponteiros (L-30):** cenas em `docs/narrative/comic-reliefs/easter-eggs-educacionais.md` (EE-23,
+> **Ponteiros (GW-30):** cenas em `docs/narrative/comic-reliefs/easter-eggs-educacionais.md` (EE-23,
 > EE-24); personagem em `CHARS.md` §5 (Inácia Berenger); geografia em
 > `docs/design/mundo-topologia.md` §4 item 5 e §8 (campus Ferrovelhos, tema economia austríaca);
 > mercado negro em `docs/design/mecanicas/cartas-hardware-pirataria-energia.md` §14.
@@ -61,11 +61,11 @@ Isto é **knowledge-gate**, no mesmo padrão já canônico do projeto (ex.: "Kno
 
 **Onde isto entra na história:** documento de missão contra a Sterling Corp (infiltração/heist, o tipo de conteúdo que já move o corpus, cf. `in-world-docs.md`); vira evidência/plot beat sobre números fabricados, reforçando o tema já canônico "Sterling = bug declarado feature" (`docs/narrative/comic-reliefs.md`).
 
-## 6. Interface: nada novo, por desenho (L-27)
+## 6. Interface: nada novo, por desenho (GW-27)
 
-**Nenhuma tela nova é necessária ou proposta aqui.** Tanto o registro de números (Momento 1) quanto o "tell" do documento (Momento 2) são resolvidos inteiramente em **texto de diálogo e entrada de Diário**, seguindo o padrão já em uso no projeto para conteúdo do tipo `.dlg.txt` (`docs/narrative/comic-reliefs.md`, "Como estas cenas chegam ao jogador": direção cênica vira narração, não animação). **Não existe gráfico de barras, histograma nem qualquer visualização de distribuição de dígitos no v1 deste easter egg**: isso seria interface nova e cai direto na L-27 (nenhuma interface nasce antes do GlintFx). Se um dia alguém propuser um histograma visual como melhoria, ele nasce bloqueado até a camada `present/` existir, e não faz parte deste canon.
+**Nenhuma tela nova é necessária ou proposta aqui.** Tanto o registro de números (Momento 1) quanto o "tell" do documento (Momento 2) são resolvidos inteiramente em **texto de diálogo e entrada de Diário**, seguindo o padrão já em uso no projeto para conteúdo do tipo `.dlg.txt` (`docs/narrative/comic-reliefs.md`, "Como estas cenas chegam ao jogador": direção cênica vira narração, não animação). **Não existe gráfico de barras, histograma nem qualquer visualização de distribuição de dígitos no v1 deste easter egg**: isso seria interface nova e cai direto na GW-27 (nenhuma interface nasce antes do GlintFx). Se um dia alguém propuser um histograma visual como melhoria, ele nasce bloqueado até a camada `present/` existir, e não faz parte deste canon.
 
-## 7. Conferência dos 14 cortes (L-29): nenhuma colisão encontrada
+## 7. Conferência dos 14 cortes (GW-29): nenhuma colisão encontrada
 
 | Corte | Por que não colide |
 |---|---|
@@ -85,7 +85,7 @@ Isto é **knowledge-gate**, no mesmo padrão já canônico do projeto (ex.: "Kno
 
 ## 8. Conquista oculta (nome e gatilho provisórios, mesmo padrão de `conquistas.md`)
 
-Nome de exibição e dica são prosa/asset (L-08), pendente de `narrative-writer`. Gatilho de domínio, provisório: destrava quando o jogador confirma corretamente, usando só o padrão numérico (sem outro sinal de reputação já revelado), qual vendedor do Mercado é o fraudador. `id` provisório (`snake_case`, L-22): `achv_nose_never_lies`. **Não fechado**, é sugestão; o líder decide o nome final junto com o texto (mesmo processo de `conquistas.md` §3).
+Nome de exibição e dica são prosa/asset (GW-08), pendente de `narrative-writer`. Gatilho de domínio, provisório: destrava quando o jogador confirma corretamente, usando só o padrão numérico (sem outro sinal de reputação já revelado), qual vendedor do Mercado é o fraudador. `id` provisório (`snake_case`, GW-22): `achv_nose_never_lies`. **Não fechado**, é sugestão; o líder decide o nome final junto com o texto (mesmo processo de `conquistas.md` §3).
 
 ## 9. Como Inácia guarda isto no CHARS.md
 
@@ -94,7 +94,7 @@ Aplicado nesta mesma fatia (canon do líder, não invenção de agente): `CHARS.
 ## 10. Pendências explícitas, para o líder e para o `economy-designer`
 
 1. **Quantos números o jogador precisa coletar** no Mercado antes do padrão do vendedor suspeito ficar identificável: fechado, área cifrada.
-2. **Margem/critério de "suspeito"** (quantos dígitos altos, de quantos, contam como anomalia): continua pendente de medição, por ordem explícita do líder. Proposta de fórmula/tabela paramétrica (nunca número literal no corpo da regra, L-17), não de valor único; fica com `economy-designer`.
+2. **Margem/critério de "suspeito"** (quantos dígitos altos, de quantos, contam como anomalia): continua pendente de medição, por ordem explícita do líder. Proposta de fórmula/tabela paramétrica (nunca número literal no corpo da regra, GW-17), não de valor único; fica com `economy-designer`.
 3. **Nome de exibição da conquista e o texto exato da fala de Inácia e do documento do vilão:** prosa final, `narrative-writer` (L-76).
 4. **De onde vem o NOME formal do padrão** para o jogador: fechado, área cifrada.
 5. **Item novo de `TODO.md`** (não editado por mim, ordem explícita do team lead): sugestão de próximo ID livre medido em `TODO.md`, **D53** (maior D em uso hoje é D52), sem pré-requisito estrito, mas natural depender de nada além deste documento. Numeração de "doc N" em `in-world-docs.md` para o documento do vilão também não reservada aqui, pelo mesmo motivo.

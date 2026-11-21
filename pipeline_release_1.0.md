@@ -1,6 +1,6 @@
 # Pipeline: Da Ideia ao Release 1.0 do GusWorld
 
-> Fases do pipeline aplicáveis a um **jogo FOSS single-player offline** (LEI ZERO do `GODS_LAWS.md`: liga só em GlintFx e no sistema operacional). Sem backend, sem API, sem mobile, sem conta de usuário, sem monetização. Ancorado na **L-10**: `main` só orquestra; C-level audita e arquiteta sempre com modelo `fable`; agente operacional implementa sempre com `sonnet`. Hub: `Standards.md`.
+> Fases do pipeline aplicáveis a um **jogo FOSS single-player offline** (LEI ZERO do `GODS_LAWS.md`: liga só em GlintFx e no sistema operacional). Sem backend, sem API, sem mobile, sem conta de usuário, sem monetização. Ancorado na **GW-10**: `main` só orquestra; C-level audita e arquiteta sempre com modelo `fable`; agente operacional implementa sempre com `sonnet`. Hub: `Standards.md`.
 
 ---
 
@@ -9,7 +9,7 @@
 ```mermaid
 flowchart TD
     F0["0. Ideação"] --> F1["1. Discovery"] --> F2["2. Definição"] --> F3["3. Design"] --> F4["4. Arquitetura"] --> F5["5. Setup Eng"]
-    F5 --> F6["6. Desenvolvimento\n(camadas da L-17)"]
+    F5 --> F6["6. Desenvolvimento\n(camadas da GW-17)"]
     F6 --> F7["7. QA"]
     F6 --> F8["8. Proteção de dado e licença"]
     F7 --> F9["9. Beta"]
@@ -27,14 +27,14 @@ Cada fase tem loop interno (uma descoberta volta ao Discovery, um bug volta ao D
 | 0. Ideação | Celso (CEO) | - (resolvida: `inicial.md` + `GODS_LAWS.md`) |
 | 1. Discovery | Caetano (CTO) | `software-architect` (canon já existe em `docs/narrative/`) |
 | 2. Definição | Caetano (CTO) | `software-architect` |
-| 3. Design | Caetano (CTO) | - (interface só nasce com o GlintFx, L-27) |
+| 3. Design | Caetano (CTO) | - (interface só nasce com o GlintFx, GW-27) |
 | 4. Arquitetura | Caetano (CTO) | `software-architect`, `security-engineer` |
 | 5. Setup Eng | Caetano (CTO) | `devops-sre`, `tech-lead` |
 | 6. Desenvolvimento | Caetano (CTO) | `backend-engineer` (C++23) |
 | 7. QA | Caetano (CTO) | `qa-engineer` |
 | 8. Proteção de dado e licença | Narciso (CISO) + Cláudio (CLO) | `security-engineer`, `compliance-legal` |
 | 9. Beta | Caetano (CTO) | `qa-engineer`, `technical-writer` |
-| 10. Comunidade | Celso (CEO) | `technical-writer` (comunicação via bus, L-07) |
+| 10. Comunidade | Celso (CEO) | `technical-writer` (comunicação via bus, GW-07) |
 | 11. Release 1.0 | Celso (CEO) coordena | `devops-sre`, `tech-lead`, `qa-engineer` |
 | 12. Pós | Caetano (CTO) | `qa-engineer`, `technical-writer` |
 
@@ -50,35 +50,35 @@ Já concluída. A ideia, a hipótese de valor e o escopo do MVP estão no `inici
 
 ## Fase 1: Discovery
 
-Para um jogo FOSS de autor, discovery não é pesquisa de mercado: é o **canon já escrito**. O corpus em `docs/narrative/`, `docs/design/`, `sinopse.md`, `CHARS.md` e `PLACES.md` é o insumo (L-01: vale para lore e design, não para código). Onde o canon contradiz uma lei vigente, o trabalho que depende dele **para** até o líder atualizar o canon (L-13).
+Para um jogo FOSS de autor, discovery não é pesquisa de mercado: é o **canon já escrito**. O corpus em `docs/narrative/`, `docs/design/`, `sinopse.md`, `CHARS.md` e `PLACES.md` é o insumo (GW-01: vale para lore e design, não para código). Onde o canon contradiz uma lei vigente, o trabalho que depende dele **para** até o líder atualizar o canon (GW-13).
 
-**Entregável:** lista de contradições de canon abertas (ver L-13), atualizada conforme aparecem.
+**Entregável:** lista de contradições de canon abertas (ver GW-13), atualizada conforme aparecem.
 
 ---
 
 ## Fase 2: Definição
 
-O equivalente de PRD é a soma de `inicial.md` + `GODS_LAWS.md` + os documentos de design em `docs/design/`. Escopo do "MVP": núcleo de regra de jogo jogável por replay determinístico (L-17), antes mesmo de existir tela (L-06).
+O equivalente de PRD é a soma de `inicial.md` + `GODS_LAWS.md` + os documentos de design em `docs/design/`. Escopo do "MVP": núcleo de regra de jogo jogável por replay determinístico (GW-17), antes mesmo de existir tela (GW-06).
 
-**Métricas de sucesso não são de aquisição/retenção** (não há usuário externo nem telemetria, L-08): são de **qualidade técnica**, os cinco portões da L-19, e de fidelidade ao canon.
+**Métricas de sucesso não são de aquisição/retenção** (não há usuário externo nem telemetria, GW-08): são de **qualidade técnica**, os cinco portões da GW-19, e de fidelidade ao canon.
 
 ---
 
 ## Fase 3: Design (jogo, não UI)
 
-Design de sistema de jogo (combate, deck, mapa, progressão) deriva da prosa do canon (L-01) e das mecânicas em `docs/design/mecanicas/`. **Design de interface não é escrito ainda**: nenhuma marcação, folha de estilo ou tela piloto nasce antes de o GlintFx traduzir marcação (L-27). Perspectiva fixada: 3/4 top-down, quatro direções cardeais, câmera que não gira (L-26).
+Design de sistema de jogo (combate, deck, mapa, progressão) deriva da prosa do canon (GW-01) e das mecânicas em `docs/design/mecanicas/`. **Design de interface não é escrito ainda**: nenhuma marcação, folha de estilo ou tela piloto nasce antes de o GlintFx traduzir marcação (GW-27). Perspectiva fixada: 3/4 top-down, quatro direções cardeais, câmera que não gira (GW-26).
 
 ---
 
 ## Fase 4: Arquitetura Técnica
 
-**Stack:** C++23 (L-03), zero dependência além do GlintFx e do sistema operacional (LEI ZERO).
+**Stack:** C++23 (GW-03), zero dependência além do GlintFx e do sistema operacional (LEI ZERO).
 
-**Padrão arquitetural:** espinha de cinco camadas com dependência só para baixo e gate de CI (`core/ → content/ → domain/ → app/ → present/`), núcleo determinístico por comando e evento (L-17). Nada de monólito (L-04), nada de dublê de plataforma (L-05).
+**Padrão arquitetural:** espinha de cinco camadas com dependência só para baixo e gate de CI (`core/ → content/ → domain/ → app/ → present/`), núcleo determinístico por comando e evento (GW-17). Nada de monólito (GW-04), nada de dublê de plataforma (GW-05).
 
-**Modelagem de dado:** POCOs de domínio, serializados em envelope binário próprio, nunca texto (L-18, L-25).
+**Modelagem de dado:** POCOs de domínio, serializados em envelope binário próprio, nunca texto (GW-18, GW-25).
 
-**Segurança by design:** Narciso (CISO) desenha a proteção de save/config/mapa/catálogo (L-25); primitivas criptográficas vêm só do GlintFx.
+**Segurança by design:** Narciso (CISO) desenha a proteção de save/config/mapa/catálogo (GW-25); primitivas criptográficas vêm só do GlintFx.
 
 **ADRs:** decisão de arquitetura registrada como lei no `GODS_LAWS.md` quando vem do líder; documento técnico de suporte fica em `docs/design/`.
 
@@ -86,9 +86,9 @@ Design de sistema de jogo (combate, deck, mapa, progressão) deriva da prosa do 
 
 ## Fase 5: Setup de Engenharia
 
-**Repositório:** `git`, Conventional Commits, mensagem em pt-br (L-22). `.gitignore`/`.gitattributes` escritos antes do primeiro commit (L-15): `resources/livros/` e `resources/glb/` fora do git, Git LFS para o resto do binário pesado.
+**Repositório:** `git`, Conventional Commits, mensagem em pt-br (GW-22). `.gitignore`/`.gitattributes` escritos antes do primeiro commit (GW-15): `resources/livros/` e `resources/glb/` fora do git, Git LFS para o resto do binário pesado.
 
-**CI:** matriz de cinco plataformas desde o primeiro commit (L-09, L-20): Fedora 44 pinado (primário), Ubuntu, Arch, CachyOS, Windows. Fundação de build nasce legitimamente sem TDD; a partir do primeiro módulo de comportamento, não há mais essa saída (L-19, L-20).
+**CI:** matriz de cinco plataformas desde o primeiro commit (GW-09, GW-20): Fedora 44 pinado (primário), Ubuntu, Arch, CachyOS, Windows. Fundação de build nasce legitimamente sem TDD; a partir do primeiro módulo de comportamento, não há mais essa saída (GW-19, GW-20).
 
 **Observabilidade:** não aplicável (sem serviço em produção, sem telemetria).
 
@@ -96,9 +96,9 @@ Design de sistema de jogo (combate, deck, mapa, progressão) deriva da prosa do 
 
 ## Fase 6: Desenvolvimento
 
-Sem trilhas frontend/backend/mobile: **uma trilha só**, organizada pelas cinco camadas da L-17. Núcleo de regra (`core/`, `content/`, `domain/`) nasce primeiro, em TDD estrito (L-06, L-19); `app/` e `present/` só quando o GlintFx tiver janela, contexto gráfico, entrada e texto.
+Sem trilhas frontend/backend/mobile: **uma trilha só**, organizada pelas cinco camadas da GW-17. Núcleo de regra (`core/`, `content/`, `domain/`) nasce primeiro, em TDD estrito (GW-06, GW-19); `app/` e `present/` só quando o GlintFx tiver janela, contexto gráfico, entrada e texto.
 
-**Consequência assumida (L-06):** enquanto isso, o jogo não roda, não tem tela, não tem demo. O que existe é suíte de teste verde e núcleo provado. Relatar progresso visual inexistente é falta grave.
+**Consequência assumida (GW-06):** enquanto isso, o jogo não roda, não tem tela, não tem demo. O que existe é suíte de teste verde e núcleo provado. Relatar progresso visual inexistente é falta grave.
 
 **Agent:** `backend-engineer` (C++23), sempre `sonnet`, sob orquestração de Caetano (CTO, `fable`).
 
@@ -106,18 +106,18 @@ Sem trilhas frontend/backend/mobile: **uma trilha só**, organizada pelas cinco 
 
 ## Fase 7: QA e Testes
 
-TDD estrito a partir do primeiro módulo com comportamento (L-19): vermelho, verde, refatorar, sem pular etapa. Suíte de replay determinístico (semente + comandos reproduz o mesmo estado, L-17) como teste permanente. Detalhe completo em `TESTES.md`.
+TDD estrito a partir do primeiro módulo com comportamento (GW-19): vermelho, verde, refatorar, sem pular etapa. Suíte de replay determinístico (semente + comandos reproduz o mesmo estado, GW-17) como teste permanente. Detalhe completo em `TESTES.md`.
 
-**Sem meta numérica de cobertura** (L-19): cobertura é consequência do TDD, não alvo.
+**Sem meta numérica de cobertura** (GW-19): cobertura é consequência do TDD, não alvo.
 
 ---
 
 ## Fase 8: Proteção de Dado e Licença
 
-Substitui "Segurança e Compliance" genérico: não há LGPD/GDPR/HIPAA aplicável (sem dado de usuário coletado, jogo offline, L-08). O que existe:
+Substitui "Segurança e Compliance" genérico: não há LGPD/GDPR/HIPAA aplicável (sem dado de usuário coletado, jogo offline, GW-08). O que existe:
 
-- **Proteção de save/config/mapa/catálogo** (L-18, L-25): envelope binário, cifra autenticada, validador semântico, sem prometer "impossível editar".
-- **Licenciamento** (L-08): código AGPL-3.0-or-later com ressalva de uso offline; assets e lore com todos os direitos reservados; marcação REUSE/SPDX desde o primeiro commit.
+- **Proteção de save/config/mapa/catálogo** (GW-18, GW-25): envelope binário, cifra autenticada, validador semântico, sem prometer "impossível editar".
+- **Licenciamento** (GW-08): código AGPL-3.0-or-later com ressalva de uso offline; assets e lore com todos os direitos reservados; marcação REUSE/SPDX desde o primeiro commit.
 
 **Liderança:** Narciso (CISO) na proteção de dado, Cláudio (CLO) no licenciamento, os dois sempre `fable`.
 
@@ -125,25 +125,25 @@ Substitui "Segurança e Compliance" genérico: não há LGPD/GDPR/HIPAA aplicáv
 
 ## Fase 9: Beta
 
-Playtesting interno (o próprio líder e, quando aplicável, o filho dele como "Gus Dragon", L-16) substitui o beta fechado de usuários externos. Feedback do Gus Dragon chega pelo bus (L-07), nunca por canal de suporte comercial.
+Playtesting interno (o próprio líder e, quando aplicável, o filho dele como "Gus Dragon", GW-16) substitui o beta fechado de usuários externos. Feedback do Gus Dragon chega pelo bus (GW-07), nunca por canal de suporte comercial.
 
-**Documentação para o jogador:** `README` com a ressalva de uso offline (L-08), changelog público por release (L-23).
+**Documentação para o jogador:** `README` com a ressalva de uso offline (GW-08), changelog público por release (GW-23).
 
 ---
 
 ## Fase 10: Comunidade
 
-Substitui GTM comercial: sem pricing, sem funil pago, sem ASO. O que existe é comunicação simples de projeto FOSS (release notes no GitHub, resposta a issue) e o pipe de ideia do Gus Dragon (L-07: absorver, ack automático, discutir viabilidade com o líder, postar resultado honesto, arquivar).
+Substitui GTM comercial: sem pricing, sem funil pago, sem ASO. O que existe é comunicação simples de projeto FOSS (release notes no GitHub, resposta a issue) e o pipe de ideia do Gus Dragon (GW-07: absorver, ack automático, discutir viabilidade com o líder, postar resultado honesto, arquivar).
 
 ---
 
 ## Fase 11: Release 1.0
 
-**Versionamento:** `vA.B.C.D`, mesma convenção do GlintFx (L-23). Tag e release exigem aval explícito do líder no contexto, sempre (L-23).
+**Versionamento:** `vA.B.C.D`, mesma convenção do GlintFx (GW-23). Tag e release exigem aval explícito do líder no contexto, sempre (GW-23).
 
 Detalhe completo do checklist de release irreversível em `DEPLOY_CHECKLIST.md`.
 
-**Liderança:** Celso (CEO) coordena o go/no-go; Caetano (CTO) e o `internal-auditor` confirmam que os portões da L-19 e o dossiê de auditoria (`AUDITORIAS.md`) estão fechados antes da tag.
+**Liderança:** Celso (CEO) coordena o go/no-go; Caetano (CTO) e o `internal-auditor` confirmam que os portões da GW-19 e o dossiê de auditoria (`AUDITORIAS.md`) estão fechados antes da tag.
 
 ---
 
@@ -155,9 +155,9 @@ Estabilização por bug reportado (via bus com Gus Dragon ou issue pública), se
 
 ## Anti-padrões que este pipeline recusa
 
-1. Escrever camada `present/` antes do GlintFx existir (L-06, L-27).
-2. Dublê de plataforma: mock, stub ou `#ifdef` fingindo o GlintFx (L-05).
-3. Meta numérica de cobertura de teste (L-19).
-4. Prometer "impossível editar" em comunicação pública (L-25).
+1. Escrever camada `present/` antes do GlintFx existir (GW-06, GW-27).
+2. Dublê de plataforma: mock, stub ou `#ifdef` fingindo o GlintFx (GW-05).
+3. Meta numérica de cobertura de teste (GW-19).
+4. Prometer "impossível editar" em comunicação pública (GW-25).
 5. Aplicar pipeline comercial (GTM pago, LGPD, mobile store) a um jogo FOSS single-player sem esses domínios.
 6. Deixar C-level dormente por presunção de agente: o porte é COMPLETO (`ORG.md` secao 2) e a constelação inteira tem mandato aqui; quando uma fase parecer não se aplicar a um C-level, o caso vai ao líder por `AskUserQuestion`, nunca vira corte silencioso.

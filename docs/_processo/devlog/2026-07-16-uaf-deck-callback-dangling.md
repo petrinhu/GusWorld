@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-> **RESGATADO em 25/08/2026 do `gusworld_legacy`.** Devlog de um heap-use-after-free real, achado por acaso numa suíte 2121/2121 verde, no sistema de deck/mão do projeto anterior a LEI ZERO. O código citado (`CardCollection`, `HandLoadout`, `TierLookup`) **não existe neste repositório** — o L-01 zerou o código. O valor que sobrevive é a LIÇÃO de engenharia C++: guardar um iterador/referência que aponta pra dentro de um `std::vector` e passá-lo a um callback é uma classe de bug que sobrevive a qualquer reescrita de motor, porque não é sobre este motor, é sobre C++. Releia com ceticismo os nomes de arquivo/classe; releia com atenção o mecanismo do bug.
+> **RESGATADO em 25/08/2026 do `gusworld_legacy`.** Devlog de um heap-use-after-free real, achado por acaso numa suíte 2121/2121 verde, no sistema de deck/mão do projeto anterior a LEI ZERO. O código citado (`CardCollection`, `HandLoadout`, `TierLookup`) **não existe neste repositório** — o GW-01 zerou o código. O valor que sobrevive é a LIÇÃO de engenharia C++: guardar um iterador/referência que aponta pra dentro de um `std::vector` e passá-lo a um callback é uma classe de bug que sobrevive a qualquer reescrita de motor, porque não é sobre este motor, é sobre C++. Releia com ceticismo os nomes de arquivo/classe; releia com atenção o mecanismo do bug.
 
 ---
 

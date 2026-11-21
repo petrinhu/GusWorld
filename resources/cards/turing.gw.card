@@ -2,7 +2,7 @@
 //
 // Decrypt-All (Turing): ForaDeCombate, Universal, mana 0. Posse-only
 // (cripto-chave universal / revela cifras); sem programa de combate.
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/turing.md.
 
 #meta id turing

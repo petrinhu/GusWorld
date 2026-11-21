@@ -2,7 +2,7 @@
 
 > **Status:** Canônico. Cresce só por decisão do líder, nunca por antecipação de agente.
 > **Escopo:** os princípios do mundo que regem escopo e desenho, e que não moram nem no que o jogo **é**, nem na cerca do que ele **não é**.
-> **Este documento não duplica canon existente.** O que o GusWorld **é** está resumido na seção "O que é o GusWorld" do `CLAUDE.md`. O que o GusWorld **não é** — a cerca de catorze cortes — está em `GODS_LAWS.md`, L-29. Este documento é o terceiro lugar, para o que não cabia em nenhum dos dois: os princípios que orientam decisão de escopo e de desenho.
+> **Este documento não duplica canon existente.** O que o GusWorld **é** está resumido na seção "O que é o GusWorld" do `CLAUDE.md`. O que o GusWorld **não é** — a cerca de catorze cortes — está em `GODS_LAWS.md`, GW-29. Este documento é o terceiro lugar, para o que não cabia em nenhum dos dois: os princípios que orientam decisão de escopo e de desenho.
 
 ## Princípios do mundo
 

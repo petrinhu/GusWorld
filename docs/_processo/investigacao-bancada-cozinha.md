@@ -1,7 +1,7 @@
 # Investigação: "bancada de cozinha" é termo do líder ou não
 
 **Extraído de:** `docs/design/mecanicas/economia.md` §5.5.2c em 2026-08-25, durante o fatiamento
-de `economia.md` § 5.5 para `docs/design/mecanicas/comidas-ingredientes-craft.md` (L-33: economia
+de `economia.md` § 5.5 para `docs/design/mecanicas/comidas-ingredientes-craft.md` (GW-33: economia
 de crédito e sistema de comida mudam por razão diferente). Este documento é a metodologia da
 investigação; não é canon, não é norma: é o raciocínio por trás do achado, no mesmo espírito dos
 demais arquivos deste diretório (ver `_INDEX.md`).

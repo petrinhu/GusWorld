@@ -47,17 +47,17 @@ selo, §2.7). Citação:
 |---|---|---|
 | **Natureza** | conteúdo estático que **nós distribuímos** | escrito na máquina do jogador, em execução |
 | **O que importa** | **detecção** de corrupção/adulteração | **autenticidade** (confidencialidade é bônus) |
-| **Segredo envolvido** | **nenhum** — detecção pura sai de graça: o jogo guarda o resumo dos mapas canônicos e compara | envelope selado com cifra autenticada (chave fornecida por quem chama, `L-25` nossa) |
+| **Segredo envolvido** | **nenhum** — detecção pura sai de graça: o jogo guarda o resumo dos mapas canônicos e compara | envelope selado com cifra autenticada (chave fornecida por quem chama, `GW-25` nossa) |
 | **Papel da cifra** | acrescenta só **ilegibilidade**, por pedido do líder — não é o que garante a detecção | acrescenta autenticidade e confidencialidade de verdade |
 
 **Por que isto muda o desenho:** tratar os dois como o mesmo problema produz um mecanismo mais
 pesado do que o necessário num dos dois lados. O **selo aberto de integridade** do §2.7 é
 exatamente a metade "mapa" desta distinção — sem chave, sem assinatura, sem segredo. O **envelope
-selado do save** (`L-25` nossa, item `E1`) é a outra metade, e não é assunto deste documento.
+selado do save** (`GW-25` nossa, item `E1`) é a outra metade, e não é assunto deste documento.
 
 **Consequência prática para `D10`/`D11`:** o verificador de mapa (`E3` na parte que toca mapa) não
 precisa de chave nenhuma para detectar mapa corrompido ou trocado; o verificador de save precisa,
-e essa necessidade é do envelope `L-25`, não deste contrato.
+e essa necessidade é do envelope `GW-25`, não deste contrato.
 
 ---
 
@@ -175,7 +175,7 @@ Citação verbatim, registrada porque sustenta a regra e não só a ilustra:
 
 **Corolário gravado como fato pelo próprio GlintFx, não como opinião:** em projeto com fonte
 publicado, **detectar alteração é alcançável e impedir não é** — a mesma verdade que a nossa
-`L-25` e `L-18` já assumem, agora dita do lado do formato de mapa.
+`GW-25` e `GW-18` já assumem, agora dita do lado do formato de mapa.
 
 **Consequência que o GlintFx registrou de propósito, além do que foi pedido:** qualquer proposta
 futura de assinatura, DRM, chave embarcada ou ofuscação **no formato de mapa** vira **achado de
@@ -206,7 +206,7 @@ pontuada e fatiada, mas não entra em execução ainda**. Citação direta:
 **Nenhuma data foi dada, e nenhuma é estimada aqui.** O que muda para nós, concretamente:
 `D10` e `D11` projetam o modelo de domínio **contra este contrato hoje**; o código que
 efetivamente liga no leitor/escritor de mapa do GlintFx só nasce quando esse código existir do
-lado deles (`LEI ZERO`, `L-05` — proibido dublê de plataforma).
+lado deles (`LEI ZERO`, `GW-05` — proibido dublê de plataforma).
 
 ---
 
@@ -249,7 +249,7 @@ principalmente para quem **escreve** o formato.
 ## 6. O que este documento não decide
 
 Não é assunto deste documento, e não deve ser confundido com ele: o desenho do envelope de
-**save** (`L-25` nossa, `E1`), a criptografia que o GlintFx vai entregar para esse envelope
+**save** (`GW-25` nossa, `E1`), a criptografia que o GlintFx vai entregar para esse envelope
 (`E7`, já respondido em `inbox/gusworld/archive/20260825-1300-glintfx-resposta-cripto-envelope.md`),
 e qualquer decisão de conteúdo (o que vai dentro do payload opaco de cada objeto — isso é nosso,
 mas é assunto de `D10`/`D17`/catálogo, não deste contrato de formato).

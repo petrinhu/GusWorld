@@ -5,7 +5,7 @@
 # Notice of the visible-warning channel (ADR-026, decision 8), with a FAKE bigtech
 # plugin: its tdd_guard.evaluate answers by FAKE_GUARD_MODE, while tdd_common is the
 # real one (copied from the plugin under plugin/hooks). The real guard is covered by
-# test_notice_contract.sh. Runs inside the container (L-35) with a fake HOME.
+# test_notice_contract.sh. Runs inside the container (GW-35) with a fake HOME.
 #
 # Every case checks the exit code and the stdout together. A "mute" case is only
 # trusted after a control on the same fixture has warned, so a silent notice cannot

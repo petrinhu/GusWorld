@@ -239,7 +239,7 @@ Mensagem opcional discreta no canto da tela durante carregamento:
 | Difícil | 8% |
 | Hardcore | sem Token (0%) |
 
-- O gatilho é a dificuldade escolhida no save, sem exceção ao corte `C-06` (L-29), que proíbe qualquer gatilho por desempenho do jogador. O instante exato, dentro da cena, em que a dificuldade do save dispara a concessão fica pendente: detalhe em `docs/design/mecanicas/conquistas.md` §2.18.
+- O gatilho é a dificuldade escolhida no save, sem exceção ao corte `C-06` (GW-29), que proíbe qualquer gatilho por desempenho do jogador. O instante exato, dentro da cena, em que a dificuldade do save dispara a concessão fica pendente: detalhe em `docs/design/mecanicas/conquistas.md` §2.18.
 
 ---
 

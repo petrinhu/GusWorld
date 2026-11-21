@@ -5,7 +5,7 @@
 | **Status** | Accepted |
 | **Data** | 2026-10-11 |
 | **Decisor** | petrinhu (líder supremo) |
-| **Reversibilidade** | Two-way door quanto à ferramenta (nenhum código de jogo existe ainda para migrar); one-way door de fato quanto ao piso de versão, uma vez que o primeiro `CMakeLists.txt` for commitado e a matriz de CI (L-09, L-20) passar a depender dele. |
+| **Reversibilidade** | Two-way door quanto à ferramenta (nenhum código de jogo existe ainda para migrar); one-way door de fato quanto ao piso de versão, uma vez que o primeiro `CMakeLists.txt` for commitado e a matriz de CI (GW-09, GW-20) passar a depender dele. |
 
 ## Contexto
 
@@ -13,7 +13,7 @@ Antes da ordem de serviço que originou este ADR, "CMake" aparecia dentro das
 fatias do `TODO.md` e nas frases que descrevem o estado do repositório ("não
 existe `CMakeLists.txt`"), mas em lugar nenhum como **decisão registrada**. O
 líder identificou a lacuna e pediu que a fundação de build nascesse decidida, e
-medida, antes da primeira fatia de código (L-20: "a fundação de build e o CI
+medida, antes da primeira fatia de código (GW-20: "a fundação de build e o CI
 são a primeira fatia do projeto").
 
 A pergunta concreta não é "qual ferramenta". O GlintFx já usa CMake, e reusar a
@@ -21,7 +21,7 @@ mesma ferramenta do framework do qual o jogo assenta (LEI ZERO) é a opção ób
 sem alternativa real levantada pelo líder: **CMake é o sistema de build do
 GusWorld por decisão do líder de 25/08/2026.** A pergunta que exige medição, e
 que este ADR responde, é **qual a versão mínima que o GusWorld pode exigir sem
-quebrar em alguma das cinco plataformas obrigatórias** (L-09, L-20).
+quebrar em alguma das cinco plataformas obrigatórias** (GW-09, GW-20).
 
 ## Decisão
 
@@ -47,13 +47,13 @@ abaixo de 4.1 não configuraria no dia em que o submódulo entrasse.
 ## O que foi medido, plataforma por plataforma
 
 Todas as cinco entradas acompanham `:latest`, sem versão de imagem fixada
-(L-09, decisão do líder de 11/10/2026). A resolução de imagem é a mesma do
+(GW-09, decisão do líder de 11/10/2026). A resolução de imagem é a mesma do
 GlintFx: container Linux sobre `ubuntu-latest` para as quatro distros, mais
 runner nativo `windows-latest`.
 
 | Plataforma | Imagem | CMake medido | Método |
 |---|---|---|---|
-| **Fedora** (primário) | `fedora:latest` | **4.3.0** | Medição **direta** nesta máquina, que é a do líder e o alvo primário da L-09: `cmake --version` devolve 4.3.0. O CI do GlintFx mede o mesmo valor no container. |
+| **Fedora** (primário) | `fedora:latest` | **4.3.0** | Medição **direta** nesta máquina, que é a do líder e o alvo primário da GW-09: `cmake --version` devolve 4.3.0. O CI do GlintFx mede o mesmo valor no container. |
 | **Ubuntu** | `ubuntu:latest` | **4.2.3** | Medição ao vivo do GlintFx, 27/08/2026, contra um container `ubuntu:latest` real: a imagem é o Ubuntu 26.04 ("Resolute Raccoon") e `apt-get install cmake` entrega 4.2.3. Registrada em `../../../../GlintFx/.github/workflows/ci.yml`, entradas Ubuntu. |
 | **Arch** | `archlinux:latest` | **4.4.2** | Medição do GlintFx, 27/08/2026, pelo próprio `pacman`. Rolling release: o valor é fotografia da data, não garantia permanente. É a natureza do alvo, não erro de medição. |
 | **CachyOS** | `cachyos/cachyos:latest` | **4.4.2** | Medição do GlintFx, 27/08/2026, pelo próprio `pacman`. Ver [ADR-024](ADR-024-ci-cinco-plataformas-cachyos-container.md) para a confirmação de que esta imagem é oficial, e a razão de CachyOS ter job próprio em vez de herdar o de Arch. |
@@ -86,7 +86,7 @@ de no dia em que o submódulo entrar:
 
 1. **O job Windows da matriz se escreve uma vez.** O passo de instalar CMake vai
    ser necessário de todo modo; construí-lo junto com a matriz (`C4`) evita
-   reformar a matriz depois, e a L-20 exige a matriz das cinco desde o primeiro
+   reformar a matriz depois, e a GW-20 exige a matriz das cinco desde o primeiro
    commit, sem entrada não bloqueante.
 2. **Uma gramática só de versão mínima entre os dois repositórios irmãos**,
    em vez de dois pisos para rastrear e reconciliar.
@@ -108,7 +108,7 @@ obrigatórias, sem exceção, Windows incluído.** Decisão do líder de 25/08/2
 um comportamento só.** O mesmo comando de configuração
 (`cmake -S . -B <dir> -G Ninja ...`) e o mesmo comando de build
 (`cmake --build <dir>`) funcionam em qualquer entrada da matriz, Linux ou
-Windows. O script local que espelha o CI (item `C7`, L-19) não precisa de dois
+Windows. O script local que espelha o CI (item `C7`, GW-19) não precisa de dois
 caminhos: um `if` de plataforma a menos, e uma ferramenta de paralelismo só para
 entender.
 
@@ -202,17 +202,17 @@ própria acima, que nomeia esse custo em vez de escondê-lo).
 ## Reversibilidade
 
 Two-way door hoje, porque nenhum código de jogo existe para migrar. Torna-se um
-one-way door de fato assim que a matriz de CI (L-09, L-20) e o primeiro módulo
-de comportamento (L-19) passarem a depender do piso: subir o piso depois é
+one-way door de fato assim que a matriz de CI (GW-09, GW-20) e o primeiro módulo
+de comportamento (GW-19) passarem a depender do piso: subir o piso depois é
 simples, descer exige reconciliar com o que o GlintFx exige, e a fronteira da
 LEI ZERO não deixa essa reconciliação ser unilateral.
 
 ## Cross-refs
 
-- [ADR-023](ADR-023-glintfx-submodulo-git-pinado.md) (como o GlintFx entra no build, e de onde vem o 4.1; ADR irmão, razão de mudar distinta por L-33)
+- [ADR-023](ADR-023-glintfx-submodulo-git-pinado.md) (como o GlintFx entra no build, e de onde vem o 4.1; ADR irmão, razão de mudar distinta por GW-33)
 - [ADR-024](ADR-024-ci-cinco-plataformas-cachyos-container.md) (a matriz de CI que consome este piso, e o passo de instalação do CMake no Windows)
 - [ADR-025](ADR-025-harness-teste-proprio-minimo.md) (o harness que roda sobre esta fundação)
-- `../../../GODS_LAWS.md` L-09, L-17, L-20, L-33
+- `../../../GODS_LAWS.md` GW-09, GW-17, GW-20, GW-33
 - `../../../../GlintFx/CMakeLists.txt` linha 33 (a exigência de `VERSION 4.1`, origem deste piso)
 - `../../../../GlintFx/.github/workflows/ci.yml` (as medições de CMake por distro, e o precedente de imagem `:latest` por plataforma)
 - `../../../../GlintFx/tools/ci/windows/prep.ps1` (o padrão de instalação de CMake no runner Windows)

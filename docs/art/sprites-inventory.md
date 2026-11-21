@@ -307,9 +307,9 @@ estão em **256×256** — o **Gus** (protagonista, ver bloco ⭐ abaixo) e o
 256×256, só `walk/` já em 180×180). **Esses arquivos NÃO são regerados** para
 bater com o canônico; o ajuste de 256 para 180 é feito **em tempo de execução,
 pelo motor gráfico do GlintFx**, na camada de apresentação — que ainda não existe
-(L-06, L-27). Isto abre uma exigência nova ao framework, registrada no `TODO.md`
+(GW-06, GW-27). Isto abre uma exigência nova ao framework, registrada no `TODO.md`
 como item `P4`; o pedido só vai ao bus quando `present/` esbarrar de fato na falta
-(L-07).
+(GW-07).
 
 **Ao ler a coluna `dim` da tabela abaixo:** ela descreve o **arquivo real no
 disco**, não o canônico. Onde os dois coincidem (180×180), nenhuma nota é
@@ -392,7 +392,7 @@ personagens_inspirados/gus/
 │   │          decisão do líder de 30/08/2026) vale ENTRE o protagonista e o
 │   │          elenco, não DENTRO do protagonista — o Gus não pode trocar de
 │   │          técnica conforme a direção pra qual olha, porque isso aparece
-│   │          quando ele gira. **A regeração é trabalho do líder (L-02) — o
+│   │          quando ele gira. **A regeração é trabalho do líder (GW-02) — o
 │   │          pipeline de arte não é tocado por agente.** Rastreado no
 │   │          `TODO.md` como `ART-2`, que nenhum agente deve executar.
 │   │          ⚠️ **O identificador `ARTE-RESP-4DIR`, citado em versões

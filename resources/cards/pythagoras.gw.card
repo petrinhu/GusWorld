@@ -2,7 +2,7 @@
 //
 // Hypotenuse (Pythagoras): Passiva, Universal, mana 0. Combo cross-ator:
 // quando >=2 aliados batem no mesmo alvo na mesma rodada, golpe-bonus de
-// potencia = raiz(a^2+b^2). Extraida do projeto anterior (L-01). Ver
+// potencia = raiz(a^2+b^2). Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/pythagoras.md.
 
 #meta id pythagoras

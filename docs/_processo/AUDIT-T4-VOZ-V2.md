@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 >
 > **Não foi reconferido item a item** por este agente: são 71 achados de prosa, e reavaliar "esta frase ainda soa cansada" exige leitura literária, não `grep`. Isto é trabalho de **correção de prosa**, que — por escopo desta sessão — é do `narrative-writer`, não do `technical-writer` (o mesmo princípio que `TEXTREVIEW-BRUNUS-LINGUA-2026-07-06.md` já registrou: "correção de prosa é trabalho do `narrative-writer`, correção de canon é decisão do líder").
 >
-> **Nenhum documento foi declarado morto ou resolvido por este agente** (L-14 do `GODS_LAWS.md`). Fica registrado como candidato: se o líder quiser, um passe de `narrative-writer` sobre `era-2-boom-tecnico.md` guiado por este dossiê fecharia o item — ou uma nova auditoria de voz, já que oito meses de revisão separam 22/05/2026 de hoje.
+> **Nenhum documento foi declarado morto ou resolvido por este agente** (GW-14 do `GODS_LAWS.md`). Fica registrado como candidato: se o líder quiser, um passe de `narrative-writer` sobre `era-2-boom-tecnico.md` guiado por este dossiê fecharia o item — ou uma nova auditoria de voz, já que oito meses de revisão separam 22/05/2026 de hoje.
 >
 > **O que segue é o texto original do legacy, sem edição de conteúdo.**
 

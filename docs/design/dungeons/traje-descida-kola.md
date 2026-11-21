@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
-SPDX-License-Identifier: NONE — regime reservado (L-08 de GODS_LAWS.md; docs/design/ fica fora do
+SPDX-License-Identifier: NONE — regime reservado (GW-08 de GODS_LAWS.md; docs/design/ fica fora do
 código, sob o mesmo regime de `narrative/`, `specs/`, `CHARS.md`, `PLACES.md`, `sinopse.md`).
 -->
 
@@ -16,7 +16,7 @@ código, sob o mesmo regime de `narrative/`, `specs/`, `CHARS.md`, `PLACES.md`, 
 > **Fonte:** decisão do líder, verbatim, 06/09/2026 (ver seções 1-5) e
 > `docs/_secret/dungeons/CAPTURA-BRUTA-kola-espelho-obsidiana.md` item 12 (as três impossibilidades
 > físicas medidas — cifrada por estar no mesmo diretório de apoio à dungeon, só o caminho é
-> citável, L-25).
+> citável, GW-25).
 >
 > **Cross-refs:** `docs/design/dungeons/kola-sg3-12262-espelho-obsidiana.md` (hub da dungeon, beat
 > 2) · `docs/design/roster-analogos/21-helion-tusk.md` (Helion Tusk) ·
@@ -107,13 +107,13 @@ bateria nenhuma no inventário") sem depender da Kola-SG3-12262, dungeon de Ato 
 (`kola-sg3-12262-espelho-obsidiana.md`). Lista de fontes e o que já existe delas no corpus:
 `cartas-hardware-pirataria-energia.md` §5, "Bateria de baixa qualidade (craftada)".
 
-## 6. Nenhuma altura, nenhuma verticalidade de câmera, nenhuma coordenada Z (L-26)
+## 6. Nenhuma altura, nenhuma verticalidade de câmera, nenhuma coordenada Z (GW-26)
 
 A "descida" a 12.262 m é inteiramente **travessia de mapa em grade 2D**, igual a qualquer outra
 transição de área do jogo — nunca um sistema de profundidade/altitude simulado por número. As
 "primeira descida", "segunda descida" e "terceira descida" do hub público são transições de ÁREA
 dentro da topologia já existente, lidas na mesma perspectiva 3/4 top-down fixa e grade quadrada que
-todo o resto do jogo usa (L-26). O traje não introduz:
+todo o resto do jogo usa (GW-26). O traje não introduz:
 
 - nenhuma coordenada de profundidade/altura por personagem ou por tile;
 - nenhuma rotação de câmera, projeção isométrica ou eixo vertical de movimento;
@@ -139,9 +139,9 @@ como vestimenta física:
 
 **Não corrigido por esta fatia:** a propagação de consequências a `CHARS.md` e ao hub da dungeon já
 tem item próprio na tabela de pendências, `D30` — editar os três agora seria pisar em outro átomo
-(L-33). Sinalizado aqui para quem executar `D30` não perder nenhuma das três ocorrências.
+(GW-33). Sinalizado aqui para quem executar `D30` não perder nenhuma das três ocorrências.
 
-## 8. Cortes da L-29 conferidos (nenhum atravessado)
+## 8. Cortes da GW-29 conferidos (nenhum atravessado)
 
 - **C-02** (gating nunca é trava dura): o campo é gate de sobrevivência num ambiente, não trava de
   acesso à área — a Kola-SG3-12262 já é alcançável desde o início. **Cabe.**

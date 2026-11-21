@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //
-// DELIBERATE DEFECT. This file exists only to prove the clang-tidy gate (L-19 portao 3,
+// DELIBERATE DEFECT. This file exists only to prove the clang-tidy gate (GW-19 portao 3,
 // clang-tidy job). It is not a CMake target and no build compiles it: the gate scans it
 // by path, with its own flags and without the compile database. Do not fix the defect
 // below: without it the proof has nothing to catch.

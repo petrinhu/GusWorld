@@ -5,7 +5,7 @@
 
 This is a gate, not a report: any doubt is a failure. Three blind spots are
 closed on purpose: a missing version line, a tag outside the four-component
-format (GODS_LAWS.md L-23), and a shallow clone, where the tags may not have
+format (GODS_LAWS.md GW-23), and a shallow clone, where the tags may not have
 been fetched and an apparent match would be a false green.
 
 Usage: CI reads GITHUB_REF_NAME; a local run passes the tag as argument:
@@ -72,7 +72,7 @@ def main(argv):
     tag = read_tag_name(argv)
     match = TAG_RE.fullmatch(tag)
     if match is None:
-        return fail(f"tag {tag!r} is not in the vA.B.C.D format (four components, L-23)")
+        return fail(f"tag {tag!r} is not in the vA.B.C.D format (four components, GW-23)")
 
     try:
         shallow = is_shallow_clone()

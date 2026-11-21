@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-> **RESGATADO em 25/08/2026 do `gusworld_legacy`.** Este README documenta uma ferramenta cujo CÓDIGO (`8values_engine.py`, `gus_rightness.py`) não sobreviveu ao reset do L-01 — só a documentação foi resgatada. Se a ferramenta for necessária de novo, o código precisa ser reescrito do zero; use este texto e `LICENSE_8VALUES_ORIGINAL.txt` como especificação e atribuição. `../OBRA-DE-FICCAO-E-METODOLOGIA.md`, citado abaixo, já existe neste repositório.
+> **RESGATADO em 25/08/2026 do `gusworld_legacy`.** Este README documenta uma ferramenta cujo CÓDIGO (`8values_engine.py`, `gus_rightness.py`) não sobreviveu ao reset do GW-01 — só a documentação foi resgatada. Se a ferramenta for necessária de novo, o código precisa ser reescrito do zero; use este texto e `LICENSE_8VALUES_ORIGINAL.txt` como especificação e atribuição. `../OBRA-DE-FICCAO-E-METODOLOGIA.md`, citado abaixo, já existe neste repositório.
 
 ---
 

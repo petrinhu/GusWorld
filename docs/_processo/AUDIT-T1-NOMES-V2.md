@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > - **CR-T1v2-03** (`era-2-boom-tecnico.md:925`, trio matrilinear obsoleto → patrilinear Chevalier): **resolvido**. O arquivo atual não tem mais ocorrência de "Lucélia", "Antonella" ou "Helga"; a linhagem patrilinear (Antoneto/Dmitri/Casimiro/Aldebrando) está presente.
 > - **CR-T1v2-04** (arquivo `11-venea-vance-mae.md` obsoleto): **resolvido**. O arquivo já se chama `docs/narrative/deep/antologia/11-gargi-vance-mae.md`, conteúdo idêntico ao que a v2 já considerava canônico.
 >
-> **Os itens MÉDIOS, LEVES e a lista de "NPCs não-canonizados" abaixo não foram reconferidos individualmente** por este agente — ficam como estavam no legacy. Nada aqui foi declarado morto por este agente (L-14 do `GODS_LAWS.md`); a confirmação acima é factual (arquivo:linha), o resto é candidato a nova varredura, se o líder quiser.
+> **Os itens MÉDIOS, LEVES e a lista de "NPCs não-canonizados" abaixo não foram reconferidos individualmente** por este agente — ficam como estavam no legacy. Nada aqui foi declarado morto por este agente (GW-14 do `GODS_LAWS.md`); a confirmação acima é factual (arquivo:linha), o resto é candidato a nova varredura, se o líder quiser.
 >
 > **O que segue é o texto original do legacy, sem edição de conteúdo.**
 

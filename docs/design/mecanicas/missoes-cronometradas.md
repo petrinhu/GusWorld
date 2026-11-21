@@ -34,4 +34,4 @@ Uma missão de **aventura/exploração** (fora do core de combate): o player tem
 - Números: X minutos, margem de folga, tamanho da rota → `economy-designer`/balance.
 - Se há missões cronometradas recorrentes ou é um tipo pontual; onde a primeira aparece.
 
-Ponteiro (L-30): `TODO.md` item `F4` (o item que governa este documento inteiro; aceite final ainda não fechado).
+Ponteiro (GW-30): `TODO.md` item `F4` (o item que governa este documento inteiro; aceite final ainda não fechado).

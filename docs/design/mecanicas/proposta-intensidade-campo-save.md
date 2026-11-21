@@ -14,7 +14,7 @@
 - **Total:** salva-se só na porta (entrada/saída); carregar reinicia na porta; save manual e autosave desligados fora da porta.
 - **Fraca:** o campo bloqueia só o autosave dentro da dungeon; o save manual continua disponível pelo menos na porta.
 - A percepção de qual intensidade está em vigor soma **sinal diegético no ambiente** (primário) e confirmação no **menu de save**, sem tutorial em texto (decisão do líder, 28/08/2026 e 05/09/2026, `save-por-local.md` §3).
-- **A intensidade é dado do mapa** — atribuída por dungeon, estática por design, não calculada em tempo de jogo a partir do desempenho do jogador. Isto casa direto com o corte `C-06` da L-29 (proibido dificuldade dinâmica adaptativa): a proposta abaixo **não introduz nenhuma adaptação por jogador**, é uma tabela fixa, decidida na mesa de design.
+- **A intensidade é dado do mapa** — atribuída por dungeon, estática por design, não calculada em tempo de jogo a partir do desempenho do jogador. Isto casa direto com o corte `C-06` da GW-29 (proibido dificuldade dinâmica adaptativa): a proposta abaixo **não introduz nenhuma adaptação por jogador**, é uma tabela fixa, decidida na mesa de design.
 
 O que falta, e é objeto deste documento: **qual das 13 fica em qual intensidade, e por quê.**
 
@@ -31,7 +31,7 @@ Dois sinais pedidos na tarefa **não existem no corpus hoje**, e é preciso dize
 ## 2. O critério proposto (hierarquia de regras, a primeira que casar decide)
 
 **Regra 1 — Abertura do jogo → FRACA.**
-A primeira dungeon que o jogador visita é também o primeiro contato dele com a própria restrição de save. Isto é uma mecânica nova sendo ensinada, e o corte `C-16` da L-29 exige onboarding orgânico, não punitivo, no primeiro contato com qualquer sistema novo. Impor a versão mais dura logo na primeira dungeon puniria um jogador que ainda não sabe que a regra existe. Só há uma dungeon nesta posição: **Dutos — aparato (abertura)**.
+A primeira dungeon que o jogador visita é também o primeiro contato dele com a própria restrição de save. Isto é uma mecânica nova sendo ensinada, e o corte `C-16` da GW-29 exige onboarding orgânico, não punitivo, no primeiro contato com qualquer sistema novo. Impor a versão mais dura logo na primeira dungeon puniria um jogador que ainda não sabe que a regra existe. Só há uma dungeon nesta posição: **Dutos — aparato (abertura)**.
 
 **Regra 2 — Clímax da campanha → TOTAL.**
 A dungeon final é o único ponto do corpus com marcação textual de fronteira dramática inequívoca (Seção 1). Neste ponto, o jogador já dominou a mecânica de save há dezenas de dungeons; a convenção do gênero citado como referência (Zelda de SNES, Chrono Trigger — `save-por-local.md` §1.2) reserva o bloqueio mais duro justamente para o trecho final. Só há uma dungeon nesta posição: **Selve Profunda (final)**.
@@ -89,8 +89,8 @@ Nenhuma linha da tabela da Seção 5 se apoia em conteúdo de dungeon que o corp
 
 ## 6. Conformidade com o que já foi fixado
 
-- **Não acrescenta campo ao save.** A intensidade proposta aqui é um atributo por dungeon, fixo por design, e — como o líder já registrou — pertence ao **dado do mapa**, não ao envelope de save. O save consulta essa informação (via o requisito já descrito em `save-por-local.md` §5 item 1: "a área carregada precisa expor... se aquele lugar é cidade ou dungeon, e, sendo dungeon, se o PEM local está ativo, desativado ou nunca existiu ali"); esta proposta só preenche **qual valor** (fraca/total) cada uma das 13 dungeons carrega nesse campo do mapa, não muda a forma do save nem do formato binário selado (L-18, L-25). O item `D11` continua livre para nascer com o formato já previsto.
-- **Não introduz dificuldade dinâmica.** A tabela da Seção 5 é estática, decidida na mesa de design, sem leitura de desempenho do jogador — respeita o corte `C-06` da L-29.
+- **Não acrescenta campo ao save.** A intensidade proposta aqui é um atributo por dungeon, fixo por design, e — como o líder já registrou — pertence ao **dado do mapa**, não ao envelope de save. O save consulta essa informação (via o requisito já descrito em `save-por-local.md` §5 item 1: "a área carregada precisa expor... se aquele lugar é cidade ou dungeon, e, sendo dungeon, se o PEM local está ativo, desativado ou nunca existiu ali"); esta proposta só preenche **qual valor** (fraca/total) cada uma das 13 dungeons carrega nesse campo do mapa, não muda a forma do save nem do formato binário selado (GW-18, GW-25). O item `D11` continua livre para nascer com o formato já previsto.
+- **Não introduz dificuldade dinâmica.** A tabela da Seção 5 é estática, decidida na mesa de design, sem leitura de desempenho do jogador — respeita o corte `C-06` da GW-29.
 - **Não decide a forma do sinal diegético.** Isto já está fechado (sinal no ambiente, confirmado pelo menu de save, `save-por-local.md` §3) e fora do escopo deste documento; a proposta só diz qual intensidade cada dungeon carrega, não como o ambiente e o menu a comunicam.
 - **Não toca layout sala-a-sala nem conteúdo específico de dungeon** (fora do escopo, `mundo-topologia.md` §10 item 1).
 

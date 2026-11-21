@@ -2,7 +2,7 @@
 //
 // EM-Shield (Faraday): Hibrida, Eletrico. Face de combate castável (a face
 // fora-de-combate anti-PEM original segue sem programa, feat futura).
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/faraday.md.
 
 #meta id faraday

@@ -2,7 +2,7 @@
 
 > **Status:** FECHADO em 11/10/2026, com as decisões do líder aplicadas: o Cronovisor é a metade que vê do rádio e é **opcional**; a fabricação é do Joaquim Bartolomeu, com a cadeia de encomenda que segue; a visita acontece **depois** do rádio montado; a interface é uma placa de Lemon-Gama, que pertence a uma família; e o espelhamento da imagem é **defeito do aparelho**. Seis pontas continuam abertas e estão em §12. Documento novo, público (a partição está em §11).
 >
-> **Cross-ref:** `docs/design/mecanicas/radio-padre-landell.md` (peça irmã, mesma regra de acesso e mesma trava), `docs/design/technomagik.md` (seção Tavus-Eco, cena de encontro), `docs/design/mundo-topologia.md` §2 (grafo de 13 áreas e dificuldade), `CHARS.md` (Padrinho Tiago, linha 84; Joaquim Bartolomeu, linha 88; Gargi Vance e Pyotor na §4), `PLACES.md` (Edifício Vance, linha 83; Subsolo do Edifício Vance, linha 84; Zona do Silêncio), `GODS_LAWS.md` L-38 (o jogador resolve o enigma), L-29 (cortes C-02, C-04 e C-15), `docs/narrative/comic-reliefs/easter-eggs-educacionais.md` (EE-25).
+> **Cross-ref:** `docs/design/mecanicas/radio-padre-landell.md` (peça irmã, mesma regra de acesso e mesma trava), `docs/design/technomagik.md` (seção Tavus-Eco, cena de encontro), `docs/design/mundo-topologia.md` §2 (grafo de 13 áreas e dificuldade), `CHARS.md` (Padrinho Tiago, linha 84; Joaquim Bartolomeu, linha 88; Gargi Vance e Pyotor na §4), `PLACES.md` (Edifício Vance, linha 83; Subsolo do Edifício Vance, linha 84; Zona do Silêncio), `GODS_LAWS.md` GW-38 (o jogador resolve o enigma), GW-29 (cortes C-02, C-04 e C-15), `docs/narrative/comic-reliefs/easter-eggs-educacionais.md` (EE-25).
 
 ---
 
@@ -24,14 +24,14 @@ A diferença para o rádio é de sentido, não de regra: o rádio sintoniza, o C
 
 O Cronovisor **mostra o que o eco já tem para mostrar depois do acerto**. Ele **não mostra** nada que ajude a resolver o puzzle. Em lista:
 
-- **Nenhum estímulo do puzzle.** Antes do acerto, o Cronovisor não exibe glifo, padrão, sequência, forma do artefato a ligar nem posição de nada. Antes do acerto ele exibe só o estado do sinal, presente ou ausente, e esse estado depende apenas de o rádio estar ligado e de o eco estar presente. Ele não varia com a proximidade do artefato certo, com a configuração parcial nem com o número de tentativas. Se variasse, seria indicador de quente e frio, que é a dica que a L-38 proíbe.
-- **Nenhum destaque sobre o mundo.** Não há contorno, scan, marcação, seta, brilho ou prompt sobre o artefato, a parede ou a câmara. Isso é o que a L-38 proíbe de forma expressa.
+- **Nenhum estímulo do puzzle.** Antes do acerto, o Cronovisor não exibe glifo, padrão, sequência, forma do artefato a ligar nem posição de nada. Antes do acerto ele exibe só o estado do sinal, presente ou ausente, e esse estado depende apenas de o rádio estar ligado e de o eco estar presente. Ele não varia com a proximidade do artefato certo, com a configuração parcial nem com o número de tentativas. Se variasse, seria indicador de quente e frio, que é a dica que a GW-38 proíbe.
+- **Nenhum destaque sobre o mundo.** Não há contorno, scan, marcação, seta, brilho ou prompt sobre o artefato, a parede ou a câmara. Isso é o que a GW-38 proíbe de forma expressa.
 - **Nenhuma cena com o passo-chave.** Cada mestre tem uma lista fechada de cenas, aprovada pelo designer do puzzle daquele mestre. Nenhuma cena da lista mostra o passo que resolve o puzzle, e nenhuma mostra o mestre resolvendo o próprio puzzle.
 - **Nenhuma informação de lado.** Nenhuma cena e nenhum elemento de puzzle depende de esquerda ou direita lida no Cronovisor. Um puzzle que precise de lateralidade não pode usar o Cronovisor como fonte. Isso torna o defeito de espelhamento (§4.1) inofensivo para o enigma.
 - **Nenhum juízo de acerto.** O Cronovisor não diz se o jogador está perto ou longe. Quem confere o acerto é o jogo, e o aparelho só recebe.
 - **Nenhum vocabulário técnico do puzzle.** O Cronovisor não nomeia o que o jogador deve fazer.
 
-A regra vale para este documento e para qualquer documento futuro de puzzle que use o Cronovisor. A frase-guarda da L-38, repetida aqui como manda a lei: **nenhum enigma do jogo, em nenhuma dungeon, câmara ou área secreta, cede por ferramenta do jogo em vez do jogador que segura o controle.** E a frase final da mesma lei: **ferramenta que mostra estado observável do mundo é legítima; o que esta lei proíbe é a ferramenta que faz o raciocínio no lugar do jogador.** Qualquer solução em que o Cronovisor aponte a resposta contradiz esta decisão.
+A regra vale para este documento e para qualquer documento futuro de puzzle que use o Cronovisor. A frase-guarda da GW-38, repetida aqui como manda a lei: **nenhum enigma do jogo, em nenhuma dungeon, câmara ou área secreta, cede por ferramenta do jogo em vez do jogador que segura o controle.** E a frase final da mesma lei: **ferramenta que mostra estado observável do mundo é legítima; o que esta lei proíbe é a ferramenta que faz o raciocínio no lugar do jogador.** Qualquer solução em que o Cronovisor aponte a resposta contradiz esta decisão.
 
 Por que imagem exige mais cuidado que som: uma cena visual vaza solução com mais facilidade que uma fala, porque o olho acha o padrão sem interpretação. Por isso a proteção tem três camadas, e as três são obrigatórias: a lista fechada de cenas (primeira bullet acima), o estado do sinal antes do acerto (sem conteúdo do puzzle) e o jogo conferindo o acerto por conta própria.
 
@@ -82,7 +82,7 @@ Regra do defeito:
 3. **É consertado na visita.** O ajuste do Joaquim corrige a inversão de uma vez. A partir daí a cena sai na orientação certa.
 4. **Não carrega informação de enigma.** A inversão só acontece na visita, que é depois do rádio montado, e ocorre numa cena de ajuste, não numa cena de puzzle. Além disso, nenhum puzzle lê lateralidade do Cronovisor (§3). Assim a inversão nunca indica caminho nem passo-chave.
 
-Justificativa da escolha: defeito que se anuncia e se conserta é cor local. Defeito que o jogador tem de deduzir é enigma disfarçado, e a L-38 proíbe as duas coisas. A frase-guarda da L-38 vale aqui também: **nenhum enigma do jogo cede por ferramenta do jogo em vez do jogador que segura o controle.** Qualquer solução em que a inversão do Cronovisor aponte a resposta contradiz esta decisão.
+Justificativa da escolha: defeito que se anuncia e se conserta é cor local. Defeito que o jogador tem de deduzir é enigma disfarçado, e a GW-38 proíbe as duas coisas. A frase-guarda da GW-38 vale aqui também: **nenhum enigma do jogo cede por ferramenta do jogo em vez do jogador que segura o controle.** Qualquer solução em que a inversão do Cronovisor aponte a resposta contradiz esta decisão.
 
 Por que o defeito ecoa o motivo do espelho no canon: o Espelho Negro do John Dee (`docs/narrative/deep/characters/mestre-ocu-02-john-dee.md`), o Espelho de Obsidiana (`docs/design/dungeons/espelho-obsidiana-artefato.md`) e o Espelho Acústico Sterling (`sinopse.md`) já são motivos do canon. O defeito não cria símbolo novo.
 

@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > verdade quando o terceiro idioma chegar, não só o segundo.
 >
 > **Contexto de canon que motivou este documento:** em 25/08/2026 o líder alterou o corte `C-09`
-> da `GODS_LAWS.md` L-29, passando a exigir **pt-br e inglês na 1.0**, estrutura pronta para os
+> da `GODS_LAWS.md` GW-29, passando a exigir **pt-br e inglês na 1.0**, estrutura pronta para os
 > idiomas que vierem depois. Medido nesta data: `resources/translations/en_intl.md` tem 1.650
 > palavras contra 2.833 de `pt_br.md`; só o Diário do jogo (`docs/narrative/diary/`, 8 arquivos)
 > são 54.772 palavras.
@@ -25,7 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 > selado — isso é trabalho do `B9` (`docs/tech/convencao-formatos-gw.md`, tipo `.gw.text`), que
 > **depende** deste contrato e tem de satisfazer cada regra abaixo. Este documento fixa **o que**
 > o formato precisa garantir; `B9` decide **como**, em texto fonte editável no repositório,
-> compilado e selado no build (L-18, L-25).
+> compilado e selado no build (GW-18, GW-25).
 
 ---
 
@@ -38,7 +38,7 @@ Todo o resto deste contrato é a decomposição dessa frase em regras verificáv
 abaixo obrigaria re-trabalho de formato ao entrar um terceiro locale, a regra está errada e deve
 ser levada ao líder antes de `B9` implementar.
 
-**Por que isto é mais que preferência de arquitetura:** a L-25 já fixa que save, configuração,
+**Por que isto é mais que preferência de arquitetura:** a GW-25 já fixa que save, configuração,
 mapa e catálogo vivem num envelope binário único, versionado, selado. Mudar o formato do catálogo
 de texto depois do lançamento colide de frente com compatibilidade de versão de formato — o mesmo
 motivo por que `LOAD_MIGRATION_REQUIRED` existe para save. Locale como dimensão fechada de dois
@@ -56,7 +56,7 @@ dois: `pt_br` (referência) e `en_intl`. O contrato vale igual para dois ou para
 
 O mecanismo (seja lá qual `B9` desenhar) lê a lista de locales existentes **de um registro de
 dados**, nunca de um `switch`/`if locale == "en"` no código ou de um número de campos fixo no
-envelope. Isto é o análogo direto do que a L-25 já faz para conquista (`.gw.achv`) e para item de
+envelope. Isto é o análogo direto do que a GW-25 já faz para conquista (`.gw.achv`) e para item de
 mundo (`.gw.box`): o catálogo tem N entradas, e N é dado, não constante de compilação.
 
 **Recomendação, não decisão fechada:** manter `pt_br` e `en_intl` como identificadores já em uso
@@ -82,7 +82,7 @@ declarar, como **dado** (dentro do que `B9` desenhar, não neste documento):
 **Isto não é engenharia adiantada para um problema que não existe:** o campo nasce hoje, vazio ou
 trivial, porque adicioná-lo depois é o próprio re-trabalho de formato que este contrato existe
 para evitar. O que **não** nasce hoje é a lógica que trata categorias além de `one`/`other` — essa
-espera o locale que precisar dela, como qualquer teto técnico faseado da L-25.
+espera o locale que precisar dela, como qualquer teto técnico faseado da GW-25.
 
 ### 2.3 Locale é diferente de idioma
 
@@ -107,7 +107,7 @@ O jogador só pode escolher, na tela de idioma (`SETTINGS_LANGUAGE`), um locale 
 pacote instalado — a lista vem do registro (§2.2), nunca é digitável nem inferida livremente do
 SO. Se um save mais novo referenciar um locale que este build não tem (por exemplo, o jogador
 voltou a uma versão anterior depois de ter jogado numa que trazia um terceiro idioma), a mesma
-doutrina da L-25 para configuração selada se aplica: **nunca recusar o boot**. Cai silenciosamente
+doutrina da GW-25 para configuração selada se aplica: **nunca recusar o boot**. Cai silenciosamente
 para o locale de referência (`pt_br`), com aviso visível, exatamente como configuração corrompida
 já cai para o padrão de fábrica com aviso, e não crash.
 
@@ -139,7 +139,7 @@ tradução pendente, e o tratamento é deliberadamente diferente do §3.2:
 branco e não tem como nomear o problema num relato de bug, e o QA não consegue `grep` por "nada".
 A chave crua, ao contrário, **é** o nome do bug: quem reporta cola o texto exato que apareceu na
 tela, e isso já é o identificador que localiza a linha de código ou de dado errada, sem
-investigação adicional. É a mesma lógica de honestidade que a L-25 já aplica a save corrompido —
+investigação adicional. É a mesma lógica de honestidade que a GW-25 já aplica a save corrompido —
 declarar o defeito em vez de mascará-lo — aplicada ao texto em vez de ao arquivo.
 
 ### 3.4 Resumo do critério
@@ -172,7 +172,7 @@ para os tipos ainda não criados.
 
 ### 4.2 Granularidade: uma chave por unidade de atenção do tradutor
 
-A régua não é tamanho do texto, é a mesma da L-33 aplicada a documento: **uma chave cobre a menor
+A régua não é tamanho do texto, é a mesma da GW-33 aplicada a documento: **uma chave cobre a menor
 unidade que ainda faz sentido isolada para quem traduz.**
 
 - **UI curta** (botão, rótulo, título): uma chave por string completa. Nunca concatenar duas
@@ -205,7 +205,7 @@ Duas operações são diferentes e o contrato as trata diferente:
    quando qualquer locale (inclusive só a referência) já a traduziu — é proibido. Se o sentido
    mudou, **nasce uma chave nova**; a antiga fica marcada como não usada e só é removida depois de
    confirmado por grep que nada mais referencia (código nem dado), e com o líder informado — nunca
-   apagada por presunção de agente (L-14).
+   apagada por presunção de agente (GW-14).
 
 **Por que isto é mais caro para chave do que para valor:** uma chave tem consumidor duplo — o
 código/dado (`ACTION_<nome>` é lido por `gus/domain/input/action_registry.cpp`, conforme o
@@ -298,7 +298,7 @@ inventa uma taxonomia de plural própria quando a Unicode já mantém uma, testa
 idiomas.
 
 **Por que "num subconjunto escrito em casa" e não a biblioteca ICU4C:** o projeto é zero-dependência
-por decisão já tomada (`ADR-006`, ratificada pela L-25 para a própria criptografia — "nenhuma
+por decisão já tomada (`ADR-006`, ratificada pela GW-25 para a própria criptografia — "nenhuma
 biblioteca de terceiro"), e ICU4C é uma dependência pesada para o que o jogo precisa. A
 **sintaxe** ICU MessageFormat pode ser adotada sem a **biblioteca** ICU: um parser pequeno,
 escrito em `domain/i18n/` junto do carregador de catálogo,
@@ -326,7 +326,7 @@ progressivamente, sem pressa e sem quebrar nada, à medida que cada chave for re
 
 ## 7. Termo de lore sem tradução honesta
 
-A L-22 já fixa a regra geral: **nome próprio do mundo do jogo, unidade inventada e palavra da
+A GW-22 já fixa a regra geral: **nome próprio do mundo do jogo, unidade inventada e palavra da
 língua construída não se traduzem** — os exemplos citados na lei são `runa`, `tavus_drive`,
 `selve`. O piloto da Cena 15 já encontrou um caso concreto e resolveu do jeito certo
 (`cena15-dlgtxt-PILOTO-PROPOSTA.md`, item DLG-12): o par `compilar`/`compile` sobrevive traduzido
@@ -351,7 +351,7 @@ protege é o comentário, não o formato.
 
 ## 8. Orçamento de expansão
 
-**Regra geral, sem medir texto específico ainda porque não há `present/` (L-06):** nenhum
+**Regra geral, sem medir texto específico ainda porque não há `present/` (GW-06):** nenhum
 contêiner de texto pode ser dimensionado no tamanho exato do texto em pt-br. A referência de
 mercado (alemão e francês tipicamente +30-40% sobre o inglês; línguas com escrita mais larga por
 caractere, ou línguas que precisam de transliteração, até +50%) vale como piso de folga a exigir
@@ -370,7 +370,7 @@ fallback, plural). Ela **não** resolve sozinha um idioma cujo alfabeto a fonte 
 desenha — japonês, coreano, árabe, ou qualquer script fora do repertório latino acentuado que
 `PixelOperatorMono` cobre hoje exigiria **fonte adicional por locale**, o que é dado (arquivo de
 fonte por locale) se o renderizador de texto (ainda não escrito, é trabalho da camada `present/`
-que a L-06 ainda bloqueia) já nascer preparado para trocar fonte por locale, e é retrabalho de
+que a GW-06 ainda bloqueia) já nascer preparado para trocar fonte por locale, e é retrabalho de
 formato se o renderizador nascer hardcoded numa fonte só. **Isto fica registrado como pendência
 para quando `present/` for desenhado — não é decisão deste documento, mas é o tipo de decisão que,
 se tomada errado, transformaria "acrescentar idioma" de volta em "mudar formato" para qualquer
@@ -386,7 +386,7 @@ idioma fora do alfabeto latino.**
 | `docs/narrative/propostas/cena15-dlgtxt-PILOTO-PROPOSTA.md` | Proposta (não canon) de conversão de uma cena para o formato `.gw.text` | A convenção de chave de diálogo dela (`DLG-03`) é generalizada aqui (§4.1); a triagem de trocadilho/jargão (`DLG-12`, e `guia-dialogos.md` §11) é referenciada no §7 como o precedente correto de tratamento caso a caso |
 | `docs/narrative/guia-dialogos.md` §11 | Regra de trocadilho/jargão: caso a caso, versão própria por idioma quando o par não sobrevive | Complementar a este contrato, não sobreposta: §11 decide **quando reescrever o efeito em vez de traduzir literalmente**; este contrato (§7) decide **como o termo intraduzível fica marcado na chave** |
 | `docs/tech/convencao-formatos-gw.md` | A convenção `.gw.<tipo>` e a lista de treze tipos | `B9` (dependente deste contrato) escreve a spec de `.gw.text` dentro dessa convenção |
-| `GODS_LAWS.md` L-18, L-22, L-25, L-29 (`C-09`), L-30 | Leis vinculantes | Este contrato é a leitura operacional delas para o domínio de texto; não substitui nenhuma |
+| `GODS_LAWS.md` GW-18, GW-22, GW-25, GW-29 (`C-09`), GW-30 | Leis vinculantes | Este contrato é a leitura operacional delas para o domínio de texto; não substitui nenhuma |
 
 **O que este contrato NÃO decide, porque é decisão de outro item ou do líder:**
 
@@ -396,7 +396,7 @@ idioma fora do alfabeto latino.**
 - Esquema de identificador de locale para o terceiro idioma em diante — recomendação dada, decisão
   fica para quando o terceiro locale for despachado (§2.1).
 - Fonte/glifo por locale na camada de apresentação — registrado como risco (§8), decisão de quando
-  `present/` for desenhado, fora do escopo da L-06 hoje.
+  `present/` for desenhado, fora do escopo da GW-06 hoje.
 
 ---
 
@@ -422,7 +422,7 @@ para os itens abaixo, a resposta for sim:
 - O parser aceita `{arg}` nomeado e o subconjunto ICU de `plural`/`select` do §6.2 (ou a
       alternativa que o líder aprovar no lugar).
 - Nada do texto do jogador chega em texto puro na distribuição — a fonte fica no repositório,
-      o artefato entregue é o pacote compilado e selado (L-18, L-25), sem exceção para
+      o artefato entregue é o pacote compilado e selado (GW-18, GW-25), sem exceção para
       locale nenhum, inclusive os que ainda não existem.
 
 ---

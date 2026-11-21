@@ -71,7 +71,7 @@
 
    > ⚠️ **Não verificado contra código.** Esta afirmação sobre `scripted_brain.cpp` e
    > sobre o call site de produção vem da análise de projeto, não de medição em código
-   > executado. O código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte
+   > executado. O código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte
    > que a redação original citava não existe. Revalidar quando houver implementação.
 
 ---
@@ -147,7 +147,7 @@ valor do multiplicador vigente; ver a nota de ferramenta na seção 9.4.
   > ⚠️ **Não verificado contra código.** A citação de `combat_constants.hpp` e
   > `mira_sim_harness.hpp` com o valor `10.5` vem da análise de projeto, não de
   > medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md,
-  > L-01), e a fonte que a redação original citava não existe. A consistência interna
+  > GW-01), e a fonte que a redação original citava não existe. A consistência interna
   > do dado (queda de ~2pp) continua válida como leitura da simulação; revalidar o
   > valor do multiplicador quando houver implementação.
 
@@ -354,7 +354,7 @@ mais um controle interno gratuito.
 
 > ⚠️ **Não verificado contra código.** A citação de `mira_sim_harness.hpp:512` vem da
 > análise de projeto, não de medição em código executado. O código deste projeto
-> nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava não
+> nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não
 > existe. A leitura do dado (P7b bit-idêntico entre braços) continua válida; revalidar
 > o mecanismo quando houver implementação.
 
@@ -419,7 +419,7 @@ decisão do Caetano.
 > ⚠️ **Não verificado contra código.** A afirmação "a verificação foi feita por fora,
 > no código" e a citação de `combat_constants.hpp` vêm da análise de projeto, não de
 > medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md,
-> L-01), e a fonte que a redação original citava não existe. A consistência interna do
+> GW-01), e a fonte que a redação original citava não existe. A consistência interna do
 > dado (deslocamento medido da fatia) continua válida como leitura da simulação;
 > revalidar o valor do multiplicador quando houver implementação.
 
@@ -443,7 +443,7 @@ número deste estudo em `combat.md`.
 > ⚠️ **Não verificado contra código.** Esta afirmação sobre
 > `mira_target_weight`/`pick_weighted_enemy_target` e `scripted_brain.cpp` vem da
 > análise de projeto, não de medição em código executado. O código deste projeto
-> nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava não
+> nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não
 > existe. Revalidar quando houver implementação.
 
 ## 11. Comparação com a C-bis

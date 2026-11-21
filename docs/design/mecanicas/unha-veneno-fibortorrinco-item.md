@@ -11,7 +11,7 @@ Cross-ref: `docs/narrative/diary/entries-fichas-bestiary.md` §5.5 (Fibortorrinc
 
 ## 1. Conceito
 
-Dois objetos, um só documento, porque um não faz sentido sem o outro (L-33 do projeto: "partes que só têm sentido juntas" são o caso em que agregar é certo):
+Dois objetos, um só documento, porque um não faz sentido sem o outro (GW-33 do projeto: "partes que só têm sentido juntas" são o caso em que agregar é certo):
 
 - **Unha venenosa de Fibortorrinco-Zeckendorf (fresca):** loot que o inimigo Fibortorrinco-Zeckendorf larga em combate (`entries-fichas-bestiary.md` §5.5). Insumo bruto, não usável sozinho.
 - **Gota de veneno de Fibortorrinco-Zeckendorf:** o produto da reação química que consome unhas frescas em lote. É o item que o jogador de fato aplica em arma.
@@ -54,7 +54,7 @@ Esta distinção é o que fecha a porta de um atalho óbvio (comprar em vez de c
 
 ## 6. Pendências de implementação (quando inventário e craft existirem)
 
-- Item `fibolatypus_claw_fresh` (loot, exibição "Unha venenosa de Fibortorrinco-Zeckendorf") e `fibolatypus_claw_dried` (compra, sabor, exibição "Unha ressecada de Fibortorrinco-Zeckendorf") como duas entradas distintas de catálogo. Identificador em inglês `snake_case` (L-22 do projeto), derivado do nome em inglês do bicho (`fibolatypus`, decisão do líder mantida mesmo os seis bichos existentes usando português para o slug de asset); nome de exibição em pt-br usa "Fibortorrinco-Zeckendorf".
+- Item `fibolatypus_claw_fresh` (loot, exibição "Unha venenosa de Fibortorrinco-Zeckendorf") e `fibolatypus_claw_dried` (compra, sabor, exibição "Unha ressecada de Fibortorrinco-Zeckendorf") como duas entradas distintas de catálogo. Identificador em inglês `snake_case` (GW-22 do projeto), derivado do nome em inglês do bicho (`fibolatypus`, decisão do líder mantida mesmo os seis bichos existentes usando português para o slug de asset); nome de exibição em pt-br usa "Fibortorrinco-Zeckendorf".
 - Item `fibolatypus_venom_drop` (exibição "Gota de veneno de Fibortorrinco-Zeckendorf"), produto da reação de 144 unhas frescas.
 - A reação em si: onde ela roda (bancada existente ou local novo), se tem UI própria ou é resolvida via diálogo com Helena pós-missão.
 - A mecânica de "aplicar item em arma" (§5), hoje sem precedente em canon.

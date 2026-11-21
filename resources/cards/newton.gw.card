@@ -2,7 +2,7 @@
 //
 // Force-Law (Newton): Hibrida, Universal, Grupo. Duas faces, roteadas por
 // side_filter (ambas dissipam-no-lado-errado, sem erro e sem excecao).
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/newton.md para o "porque" completo.
 
 #meta id newton

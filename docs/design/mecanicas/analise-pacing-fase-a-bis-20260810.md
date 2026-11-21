@@ -48,7 +48,7 @@
 
    > ⚠️ **Não verificado contra código.** Este valor vem da análise de projeto, não de
    > medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md,
-   > L-01), e a fonte que a redação original citava não existe. Revalidar quando
+   > GW-01), e a fonte que a redação original citava não existe. Revalidar quando
    > houver implementação.
 6. **⚠️ RESSALVA DO QA (leia antes de usar qualquer número): a mira ponderada que o
    estudo simula ainda não está ligada no jogo.** O harness usa a mira ponderada
@@ -61,7 +61,7 @@
    > ⚠️ **Não verificado contra código.** Esta afirmação sobre o call site de
    > `pick_weighted_enemy_target` e sobre `scripted_brain.cpp` vem da análise de
    > projeto, não de medição em código executado. O código deste projeto nasce do
-   > zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava não existe.
+   > zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não existe.
    > Revalidar quando houver implementação.
 7. **A Fase B não pode rodar como está escrita.** Ela foi ancorada na leitura antiga
    (multiplicadores da referência 55). Precisa ser re-ancorada nos vencedores desta
@@ -81,7 +81,7 @@ verificação e auditoria adversarial independente do harness):
 > ⚠️ **Não verificado contra código.** A afirmação de que estas mudanças passaram por
 > `check.sh`, foram verificadas pelo orquestrador e auditadas por QA adversarial no
 > harness vem da análise de projeto, não de medição em código executado. O código
-> deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original
+> deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original
 > citava não existe. Revalidar quando houver implementação.
 
 1. **Gate E2 novo, pré-registrado pelo líder em 2026-08-03:** um ponto só é candidato
@@ -259,7 +259,7 @@ só vem quando a F7 rodar a Fase B re-ancorada com o braço P3B incluído.
 
 > ⚠️ **Não verificado contra código.** Este valor vem da análise de projeto, não de
 > medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md,
-> L-01), e a fonte que a redação original citava (`pacing_sim_harness.hpp`,
+> GW-01), e a fonte que a redação original citava (`pacing_sim_harness.hpp`,
 > `build_phase_a_grid`, `build_phase_b_healer_battery_grid`, linhas específicas e
 > comentário no código) não existe. Revalidar quando houver implementação.
 
@@ -274,7 +274,7 @@ líder.
 > ⚠️ **Não verificado contra código.** Esta afirmação sobre a ausência de call site de
 > `mira_target_weight`/`pick_weighted_enemy_target` e sobre `scripted_brain.cpp` vem
 > da análise de projeto, não de medição em código executado ou em blob commitado. O
-> código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação
+> código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação
 > original citava não existe. Revalidar quando houver implementação.
 
 Consequência direta para ESTA análise, sem enterrar:

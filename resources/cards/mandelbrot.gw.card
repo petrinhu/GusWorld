@@ -2,7 +2,7 @@
 //
 // Fractal-Echo (Mandelbrot): Ativa, Universal. Repete a última ação de dano
 // de qualquer aliado nesta rodada, sempre (sem chance). Extraida do
-// projeto anterior (L-01). Ver docs/design/mecanicas/cartas/mandelbrot.md.
+// projeto anterior (GW-01). Ver docs/design/mecanicas/cartas/mandelbrot.md.
 
 #meta id mandelbrot
 #meta display_name CARD_EXEC_MANDELBROT_NAME

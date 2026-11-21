@@ -61,12 +61,12 @@ Aproximação física ao nó de combate dentro de um raio de contato dispara a t
 - **Consequência:** detecção positiva no overworld dispara o investimento do inimigo (§4); no Gambito, o mesmo evento é a falha do puzzle (`puzzle-gambito.md` §2, reset suave D2).
 - **Forma já usada no Gambito:** `puzzle-gambito.md` §2 e §8 descrevem o cone como uma célula à frente. É o caso particular do mesmo contrato, com conjunto de tamanho um. Este contrato o generaliza sem mudar o puzzle.
 
-**Caso em diagonal (exposto pela L-26).** Quando o Gus está em célula diagonal ao inimigo, essa célula é perguntada como qualquer outra célula do conjunto, e a resposta continua booleana. O fato de o Gus ter chegado por movimento diagonal não muda a pergunta.
+**Caso em diagonal (exposto pela GW-26).** Quando o Gus está em célula diagonal ao inimigo, essa célula é perguntada como qualquer outra célula do conjunto, e a resposta continua booleana. O fato de o Gus ter chegado por movimento diagonal não muda a pergunta.
 
 **DECISÃO ABERTA (não decidida neste documento):**
 
 - **Forma do conjunto:** se as células diagonais à frente do inimigo entram no conjunto de detecção (parte 1). Isto define o que o jogador consegue ler no cone.
-- **Orientação do inimigo que anda em diagonal:** o cone segue o sprite cardeal mais próximo (quatro) ou o vetor exato de movimento (oito). A L-26 fixa o sprite em quatro, mas não diz qual orientação alimenta o conjunto de detecção.
+- **Orientação do inimigo que anda em diagonal:** o cone segue o sprite cardeal mais próximo (quatro) ou o vetor exato de movimento (oito). A GW-26 fixa o sprite em quatro, mas não diz qual orientação alimenta o conjunto de detecção.
 - **Frequência da consulta:** a pergunta é refeita a cada passo de célula (do Gus e do inimigo), ou a cada quadro enquanto o movimento é contínuo dentro da célula.
 
 ## 5. Gatilho do puzzle Gambito
@@ -119,7 +119,7 @@ Itens ratificados pelo criador supremo Sprint 2 W2 2026-06-03.
 
 | # | Decisão | Canon (ratificado 2026-06-03) |
 |---|---|---|
-| **DA-1** | Câmera e navegação no overworld | **3/4 top-down fixa + controle direto** — WASD/stick move Gus livremente, inclusive na diagonal; o sprite exibido é sempre o cardeal (north/south/east/west) mais próximo do vetor de movimento (L-26); câmera acompanha o personagem, sem girar. |
+| **DA-1** | Câmera e navegação no overworld | **3/4 top-down fixa + controle direto** — WASD/stick move Gus livremente, inclusive na diagonal; o sprite exibido é sempre o cardeal (north/south/east/west) mais próximo do vetor de movimento (GW-26); câmera acompanha o personagem, sem girar. |
 | **DA-2** | First-strike por Scan prévio | **Sem vantagem mecânica** — Scan no overworld só adianta info. Nenhum bônus em combate. Preserva Pillar 1: "info, não poder". |
 | **DA-3** | Limite/cooldown do Scan-overworld | **Contínuo, sem cooldown** — passivo permanente. AP só existe em combate. Coerente com combat.md §12. |
 

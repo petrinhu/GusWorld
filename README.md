@@ -48,7 +48,7 @@ Detalhes completos em [`docs/design/pillars.md`](docs/design/pillars.md).
 
 ## Stack técnica
 
-GusWorld é escrito em **C++23** ([L-03](GODS_LAWS.md#l-03)). A única dependência de framework é o **[GlintFx](https://github.com/petrinhu/GlintFx)**: janela, laço principal, entrada, áudio e desenho são dele, e o GusWorld escreve só a lógica do jogo ([LEI ZERO](GODS_LAWS.md)). Fora do GlintFx e do sistema operacional, o jogo não linka em mais nada.
+GusWorld é escrito em **C++23** ([GW-03](GODS_LAWS.md#gw-03)). A única dependência de framework é o **[GlintFx](https://github.com/petrinhu/GlintFx)**: janela, laço principal, entrada, áudio e desenho são dele, e o GusWorld escreve só a lógica do jogo ([LEI ZERO](GODS_LAWS.md)). Fora do GlintFx e do sistema operacional, o jogo não linka em mais nada.
 
 ## Build e execução
 

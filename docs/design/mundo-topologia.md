@@ -166,7 +166,7 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
 - **O padrão, em termos de jogo:** os canteiros da trilha da Selve Sombria formam uma grade viva: cada canteiro está vivo ou morto, e a cada rega a grade inteira se recalcula pelas mesmas regras de vizinhança, sempre as mesmas. Um arranjo específico de canteiros, plantado certo, avança pela grade sozinho a cada rega.
 - **Por que esta dungeon, e não outra:** o gimmick da Selve Sombria já dizia, antes desta decisão, "flora matemática, plantas em sequência, abrir caminho lendo o padrão de crescimento" (item 9 acima). O jardim dá músculo mecânico a uma frase que o canon já escrevia sozinha.
 - **Como o jogo ensina antes de cobrar:** uma antecâmara pequena, sem risco de falha, treina a mesma leitura em escala reduzida antes de a câmara cheia cobrar em escala real.
-- **Grade e câmera:** o jardim vive todo no piso, em grade quadrada 2D, sem eixo de altura e sem câmera que gire (L-26); cabe direto na perspectiva 3/4 top-down fixa do jogo.
+- **Grade e câmera:** o jardim vive todo no piso, em grade quadrada 2D, sem eixo de altura e sem câmera que gire (GW-26); cabe direto na perspectiva 3/4 top-down fixa do jogo.
 - **O que perde quem desiste:** a trilha é ramificada por nome; o jardim abre o ramal mais curto, quem não resolve segue pelo ramal mais longo, com mais fauna-bug, sem ficar trancado.
 - **Quem resolve é o jogador que segura o controle, não o personagem nem o jogo (decisão do líder, 12/09/2026, verbatim: "o jogador resolve, nao é pra ser automatico"), mesma trava das cordas emaranhadas e da espiral de Ulam.** O Gus não nomeia o arranjo nem conta vizinhas; nenhuma marcação de interface aponta o próximo passo ou destaca o canteiro certo; a passagem não cede por insistência nem por plantio exaustivo.
 - **O que o jogo confere:** só o acerto, os canteiros-alvo vivos por terem sido cruzados pelo arranjo certo, nunca o vocabulário.
@@ -189,7 +189,7 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
   e três becos sem saída e um único portão para abrir, mostra a mesma travessia impossível em
   escala mínima antes da malha cheia cobrar.
 - **Grade e câmera:** a malha inteira vive num único plano, em grade quadrada 2D, sem eixo de
-  altura e sem câmera que gire (L-26); as escadas do gimmick mudam rota, nunca altura.
+  altura e sem câmera que gire (GW-26); as escadas do gimmick mudam rota, nunca altura.
 - **O que perde quem desiste:** esta não é uma Área faraday contornável; é a própria dungeon da
   Periferia residencial. Quem não resolve continua podendo vagar pelo labirinto do jeito comum,
   perdendo só a travessia limpa, sem ficar trancado.
@@ -229,7 +229,7 @@ Dungeons chamam-se "**faraday**" no idioma do local (motivo Gaiola de Faraday; v
   completo; a experiência de sucesso ali é o que arma a generalização errada que o salão principal
   desarma.
 - **Grade e câmera:** o piso vive todo num único plano, em grade quadrada 2D, sem eixo de altura e
-  sem câmera que gire (L-26); cabe direto na perspectiva 3/4 top-down fixa do jogo.
+  sem câmera que gire (GW-26); cabe direto na perspectiva 3/4 top-down fixa do jogo.
 - **O que perde quem desiste (de cobrir o piso, não da dungeon):** nada. A saída real é um painel
   holográfico de cenário numa das paredes do salão, que pisca por glitch desde o instante em que a
   party entra, escaneável e atravessável a qualquer momento, sem depender de nenhuma tentativa

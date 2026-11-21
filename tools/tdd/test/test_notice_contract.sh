@@ -6,7 +6,7 @@
 # notice must mirror the guard's own answer. The plugin's hooks come as a copy under
 # $REPO/plugin/hooks (run_in_container.sh), so the real tdd_guard.evaluate runs here.
 # If the copy is missing, the case fails: a run without the real plugin is "nao
-# executado" and never counts as green (L-35).
+# executado" and never counts as green (GW-35).
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 NOTICE="$TDD_DIR/notice.py"

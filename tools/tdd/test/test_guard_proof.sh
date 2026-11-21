@@ -7,7 +7,7 @@
 # $REPO/plugin/hooks), the literal hook command of .claude/settings.json, and a fixture
 # project whose test_command is a sentinel: exit $(cat verdict). The fixture runs no code
 # of the game. HOME is fake, so the real ~/.claude is never read or written.
-# Runs inside the container (L-35). mutate_guard.sh runs it again on mutated copies.
+# Runs inside the container (GW-35). mutate_guard.sh runs it again on mutated copies.
 # Every case prints "ok" or "FALHA" with its name, and a mutant is killed by a name that
 # passed on the baseline and failed (or vanished) on the copy. Case names carry no colon.
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"

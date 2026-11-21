@@ -8,7 +8,7 @@
 // backfire 1/3 exato do Gus Dragon, playtester". A tabela de pendências
 // registra a mesma autoria no item F2. Este crédito se perdeu na primeira
 // extração e foi restaurado em 25/08/2026 — os dois Gus são pessoas
-// diferentes, e confundi-los apaga a autoria de um colaborador real (L-16).
+// diferentes, e confundi-los apaga a autoria de um colaborador real (GW-16).
 // Universal, mana 0, alvo Self. O "programa" de verdade não vive num
 // EffectSpec — vive em duas tabelas de peso GLOBAIS fora deste registro
 // (uma para carta original, outra para carta pirata), que sorteiam uma
@@ -16,7 +16,7 @@
 // GATILHO desse branch dedicado. Números completos das duas tabelas de
 // peso: docs/design/mecanicas/cartas-numeros-proposta.md §4 (não
 // duplicados aqui — pertencem à carta, mas vivem fora do registro Card).
-// Extraida do projeto anterior (L-01). Ver
+// Extraida do projeto anterior (GW-01). Ver
 // docs/design/mecanicas/cartas/urandom.md.
 
 #meta id urandom

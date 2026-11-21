@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 # docs/tech
 
 Decisão técnica viva e registro histórico de decisão morta que ainda ensina. Nada aqui é código —
-o código do GusWorld nasce do zero, sempre assentado sobre o GlintFx (LEI ZERO, L-01).
+o código do GusWorld nasce do zero, sempre assentado sobre o GlintFx (LEI ZERO, GW-01).
 
 - `convencao-formatos-gw.md` — a convenção `.gw.<tipo>` para todo formato próprio do projeto; decisão
   do líder de 24/08/2026, canônica e vigente.
@@ -24,7 +24,7 @@ o código do GusWorld nasce do zero, sempre assentado sobre o GlintFx (LEI ZERO,
   redesenha o envelope comum `E1`, ainda pendente.
 - `ai-assets-provenance.md` — proveniência e cadeia de titularidade dos assets gerados por IA;
   resgatado do `gusworld_legacy` em 25/08/2026, com correção de regime (o texto fala em CC-BY-SA,
-  o regime vigente é todos-os-direitos-reservados por L-08; o motivo de fundo — titularidade do
+  o regime vigente é todos-os-direitos-reservados por GW-08; o motivo de fundo — titularidade do
   líder sobre a ferramenta de IA — sobrevive intacto).
 - `mapas-formato-legado.md` — registro histórico do formato `.gmap` do projeto anterior. O formato
   morreu (mapa é hoje contrato do GlintFx, L-30 deles); sobrevivem as decisões de 23/06/2026 (mapa
@@ -42,7 +42,7 @@ o código do GusWorld nasce do zero, sempre assentado sobre o GlintFx (LEI ZERO,
   turnos (relógio híbrido, atributos, fórmulas, Utility AI, targeting, coordenador de pressão,
   dificuldade, IA de aliados, autobattle, e o bloco inteiro de anti-degeneração); trazida pelo
   próprio líder do `gusworld_legacy` em 25/08/2026, verbatim, ainda sem reconferência contra as leis
-  vigentes. Cita arquivo de código do projeto anterior que não existe aqui (L-01).
+  vigentes. Cita arquivo de código do projeto anterior que não existe aqui (GW-01).
 - `adr/` — **13 ADRs vivos**, numerados `001` a `025` com **doze números aposentados** que não se reaproveitam; a lista dos aposentados está em `adr/_INDEX.md`.
 
 ## Varredura de 25/08/2026, resolvida em `G21` (28/08/2026)
@@ -52,5 +52,5 @@ decisão que uma lei posterior já tinha revogado, sem marcador de superação n
 O líder decidiu (verbatim: *"edite e deixe apenas as partes vivas. O que não tiver mais nada vivo,
 apague"*) e cada um foi tratado pelo que tinha: `ADR-004` e `ADR-006` foram editados, mantendo só
 o que segue vigente; `ADR-007` foi editado, mantendo só as camadas do save que não dependiam do
-JSON banido pela L-18; `ADR-021` não tinha nada vivo fora do que a L-08 já cobre e foi apagado
+JSON banido pela GW-18; `ADR-021` não tinha nada vivo fora do que a GW-08 já cobre e foi apagado
 (listado em `adr/_INDEX.md`, seção "Não presentes"). Detalhe por ADR em `adr/_INDEX.md`.

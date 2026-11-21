@@ -30,7 +30,7 @@ Dragon Victory canon condicional. Se Gus perdoou Dante na cena pós-Caverna dos 
 
 ## §4. Manifestação do codinome e matriz de reativação pós-jogo
 
-Conteúdo cifrado, não reproduzido aqui: a origem do codinome do dragão herdado pela linhagem Vance, e a matriz de condições que reativaria o resíduo ancestral depois do jogo. Fonte: `docs/narrative/deep/stinger/sequel-hooks-deep.md` §6 (área cifrada, GODS_LAWS.md L-25).
+Conteúdo cifrado, não reproduzido aqui: a origem do codinome do dragão herdado pela linhagem Vance, e a matriz de condições que reativaria o resíduo ancestral depois do jogo. Fonte: `docs/narrative/deep/stinger/sequel-hooks-deep.md` §6 (área cifrada, GODS_LAWS.md GW-25).
 
 ## §5. Fronteira das camadas: a cutscene e a arena ao redor dela
 

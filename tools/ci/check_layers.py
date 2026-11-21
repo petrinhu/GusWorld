@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Layer gate (GODS_LAWS.md L-17): the compiler decides what the pure layers include.
+"""Layer gate (GODS_LAWS.md GW-17): the compiler decides what the pure layers include.
 
 Pure layers are core/, content/, domain/ and app/, in dependency order: core/ is the
 bottom, app/ the top. present/ is outside this gate on purpose: it is the only layer
-allowed to touch GlintFx (L-06, L-27), and the pure layers may not include it.
+allowed to touch GlintFx (GW-06, GW-27), and the pure layers may not include it.
 
 No include directive is parsed as text, by either policy below. A root is a file the
 compiler is asked to preprocess in dependency mode (-M): every compile unit of
@@ -24,7 +24,7 @@ Two policies judge the files each root opened:
   lists in its own search path (asked with -v). Each pure-layer file is also read as
   bytes, and a file in UTF-16 or with NUL bytes is a violation, because the compiler
   may be reading something the text does not show.
-- direction (C10, L-17): a root must not open a pure-layer file above its own layer.
+- direction (C10, GW-17): a root must not open a pure-layer file above its own layer.
   present/ has no rank here; it is judged by containment alone.
 
 Declared limits, not covered here:

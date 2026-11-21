@@ -56,7 +56,7 @@
 
    > ⚠️ **Não verificado contra código.** Esta afirmação sobre `scripted_brain.cpp` e
    > `pick_weighted_enemy_target` vem da análise de projeto, não de medição em código
-   > executado. O código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte
+   > executado. O código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte
    > que a redação original citava não existe. Revalidar quando houver implementação.
 7. **Recomendação de finalistas para a Fase C** (corte proposto por gente, como o
    harness exige; decisão final do líder): o incumbente 33/12 como controle, o gêmeo
@@ -81,7 +81,7 @@ provado equivalente, veredicto PRONTO), ficou assim:
 > ⚠️ **Não verificado contra código.** A descrição de QA adversarial e mutation
 > testing acima (16/17 mutantes mortos, 1 equivalente) vem da análise de projeto, não
 > de medição em código executado. O código deste projeto nasce do zero
-> (GODS_LAWS.md, L-01), e a fonte que a redação original citava não existe. A grade
+> (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não existe. A grade
 > de pontos resultante (28+30+6 = 64) continua válida como especificação de
 > protocolo; revalidar a execução quando houver implementação.
 
@@ -313,7 +313,7 @@ o achado; esta análise o repete sem re-verificar o código.
 > verificação contra blob commitado, `mira_target_weight`/`pick_weighted_enemy_target`
 > e `scripted_brain.cpp` vem da análise de projeto, não de medição em código
 > executado ou em blob commitado real. O código deste projeto nasce do zero
-> (GODS_LAWS.md, L-01), e a fonte que a redação original citava não existe. Revalidar
+> (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não existe. Revalidar
 > quando houver implementação.
 
 - **Os 64 pontos desta Fase B descrevem o jogo COM a mira ponderada ativa** (Opção

@@ -3,14 +3,14 @@
 """
 Testes do gate de commit-msg (tools/security/commit_gate.py).
 
-GODS_LAWS.md L-19 (TDD estrito: este arquivo nasceu ANTES da implementacao,
+GODS_LAWS.md GW-19 (TDD estrito: este arquivo nasceu ANTES da implementacao,
 e a primeira execucao dele falhou por ausencia do modulo -- ver a saida
 colada no relatorio de execucao) e restricao (d) da ordem de servico
 ("falso positivo tem custo real... prove com teste que nao casa dentro de
 palavra").
 
 Roda com stdlib puro (unittest), sem pytest, para nao depender de instalar
-nada em nenhuma das cinco plataformas (GODS_LAWS.md L-28).
+nada em nenhuma das cinco plataformas (GODS_LAWS.md GW-28).
 
 Uso: python3 tools/security/test_commit_gate.py -v
 """
@@ -210,7 +210,7 @@ class TestMainFimAFim(unittest.TestCase):
             ["commit_gate.py", str(msg_path)], termos_path=cifrado, env={}
         )
         self.assertNotEqual(
-            codigo, 0, "gate aprovou em silencio sem conseguir medir (viola L-19)"
+            codigo, 0, "gate aprovou em silencio sem conseguir medir (viola GW-19)"
         )
 
     def test_main_escape_hatch_explicito_libera_mesmo_bloqueado(self):

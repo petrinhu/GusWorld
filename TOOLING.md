@@ -13,20 +13,20 @@
 
 | Ferramenta | Status | Para quê | Instalar |
 |---|---|---|---|
-| cmake / ninja / make | ✓ | geração e build do projeto (L-03: C++23) | `sudo dnf install cmake ninja-build make` |
-| clang-format | ✓ | formatação uniforme do código (L-22: `snake_case`, sem `m_`) | `sudo dnf install clang-tools-extra` |
-| clang-tidy | ✓ | lint estático C++, portão 3 da L-19 | `sudo dnf install clang-tools-extra` |
-| cppcheck | ✓ | análise estática C/C++, portão 3 da L-19 | `sudo dnf install cppcheck` |
+| cmake / ninja / make | ✓ | geração e build do projeto (GW-03: C++23) | `sudo dnf install cmake ninja-build make` |
+| clang-format | ✓ | formatação uniforme do código (GW-22: `snake_case`, sem `m_`) | `sudo dnf install clang-tools-extra` |
+| clang-tidy | ✓ | lint estático C++, portão 3 da GW-19 | `sudo dnf install clang-tools-extra` |
+| cppcheck | ✓ | análise estática C/C++, portão 3 da GW-19 | `sudo dnf install cppcheck` |
 
 ---
 
-## 2. Testes e sanitizers (portões da L-19)
+## 2. Testes e sanitizers (portões da GW-19)
 
 | Ferramenta | Status | Para quê | Instalar |
 |---|---|---|---|
-| ctest | ✓ | roda a suíte de teste (vem com o CMake); TDD estrito (L-19) | (vem com cmake) |
-| ASan (`-fsanitize=address`) | ✓ | detecção de memory error, portão 2 da L-19, build separado a cada fatia | (flag do compilador; vem com gcc/clang) |
-| UBSan (`-fsanitize=undefined`) | ✓ | detecção de comportamento indefinido, portão 2 da L-19 | (flag do compilador; vem com gcc/clang) |
+| ctest | ✓ | roda a suíte de teste (vem com o CMake); TDD estrito (GW-19) | (vem com cmake) |
+| ASan (`-fsanitize=address`) | ✓ | detecção de memory error, portão 2 da GW-19, build separado a cada fatia | (flag do compilador; vem com gcc/clang) |
+| UBSan (`-fsanitize=undefined`) | ✓ | detecção de comportamento indefinido, portão 2 da GW-19 | (flag do compilador; vem com gcc/clang) |
 
 ---
 
@@ -34,13 +34,13 @@
 
 | Ferramenta | Status | Para quê | Instalar |
 |---|---|---|---|
-| gitleaks | ✓ | scan de segredo, portão 4 da L-19. Cobre a árvore por padrão; para dado sensível, `git log --all -p \| grep -ci <termo>`, sempre com `-i`, nunca `git grep` | `sudo dnf install gitleaks` |
+| gitleaks | ✓ | scan de segredo, portão 4 da GW-19. Cobre a árvore por padrão; para dado sensível, `git log --all -p \| grep -ci <termo>`, sempre com `-i`, nunca `git grep` | `sudo dnf install gitleaks` |
 
-REUSE/SPDX (L-08) é conferido por inspeção do cabeçalho de cada arquivo; ferramenta dedicada só se o líder autorizar instalação de `reuse` (`pipx install reuse`).
+REUSE/SPDX (GW-08) é conferido por inspeção do cabeçalho de cada arquivo; ferramenta dedicada só se o líder autorizar instalação de `reuse` (`pipx install reuse`).
 
 ---
 
-## 4. Versionamento de binário (L-15)
+## 4. Versionamento de binário (GW-15)
 
 | Ferramenta | Status | Para quê | Instalar |
 |---|---|---|---|
@@ -56,5 +56,5 @@ REUSE/SPDX (L-08) é conferido por inspeção do cabeçalho de cada arquivo; fer
 | tech-lead | clang-tidy, cppcheck, ctest |
 | qa-engineer | ctest, ASan, UBSan |
 | security-engineer / internal-auditor | gitleaks, `git log --all -p` |
-| devops-sre | cmake/ninja/make (matriz de CI das 5 plataformas, L-09/L-20), git-lfs |
-| compliance-legal | inspeção de cabeçalho REUSE/SPDX (L-08) |
+| devops-sre | cmake/ninja/make (matriz de CI das 5 plataformas, GW-09/GW-20), git-lfs |
+| compliance-legal | inspeção de cabeçalho REUSE/SPDX (GW-08) |

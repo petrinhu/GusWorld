@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Case (d): the XDG_RUNTIME_DIR check refuses any directory that is not mode 700
-# owned by the current user (L-35: the test process gets its own runtime dir).
+# owned by the current user (GW-35: the test process gets its own runtime dir).
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 XDG_LIB="$TDD_DIR/xdg_check.sh"

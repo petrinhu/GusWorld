@@ -1,6 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2026 Petrus Alves da Silva Costa
-SPDX-License-Identifier: NONE — regime reservado (L-08 de GODS_LAWS.md; docs/design/ fica fora do
+SPDX-License-Identifier: NONE — regime reservado (GW-08 de GODS_LAWS.md; docs/design/ fica fora do
 código, sob o mesmo regime de `narrative/`, `specs/`, `CHARS.md`, `PLACES.md`, `sinopse.md`).
 -->
 
@@ -20,7 +20,7 @@ código, sob o mesmo regime de `narrative/`, `specs/`, `CHARS.md`, `PLACES.md`, 
 > (beat 8, secão 3) e em `docs/_secret/dungeons/pesquisa-espelho-obsidiana.md` §5 (cifrado só por
 > estar no mesmo diretório de pesquisa, não por conteúdo secreto — a pesquisa em si é meramente
 > factual sobre RFID real). Este documento não introduz fato novo sobre a física do objeto; ele
-> consolida, num átomo próprio (L-04/L-33), a especificação de hardware que o item `D28` da tabela
+> consolida, num átomo próprio (GW-04/GW-33), a especificação de hardware que o item `D28` da tabela
 > de pendências pede.
 >
 > **Fonte:** `docs/_secret/dungeons/CAPTURA-BRUTA-kola-espelho-obsidiana.md` item 13 (dimensão) e
@@ -97,7 +97,7 @@ público). Ele não cobre, porque pertence à metade cifrada:
 
 - **Não é carta.** Não tem POCO de carta, não entra em mão, não é craftável, não tem raridade, não
   aparece em `_IDS-CARTAS.md`.
-- **Não introduz sistema de altura, verticalidade de câmera ou coordenada Z (L-26).** O espelho é
+- **Não introduz sistema de altura, verticalidade de câmera ou coordenada Z (GW-26).** O espelho é
   um objeto de cena, num ponto fixo da grade 2D da sala final da Kola-SG3-12262, igual a qualquer
   outro objeto interativo do jogo. Ele não é, em si, o mecanismo que resolve a descida física até
   12.262 m — isso é papel do item `D25` (traje) somado à geografia (rocha pastosa que fecha o
@@ -109,7 +109,7 @@ público). Ele não cobre, porque pertence à metade cifrada:
   (`pesquisa-espelho-obsidiana.md` §5.1: "o leitor" energiza a etiqueta passiva; aqui os papéis
   entre carta e espelho, e qual dos dois é o "leitor" ativo, são detalhe da metade cifrada).
 
-## 5. Cortes da L-29 conferidos (nenhum atravessado)
+## 5. Cortes da GW-29 conferidos (nenhum atravessado)
 
 - **C-02** (sem mundo aberto/persistente, gating não é trava dura): o artefato é objeto de missão
   linear dentro de uma dungeon já orçada; não cria mundo novo nem trava permanente de área. **Cabe.**

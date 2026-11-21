@@ -5,13 +5,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Especificação do formato `.gw.card`
 
-**Tipo Diátaxis:** Reference. **Audiência:** quem vai escrever o leitor/parser deste formato (`backend-engineer`, `content/` layer, L-17), e quem vai escrever ou revisar um arquivo `.gw.card` novo. **Versão do produto:** nenhuma ainda — formato nasce nesta tarefa, sem implementação de leitor. **Last-reviewed:** 11/10/2026. **Owner:** `technical-writer`, a pedido do orquestrador; qualquer mudança de forma passa pelo mesmo canal que aprovou esta.
+**Tipo Diátaxis:** Reference. **Audiência:** quem vai escrever o leitor/parser deste formato (`backend-engineer`, `content/` layer, GW-17), e quem vai escrever ou revisar um arquivo `.gw.card` novo. **Versão do produto:** nenhuma ainda — formato nasce nesta tarefa, sem implementação de leitor. **Last-reviewed:** 11/10/2026. **Owner:** `technical-writer`, a pedido do orquestrador; qualquer mudança de forma passa pelo mesmo canal que aprovou esta.
 
 > **Por que este documento existe:** o `.gw.text` (`resources/dialogues/*.gw.text`) foi ao ar sem especificação escrita, e o próprio arquivo-fonte registra isso como falha ("A ESPECIFICAÇÃO DESTE FORMATO AINDA NÃO EXISTE ESCRITA... escrevê-la é item próprio da tabela"). Este documento nasce **junto** com o primeiro uso do `.gw.card`, para não repetir o buraco.
 
 ## 1. O que é
 
-`.gw.card` é o formato-fonte, próprio da casa (`docs/tech/convencao-formatos-gw.md`), para especificar os dados mecânicos de uma carta do GusWorld. **Fonte de build, não formato de runtime**: existe em texto dentro do repositório para ser lido, revisado e traduzido por humano; o jogo nunca lê `.gw.card` diretamente. Um gerador (ainda não escrito) compila estes arquivos no catálogo binário selado que a L-18/L-25 exigem. Nenhum código de leitura ou de gravação deste formato existe hoje (L-01): este documento descreve o **contrato**, não uma implementação.
+`.gw.card` é o formato-fonte, próprio da casa (`docs/tech/convencao-formatos-gw.md`), para especificar os dados mecânicos de uma carta do GusWorld. **Fonte de build, não formato de runtime**: existe em texto dentro do repositório para ser lido, revisado e traduzido por humano; o jogo nunca lê `.gw.card` diretamente. Um gerador (ainda não escrito) compila estes arquivos no catálogo binário selado que a GW-18/GW-25 exigem. Nenhum código de leitura ou de gravação deste formato existe hoje (GW-01): este documento descreve o **contrato**, não uma implementação.
 
 **Desenhado para servir a mais que carta.** O líder já avisou que o formato vai reger outros tipos de conteúdo ("isso será estendido depois para todos os itens"). Por isso a seção 3 (blocos `@effect`) não assume nada específico de "carta" — um item de inventário com um efeito ao usar cabe na mesma gramática. A seção 4 é que é hoje específica de carta (família, forma de alvo); um tipo de conteúdo futuro pode precisar de uma seção 4 diferente, com o mesmo esqueleto de comentário + `#meta` + blocos.
 
@@ -118,7 +118,7 @@ Uma carta `comum` tem **no máximo um** bloco `@status_applied` (zero é válido
 
 ## 7. Campo desconhecido, chave repetida, chave ausente: **falha, nunca silêncio**
 
-Decisão de desenho desta tarefa, não fato herdado do legado (que não tinha este formato): o leitor deste formato segue a mesma disciplina que o resto do projeto já pratica em outros gates (L-19, lição 3: *"gate que não consegue medir tem de FALHAR, nunca aprovar em silêncio"*).
+Decisão de desenho desta tarefa, não fato herdado do legado (que não tinha este formato): o leitor deste formato segue a mesma disciplina que o resto do projeto já pratica em outros gates (GW-19, lição 3: *"gate que não consegue medir tem de FALHAR, nunca aprovar em silêncio"*).
 
 - **Chave de `#meta` ou de bloco não listada nas tabelas acima:** o leitor **rejeita o arquivo inteiro**, com o nome do arquivo, a linha e a chave desconhecida na mensagem. Nunca ignora e segue.
 - **Chave obrigatória ausente:** rejeita, nomeando a chave que falta.
@@ -126,7 +126,7 @@ Decisão de desenho desta tarefa, não fato herdado do legado (que não tinha es
 - **Bloco desconhecido (`@algo` fora de `@effect`/`@status_applied`):** rejeita.
 - **Valor fora do vocabulário** (ex.: `family: Fogo`, que não existe): rejeita, citando o vocabulário aceito.
 
-Nenhuma dessas falhas é ambígua o bastante para "melhor esforço": um catálogo de conteúdo errado que passa calado é exatamente o cenário que a L-18 (proteção contra fraude/edição) e a L-19 (gate que aprova em silêncio) existem para impedir.
+Nenhuma dessas falhas é ambígua o bastante para "melhor esforço": um catálogo de conteúdo errado que passa calado é exatamente o cenário que a GW-18 (proteção contra fraude/edição) e a GW-19 (gate que aprova em silêncio) existem para impedir.
 
 ## 8. Exemplo completo, anotado
 
@@ -178,4 +178,4 @@ percent: 30   // kNewtonReflectPercent, //PLAYTEST: mesma fracao da face 2
 
 ## 9. O que este documento decidiu, e contra qual critério
 
-Onde o número fica (`.gw.card`, curto, ao lado do valor) contra onde a prosa de design fica (`.md` por carta, longo, explicando o mecanismo inteiro): o critério usado foi **tamanho + reusabilidade**. Uma frase de uma linha que ancora um número (`kActiveChargeCost, //PLAYTEST`) cabe e pertence ao dado, porque é parte do próprio dado (sem ela, o número é órfão). Um parágrafo que explica por que duas faces de uma carta existem, o que cada uma faz, e que decisão do líder ou achado de auditoria motivou a forma atual — isso é ensaio, não anotação, e enche o arquivo de dado de texto que um leitor de máquina jamais precisa. Cada `.gw.card` termina o comentário de cabeçalho apontando para o `.md` irmão (L-30); nenhum arquivo de dado repete o ensaio nem faz o leitor humano caçá-lo.
+Onde o número fica (`.gw.card`, curto, ao lado do valor) contra onde a prosa de design fica (`.md` por carta, longo, explicando o mecanismo inteiro): o critério usado foi **tamanho + reusabilidade**. Uma frase de uma linha que ancora um número (`kActiveChargeCost, //PLAYTEST`) cabe e pertence ao dado, porque é parte do próprio dado (sem ela, o número é órfão). Um parágrafo que explica por que duas faces de uma carta existem, o que cada uma faz, e que decisão do líder ou achado de auditoria motivou a forma atual — isso é ensaio, não anotação, e enche o arquivo de dado de texto que um leitor de máquina jamais precisa. Cada `.gw.card` termina o comentário de cabeçalho apontando para o `.md` irmão (GW-30); nenhum arquivo de dado repete o ensaio nem faz o leitor humano caçá-lo.

@@ -3,7 +3,7 @@
 // Null-Proof (Godel): Ativa, Universal, mana 0. Duas vias fura-defesa
 // INDEPENDENTES: a flag ignores_weakness_wheel (sempre-ligada) e o status
 // NullProof castavel (consumido no golpe que fura). Extraida do projeto
-// anterior (L-01). Ver docs/design/mecanicas/cartas/godel.md.
+// anterior (GW-01). Ver docs/design/mecanicas/cartas/godel.md.
 
 #meta id godel
 #meta display_name CARD_EXEC_GODEL_NAME

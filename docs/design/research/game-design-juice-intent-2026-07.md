@@ -4,7 +4,7 @@
 >
 > Contexto assumido pela pesquisa ao escrever: o motor **teria** o contrato de telegraph (`enemy_brain.hpp` + `combat_records.hpp`) e **já usaria** o glintfx pra UI (`app/`). As recomendações abaixo foram desenhadas para casar com essa premissa, não para propor reescrever nada dela.
 >
-> ⚠️ **Não verificado contra código.** Este contexto vem da análise de projeto, não de medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava (`enemy_brain.hpp`, `combat_records.hpp`) não existe. Revalidar quando houver implementação.
+> ⚠️ **Não verificado contra código.** Este contexto vem da análise de projeto, não de medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava (`enemy_brain.hpp`, `combat_records.hpp`) não existe. Revalidar quando houver implementação.
 
 ---
 
@@ -35,7 +35,7 @@
 
 ### (B) → GusWorld (como construir barato)
 
-A pesquisa presumiu que o motor **já modelaria isso**, com `enemy_brain.hpp` declarando (descrição de intenção, código ainda não escrito — ver L-01 em `GODS_LAWS.md`):
+A pesquisa presumiu que o motor **já modelaria isso**, com `enemy_brain.hpp` declarando (descrição de intenção, código ainda não escrito — ver GW-01 em `GODS_LAWS.md`):
 
 ```cpp
 // Telegraph obrigatorio: o que o inimigo pretende fazer no proximo turno.
@@ -57,7 +57,7 @@ struct IntentPreview {
 
 Isso seria **exatamente** o padrão Slay the Spire (número exato) + Into the Breach (`predicted_shape`/`predicted_target_id` = geometria do alvo, não só dano) + o ícone "Unknown" (`is_chaotic`). O comentário no header, como a redação original o citava ("TODA AI é obrigada a expor IntentPreview... um inimigo sem intent legível quebraria o pillar de informação"), seria a mesma filosofia de "perfect information" do Into the Breach.
 
-> ⚠️ **Não verificado contra código.** As duas estruturas de código acima, a assinatura de `preview_intent` e a citação do comentário de header vêm da análise de projeto, não de medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava (`enemy_brain.hpp`, `combat_records.hpp`) não existe. Os campos e a forma continuam válidos como descrição de intenção; revalidar quando houver implementação.
+> ⚠️ **Não verificado contra código.** As duas estruturas de código acima, a assinatura de `preview_intent` e a citação do comentário de header vêm da análise de projeto, não de medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava (`enemy_brain.hpp`, `combat_records.hpp`) não existe. Os campos e a forma continuam válidos como descrição de intenção; revalidar quando houver implementação.
 
 **Passos concretos:**
 
@@ -67,14 +67,14 @@ Isso seria **exatamente** o padrão Slay the Spire (número exato) + Into the Br
 4. **`predicted_shape` → destacar os alvos, não só mostrar 1 ícone.** Into the Breach mostra o TILE/área atingida, não só "X de dano". Pro GusWorld (grid de combate por cartas, não tile-based livre): `Linha`/`Area3x3`/`Grupo` devem highlightar visualmente os personagens/posições afetados (borda RCSS nos slots-alvo), não só aparecer como texto — isso é o que torna o intent "perfect information" de verdade (o jogador vê ONDE vai doer, não só QUANTO).
 5. **Gambito = a mecânica de "pré-visualizar reordenação de turno" que já é padrão de tactics genérico** (TV Tropes acima) — o campo `reorder_delta` teria existido em `CombatAction` (`combat_records.hpp:136`, referência não verificada, ver ressalva abaixo). Sugiro (não decisão, só leitura de padrão): ao jogador armar uma ação de Gambito (antes de confirmar), a UI de fila de turno mostra a ordem PROJETADA pós-reorder ao lado da ordem atual, do jeito que "alguns jogos deixam pré-visualizar a fila mudando antes de confirmar" — reaproveita o mesmo layout de fila-de-retratos que qualquer UI de turn-order tactics já teria, só adiciona o estado "prévia".
 
-   > ⚠️ **Não verificado contra código.** A citação de `combat_records.hpp:136` vem da análise de projeto, não de medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava não existe. Revalidar quando houver implementação.
+   > ⚠️ **Não verificado contra código.** A citação de `combat_records.hpp:136` vem da análise de projeto, não de medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não existe. Revalidar quando houver implementação.
 6. **Griftlands valida um ponto de reuso:** o mesmo componente de intent (ícone+número+alvo) pode servir tanto pro combate quanto pra qualquer futura mecânica social/negociação do GusWorld sem reinventar layout — não é decisão pra agora, é nota pra arquitetura de componente reutilizável.
 
 ### (C) Veredito de custo — TEMA 1
 
 **BARATO, segundo a premissa da pesquisa.** O dado existiria no domínio (`IntentPreview`), o contrato obrigaria toda IA a expô-lo, e o `battle_scene.hpp` teria `intent_for(...)` retornando `std::optional<IntentPreview>` (comentário citado pela redação original: "a cena mostra o ícone sobre o inimigo"). O trabalho que falta é: (a) confirmar recálculo ao vivo (teste, não código novo), (b) bind via glintfx de ícone+número+cor por categoria (RCSS + data model, técnica padrão já em uso no projeto para outras telas), (c) highlight de alvo por `TargetShape` (RCSS de borda em slot, sem asset 3D), (d) prévia de reorder de fila pro Gambito (reaproveita `reorder_delta`, ver ressalva acima). Nenhum item exigiria asset novo, shader novo, ou pedido ao dev do glintfx.
 
-> ⚠️ **Não verificado contra código.** As citações de `IntentPreview`, `battle_scene.hpp`/`intent_for(...)` e do comentário de header vêm da análise de projeto, não de medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava não existe. O veredito de custo ("BARATO") e a lista de trabalho continuam válidos como leitura de projeto; revalidar quando houver implementação.
+> ⚠️ **Não verificado contra código.** As citações de `IntentPreview`, `battle_scene.hpp`/`intent_for(...)` e do comentário de header vêm da análise de projeto, não de medição em código executado. O código deste projeto nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não existe. O veredito de custo ("BARATO") e a lista de trabalho continuam válidos como leitura de projeto; revalidar quando houver implementação.
 
 ---
 
@@ -161,7 +161,7 @@ Ordem por valor × custo × dependência (o que destrava o quê):
 > ⚠️ **Não verificado contra código.** Os itens #2 e #10 abaixo repetem a premissa de
 > que `IntentPreview` e `reorder_delta` "já existem" no domínio. Essa premissa vem da
 > análise de projeto, não de medição em código executado. O código deste projeto
-> nasce do zero (GODS_LAWS.md, L-01), e a fonte que a redação original citava não
+> nasce do zero (GODS_LAWS.md, GW-01), e a fonte que a redação original citava não
 > existe. Revalidar quando houver implementação.
 
 1. **Cor consistente por categoria** (RCSS class por tipo de ação/dano) — zero dependência, base de tudo que segue. BARATO.

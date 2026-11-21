@@ -5,7 +5,7 @@
 | **Status** | Accepted (decisão do líder, 25/08/2026) |
 | **Data** | 2026-08-25 |
 | **Decisor** | petrinhu (líder supremo) |
-| **Reversibilidade** | Two-way door — nenhum teste de comportamento existe ainda (L-19 só começa no primeiro módulo real); adotar um framework de terceiro depois é possível, mas custa reescrever toda asserção já feita contra a API própria. |
+| **Reversibilidade** | Two-way door — nenhum teste de comportamento existe ainda (GW-19 só começa no primeiro módulo real); adotar um framework de terceiro depois é possível, mas custa reescrever toda asserção já feita contra a API própria. |
 
 ## Contexto, e o erro que motivou esta ADR
 
@@ -73,7 +73,7 @@ O risco real de "vamos escrever nosso harness" é escopo inflado — foi
 exatamente o que aconteceu na primeira leitura do `C3` (Job Size 13). A
 decisão do líder aqui é explícita sobre o tamanho: dependência zero
 continua, mas o harness não vira um produto à parte dentro do projeto. Ele
-existe para servir o TDD estrito da L-19 (vermelho → verde → refatorar) com
+existe para servir o TDD estrito da GW-19 (vermelho → verde → refatorar) com
 o mínimo que isso exige: rodar um teste, ver se ele falha, ver se ele passa.
 
 ## Alternativas consideradas
@@ -94,7 +94,7 @@ um tom de autossuficiência que o líder reafirmou ao aprovar esta decisão.
 **Prós:** nenhum, frente à opção mínima — tudo que um framework completo
 ofereceria aqui é trabalho não pedido.
 **Contras:** é o escopo inflado que gerou o Job Size 13 errado; constrói
-infraestrutura que o TDD estrito da L-19 não está pedindo hoje
+infraestrutura que o TDD estrito da GW-19 não está pedindo hoje
 (anti-over-engineering).
 **Rejeitada.**
 
@@ -136,20 +136,20 @@ caso de teste.
 - Nenhum agente deve desenhar a API do harness a partir desta ADR — ela
   decide "próprio e mínimo", não a forma exata das funções. Isso é a fatia
   `C3`.
-- Ao despachar a fatia `C3`, citar esta ADR e a L-19 (TDD estrito, cinco
+- Ao despachar a fatia `C3`, citar esta ADR e a GW-19 (TDD estrito, cinco
   portões de qualidade) no prompt da task, para que o desenho do harness
   nasça já compatível com o ciclo vermelho/verde/refatorar exigido.
 
 ## Reversibilidade
 
-Two-way door. Nenhum teste de comportamento existe hoje (L-19 só começa no
+Two-way door. Nenhum teste de comportamento existe hoje (GW-19 só começa no
 primeiro módulo real); trocar de harness próprio para um framework de
 terceiro mais tarde é possível, mas custa reescrever toda asserção já
 escrita contra a API própria — custo que cresce com o tempo, não zero.
 
 ## Cross-refs
 
-- [ADR-022](ADR-022-cmake-versao-minima-fixada.md), [ADR-023](ADR-023-glintfx-submodulo-git-pinado.md), [ADR-024](ADR-024-ci-cinco-plataformas-cachyos-container.md) (ADRs irmãos desta mesma ordem de serviço, razões de mudar distintas por L-33)
-- `../../../GODS_LAWS.md` LEI ZERO (a leitura corrigida), L-05, L-19 (TDD estrito, cinco portões), L-33
+- [ADR-022](ADR-022-cmake-versao-minima-fixada.md), [ADR-023](ADR-023-glintfx-submodulo-git-pinado.md), [ADR-024](ADR-024-ci-cinco-plataformas-cachyos-container.md) (ADRs irmãos desta mesma ordem de serviço, razões de mudar distintas por GW-33)
+- `../../../GODS_LAWS.md` LEI ZERO (a leitura corrigida), GW-05, GW-19 (TDD estrito, cinco portões), GW-33
 - `../../../GlintFx/GODS_LAWS.md` L-07 (a lei real de onde vem a cultura de dependência zero)
 - `../../../GlintFx/tests/CMakeLists.txt`, `../../../GlintFx/tests/harness/` (o precedente medido: `test_registry.cpp`, `check.cpp`, `harness_main.cpp`)

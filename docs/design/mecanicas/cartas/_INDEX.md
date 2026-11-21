@@ -5,9 +5,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Índice das 25 cartas extraídas do projeto anterior
 
-**Tipo Diátaxis:** Reference (índice). **Audiência:** quem procura uma carta específica ou quer o panorama das 25. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, sob a tarefa de extração de conhecimento do projeto anterior (L-01, GODS_LAWS.md deste projeto).
+**Tipo Diátaxis:** Reference (índice). **Audiência:** quem procura uma carta específica ou quer o panorama das 25. **Last-reviewed:** 25/08/2026. **Owner:** `technical-writer`, sob a tarefa de extração de conhecimento do projeto anterior (GW-01, GODS_LAWS.md deste projeto).
 
-> Este é um **índice**, não um ensaio. Uma linha por carta, com o dado (`.gw.card`) e a prosa (`.md`) apontados — nunca o conteúdo deles repetido aqui (L-30, L-33: um documento por assunto, e um índice não é o lugar do assunto). Formato: lista de bullets, nunca tabela com coluna de status (contrato deste projeto para tabelas fora da tabela de pendências canônica).
+> Este é um **índice**, não um ensaio. Uma linha por carta, com o dado (`.gw.card`) e a prosa (`.md`) apontados — nunca o conteúdo deles repetido aqui (GW-30, GW-33: um documento por assunto, e um índice não é o lugar do assunto). Formato: lista de bullets, nunca tabela com coluna de status (contrato deste projeto para tabelas fora da tabela de pendências canônica).
 
 ## As 5 cartas COMUNS
 
@@ -46,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 - **Duas cartas usam o nome real do mestre como texto de exibição, quebrando o padrão de alcunha técnica das outras 18.** `tesla` resolve para "Tesla" (não "Coil-Arc") e `einstein` resolve para "Einstein" (não "Time-Dilate") em `resources/translations/pt_br.md` deste projeto, enquanto as demais 18 especiais seguem `cardExec-[figura]` → alcunha técnica (`newton` → "Force-Law", etc.). Ver `tesla.md` e `einstein.md`, seção Pontas soltas.
 - **3 das 5 cartas comuns não têm nome de exibição em português cadastrado hoje** (`eco_sonico`, `fenda_criptica`, `impacto_cinetico`) — só `pulso_eletrico` e `raiz_cura` têm entrada em `resources/translations/pt_br.md`.
 - **Nenhum número desta extração é canônico.** Todo valor marcado `//PLAYTEST` no `.gw.card` de origem é um número que o projeto anterior usava em runtime, não um número aprovado por playtest formal deste projeto — a marca só distingue "foi jogado ao menos uma vez" de "chutado e nunca rodado". As exceções fechadas pelo líder (Planck, a duração do Scrying de Dee) estão sinalizadas em cada `.gw.card` e no `.md` correspondente.
-- **Todo `//PLAYTEST` e toda razão de design vieram do comentário do código-fonte do projeto anterior**, lido via `git show` de um clone read-only (L-01: conhecimento, nunca código). Nenhuma linha de C++ foi copiada para dentro de `resources/cards/` nem de `docs/design/mecanicas/cartas/`.
+- **Todo `//PLAYTEST` e toda razão de design vieram do comentário do código-fonte do projeto anterior**, lido via `git show` de um clone read-only (GW-01: conhecimento, nunca código). Nenhuma linha de C++ foi copiada para dentro de `resources/cards/` nem de `docs/design/mecanicas/cartas/`.
 
 ## Documentos irmãos desta pasta
 

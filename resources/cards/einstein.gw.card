@@ -3,7 +3,7 @@
 // Alcunha de efeito "Time-Dilate" no design (_EFEITOS-ESCOLHIDOS.md), mas a
 // chave de tradução em uso resolve literalmente para "Einstein" — ver o .md
 // irmão, secão Pontas soltas. Ativa, Cinetico. Empurra a ação do alvo para
-// o FIM da fila da rodada corrente. Extraida do projeto anterior (L-01).
+// o FIM da fila da rodada corrente. Extraida do projeto anterior (GW-01).
 // Ver docs/design/mecanicas/cartas/einstein.md.
 
 #meta id einstein
