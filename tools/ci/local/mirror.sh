@@ -156,10 +156,17 @@ run_container() {
   fi
   clog="$LOGS/container.log"
   rc=0
+  # One heavy-work slot (L-11 global), held from before docker run until the file descriptor
+  # is closed below. The same take that tools/tdd/prepare.sh makes.
+  # shellcheck source=../../container/heavy_slot.sh
+  . "$root/tools/container/heavy_slot.sh" || { container_not_run "não executado: heavy_slot.sh ilegível"; return 0; }
+  take_heavy_slot || { container_not_run "não executado: slots de trabalho pesado ocupados"; return 0; }
   # The tree enters by stdin, as a tar of the snapshot. No host volume. Flags as GW-35 asks.
   tar -C "$src" -cf - . | "$rt" run --rm -i \
     --pull never --network none --cap-drop ALL --pids-limit 80 --memory 4g \
     "$img" bash -c "$(cat "$steps")" > "$clog" 2>&1 || rc=$?
+  exec 9>&-
+  echo "  heavy slot solto"
   echo "  contêiner ($img) saiu com rc=$rc, log: $clog"
   grep '^STEP ' "$clog" | while read -r tag gate name code; do
     if [ "$code" = 0 ]; then
