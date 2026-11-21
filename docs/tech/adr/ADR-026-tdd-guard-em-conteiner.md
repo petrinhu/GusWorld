@@ -134,7 +134,7 @@ Decididas pelo orquestrador, sem ratificação registrada ainda:
 ## Alternativas consideradas
 
 - **Volume de host (`-v`).** Rejeitada: o SELinux em `Enforcing` bloqueia
-  `container_t`, e o `:Z` reetiqueta o host. A `L-60` do global manda não mexer
+  `container_t`, e o `:Z` reetiqueta o host. A `L-58` do global manda não mexer
   em política.
 - **Volume nomeado (opção B).** Não escolhida agora. Fica como alternativa se a
   opção A medir custo alto de cópia da árvore.

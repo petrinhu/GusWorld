@@ -156,4 +156,4 @@ A estrutura bolsa→mão (§4) define o deck em campo: a **mão-loadout (~5)** �
 
 ## 10. Como conduzir
 
-Frente de design colaborativa (não código imediato). Brainstorm DIRETO com o criador (`GODS_LAWS.md` global, L-16); cada decisão via AskUserQuestion. Implementação (pós-decisão) via agentes: `backend-engineer` (POCO de deck/mão/containers + invariantes + save), `gameplay_engineer` (loadout em combate, swap de emergência), `ux-ui-designer`/mockup (tela da bancada). Casa com CARTAS-BALANCEAMENTO e o motor de efeitos já entregue.
+Frente de design colaborativa (não código imediato). Brainstorm DIRETO com o criador (`GODS_LAWS.md` global, L-10); cada decisão via AskUserQuestion. Implementação (pós-decisão) via agentes: `backend-engineer` (POCO de deck/mão/containers + invariantes + save), `gameplay_engineer` (loadout em combate, swap de emergência), `ux-ui-designer`/mockup (tela da bancada). Casa com CARTAS-BALANCEAMENTO e o motor de efeitos já entregue.

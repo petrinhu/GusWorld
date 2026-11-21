@@ -131,7 +131,7 @@ O caminho medido que funciona nesta máquina, e por que cada parte dele é assim
 
 - **Configure e build:** `cmake -S . -B <dir> -G Ninja -DGUSWORLD_WERROR=ON`, depois `cmake --build <dir>`. O `-Werror` fica atrás de opção porque é o gancho do portão 1 da GW-19, e só o CI o liga.
 - **Suíte:** `ctest --test-dir <dir> --output-on-failure`. ⚠️ **`ctest -N` num build sem teste diz `Total Tests: 0` e SAI COM CÓDIGO ZERO** (medido em 11/10): todo passo que contar teste tem de testar o VALOR, nunca só o código de saída.
-- **Volume de host em container NÃO funciona:** o SELinux desta máquina está `Enforcing` e bloqueia `container_t`. A L-60 do global manda não mexer em política; os arquivos entram por `tar` na entrada padrão e o resultado sai pela saída padrão.
+- **Volume de host em container NÃO funciona:** o SELinux desta máquina está `Enforcing` e bloqueia `container_t`. A L-58 do global manda não mexer em política; os arquivos entram por `tar` na entrada padrão e o resultado sai pela saída padrão.
 - **Cópia de trabalho em subpasta FALHA neste repositório:** o filtro de descriptografia do `git-crypt` não resolve no worktree novo e o checkout aborta nos arquivos de `docs/_secret/`. Para verificar uma fatia, extraia do blob com `git archive`, que é o que a L-27 do global manda de todo modo.
 - **Instalar a toolchain em container estoura o limite de primeiro plano:** rode em segundo plano.
 
