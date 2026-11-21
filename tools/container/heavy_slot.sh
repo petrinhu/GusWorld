@@ -17,7 +17,8 @@
 # heavy_slot finding of 2026-11-20 (TODO.md, INBOX).
 
 # check_slot_lock PATH: 0 when PATH may be opened as a slot lock, 1 with the reason on
-# stderr otherwise. A missing PATH passes, and exec creates it as a regular file.
+# stderr otherwise. take_heavy_slot creates a missing PATH with O_EXCL before this check, so
+# a missing PATH here only means that create failed; exec then fails as well.
 check_slot_lock() {
     local p="$1" uid
     if [ -L "$p" ]; then
@@ -45,6 +46,10 @@ take_heavy_slot() {
     local n lock
     for n in 1 2 3; do
         lock="/var/tmp/gusworld-heavy-slot-${n}.lock"
+        # O_EXCL: the lock is created only when nothing is at the path. A symbolic link or
+        # a file of another owner makes this create fail, and check_slot_lock refuses it.
+        # Once the lock exists, exec only opens it, so no create race is left after the check.
+        (set -C; : > "$lock") 2>/dev/null || true
         check_slot_lock "$lock" || return 1
         exec 9>"$lock"
         if flock -n 9; then

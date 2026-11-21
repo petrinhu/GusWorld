@@ -96,23 +96,25 @@ clean_locks
 # F. A regular lock owned by another uid is refused. The container has no file of another
 # uid it can hardlink into /var/tmp (the link crosses devices, and protected_hardlinks
 # refuses the root files of the same device), so the owner is reported by a test double:
-# a stat in PATH that answers uid 0 only for the %u query. Every other call is the real stat.
+# a stat in PATH that answers a uid other than ours (non-zero, so a "= 0" mutant is seen too)
+# only for the %u query on the slot-1 lock. Every other call, and the other slots, is the real stat.
 clean_locks
 : > /var/tmp/gusworld-heavy-slot-1.lock
 real_stat="$(command -v stat)"
+foreign=$(( $(id -u) + 1 ))
 shim="$(mktemp -d)"
 cat > "$shim/stat" <<EOF
 #!/usr/bin/env bash
-for a in "\$@"; do [ "\$a" = '%u' ] && { echo 0; exit 0; }; done
+case "\$*" in *'%u'*heavy-slot-1.lock*) echo $foreign; exit 0 ;; esac
 exec "$real_stat" "\$@"
 EOF
 chmod 700 "$shim/stat"
 err="$(PATH="$shim:$PATH" bash -c '. "$1"; take_heavy_slot' _ "$heavy_slot" 2>&1)"
 rc=$?
-if [ "$rc" -ne 0 ] && [[ "$err" == *"REFUSED"* ]] && [[ "$err" == *"belongs to uid 0"* ]]; then
-    pass_case "lock regular de outro uid e recusado (rc nao zero, motivo com o uid)"
+if [ "$rc" -ne 0 ] && [[ "$err" == *"REFUSED"* ]] && [[ "$err" == *"belongs to uid $foreign"* ]]; then
+    pass_case "lock regular de outro uid e recusado (rc nao zero, motivo com o uid $foreign)"
 else
-    fail_case "lock regular de outro uid e recusado (rc nao zero, motivo com o uid)" "rc $rc, err [$err]"
+    fail_case "lock regular de outro uid e recusado (rc nao zero, motivo com o uid $foreign)" "rc $rc, err [$err]"
 fi
 clean_locks
 
