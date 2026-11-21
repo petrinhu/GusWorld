@@ -31,7 +31,7 @@ Transcrito de `GODS_LAWS.md` (38 leis, medido em 12/09/2026 por `grep -c "^## L-
 | [L-07](GODS_LAWS.md#l-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
 | [L-08](GODS_LAWS.md#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
 | [L-09](GODS_LAWS.md#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos, todos em `:latest`; Fedora primário; CachyOS é próprio, não Arch |
-| [L-10](GODS_LAWS.md#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level fable audita e cria; sonnet implementa |
+| [L-10](GODS_LAWS.md#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level audita e planeja; operacional cria e implementa; modelo pelo /modelos_sessao |
 | [L-11](GODS_LAWS.md#l-11) | fazer **qualquer** pergunta ao líder, inclusive de esclarecimento | `AskUserQuestion` SEMPRE, com opções clicáveis; nunca pergunta em prosa |
 | [L-12](GODS_LAWS.md#l-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
 | [L-13](GODS_LAWS.md#l-13) | tocar em qualquer trabalho que dependa de canon | Canon desatualizado bloqueia: atualiza primeiro, trabalha depois |

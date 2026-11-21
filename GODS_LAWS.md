@@ -28,7 +28,7 @@
 | [L-07](#l-07) | precisar de função do framework, ou receber ideia do Gus | Bus: pedido só quando o jogo esbarrar de verdade na falta |
 | [L-08](#l-08) | criar `LICENSE`, cabeçalho de arquivo, versionar asset ou publicar | AGPL-3.0-or-later no código; assets e lore com todos os direitos reservados; livros à parte |
 | [L-09](#l-09) | escrever CI ou declarar suporte de plataforma | Cinco alvos, todos em `:latest`; Fedora primário; CachyOS é próprio, não Arch |
-| [L-10](#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; auditoria/arquitetura são de C-level fable da constelação; implementação é de agente operacional sonnet da constelação, nunca genérico |
+| [L-10](#l-10) | ir executar qualquer trabalho de produto | Main só orquestra; C-level audita e planeja; operacional cria e implementa; modelo pelo /modelos_sessao |
 | [L-11](#l-11) | fazer **qualquer** pergunta ao líder, inclusive de esclarecimento | `AskUserQuestion` SEMPRE, com opções clicáveis; nunca pergunta em prosa |
 | [L-12](#l-12) | escrever qualquer mensagem ao líder | Timestamp real `[DD/MM/YY - HH:MM:SS]` obtido do `date` |
 | [L-13](#l-13) | tocar em qualquer trabalho que dependa de canon | Canon desatualizado bloqueia: atualiza primeiro, trabalha depois |
@@ -98,7 +98,9 @@ Nenhum CI cobre menos que cinco alvos distintos (Fedora, Ubuntu, Arch, CachyOS e
 
 ## L-10
 
-Nenhum trabalho de produto é executado pela thread principal: ela só orquestra, delega e reverifica. Nenhuma auditoria e nenhuma criação de arquitetura saem de agente que não seja C-level da constelação bigtech, no modelo fable. Nenhuma implementação sai de agente que não seja agente operacional da constelação bigtech, no modelo sonnet. Nenhum agente genérico, anônimo ou improvisado executa auditoria, arquitetura ou implementação. Nenhum C-level fica dormente por presunção de agente, e quem implementa nunca é quem revisa nem quem reverifica.
+Nenhum trabalho de produto é executado pela thread principal: ela só orquestra, delega e reverifica. Nenhuma auditoria e nenhum planejamento de arquitetura saem de agente que não seja C-level da constelação bigtech. Nenhuma criação e nenhuma implementação saem de agente que não seja agente operacional da constelação bigtech. Nenhum agente genérico, anônimo ou improvisado executa trabalho. Nenhum modelo é fixado por esta lei: o modelo e o effort de cada agente seguem a skill `/modelos_sessao`, e, pela regra por tarefa dessa skill, prosa ou texto longo para leitor humano vai com `opus` e effort `max`. Nenhum C-level fica dormente por presunção de agente, e quem implementa nunca é quem revisa nem quem reverifica.
+
+Decisões do líder de 20/11/2026, na sessão do claude_configs, verbatim: *"Alinhar à LEI ZERO"*, a LEI ZERO do `GODS_LAWS.md` global, que separa quem planeja de quem implementa, e *"Seguir o /modelos_sessao"*. Confirmação nesta sessão, pela LEI DAS LEIS, por `AskUserQuestion` em 20/11/2026, verbatim: *"Confirmo as duas (Recomendado)"*. A redação desta lei é do agente; o texto do líder é só o das citações.
 
 ## L-11
 
