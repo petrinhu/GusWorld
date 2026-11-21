@@ -159,7 +159,6 @@ run_container() {
   # The tree enters by stdin, as a tar of the snapshot. No host volume. Flags as GW-35 asks.
   tar -C "$src" -cf - . | "$rt" run --rm -i \
     --pull never --network none --cap-drop ALL --pids-limit 80 --memory 4g \
-    -e RUNNER_TEMP=/work/rt \
     "$img" bash -c "$(cat "$steps")" > "$clog" 2>&1 || rc=$?
   echo "  contêiner ($img) saiu com rc=$rc, log: $clog"
   grep '^STEP ' "$clog" | while read -r tag gate name code; do
@@ -170,6 +169,9 @@ run_container() {
       record "$gate" "$name" "REPROVA" "rc=$code no contêiner"
       echo "  [REPROVA] $gate / $name (contêiner, rc=$code, log: $clog)"
     fi
+  done
+  grep '^NOTRUN ' "$clog" | while read -r tag gate name reason; do
+    not_run "$gate" "$name" "$reason"
   done
   if ! grep -q '^CONTAINER STEPS DONE' "$clog"; then
     container_not_run "não executado: o contêiner não chegou ao fim (rc=$rc, log: $clog)"
