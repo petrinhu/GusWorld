@@ -12,7 +12,7 @@
 >
 > Trate o **gerador** (de catálogo `.gw.*`, de código, de tabela) como ferramenta, porque ele **não linka**, e o que ele produz como produto, porque **EMBARCA**: faça o output obedecer integralmente às leis do produto (GW-18: nada em formato de texto; GW-25: envelope selado).
 >
-> Trate a ferramenta de build como zona **permitida**, não **neutra**, e use o mínimo delas, porque pacote comprometido no caminho de build injeta no artefato sem jamais aparecer como dependência do binário.
+> Trate a ferramenta de build como zona **permitida**, não **neutra**, porque pacote comprometido no caminho de build injeta no artefato sem jamais aparecer como dependência do binário, e quanto menos ferramenta, menor a superfície.
 
 # GODS_LAWS.md
 
@@ -209,7 +209,7 @@ Escreva versão e tag do GusWorld como `vA.B.C.D`, em quatro componentes, como n
 
 Apague por inteiro o texto que o líder revogar, inclusive do índice de gatilhos: não o guarde em bloco de histórico, nota de status superado nem seção recolhida. A única exceção é texto com efeito jurídico ou direito adquirido de terceiro: não o apague e leve-o ao líder. Não apague sozinho citação órfã para documento inexistente: espere o líder decidir, pela GW-14, que o documento citado está morto, e só então apague o ponteiro, preservando a afirmação.
 
-Aplique a mesma proibição ao histórico de **PROCESSO**, não só ao canon do jogo: relatório de auditoria ou reconferência não narra dentro de si que um item já reprovou antes, quantas vezes nem por quê; apague, não reescreva em outra forma. Use uma régua só para tudo, sem julgar caso a caso qual histórico é inocente, porque critério que exige interpretar degrada na primeira exceção.
+Aplique a mesma proibição ao histórico de **PROCESSO**, não só ao canon do jogo: relatório de auditoria ou reconferência não narra dentro de si que um item já reprovou antes, quantas vezes nem por quê; apague, não reescreva em outra forma, porque uma régua só para tudo dispensa julgar caso a caso qual histórico é inocente, e critério que exige interpretar degrada na primeira exceção.
 
 Mantenha o rodapé de "Última revisão" que fecha os documentos do projeto: ele registra a proveniência das decisões do líder com data e fica fora da proibição, e o corpo do documento diz só o que vale. Conte como rodapé só o BLOCO FINAL do arquivo, sem conteúdo normativo depois dele, aberto por uma linha que começa com "Última revisão" (com ou sem negrito, precedida ou não de separador `---`), que pode encadear "Revisão anterior" dentro do mesmo bloco, voltando várias datas. Aplique a regra geral, como a qualquer texto do corpo, às ocorrências que não são o bloco final: a nota de CABEÇALHO perto do topo de `resources/translations/pt_br.md` e `en_intl.md`, e o item de checklist de achados no meio de `docs/_processo/AUDIT-T8-CROSSREF-V2.md`.
 

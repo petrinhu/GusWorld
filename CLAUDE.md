@@ -10,7 +10,17 @@ Siga as ordens expressas do líder em [`GODS_LAWS.md`](GODS_LAWS.md), que vencem
 
 ## O que é o GusWorld
 
-Jogo **2D pixel-art**, single-player e offline, em **C++23**: executável final, não biblioteca, assentado sobre o framework [GlintFx](../GlintFx) (LEI ZERO). Estas decisões são do líder e têm o corpo no `GODS_LAWS.md`; leve a ele toda mudança nelas:
+Jogo **2D pixel-art**, single-player e offline, em **C++23**: executável final, não biblioteca, assentado sobre o framework [GlintFx](../GlintFx) (LEI ZERO).
+
+Antes de desenhar mapa, conectividade entre áreas ou escopo de conteúdo, leia [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "O que é o GusWorld: o detalhe".
+
+## Estado atual do repositório
+
+Antes de afirmar quantos commits, arquivos, testes, workflows ou ADRs existem, ou o que há em `docs/` e em `tools/`, leia o inventário medido por comando em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Estado atual do repositório".
+
+## Decisões fechadas pelo líder
+
+Estas decisões são do líder e têm o corpo no `GODS_LAWS.md`; leve a ele toda mudança nelas:
 
 - perspectiva 3/4 top-down fixa, grade quadrada, sprite em quatro direções cardeais desenhadas à mão e locomoção em diagonal exibindo o cardeal mais próximo (GW-26);
 - sem mundo aberto e sem mundo persistente (`C-02`), com a geografia no grafo de 13 áreas com dobradiças do `mundo-topologia.md`;
@@ -20,9 +30,7 @@ Jogo **2D pixel-art**, single-player e offline, em **C++23**: executável final,
 - código sob AGPL-3.0-or-later; assets e lore com todos os direitos reservados a Petrus Alves da Silva Costa, com carve-out de marca e conteúdo de fã não comercial (GW-08);
 - porte bigtech **COMPLETO**: pipeline de 12 fases e toda a constelação C-level ativos, sem fase dormente por presunção de agente (GW-10).
 
-Antes de desenhar mapa, conectividade entre áreas ou escopo de conteúdo, leia [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "O que é o GusWorld: o detalhe". Antes de afirmar quantos commits, arquivos, testes, workflows ou ADRs existem, ou o que há em `docs/` e em `tools/`, leia a seção "Estado atual do repositório" do mesmo arquivo.
-
-## Manuais
+## Autoridade documental
 
 Leia o manual relevante ANTES de decidir. Os manuais da raiz vencem qualquer preferência sua e perdem para o `GODS_LAWS.md`. `Standards.md` indexa os manuais de processo; a tabela estende o índice aos de licença e de canon.
 
@@ -66,11 +74,11 @@ Guard de TDD, que roda a suíte em contêiner (`C8`; desenho, números e limites
 
 Portões locais de texto, que não dependem de build: `tools/git-hooks/install.py` instala `tools/security/commit_gate.py` como gancho `commit-msg` e `tools/security/lei_zero_guard.py` como `pre-commit`; `python3 tools/security/test_commit_gate.py` e `python3 tools/security/test_lei_zero_guard.py` rodam os autotestes dos dois.
 
-Mantenha cada portão de CI em `tools/ci/<portão>/` como script de uma responsabilidade: o workflow só orquestra, e cada veredicto sai de um script.
+Os portões de CI em `tools/ci/<portão>/` são scripts de uma responsabilidade cada: o workflow só orquestra, e cada veredicto sai de um script.
 
 Antes de ler o resultado de uma execução do guard, rodar os testes de `tools/tdd/`, conferir tag contra a versão, afirmar o que um workflow de CI prova ou citar prova medida de execução, leia [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Comandos: o detalhe".
 
-## Restrições da máquina
+## Restrições desta máquina
 
 - Compile build pesado em `/var/tmp`, com `export TMPDIR=/var/tmp`, porque `/tmp` aqui é tmpfs (sai da RAM) e o link de C++ grande falha com "no space on device".
 - Meça espaço em disco com `btrfs filesystem usage /` (sem `sudo`), lendo `Device unallocated` e o `min` de `Free (estimated)`, porque o `df` mente em btrfs.
