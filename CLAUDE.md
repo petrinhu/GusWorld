@@ -57,7 +57,7 @@ Ao despachar subagent, inclua no prompt da task o caminho absoluto do manual, po
 
 ## Comandos
 
-Rode build e suíte só em container, nunca na sessão do líder (GW-35); sem container, relate "não executado, falta o container".
+Siga a GW-35: rode no host o build e a suíte sem janela, com os limites da L-11 global e o trabalho pesado pelo `pesado`, e rode isolado, em contêiner ou compositor aninhado, todo teste que abre janela ou mexe no foco, no teclado ou no mouse, nunca na sessão viva do líder. Sem isolamento, relate "não executado, falta isolamento" e não rode.
 
 - **Configure e compile:** `cmake -S . -B <dir> -G Ninja -DGUSWORLD_WERROR=ON`, depois `cmake --build <dir>`. O `-Werror` fica atrás de opção porque é o gancho do portão 1 da GW-19, e só o CI o liga.
 - **Suíte:** `ctest --test-dir <dir> --output-on-failure`. Teste o VALOR em todo passo que conta teste, nunca só o código de saída, porque `ctest -N` num build sem teste diz `Total Tests: 0` e sai com código zero.
@@ -82,7 +82,7 @@ Antes de ler o resultado de uma execução do guard, rodar os testes de `tools/t
 
 - Compile build pesado em `/var/tmp`, com `export TMPDIR=/var/tmp`, porque `/tmp` aqui é tmpfs (sai da RAM) e o link de C++ grande falha com "no space on device".
 - Meça espaço em disco com `btrfs filesystem usage /` (sem `sudo`), lendo `Device unallocated` e o `min` de `Free (estimated)`, porque o `df` mente em btrfs.
-- Antes de rodar teste com janela, entrada ou tela, leia o detalhe do `XDG_RUNTIME_DIR` e do compositor aninhado em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Teste dinâmico em container (GW-35): o detalhe".
+- Antes de rodar teste com janela, entrada ou tela, leia o detalhe do `XDG_RUNTIME_DIR` e do compositor aninhado em [`docs/claude/estado-e-comandos.md`](docs/claude/estado-e-comandos.md), seção "Teste com janela ou entrada (GW-35): o detalhe".
 - Deixe a verificação de entregável visual ao `qa-engineer`, independente de quem implementou, com o orquestrador reconferindo o relatório do QA, quando houver interface ou tela.
 
 ## Pendências

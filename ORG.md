@@ -45,7 +45,7 @@ O GusWorld é jogo FOSS single-player offline, freeware (`README.md`, seção "A
 | **Cláudio** | CLO | Licenciamento AGPL + REUSE/SPDX, regime de asset e do catálogo fatiado por natureza jurídica (GW-08, GW-25), homenagem e nome de menor (GW-16), via `compliance-legal` e `internal-auditor` |
 | **Cósimo** | Chief of Staff | O porte está classificado pelo líder como COMPLETO (GW-10) e não se reclassifica por agente. Confirma, a cada onda, que toda fase tem C-level nomeado e que nenhum ficou dormente por presunção; quando uma fase parecer não se aplicar, leva ao líder por `AskUserQuestion` (GW-11); mantém este manual e o mapa de fases de `pipeline_release_1.0.md` coerentes com a lei |
 
-O `internal-auditor` (agent operacional, mas com mandato de dossiê formal) monta o dossiê de auditoria da GW-19 antes da 1.0, reportando a Caetano, Narciso e Cláudio conforme o capítulo.
+O `internal-auditor` (agent operacional, mas com mandato de dossiê formal) monta o dossiê de auditoria só em segurança, privacidade e deploy irreversível (L-35 global), reportando a Caetano, Narciso e Cláudio conforme o capítulo.
 
 ---
 
@@ -69,7 +69,7 @@ Por domínio, com o C-level que delega entre parênteses. Todo agente abaixo tra
 
 **IA na produção (Caio):** `applied-ai-engineer`.
 
-**Proteção, conformidade e auditoria (Narciso e Cláudio):** `security-engineer`, `compliance-legal`, `internal-auditor` (dossiê da GW-19, `AUD-5`).
+**Proteção, conformidade e auditoria (Narciso e Cláudio):** `security-engineer`, `compliance-legal`, `internal-auditor` (dossiê de auditoria só em segurança, privacidade e deploy irreversível, L-35 global).
 
 **Documentação (Caetano, com Camilo no texto público):** `technical-writer` (documentação do projeto, wiki `H1` e guia para iniciante `H2`, nunca inline).
 

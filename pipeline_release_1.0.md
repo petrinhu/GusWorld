@@ -143,7 +143,7 @@ Substitui GTM comercial: sem pricing, sem funil pago, sem ASO. O que existe é c
 
 Detalhe completo do checklist de release irreversível em `DEPLOY_CHECKLIST.md`.
 
-**Liderança:** Celso (CEO) coordena o go/no-go; Caetano (CTO) e o `internal-auditor` confirmam que os portões da GW-19 e o dossiê de auditoria (`AUDITORIAS.md`) estão fechados antes da tag.
+**Liderança:** Celso (CEO) coordena o go/no-go; Caetano (CTO) confirma que os portões da GW-19 estão fechados antes da tag, e o `internal-auditor` confirma o dossiê de auditoria (`AUDITORIAS.md`) só quando a release toca segurança, privacidade ou deploy irreversível (L-35 global).
 
 ---
 

@@ -134,7 +134,7 @@ Não recebi IDs específicos de TST-*/AUD-* no arquivo bruto (o item diz que "a 
 
 - Teste unitário não é item de tabela: nasce junto com o código pelo TDD estrito da GW-19 (vermelho, verde, refatorar), então não tem ID próprio nem entra em onda separada.
 - Teste não unitário (ASan/UBSan, replay D13, auto-resolve D14, matriz de CI C4, análise estática C5) é sempre downstream do código que ele cobre.
-- Auditoria (dossiê `AUDITORIAS.md`, portão de release antes da 1.0 por GW-19) é downstream de código mais teste, e é o item mais a jusante depois de H2 em termos de "tudo precisa existir primeiro".
+- Auditoria (dossiê `AUDITORIAS.md`, só em segurança, privacidade e deploy irreversível, pela L-35 global) é downstream de código mais teste.
 - Nenhum destes deve aparecer numa onda antes do código que verificam.
 
 ## Fundação, em ordem de criticidade

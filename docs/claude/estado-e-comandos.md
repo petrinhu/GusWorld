@@ -1,6 +1,6 @@
 # Estado e comandos do GusWorld: o detalhe
 
-Referência para agentes e para o líder. O essencial deste projeto (as leis, o índice de gatilhos, as decisões fechadas, a autoridade documental, os comandos e as restrições da máquina) está no [`CLAUDE.md`](../../CLAUDE.md) da raiz; este arquivo guarda o detalhe para o qual ele aponta.
+Referência para agentes e para o líder. O essencial deste projeto (a ordem de ler as leis antes de agir, as decisões fechadas, a autoridade documental, os comandos e as restrições da máquina) está no [`CLAUDE.md`](../../CLAUDE.md) da raiz, e o índice de gatilhos mora só no [`GODS_LAWS.md`](../../GODS_LAWS.md); este arquivo guarda o detalhe para o qual o `CLAUDE.md` aponta.
 
 ## O que é o GusWorld: o detalhe
 
@@ -44,7 +44,7 @@ Nenhum conteúdo se corta por não caber num jogo curto, e a duração só se me
 
 ## Comandos: o detalhe
 
-Espelho local do CI, antes do push: `sh tools/ci/local/mirror.sh` roda os portões estáticos na cópia de `HEAD` e reporta por portão (PASSA, REPROVA, NÃO EXECUTADO ou PARCIAL); `--container` sobe os dinâmicos e só é usado com o pode do líder (GW-35).
+Espelho local do CI, opcional, porque o portão é o CI (L-35 global): `sh tools/ci/local/mirror.sh` roda os portões estáticos na cópia de `HEAD` e reporta por portão (PASSA, REPROVA, NÃO EXECUTADO ou PARCIAL); a opção `--container` sobe os dinâmicos no contêiner e, como é trabalho pesado, roda pelo `pesado` (L-11 global).
 
 ### Resultado do guard de TDD e testes de `tools/tdd/`
 
@@ -66,9 +66,9 @@ Espelho local do CI, antes do push: `sh tools/ci/local/mirror.sh` roda os portõ
 
 Os demais workflows (`layers.yml`, `lei-zero.yml`, `version-tag.yml`, `gitleaks.yml`, `commit-gate.yml`, `cppcheck.yml`, `clang-tidy.yml` e `clang-format.yml`) não entram nesta prova. Para o estado deles, use `gh run list --workflow=<arquivo>`. O `Build` é o CI de build, e o `LEI ZERO` verifica só texto, sem compilar nada.
 
-## Teste dinâmico em container (GW-35): o detalhe
+## Teste com janela ou entrada (GW-35): o detalhe
 
-⚠️ **Subir o container não basta:** `wl_display_connect(NULL)` cai no nome embutido `wayland-0` dentro do `XDG_RUNTIME_DIR`, e desligar a variável **não protege** — a proteção real é trocar o `XDG_RUNTIME_DIR` por diretório próprio `chmod 700` só no processo sob teste, e provar antes de interagir. O compositor aninhado (`kwin_wayland`, `Xvfb`) continua valendo como **piso dentro** do container, nunca como alternativa a ele. O GusWorld tem código e suíte desde 11/10/2026 (sete testes registrados sem condição, medido em 20/11/2026 por `grep -cE '^add_test' tests/CMakeLists.txt`), e a suíte roda no CI, não na sessão do líder. A camada `present/` continua bloqueada pelo GlintFx (GW-06, GW-27), e a lei foi escrita **antes** do primeiro teste, de propósito.
+⚠️ **Subir o contêiner ou o compositor aninhado não basta:** `wl_display_connect(NULL)` cai no nome embutido `wayland-0` dentro do `XDG_RUNTIME_DIR`, e desligar a variável **não protege** — a proteção real é trocar o `XDG_RUNTIME_DIR` por diretório próprio `chmod 700` só no processo sob teste, e provar antes de interagir. Isole o teste no contêiner ou no compositor aninhado (`kwin_wayland`, `Xvfb`), e prove a troca em qualquer dos dois. O GusWorld tem código e suíte desde 11/10/2026 (sete testes registrados sem condição, medido em 20/11/2026 por `grep -cE '^add_test' tests/CMakeLists.txt`), e a suíte, que não abre janela, roda no host com os limites da L-11 global e no CI. A camada `present/` continua bloqueada pelo GlintFx (GW-06, GW-27), e a lei foi escrita **antes** do primeiro teste, de propósito.
 
 ## Pendências
 

@@ -11,7 +11,7 @@ Auditoria é sempre trabalho de C-level `fable` (`internal-auditor`, ou o CTO/CI
 Dois níveis, os dois obrigatórios:
 
 1. **Portões automáticos**, a cada commit e a cada fatia fechada (GW-19).
-2. **Dossiê formal** do `internal-auditor`, portão de release antes da 1.0 (GW-19), consolidando os capítulos abaixo.
+2. **Dossiê formal** do `internal-auditor`, só em segurança, privacidade e deploy irreversível (L-35 global), consolidando os capítulos abaixo que tratam deles.
 
 ---
 
@@ -34,8 +34,7 @@ Dois níveis, os dois obrigatórios:
 - **Gate de CI:** nenhum `#include <glintfx/` fora de `present/`. Violação derruba o build, não depende de disciplina de quem escreve.
 - `present/` só existe quando o GlintFx tiver janela, contexto gráfico, entrada e texto (GW-06); até lá, a auditoria de camadas cobre `core/`, `content/`, `domain/` e `app/`.
 - **Determinismo do replay** como teste automatizado permanente: mesma semente mais mesma lista de comandos reproduz o mesmo estado final, byte a byte.
-- **CRÍTICO (GW-33):** nenhuma unidade acumula razões de mudar vindas de **leis diferentes e não relacionadas**, e os relatórios de revisão das fatias auditadas contêm **as cinco perguntas respondidas por unidade** criada ou crescida. Silêncio sobre uma unidade conta como unidade **não revisada**.
-  **O auditor não confia nos relatórios:** pega o maior arquivo de cada camada e o arquivo com mais aparições em `git log --stat`, responde ele mesmo as cinco perguntas, e compara com o que os relatórios disseram. Divergência entre os dois é achado.
+- **CRÍTICO (GW-33):** nenhuma unidade acumula razões de mudar vindas de **leis diferentes e não relacionadas**.
 - Vigiar as cinco armadilhas nomeadas na GW-17 (objeto `Game`/`app/` que vira dono de tudo, barramento genérico, `if` de dificuldade no corpo da regra, determinismo quebrado por detalhe de C++, regra vazando para a interface).
 
 ---
@@ -67,6 +66,6 @@ Dois níveis, os dois obrigatórios:
 
 ---
 
-## 6. Dossiê formal (pré-1.0)
+## 6. Dossiê formal (segurança, privacidade e deploy irreversível)
 
-O `internal-auditor` consolida os cinco capítulos acima num dossiê único antes do release 1.0, com achado, severidade e remediação. Até lá, os portões automáticos da seção 1 cobrem o dia a dia.
+O `internal-auditor` consolida num dossiê único, com achado, severidade e remediação, os capítulos acima que tratam de segurança, privacidade e deploy irreversível, só quando a mudança toca um deles (L-35 global). No resto, os portões automáticos da seção 1 cobrem o dia a dia.
