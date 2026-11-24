@@ -152,7 +152,7 @@ Entregue à máquina do jogador todo dado do jogo (mapa, save, configuração ou
 
 ## GW-19
 
-**Data:** emenda de 11/10/2026, adotada do projeto irmão GlintFx por ordem do líder: *"Pode fazer igual ao aviso de glintfx"*; lá, diante de dois dias sem código da biblioteca e cerca de 15 voltas de revisão, ele disse *"Já sao mais de DOIS DIAS de teste! Isso definitivamente não é normal. Otimize isso! Descubra como!"* e *"Está incompatível o rigor dos testes com o código. Ou os códigos estão PÉSSIMOS ou o rigor dos testes está com OE"*, e escolheu por `AskUserQuestion` **"Por camada"**. Emenda de 12/10/2026, na conversa com o líder: *"cuidado com OE nos testes!"*, *"Use KISS"*, *"e DRY"* e *"nao quero teste de teste de teste de teste..."* (OE: over-engineering, excesso de engenharia), confirmada por `AskUserQuestion` com as ressalvas abaixo. Exceção de 20/11/2026, quebra nomeada pela LEI DAS LEIS, por `AskUserQuestion`: *"Liberar até o C7 (Recomendado)"*. Esclarecimento de 21/11/2026, por `AskUserQuestion`, depois da revisão do `D1`: *"Só linhas de produto (Recomendado)"*.
+**Data:** emenda de 11/10/2026, adotada do projeto irmão GlintFx por ordem do líder: *"Pode fazer igual ao aviso de glintfx"*; lá, diante de dois dias sem código da biblioteca e cerca de 15 voltas de revisão, ele disse *"Já sao mais de DOIS DIAS de teste! Isso definitivamente não é normal. Otimize isso! Descubra como!"* e *"Está incompatível o rigor dos testes com o código. Ou os códigos estão PÉSSIMOS ou o rigor dos testes está com OE"*, e escolheu por `AskUserQuestion` **"Por camada"**. Emenda de 12/10/2026, na conversa com o líder: *"cuidado com OE nos testes!"*, *"Use KISS"*, *"e DRY"* e *"nao quero teste de teste de teste de teste..."* (OE: over-engineering, excesso de engenharia), confirmada por `AskUserQuestion` com ressalvas. Exceção de 20/11/2026, quebra nomeada pela LEI DAS LEIS, por `AskUserQuestion`: *"Liberar até o C7 (Recomendado)"*. Esclarecimento de 21/11/2026, por `AskUserQuestion`, depois da revisão do `D1`: *"Só linhas de produto (Recomendado)"*. Alinhamento ao global de 23/11/2026, por AskUserQuestion: *"Alinhar ao global (Recomendado)"*.
 
 Não escreva linha de comportamento sem um teste que falhava antes dela existir, e não feche ordem de serviço sem a saída real do teste vermelho e depois verde. Ao escrever a asserção, pergunte o que o defeito produziria, nunca só o que o acerto produz.
 
@@ -164,28 +164,7 @@ Passe todo commit de módulo de código com comportamento pelos cinco portões, 
 4. varredura de segredo cobrindo também o histórico completo do controle de versão;
 5. portão de mensagem de commit, que barra termo da lista cifrada, caminho de área cifrada, dado pessoal e credencial, e reprova o commit quando não consegue ler a chave, nunca aprova em silêncio.
 
-Rode local, antes de todo push, o mesmo script que a verificação remota roda. Não persiga meta numérica de cobertura: cobertura é consequência do TDD, nunca alvo. Não solte release 1.0 sem o dossiê formal de auditoria.
-
-**Rigor da revisão por CAMADA.** Aplique a lei inteira ao código de produto e calibre a revisão pela camada:
-
-- **N1, código de produto (as cinco camadas `core/`, `content/`, `domain/`, `app/`, `present/`):** faça revisão adversarial que executa e muta, até sair limpa. Mire a mutação **só nas linhas de PRODUTO que a fatia mudou**, no máximo 10 por revisão (padrão do Google: "State of Mutation Testing at Google", arxiv 2102.11378). Deixe linha de teste fora da mutação, e prove a força do teste pelo vermelho contra o defeito e pelos mutantes de produto que ele mata.
-- **N2, portão que protege a sessão do líder** (o que a GW-35 exige: nenhum teste dinâmico roda fora de container): faça mutação mirada na exclusão que ele protege e **uma** rodada de conserto.
-- **N3, ferramenta de teste comum** (o harness de `tests/harness/`, os autotestes, as travas de registro, os scripts de CI): faça revisão de leitura pelas cinco perguntas da GW-33 e confira **um** caso vermelho, sem o revisor procurar mutantes próprios. Na segunda reprovação da mesma família, mande o que sobra à INBOX ou declare-o como limite, e feche a fatia.
-- **N4, texto** (documento, comentário, diário): dispense o espelho local do CI e o revisor.
-
-Declare a camada no cabeçalho de toda ordem de serviço e tire dela o rigor e o orçamento de rodadas, nunca do julgamento do revisor. Como quem planeja, rode os comandos de cada ordem antes do despacho e anexe a saída à ordem.
-
-Leia a emenda vinda do GlintFx com esta tradução de referência: onde o GlintFx diz `src/` e `include/`, aqui são as cinco camadas; as cinco perguntas de revisão são as da GW-33 deste projeto, não as da L-17; o portão de isolamento é o que a GW-35 exige; e o espelho local do CI é o item `C7`. Mantenha iguais aos do projeto irmão, de propósito, a substância, os números de rodadas e a fonte do limite de dez mutantes.
-
-**Limite de níveis de verificação.**
-
-- **Não crie nível novo de verificação sem ordem explícita do líder.** Nível de verificação é prova de que um portão reprova, autoteste de script, diagnóstico que mede ou controle que confirma outro controle.
-- **Mantenha a prova de estreia vermelha**: veja cada portão novo reprovar contra aquilo que deve barrar antes de contá-lo como portão, porque ela já pegou portão falso, como um detector de comportamento indefinido que imprimia o erro e seguia em vez de reprovar. O limite corta a multiplicação de níveis, não o primeiro nível.
-- **Antes de construir verificação nova, procure a que já existe**, porque a medição que se quer criar muitas vezes o portão já faz.
-- **Enxugue o que inchou sem remover nada que reprova.**
-- **Tire do arquivo do portão o diagnóstico que já respondeu o que media**, e registre a resposta na tabela de pendências do projeto.
-
-**Exceção temporária: push do `D1` sem o espelho local.** Enquanto o item `C7` não fechar, mande as fatias do `D1` ao CI remoto sem rodar antes o espelho local que esta lei exige, com o buraco declarado nas linhas `D1` e `C7` do `TODO.md`. No dia em que o `C7` fechar, apague este parágrafo (GW-24).
+Rode no CI só o que a mudança toca, pelo seletivo da L-35 global. Não persiga meta numérica de cobertura: cobertura é consequência do TDD, nunca alvo.
 
 ## GW-20
 
@@ -283,15 +262,13 @@ Feche cada fatia com commit local citando o ID do item e tocando o status dele n
 
 ## GW-33
 
-**Data:** ordem do líder de 20/11/2026, verbatim: *"atomos devem ser apenas para o aplicativo do jogo, para os testes faça como for melhor"*, com o alcance confirmado por `AskUserQuestion`: *"Átomo só no código do jogo"*.
+**Data:** ordem do líder de 20/11/2026, verbatim: *"atomos devem ser apenas para o aplicativo do jogo, para os testes faça como for melhor"*, com o alcance confirmado por `AskUserQuestion`: *"Átomo só no código do jogo"*. Alinhamento ao global de 23/11/2026, por AskUserQuestion: *"Alinhar ao global (Recomendado)"*.
 
 Aplique a regra de átomo só ao código do aplicativo do jogo: só as cinco camadas (`core/`, `content/`, `domain/`, `app/` e `present/`) seguem a GW-04 e esta lei. Organize testes, ferramentas, scripts de CI, documentos, commits, itens de tabela e assets como for melhor em cada caso, sem obrigação de atomizar.
 
-No código do jogo, meça monolito por acoplamento sem fronteira, não por tamanho: nome próprio possível, mudança que exige tocar outras partes e consumidor forçado a levar tudo. Não fatie nos quatro casos em que agregar é certo: partes que só têm sentido juntas, ordem de leitura que é o próprio conteúdo, artefato de compilação e coesão exigida por contrato de terceiro verificável. Não deixe uma unidade acumular razões de mudar vindas de leis diferentes e não relacionadas: isso é monolito em formação.
+No código do jogo, meça monolito por acoplamento sem fronteira, não por tamanho: nome próprio possível, mudança que exige tocar outras partes e consumidor forçado a levar tudo. Não fatie nos quatro casos em que agregar é certo: partes que só têm sentido juntas, ordem de leitura que é o próprio conteúdo, artefato de compilação e coesão exigida por contrato de terceiro verificável. Não deixe uma unidade acumular razões de mudar vindas de leis diferentes e não relacionadas: isso é monolito em formação. Leve ao líder a divergência entre implementador e revisor.
 
-Não feche a revisão de unidade de código do jogo criada ou crescida numa fatia sem as cinco perguntas do revisor respondidas e registradas: quais leis a obrigam a mudar; se a descrição dela precisa de duas ações ligadas; se o teste monta o mundo inteiro para exercitá-la; se a lista de inclusões mistura grupos que não conversam; e quem paga a próxima funcionalidade no histórico de mudanças. Conte silêncio como unidade não revisada, e leve ao líder a divergência entre implementador e revisor.
-
-Não faça átomo menor que a menor unidade com significado: fatiar sem sentido e abstração especulativa são proibidos tanto quanto o monolito. Não ponha portão automático por número (linhas, métodos) no lugar das cinco perguntas: o teto de linhas do `CONTRACT.md` é recomendação, nunca portão. Como auditor, não aceite relatório de revisão sem conferir você mesmo: responda as cinco perguntas sobre o maior arquivo de cada camada do jogo. Aplique esta lei só ao que este projeto autora e possui, nunca a formato ou esquema de terceiro.
+Não faça átomo menor que a menor unidade com significado: fatiar sem sentido e abstração especulativa são proibidos tanto quanto o monolito. Não ponha portão automático por número (linhas, métodos): o teto de linhas do `CONTRACT.md` é recomendação, nunca portão. Aplique esta lei só ao que este projeto autora e possui, nunca a formato ou esquema de terceiro.
 
 ## GW-34
 
@@ -299,7 +276,9 @@ Leia primeiro na sessão toda mensagem do Gus Dragon, em qualquer dos cinco cana
 
 ## GW-35
 
-Rode todo teste dinâmico (suíte, integração, fuzzing, sanitizador, teste de mutação, benchmark, sonda de janela, teclado, mouse ou tela) sempre em container, nunca na sessão viva do líder; sem container disponível, o resultado é que não foi executado. Não apoie a proteção em desligar variável de ambiente de exibição: troque o `XDG_RUNTIME_DIR` do processo sob teste por diretório próprio, com permissão restrita a `chmod 700`, e prove a troca em vigor antes de interagir, sem assumi-la por ter subido o container. Use o compositor gráfico aninhado dentro do container como piso, nunca como alternativa a ele.
+**Data:** Alinhamento ao global de 23/11/2026, por AskUserQuestion: *"Alinhar ao global (Recomendado)"*.
+
+Rode no host o teste sem janela (suíte, integração, fuzzing, sanitizador, teste de mutação, benchmark), com os limites da L-11 global e o trabalho pesado pelo `pesado`, porque ele não toca a tela, o foco nem o teclado da sessão viva do líder. Rode isolado, em contêiner ou compositor aninhado, todo teste que abre janela ou mexe no foco, no teclado ou no mouse, nunca na sessão viva do líder; sem isolamento disponível, relate que não foi executado e não rode. Nesse teste, não apoie a proteção em desligar variável de ambiente de exibição: troque o `XDG_RUNTIME_DIR` do processo sob teste por diretório próprio, com permissão restrita a `chmod 700`, e prove a troca em vigor antes de interagir, sem assumi-la por ter subido o contêiner ou o compositor.
 
 ## GW-36
 
